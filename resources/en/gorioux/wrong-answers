@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wrong Answers Only — Interactive Web Lesson with TTS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .slide { display: none; }
+    .slide.active { display: block; }
+    .en.speaking { outline: 3px solid rgba(59,130,246,0.6); border-radius: .5rem; background: rgba(59,130,246,0.08); }
+    .speak-chip { cursor: pointer; user-select: none; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900">
+  <!-- Header / Controls -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+    <div class="max-w-5xl mx-auto p-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold">“Wrong Answers Only” — Interactive Web Lesson</h1>
+        <p class="text-sm text-slate-600">Single‑file webpage converted from PPT, with Text‑to‑Speech (English‑only) and keyboard controls.
+          <span class="inline-block ml-2 px-2 py-0.5 text-xs rounded-full bg-slate-100 border">Left/Right = Navigate · S = Speak · P = Pause/Resume · X = Stop</span>
+        </p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-2 items-end">
+        <label class="col-span-2 text-xs font-semibold">Voice
+          <select id="voice" class="w-full mt-1 border rounded p-2 text-sm"></select>
+        </label>
+        <label class="text-xs font-semibold">Rate
+          <input id="rate" type="range" min="0.6" max="1.4" step="0.05" value="1" class="w-full">
+        </label>
+        <label class="text-xs font-semibold">Pitch
+          <input id="pitch" type="range" min="0.7" max="1.3" step="0.05" value="1" class="w-full">
+        </label>
+        <label class="text-xs font-semibold">Volume
+          <input id="volume" type="range" min="0.0" max="1" step="0.05" value="1" class="w-full">
+        </label>
+      </div>
+      <div class="flex gap-2">
+        <button id="btnSpeakSlide" class="px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700">🔊 Speak Slide (EN)</button>
+        <button id="btnPauseResume" class="px-3 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600">⏯️ Pause</button>
+        <button id="btnStop" class="px-3 py-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700">⏹ Stop</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slides Container -->
+  <main class="max-w-5xl mx-auto p-4">
+    <div id="slides" class="space-y-6">
+
+      <!-- 1. Title / Intro -->
+      <section class="slide active" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-2xl font-semibold en">The “Wrong Answers Only” Game!</h2>
+          <p class="text-slate-600">ตอบผิดเท่านั้น</p>
+          <div class="mt-4 grid gap-2">
+            <div>
+              <span class="en">Dice</span>
+              <span class="text-slate-600">ลูกเต๋า</span>
+            </div>
+            <div>
+              <span class="en">What is this?</span>
+              <span class="text-slate-600">อันนี้คืออะไร</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. How to play -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">How to play</h2>
+          <ul class="list-disc ml-6 mt-3 space-y-2">
+            <li><span class="en">I ask a question about a picture.</span> <span class="text-slate-600">ฉันถามคำถามเกี่ยวกับรูป</span></li>
+            <li><span class="en">You give a <b>WRONG</b> answer.</span> <span class="text-slate-600">ให้ตอบผิด</span></li>
+            <li><span class="en">Be creative and funny!</span> <span class="text-slate-600">ให้ตอบแบบสร้างสรรค์และตลก</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 3. Right vs Wrong example -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-3">
+          <h2 class="text-xl font-semibold en">What is this?</h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="border rounded-xl p-4">
+              <h3 class="font-semibold en">Right Answer 👍</h3>
+              <p class="en">It’s a banana.</p>
+            </div>
+            <div class="border rounded-xl p-4">
+              <h3 class="font-semibold en">Wrong Answer 🤪</h3>
+              <ul class="list-disc ml-6">
+                <li class="en">It’s a telephone!</li>
+                <li class="en">It’s a car!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4–8. Quick wrong-answer cards -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">What is this?</h2>
+          <p class="en">It’s a rapper. He looks down on Thai people.</p>
+          <p class="text-slate-600">ดูถูก คนไทย</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">What is this?</h2>
+          <p class="en">It’s a tree.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">What is this?</h2>
+          <p class="en">It’s a spider cat.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">What is this?</h2>
+          <p class="en">It’s a tiger.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">What is this?</h2>
+          <p class="en">It’s a dog. The dog is barking.</p>
+          <p class="text-slate-600">หมากำลังเห่า</p>
+        </div>
+      </section>
+
+      <!-- 9–10. The REAL answers -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">The “REAL” Answers</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li class="en">Who is it? It’s a cat.</li>
+            <li class="en">Where is it? It’s a beach. / It’s the sea.</li>
+            <li class="en">What is the cat doing? The cat is relaxing on the beach.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">The “REAL” Answers</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li class="en">Who is it? It’s a bear.</li>
+            <li class="en">Where is it? It’s in a forest.</li>
+            <li class="en">What is the bear doing? The bear is riding a bicycle in the forest.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 11–12. Wrong answers only (Q&A frames) -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Wrong answers only!</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li class="en">Who is it? It’s a fish.</li>
+            <li class="en">Where is it? It’s in the sky.</li>
+            <li class="en">What is it doing? The fish is sleeping in the bedroom in the sky.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Wrong answers only!</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li class="en">Who is it? It’s a butterfly.</li>
+            <li class="en">Where is it? It is in the school.</li>
+            <li class="en">What is it doing? The butterfly is studying in the school.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 13. Learn vs Study -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Learn VS Study</h2>
+          <div class="overflow-x-auto mt-3">
+            <table class="min-w-full border text-sm">
+              <thead>
+                <tr class="bg-slate-100">
+                  <th class="border p-2 en">General</th>
+                  <th class="border p-2 en">School</th>
+                  <th class="border p-2 en">Languages</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="border p-2 text-slate-600">ทั่วไป</td>
+                  <td class="border p-2 text-slate-600">ประถม, มัธยม, มหาวิทยาลัย</td>
+                  <td class="border p-2 text-slate-600">ภาษา</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14. Group Task with links -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-3">
+          <h2 class="text-xl font-semibold en">Group</h2>
+          <p><span class="en">Look at your picture. Think of 3 funny, WRONG answers together.</span> <span class="text-slate-600">ดูรูป และคิดคำตอบผิดที่ตลกๆด้วยกัน</span></p>
+          <p><span class="en">Answer these questions:</span> <span class="text-slate-600">ตอบคำถามต่อไปนี้</span></p>
+          <ul class="list-disc ml-6">
+            <li><span class="en">Who is it?</span> <span class="text-slate-600">ใคร</span></li>
+            <li><span class="en">Where is it?</span> <span class="text-slate-600">ที่ไหน</span></li>
+            <li><span class="en">What is it doing?</span> <span class="text-slate-600">มันทำอะไร</span></li>
+          </ul>
+          <div class="grid md:grid-cols-3 gap-2 text-sm">
+            <a class="underline en" href="https://drive.google.com/file/d/1rcY77qZsnXQTfCIJ_ZD0ieWgeZE51a9N/view?usp=drive_link" target="_blank" rel="noopener">Group 1 link</a>
+            <a class="underline en" href="https://drive.google.com/file/d/1jCKeqZ4O3h8Zonvb1x_LGFiEyjaG1q3-/view?usp=drive_link" target="_blank" rel="noopener">Group 2 link</a>
+            <a class="underline en" href="https://drive.google.com/file/d/1RI0uvHJjxYjzA_YIN9Y4UecUFo016jAr/view?usp=drive_link" target="_blank" rel="noopener">Group 3 link</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15–17. Sample WRONG answers -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">WRONG answers — Sample 1</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li><span class="en">Who is it? It’s a rabbit.</span></li>
+            <li><span class="en">Where is it? It’s in the mountain.</span></li>
+            <li><span class="en">What is it doing? The rabbit is eating bananas.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">WRONG answers — Sample 2</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li><span class="en">Who is it? It’s an ant.</span></li>
+            <li><span class="en">Where is it? It is on the beach.</span></li>
+            <li><span class="en">What is it doing? It is watching TV on the beach.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">WRONG answers — Sample 3</h2>
+          <ul class="list-disc ml-6 space-y-1">
+            <li><span class="en">Who is it? It is a cow.</span></li>
+            <li><span class="en">Where is it? It’s a hotel.</span></li>
+            <li><span class="en">What is it doing? The cow is walking in the hotel.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 18. Watch & answer (TikTok) -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-1">
+          <h2 class="text-xl font-semibold en">Watch and answer these questions</h2>
+          <a class="underline en" href="https://www.tiktok.com/@hdmall/video/7508617565325905170?_r=1&_t=ZS-8ypj6jY1drT" target="_blank" rel="noopener">Open the video</a>
+          <ul class="list-disc ml-6 mt-2 space-y-1">
+            <li class="en">How do you play this game?</li>
+            <li class="en">Did they give the right answer or the wrong answer?</li>
+            <li class="en">Was it serious or funny?</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 19–24. Workplace fun prompts -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">What do you do here?</h2>
+          <p class="en">I’m Batman. I want to save the world.</p>
+          <p class="text-slate-600 text-xs">This Photo by Unknown Author is licensed under CC BY-SA</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">What do you do here?</h2>
+          <p class="en">I’m Superman.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-1">
+          <h2 class="text-xl font-semibold en">How do you get to work?</h2>
+          <p class="en">I swim here because I’m a mermaid.</p>
+          <p class="text-slate-600">วาร์ป (Teleport)</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">How do you get to work?</h2>
+          <p class="en">Rolls‑Royce gets me here.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">How long do you take to get ready?</h2>
+          <p class="en">I just woke up like this.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">How do you manage stress at work?</h2>
+          <p class="en">I don’t know what stress is.</p>
+          <p class="text-slate-600 text-xs">This Photo by Unknown Author is licensed under CC BY-NC-ND</p>
+        </div>
+      </section>
+
+      <!-- 25–29. Whole‑class wrong answers & prompts -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Wrong answers — Whole class!</h2>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">WRONG answers</h2>
+          <ul class="list-disc ml-6">
+            <li class="en">What is your job? I’m a salesman. My job is the CEO.</li>
+            <li class="en">Homeless.</li>
+            <li class="en">I’m a nurse.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">WRONG answers</h2>
+          <ul class="list-disc ml-6">
+            <li class="en">What time do you start working? 5am because I’m hardworking.</li>
+            <li class="en">The coconut office is open at 2AM. Tamarind.</li>
+            <li class="en">6PM because I like working alone.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">WRONG answers</h2>
+          <ul class="list-disc ml-6">
+            <li class="en">What do you eat for breakfast? I eat caviar. 100,000 / kg.</li>
+            <li class="en">I eat crocodile eggs (crispy).</li>
+            <li class="en">I eat grilled bears.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">WRONG answers</h2>
+          <ul class="list-disc ml-6">
+            <li class="en">What do you do for fun? I love my job. I work for fun.</li>
+            <li class="en">I eat bees because I feel itchy when eating it. They sting me.</li>
+            <li class="en">I drive cars for fun, but I cannot drive.</li>
+          </ul>
+          <p class="text-slate-600">คลอง (Canal)</p>
+        </div>
+      </section>
+
+      <!-- 30–31. Breakout rooms & Question ideas -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Wrong answers — Breakout rooms</h2>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Question ideas (WRONG answers)</h2>
+          <ol class="list-decimal ml-6 space-y-2">
+            <li>
+              <p class="en">Are you a student?</p>
+              <p class="en text-sm">Examples: “Yes, I am.”, “No, I don’t have a job.”</p>
+            </li>
+            <li>
+              <p class="en">What do you wear today?</p>
+              <p class="text-slate-600">วันนี้ใส่อะไร</p>
+              <p class="en text-sm">Examples: “A banana suit”, “A crown”</p>
+              <p class="en">No, I don’t wear anything.</p>
+              <p class="en">It makes me sleep well.</p>
+              <p class="en">You can burn more calories without clothes.</p>
+            </li>
+            <li>
+              <p class="en">What is your favourite food?</p>
+              <p class="en text-sm">Examples: “Computers”, “Blue chairs”</p>
+              <p class="en">Cat soup because I can find cats everywhere.</p>
+            </li>
+            <li>
+              <p class="en">What is your hobby?</p>
+              <p class="en">I’m dating Jackson Wang.</p>
+            </li>
+            <li>
+              <p class="en">What do you do on the weekend?</p>
+              <p class="en text-sm">Examples: “I fly to the moon.”, “I talk to penguins.”</p>
+            </li>
+            <li>
+              <p class="en">What do you do with a pencil?</p>
+              <p class="text-slate-600">ทำอะไรกับดินสอ</p>
+              <p class="en">Pencil salad.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 32–34. Extension activity: Hot Seat (with examples) -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">Extension activity: “The Hot Seat”</h2>
+          <ol class="list-decimal ml-6 space-y-1">
+            <li><span class="en">The teacher puts one student in the hot seat.</span> <span class="text-slate-600">ครูให้นักเรียนคนนึงนั่งที่ร้อน</span></li>
+            <li><span class="en">The teacher shares a funny image on the screen for everyone to see.</span> <span class="text-slate-600">ครูแชร์รูปตลกๆให้ทุกคนดู</span></li>
+            <li><span class="en">The teacher randomly picks another student to ask a question.</span> <span class="text-slate-600">ครูสุ่มเลือกนักเรียนอีกคนมาถามคำถาม</span></li>
+            <li><span class="en">The questioner asks one question (e.g., “What is he doing?”).</span> <span class="text-slate-600">คนถามหนึ่งคำถาม เช่น เขาทำอะไร</span></li>
+            <li><span class="en">The one in the hot seat must immediately give a funny, wrong answer (e.g., “He is eating a banana!”).</span> <span class="text-slate-600">ให้คำตอบที่ตลกและผิดทันที เช่น เขากินกล้วย</span></li>
+            <li><span class="en">Then choose a new student for the hot seat and a new questioner.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Hot Seat — Example A</h2>
+          <p class="en">What are they wearing? Where is this picture?</p>
+          <p class="en">They are wearing bikinis in the forest.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Hot Seat — Example B</h2>
+          <p class="en">Who is this? How many Supermen in the picture?</p>
+          <p class="en">He’s Superman. He’s sleeping.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Hot Seat — Example C</h2>
+          <p class="en">What’s this in the picture? What is his name? What is Cinderella doing?</p>
+          <p class="en">It’s a mermaid. It’s Cinderella. Cinderella wants to marry a prince.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Hot Seat — Example D</h2>
+          <p class="en">What is its name? What do you want, Tiger?</p>
+          <p class="en">It’s a tiger. Money.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Hot Seat — Example E</h2>
+          <p class="en">What is he doing? Where is he making cookies?</p>
+          <p class="en">He is making cookies in the forest.</p>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-xl font-semibold en">Hot Seat — Example F</h2>
+          <p class="en">Where is he going? What time is he going to the canal?</p>
+          <p class="en">He’s going to a canal. He’s going to the canal at 2pm.</p>
+        </div>
+      </section>
+
+      <!-- 35–36. Find the false part -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-1">
+          <h2 class="text-xl font-semibold en">Which part of the story is wrong/false?</h2>
+          <ol class="list-decimal ml-6">
+            <li class="en">My dad cannot drive a car now.</li>
+            <li class="en">So, I drove him to the hospital.</li>
+            <li class="en">On the way there, we saw a moose on the phone.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-1">
+          <h2 class="text-xl font-semibold en">Which part of the story is wrong/false?</h2>
+          <p class="en">We go the party in the evening, and I drive a car to Bangkok with Khun Nexty.</p>
+        </div>
+      </section>
+
+      <!-- 37. Wrap up -->
+      <section class="slide" data-slide>
+        <div class="bg-white rounded-2xl shadow p-6 space-y-2">
+          <h2 class="text-xl font-semibold en">Great Job, Everyone!</h2>
+          <p class="en">You are all very creative and funny!</p>
+          <p class="en">What was the funniest answer today?</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="mt-6 flex items-center justify-between">
+      <button id="prev" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300">← Prev</button>
+      <div class="text-sm text-slate-600"><span id="counter">1</span>/<span id="total">0</span></div>
+      <button id="next" class="px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900">Next →</button>
+    </div>
+  </main>
+
+  <script>
+    // ---------- Slide Nav ----------
+    const slides = Array.from(document.querySelectorAll('[data-slide]'));
+    const counter = document.getElementById('counter');
+    const total = document.getElementById('total');
+    let idx = 0;
+
+    function showSlide(i) {
+      speechSynthesis.cancel(); // stop any ongoing speech on navigation
+      slides.forEach((s, n) => s.classList.toggle('active', n === i));
+      idx = i;
+      counter.textContent = String(i + 1);
+      total.textContent = String(slides.length);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('prev').addEventListener('click', () => showSlide(Math.max(0, idx - 1)));
+    document.getElementById('next').addEventListener('click', () => showSlide(Math.min(slides.length - 1, idx + 1)));
+
+    document.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      if (key === 'arrowleft') showSlide(Math.max(0, idx - 1));
+      if (key === 'arrowright') showSlide(Math.min(slides.length - 1, idx + 1));
+      if (key === 's') speakSlideEnglish();
+      if (key === 'p') togglePause();
+      if (key === 'x') speechSynthesis.cancel();
+    });
+
+    showSlide(0);
+
+    // ---------- TTS ----------
+    const voiceSel = document.getElementById('voice');
+    const rate = document.getElementById('rate');
+    const pitch = document.getElementById('pitch');
+    const volume = document.getElementById('volume');
+
+    let voices = [];
+    function loadVoices() {
+      voices = speechSynthesis.getVoices().filter(v => /^en(-|_|$)/i.test(v.lang));
+      voiceSel.innerHTML = voices.map((v, i) => `<option value="${i}">${v.name} — ${v.lang}${v.default ? ' (default)' : ''}</option>`).join('');
+      if (voiceSel.options.length === 0) {
+        // fallback to all voices if no English voice is detected
+        const all = speechSynthesis.getVoices();
+        voices = all;
+        voiceSel.innerHTML = all.map((v, i) => `<option value="${i}">${v.name} — ${v.lang}${v.default ? ' (default)' : ''}</option>`).join('');
+      }
+    }
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    function makeUtterance(text, targetEl) {
+      const u = new SpeechSynthesisUtterance(text);
+      const v = voices[voiceSel.selectedIndex];
+      if (v) u.voice = v;
+      u.rate = parseFloat(rate.value);
+      u.pitch = parseFloat(pitch.value);
+      u.volume = parseFloat(volume.value);
+
+      // highlight while speaking
+      u.addEventListener('start', () => targetEl && targetEl.classList.add('speaking'));
+      u.addEventListener('end', () => targetEl && targetEl.classList.remove('speaking'));
+      u.addEventListener('error', () => targetEl && targetEl.classList.remove('speaking'));
+      return u;
+    }
+
+    function speakElements(elements) {
+      speechSynthesis.cancel();
+      const queue = [];
+      elements.forEach(el => {
+        const text = el.textContent.trim();
+        if (!text) return;
+        // split by sentence-ish boundaries for better pacing
+        const parts = text.split(/(?<=[.!?])\s+/);
+        parts.forEach(part => {
+          if (part.trim()) queue.push(makeUtterance(part.trim(), el));
+        });
+      });
+      if (queue.length === 0) return;
+      queue.forEach(u => speechSynthesis.speak(u));
+    }
+
+    function speakSlideEnglish() {
+      const current = slides[idx];
+      const englishNodes = Array.from(current.querySelectorAll('.en'));
+      speakElements(englishNodes);
+    }
+
+    function togglePause() {
+      if (speechSynthesis.speaking) {
+        if (speechSynthesis.paused) {
+          speechSynthesis.resume();
+          document.getElementById('btnPauseResume').textContent = '⏸️ Pause';
+        } else {
+          speechSynthesis.pause();
+          document.getElementById('btnPauseResume').textContent = '▶️ Resume';
+        }
+      }
+    }
+
+    document.getElementById('btnSpeakSlide').addEventListener('click', speakSlideEnglish);
+    document.getElementById('btnPauseResume').addEventListener('click', togglePause);
+    document.getElementById('btnStop').addEventListener('click', () => speechSynthesis.cancel());
+
+    // Add tiny per-line speak chips next to each English element
+    function enhanceSpeakChips() {
+      document.querySelectorAll('.en').forEach((el) => {
+        const chip = document.createElement('button');
+        chip.className = 'speak-chip ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border bg-slate-100 hover:bg-slate-200';
+        chip.setAttribute('title', 'Speak this line');
+        chip.textContent = '🔊 Speak';
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          speechSynthesis.cancel();
+          const u = makeUtterance(el.textContent.trim(), el);
+          speechSynthesis.speak(u);
+        });
+        const wrap = document.createElement('span');
+        wrap.appendChild(chip);
+        el.insertAdjacentElement('afterend', wrap);
+      });
+    }
+
+    enhanceSpeakChips();
+
+    // ---------- Thai translations auto-insert ----------
+    const thMap = {
+      "The “Wrong Answers Only” Game!": "เกม “ตอบผิดเท่านั้น”",
+      "Dice": "ลูกเต๋า",
+      "What is this?": "อันนี้คืออะไร",
+      "How to play": "วิธีเล่น",
+      "I ask a question about a picture.": "ฉันจะถามคำถามเกี่ยวกับรูปภาพ",
+      "You give a WRONG answer.": "คุณต้องตอบให้ 'ผิด'",
+      "Be creative and funny!": "ตอบแบบสร้างสรรค์และตลก!",
+      "Right Answer 👍": "คำตอบที่ถูกต้อง 👍",
+      "It’s a banana.": "นี่คือกล้วย",
+      "Wrong Answer 🤪": "คำตอบที่ผิด 🤪",
+      "It’s a telephone!": "นี่คือโทรศัพท์!",
+      "It’s a car!": "นี่คือรถยนต์!",
+      "It’s a rapper. He looks down on Thai people.": "นี่คือแร็ปเปอร์ เขาดูถูกคนไทย",
+      "It’s a tree.": "นี่คือต้นไม้",
+      "It’s a spider cat.": "นี่คือแมวแมงมุม",
+      "It’s a tiger.": "นี่คือเสือ",
+      "It’s a dog. The dog is barking.": "นี่คือสุนัข สุนัขกำลังเห่า",
+      "The “REAL” Answers": "คำตอบ “จริง”",
+      "Who is it? It’s a cat.": "ใครเอ่ย? เป็นแมว",
+      "Where is it? It’s a beach. / It’s the sea.": "ที่ไหน? ชายหาด / ทะเล",
+      "What is the cat doing? The cat is relaxing on the beach.": "แมวกำลังทำอะไร? แมวกำลังพักผ่อนที่ชายหาด",
+      "Who is it? It’s a bear.": "ใครเอ่ย? เป็นหมี",
+      "Where is it? It’s in a forest.": "ที่ไหน? อยู่ในป่า",
+      "What is the bear doing? The bear is riding a bicycle in the forest.": "หมีทำอะไรอยู่? หมีปั่นจักรยานในป่า",
+      "Wrong answers only!": "ตอบผิดเท่านั้น!",
+      "Who is it? It’s a fish.": "ใครเอ่ย? เป็นปลา",
+      "Where is it? It’s in the sky.": "ที่ไหน? อยู่บนท้องฟ้า",
+      "What is it doing? The fish is sleeping in the bedroom in the sky.": "กำลังทำอะไร? ปลากำลังนอนอยู่ในห้องนอนบนท้องฟ้า",
+      "Who is it? It’s a butterfly.": "ใครเอ่ย? เป็นผีเสื้อ",
+      "Where is it? It is in the school.": "ที่ไหน? อยู่ในโรงเรียน",
+      "What is it doing? The butterfly is studying in the school.": "กำลังทำอะไร? ผีเสื้อกำลังเรียนในโรงเรียน",
+      "Learn VS Study": "Learn กับ Study ต่างกันอย่างไร",
+      "General": "ทั่วไป",
+      "School": "โรงเรียน/สถาบันการศึกษา",
+      "Languages": "ภาษา",
+      "Group": "กลุ่ม",
+      "Look at your picture. Think of 3 funny, WRONG answers together.": "ดูรูปของกลุ่ม แล้วช่วยกันคิดคำตอบที่ 'ผิด' แบบตลก ๆ จำนวน 3 ข้อ",
+      "Answer these questions:": "ตอบคำถามต่อไปนี้:",
+      "Who is it?": "ใคร",
+      "Where is it?": "ที่ไหน",
+      "What is it doing?": "มันทำอะไร",
+      "Group 1 link": "ลิงก์กลุ่ม 1",
+      "Group 2 link": "ลิงก์กลุ่ม 2",
+      "Group 3 link": "ลิงก์กลุ่ม 3",
+      "WRONG answers — Sample 1": "ตัวอย่างคำตอบผิด — ชุดที่ 1",
+      "Where is it? It’s in the mountain.": "ที่ไหน? อยู่บนภูเขา",
+      "What is it doing? The rabbit is eating bananas.": "กำลังทำอะไร? กระต่ายกำลังกินกล้วย",
+      "WRONG answers — Sample 2": "ตัวอย่างคำตอบผิด — ชุดที่ 2",
+      "Who is it? It’s an ant.": "ใครเอ่ย? เป็นมด",
+      "Where is it? It is on the beach.": "ที่ไหน? อยู่บนชายหาด",
+      "What is it doing? It is watching TV on the beach.": "กำลังทำอะไร? กำลังดูทีวีที่ชายหาด",
+      "WRONG answers — Sample 3": "ตัวอย่างคำตอบผิด — ชุดที่ 3",
+      "Who is it? It is a cow.": "ใครเอ่ย? เป็นวัว",
+      "Where is it? It’s a hotel.": "ที่ไหน? โรงแรม",
+      "What is it doing? The cow is walking in the hotel.": "กำลังทำอะไร? วัวกำลังเดินอยู่ในโรงแรม",
+      "Watch and answer these questions": "ดูวิดีโอและตอบคำถามต่อไปนี้",
+      "Open the video": "เปิดวิดีโอ",
+      "How do you play this game?": "เกมนี้เล่นอย่างไร?",
+      "Did they give the right answer or the wrong answer?": "พวกเขาตอบถูกหรือผิด?",
+      "Was it serious or funny?": "จริงจังหรือขำขัน?",
+      "What do you do here?": "คุณทำงานอะไรที่นี่?",
+      "I’m Batman. I want to save the world.": "ผม/ฉันคือแบทแมน ผม/ฉันอยากกู้โลก",
+      "I’m Superman.": "ผม/ฉันคือซูเปอร์แมน",
+      "How do you get to work?": "คุณเดินทางมาทำงานอย่างไร?",
+      "I swim here because I’m a mermaid.": "ฉันว่ายน้ำมาที่นี่ เพราะฉันเป็นนางเงือก",
+      "Rolls‑Royce gets me here.": "โรลส์‑รอยซ์พาฉันมาที่นี่",
+      "How long do you take to get ready?": "คุณใช้เวลาเตรียมตัวนานแค่ไหน?",
+      "I just woke up like this.": "ตื่นมาก็สวย/หล่อแบบนี้เลย",
+      "How do you manage stress at work?": "คุณจัดการความเครียดที่ทำงานอย่างไร?",
+      "I don’t know what stress is.": "ฉันไม่รู้จักคำว่าเครียด",
+      "Wrong answers — Whole class!": "ตอบผิด — ทั้งชั้น!",
+      "WRONG answers": "คำตอบผิด",
+      "What is your job? I’m a salesman. My job is the CEO.": "คุณทำอาชีพอะไร? ผม/ฉันเป็นพนักงานขาย หน้าที่ของผม/ฉันคือซีอีโอ (ผิดสุด ๆ)",
+      "Homeless.": "ไม่มีบ้านอยู่",
+      "I’m a nurse.": "ฉันเป็นพยาบาล",
+      "What time do you start working? 5am because I’m hardworking.": "เริ่มงานกี่โมง? ตีห้า เพราะฉันขยันมาก",
+      "The coconut office is open at 2AM. Tamarind.": "ออฟฟิศมะพร้าวเปิดตีสอง มะขาม",
+      "6PM because I like working alone.": "หกโมงเย็น เพราะฉันชอบทำงานคนเดียว",
+      "What do you eat for breakfast? I eat caviar. 100,000 / kg.": "อาหารเช้ากินอะไร? ฉันกินคาเวียร์ กิโลละ 100,000",
+      "I eat crocodile eggs (crispy).": "ฉันกินไข่จระเข้ (กรอบ ๆ)",
+      "I eat grilled bears.": "ฉันกินหมีปิ้ง",
+      "What do you do for fun? I love my job. I work for fun.": "เวลาว่างทำอะไรสนุก ๆ ? ฉันรักงานของฉัน ทำงานเพื่อความสนุก",
+      "I eat bees because I feel itchy when eating it. They sting me.": "ฉันกินผึ้ง เพราะกินแล้วคัน เขาต่อยฉัน",
+      "I drive cars for fun, but I cannot drive.": "ฉันขับรถเล่น ๆ แต่จริง ๆ ขับไม่เป็น",
+      "Wrong answers — Breakout rooms": "ตอบผิด — แบ่งห้องย่อย",
+      "Question ideas (WRONG answers)": "ไอเดียคำถาม (ต้องตอบผิด)",
+      "Are you a student?": "คุณเป็นนักเรียนไหม?",
+      "Examples: “Yes, I am.”, “No, I don’t have a job.”": "ตัวอย่าง: “ใช่ครับ/ค่ะ”, “ไม่ครับ/ค่ะ ฉันยังไม่มีงานทำ”",
+      "What do you wear today?": "วันนี้ใส่อะไร?",
+      "No, I don’t wear anything.": "ไม่ ใส่อะไรเลย",
+      "It makes me sleep well.": "ทำให้ฉันนอนหลับสบาย",
+      "You can burn more calories without clothes.": "ไม่ใส่เสื้อผ้าช่วยเผาผลาญแคลอรีได้มากขึ้น",
+      "What is your favourite food?": "อาหารโปรดคืออะไร?",
+      "Examples: “Computers”, “Blue chairs”": "ตัวอย่าง: “คอมพิวเตอร์”, “เก้าอี้สีฟ้า”",
+      "Cat soup because I can find cats everywhere.": "ซุปแมว เพราะฉันหาแมวได้ทุกที่",
+      "What is your hobby?": "งานอดิเรกคืออะไร?",
+      "I’m dating Jackson Wang.": "ฉันคบกับแจ็คสัน หวัง",
+      "What do you do on the weekend?": "วันหยุดสุดสัปดาห์ทำอะไร?",
+      "Examples: “I fly to the moon.”, “I talk to penguins.”": "ตัวอย่าง: “ฉันบินไปดวงจันทร์”, “ฉันคุยกับเพนกวิน”",
+      "What do you do with a pencil?": "ทำอะไรกับดินสอ?",
+      "Pencil salad.": "สลัดดินสอ",
+      "Extension activity: “The Hot Seat”": "กิจกรรมเสริม: “เก้าอี้ร้อน”",
+      "The teacher puts one student in the hot seat.": "ครูเลือกนักเรียนหนึ่งคนนั่งเก้าอี้ร้อน",
+      "The teacher shares a funny image on the screen for everyone to see.": "ครูแชร์รูปตลกบนหน้าจอให้ทุกคนเห็น",
+      "The teacher randomly picks another student to ask a question.": "ครูสุ่มเลือกนักเรียนอีกคนให้ถามคำถาม",
+      "The questioner asks one question (e.g., “What is he doing?”).": "ผู้ถามถามหนึ่งคำถาม (เช่น “เขากำลังทำอะไร?”)",
+      "The one in the hot seat must immediately give a funny, wrong answer (e.g., “He is eating a banana!”).": "คนที่นั่งเก้าอี้ร้อนต้องตอบผิดแบบตลกทันที (เช่น “เขากำลังกินกล้วย!”)",
+      "Then choose a new student for the hot seat and a new questioner.": "จากนั้นเปลี่ยนคนขึ้นเก้าอี้ร้อนและเปลี่ยนผู้ถาม",
+      "Hot Seat — Example A": "เก้าอี้ร้อน — ตัวอย่าง A",
+      "What are they wearing? Where is this picture?": "พวกเขาใส่อะไร? รูปนี้อยู่ที่ไหน?",
+      "They are wearing bikinis in the forest.": "พวกเขาใส่บิกินีอยู่ในป่า",
+      "Hot Seat — Example B": "เก้าอี้ร้อน — ตัวอย่าง B",
+      "Who is this? How many Supermen in the picture?": "นี่คือใคร? มีซูเปอร์แมนกี่คนในรูป?",
+      "He’s Superman. He’s sleeping.": "เขาคือซูเปอร์แมน เขากำลังนอน",
+      "Hot Seat — Example C": "เก้าอี้ร้อน — ตัวอย่าง C",
+      "What’s this in the picture? What is his name? What is Cinderella doing?": "ในรูปคืออะไร? เขาชื่ออะไร? ซินเดอเรลลากำลังทำอะไร?",
+      "It’s a mermaid. It’s Cinderella. Cinderella wants to marry a prince.": "เป็นนางเงือก เป็นซินเดอเรลลา ซินเดอเรลลาอยากแต่งงานกับเจ้าชาย",
+      "Hot Seat — Example D": "เก้าอี้ร้อน — ตัวอย่าง D",
+      "What is its name? What do you want, Tiger?": "มันชื่ออะไร? เสือ คุณอยากได้อะไร?",
+      "It’s a tiger. Money.": "เป็นเสือ เงิน",
+      "Hot Seat — Example E": "เก้าอี้ร้อน — ตัวอย่าง E",
+      "What is he doing? Where is he making cookies?": "เขากำลังทำอะไร? ทำคุกกี้ที่ไหน?",
+      "He is making cookies in the forest.": "เขากำลังทำคุกกี้ในป่า",
+      "Hot Seat — Example F": "เก้าอี้ร้อน — ตัวอย่าง F",
+      "Where is he going? What time is he going to the canal?": "เขากำลังจะไปไหน? เขาจะไปคลองกี่โมง?",
+      "He’s going to a canal. He’s going to the canal at 2pm.": "เขากำลังจะไปคลอง เขาจะไปคลองตอนบ่ายสอง",
+      "Which part of the story is wrong/false?": "เรื่องนี้ส่วนไหนผิด/ไม่จริง?",
+      "My dad cannot drive a car now.": "ตอนนี้พ่อฉันขับรถไม่ได้",
+      "So, I drove him to the hospital.": "ฉันเลยขับรถพาเขาไปโรงพยาบาล",
+      "On the way there, we saw a moose on the phone.": "ระหว่างทางเราเห็นกวางมูสกำลังคุยโทรศัพท์",
+      "We go the party in the evening, and I drive a car to Bangkok with Khun Nexty.": "เราไปงานปาร์ตี้ตอนเย็น แล้วฉันขับรถไปกรุงเทพกับคุณเน็กซ์ตี้",
+      "Great Job, Everyone!": "เก่งมากทุกคน!",
+      "You are all very creative and funny!": "ทุกคนสร้างสรรค์และตลกมาก!",
+      "What was the funniest answer today?": "วันนี้คำตอบไหนตลกที่สุด?"
+    };
+
+    function insertThaiTranslations() {
+      document.querySelectorAll('.en').forEach((el) => {
+        // Detect if a Thai translation already exists right after (skip if yes)
+        let sib = el.nextElementSibling;
+        if (sib && sib.querySelector && sib.querySelector('.speak-chip')) {
+          sib = sib.nextElementSibling; // skip the speak-chip wrapper
+        }
+        if (sib && sib.classList && sib.classList.contains('text-slate-600')) return;
+
+        const text = el.textContent.trim();
+        const th = thMap[text];
+        if (!th) return;
+
+        const span = document.createElement((/h2|h3/i).test(el.tagName) ? 'p' : 'span');
+        span.className = 'text-slate-600 block';
+        span.textContent = th;
+
+        // Place Thai after the speak chip if present so the chip stays next to EN
+        let anchor = el;
+        const after = el.nextElementSibling;
+        if (after && after.querySelector && after.querySelector('.speak-chip')) {
+          anchor = after;
+        }
+        anchor.insertAdjacentElement('afterend', span);
+      });
+    }
+
+    insertThaiTranslations();
+
+  </script>
+</body>
+</html>
