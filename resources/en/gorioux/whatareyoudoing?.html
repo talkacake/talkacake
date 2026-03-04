@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilingual Lesson: What Are You Doing?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #4f46e5; /* indigo-600 */
+            transition: color 0.2s;
+            padding: 0;
+            line-height: 1;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+        .speak-btn:hover {
+            color: #3730a3; /* indigo-800 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="max-w-3xl mx-auto p-4 sm:p-8 space-y-8">
+
+        <section class="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">What Are You Doing?</h1>
+            <p class="thai text-2xl text-gray-500 mb-4">คุณกำลังทำอะไรอยู่?</p>
+            
+            <h2 class="text-xl text-gray-600">A Fun English Speaking Game!</h2>
+            <p class="thai text-lg text-gray-500">เกมฝึกพูดภาษาอังกฤษสนุกๆ!</p>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold">Warm-up: Guess the Action!</h2>
+            <p class="thai text-xl text-gray-500">วอร์มอัพ: ทายท่าทางกัน!</p>
+
+            <div class="text-center my-6">
+                <p class="text-xl">What am I doing?</p>
+                <p class="thai text-lg text-gray-500">ฉันกำลังทำอะไรอยู่?</p>
+                <div class="text-7xl mt-4">❓</div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold mb-2">Today's Action Words</h2>
+            <p class="thai text-xl text-gray-500 mb-6">คำศัพท์เกี่ยวกับท่าทางสำหรับวันนี้</p>
+            <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold">How to Play: Let's Watch!</h2>
+            <p class="thai text-xl text-gray-500 mb-4">วิธีเล่น: ไปดูกันเลย!</p>
+            <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden mb-4">
+                <iframe class="w-full h-full" src="https://www.youtube.com/embed/SNAzY0AleNA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold">The Rules! (Very Important!)</h2>
+            <p class="thai text-xl text-gray-500 mb-6">กติกา! (สำคัญมาก!)</p>
+            <div id="rules-list" class="space-y-4"></div>
+            <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                <h3 class="font-bold text-lg text-yellow-800">Rule #1: What you SAY is different from what you DO!</h3>
+                <p class="thai text-md text-yellow-700">กฎข้อที่ 1: สิ่งที่คุณพูดต้องแตกต่างจากสิ่งที่คุณทำ!</p>
+            </div>
+        </section>
+        
+        <section id="tasks-section-container" class="space-y-8">
+             </section>
+        
+        <section class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold mb-2">Additional Vocabulary</h2>
+            <p class="thai text-xl text-gray-500 mb-6">คำศัพท์เพิ่มเติม</p>
+            <div id="additional-vocab-list" class="space-y-3">
+                 </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <h1 class="text-4xl font-bold text-indigo-600">Great Job, Everyone!</h1>
+            <p class="thai text-2xl text-gray-500 mb-4">เก่งมากทุกคน!</p>
+            
+            <h2 class="text-xl text-gray-600">You were fantastic!</h2>
+            <p class="thai text-lg text-gray-500 mb-6">พวกคุณสุดยอดมาก!</p>
+
+            <h2 class="text-xl font-semibold">What was the funniest action today?</h2>
+            <p class="thai text-lg text-gray-500">ท่าทางไหนตลกที่สุดในวันนี้?</p>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const content = {
+                vocabulary: [
+                    { en: 'Cooking', th: 'ทำอาหาร', emoji: '🍳' }, { en: 'Sleeping', th: 'นอนหลับ', emoji: '😴' },
+                    { en: 'Running', th: 'วิ่ง', emoji: '🏃' }, { en: 'Swimming', th: 'ว่ายน้ำ', emoji: '🏊' },
+                    { en: 'Singing', th: 'ร้องเพลง', emoji: '🎤' }, { en: 'Dancing', th: 'เต้น', emoji: '💃' },
+                    { en: 'Brushing teeth', th: 'แปรงฟัน', emoji: '🦷' }, { en: 'Watching TV', th: 'ดูทีวี', emoji: '📺' }
+                ],
+                additionalVocabulary: [
+                    { en: 'scary', th: 'น่ากลัว' },
+                    { en: 'Central and Northern Thai food', th: 'อาหารกลางและเหนือ' },
+                    { en: 'Fried rice', th: 'ข้าวผัด' },
+                    { en: 'Stir-fried basil', th: 'ผัดกะเพรา' },
+                    { en: 'Once a week', th: 'อาทิตย์ละครั้ง' },
+                    { en: 'I like to swim in a swimming pool.', th: 'ชอบว่ายน้ำในสระ' },
+                    { en: 'I like to sing in the toilet.', th: 'ชอบร้องเพลงในห้องน้ำ' },
+                    { en: 'Soap operas / dramas after the news', th: 'ละคร(น้ำเน่า)หลังข่าว' },
+                    { en: "I'm scrolling the phone.", th: 'ไถโทรศัพท์อยู่' },
+                    { en: "I'm blinking.", th: 'กระพริบตาอยู่' },
+                    { en: "I'm blowing a kiss.", th: 'ส่งจูบอยู่' },
+                    { en: "I'm calling someone.", th: 'โทรหาใครสักคนอยู่' },
+                    { en: "I'm drinking water.", th: 'ดื่มน้ำอยู่' },
+                    { en: 'I’m laughing.', th: 'หัวเราะอยู่' },
+                    { en: 'I’m doing jumping jacks.', th: 'กระโดดตบอยู่' },
+                    { en: 'I’m scratching my head.', th: 'เกาหัวอยู่' },
+                    { en: 'I’m washing my hair.', th: 'สระผมอยู่' },
+                    { en: 'I’m doing the makeup.', th: 'แต่งหน้าอยู่' },
+                    { en: 'I’m picking my ears.', th: 'แคะหูอยู่' },
+                    { en: 'I’m farting.', th: 'ตดอยู่' },
+                    { en: 'I’m burping. / I’m belching.', th: 'เรออยู่' },
+                    { en: 'I’m being angry.', th: 'กำลังโกรธอยู่' },
+                    { en: 'I’m posing.', th: 'โพส(ถ่ายรูป)อยู่' },
+                    { en: 'I’m scratching my neck.', th: 'เกาคออยู่' },
+                    { en: 'I’m hiccuping.', th: 'สะอึกอยู่' },
+                    { en: 'I’m doing push-ups.', th: 'วิดพื้นอยู่' },
+                    { en: 'I’m combing my hair.', th: 'หวีผมอยู่' },
+                    { en: 'I’m pooping.', th: 'อึอยู่' },
+                    { en: 'I’m looking into the mirror.', th: 'ส่องกระจกอยู่' },
+                    { en: 'I’m being pissed off.', th: 'โมโหอยู่ / อารมณ์ไม่ดีอยู่' },
+                    { en: 'I’m blowing my nose.', th: 'สั่งน้ำมูกอยู่' },
+                    { en: 'I’m hitting my head.', th: 'ตีหัวอยู่' },
+                    { en: 'I’m taking medicine.', th: 'กินยา' },
+                    { en: 'I’m having a headache.', th: 'กำลังปวดหัวอยู่' },
+                    { en: 'I’m strangling myself.', th: 'บีบคอตัวเอง' },
+                    { en: 'I’m following celebrities.', th: 'ตามคนดังอยู่' },
+                    { en: 'I’m doing laundry.', th: 'ซักผ้าอยู่' },
+                    { en: 'I’m shouting.', th: 'ตะโกนอยู่' },
+                    { en: 'I’m stalking someone.', th: 'แอบตามใครบางคนอยู่' },
+                    { en: 'I’m talking like a grandma.', th: 'พูดเหมือนยาย/ย่าอยู่' },
+                    { en: 'I’m reporting the news.', th: 'รายงานข่าวอยู่' }
+                ],
+                rules: [
+                    { en: '1. Person A DOES an action (e.g., brushing teeth).', th: '1. คนที่ 1 แสดงท่าทาง (เช่น แปรงฟัน)' },
+                    { en: '2. Person B asks: "What are you doing?"', th: '2. คนที่ 2 ถาม: "คุณกำลังทำอะไรอยู่?"' },
+                    { en: '3. Person A SAYS a NEW action (e.g., "I am dancing.").', th: '3. คนที่ 1 พูดท่าทางใหม่ (เช่น "ฉันกำลังเต้น")' },
+                    { en: '4. Person B starts DOING the new action (dancing).', th: '4. คนที่ 2 เริ่มแสดงท่าทางใหม่ (เต้น)' }
+                ],
+                tasks: [
+                    {
+                        title_en: 'Breakout Rooms 1: Practice! (Pairs)', title_th: 'ห้องย่อยที่ 1: ฝึกซ้อม! (จับคู่)',
+                        details: [{ en: 'Time: 15 minutes', th: 'เวลา: 15 นาที' }, { en: 'Your Task:', th: 'ภารกิจของคุณ:' }],
+                        steps: [
+                            { en: '1. Student A: DO an action.', th: '1. นักเรียน A: แสดงท่าทาง' },
+                            { en: '2. Student B: Ask, "What are you doing?"', th: '2. นักเรียน B: ถาม "คุณกำลังทำอะไรอยู่?"' },
+                            { en: '3. Student A: SAY a new action.', th: '3. นักเรียน A: พูดท่าทางใหม่' },
+                            { en: '4. Student B: DO the new action.', th: '4. นักเรียน B: แสดงท่าทางใหม่' },
+                            { en: '5. Switch! Now Student A asks Student B.', th: '5. สลับ! ตอนนี้นักเรียน A ถามนักเรียน B' }
+                        ]
+                    },
+                    {
+                        title_en: "Breakout Room 2: Let's Play for Real!", title_th: 'ห้องย่อยที่ 2: เล่นจริง!',
+                        details: [{ en: 'Time: 15 minutes', th: 'เวลา: 15 นาที' }, { en: 'Your Task:', th: 'ภารกิจของคุณ:' }],
+                        steps: [
+                            { en: 'Play the game together in one big group.', th: 'เล่นเกมด้วยกันเป็นกลุ่มใหญ่' },
+                            { en: 'One person starts.', th: 'คนหนึ่งเริ่มก่อน' },
+                            { en: 'Continue the chain! Have fun!', th: 'เล่นต่อกันไปเรื่อยๆ! ขอให้สนุก!' }
+                        ]
+                    }
+                ]
+            };
+
+            function speak(text) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-GB';
+                const voices = window.speechSynthesis.getVoices();
+                const britishVoice = voices.find(voice => voice.lang === 'en-GB');
+                if (britishVoice) {
+                    utterance.voice = britishVoice;
+                }
+                window.speechSynthesis.speak(utterance);
+            }
+
+            function createSpeakerButton(text) {
+                const button = document.createElement('button');
+                button.innerHTML = '🔊';
+                button.className = 'speak-btn';
+                button.setAttribute('aria-label', `Listen to "${text}"`);
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    speak(text);
+                };
+                return button;
+            }
+
+            function populateVocabGrid() {
+                const vocabGrid = document.getElementById('vocab-grid');
+                if (!vocabGrid) return;
+                content.vocabulary.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-gray-100 p-4 rounded-lg text-center';
+                    
+                    const emojiDiv = document.createElement('div');
+                    emojiDiv.className = 'text-4xl mb-2';
+                    emojiDiv.textContent = item.emoji;
+
+                    const enContainer = document.createElement('div');
+                    enContainer.className = 'flex items-center justify-center gap-2 font-semibold';
+                    const enText = document.createElement('span');
+                    enText.textContent = item.en;
+                    enContainer.appendChild(enText);
+                    enContainer.appendChild(createSpeakerButton(item.en));
+                    
+                    const thPara = document.createElement('p');
+                    thPara.className = 'thai text-sm text-gray-500';
+                    thPara.textContent = item.th;
+
+                    card.appendChild(emojiDiv);
+                    card.appendChild(enContainer);
+                    card.appendChild(thPara);
+                    vocabGrid.appendChild(card);
+                });
+            }
+
+            function populateAdditionalVocab() {
+                const container = document.getElementById('additional-vocab-list');
+                if(!container) return;
+
+                content.additionalVocabulary.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'p-3 rounded-lg hover:bg-gray-50 flex items-center justify-between';
+                    
+                    const enContainer = document.createElement('p');
+                    enContainer.className = 'text-md flex items-center';
+                    enContainer.textContent = item.en;
+                    enContainer.appendChild(createSpeakerButton(item.en));
+
+                    const thPara = document.createElement('p');
+                    thPara.className = 'thai text-md text-gray-500 text-right';
+                    thPara.textContent = item.th;
+
+                    itemDiv.appendChild(enContainer);
+                    itemDiv.appendChild(thPara);
+                    container.appendChild(itemDiv);
+                });
+            }
+
+            function populateRulesList() {
+                const rulesList = document.getElementById('rules-list');
+                if (!rulesList) return;
+                content.rules.forEach(rule => {
+                    const div = document.createElement('div');
+                    const p_en = document.createElement('p');
+                    p_en.className = 'text-lg flex items-center';
+                    p_en.textContent = rule.en;
+                    p_en.appendChild(createSpeakerButton(rule.en));
+                    
+                    const p_th = document.createElement('p');
+                    p_th.className = 'thai text-md text-gray-500 ml-9';
+                    p_th.textContent = rule.th;
+                    
+                    div.appendChild(p_en);
+                    div.appendChild(p_th);
+                    rulesList.appendChild(div);
+                });
+            }
+
+            function populateTasks() {
+                const tasksContainer = document.getElementById('tasks-section-container');
+                if (!tasksContainer) return;
+                content.tasks.forEach(task => {
+                    const section = document.createElement('section');
+                    section.className = 'bg-white rounded-2xl shadow-lg p-8';
+
+                    const h2 = document.createElement('h2');
+                    h2.className = 'text-3xl font-bold flex items-center';
+                    h2.textContent = task.title_en;
+                    h2.appendChild(createSpeakerButton(task.title_en));
+                    section.appendChild(h2);
+
+                    const p_th = document.createElement('p');
+                    p_th.className = 'thai text-xl text-gray-500 mb-6';
+                    p_th.textContent = task.title_th;
+                    section.appendChild(p_th);
+
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'space-y-2 mb-4';
+                    task.details.forEach(detail => {
+                         const p = document.createElement('p');
+                         p.className = 'text-md flex items-center';
+                         p.textContent = detail.en;
+                         p.appendChild(createSpeakerButton(detail.en));
+                         detailsDiv.appendChild(p);
+
+                         const p2 = document.createElement('p');
+                         p2.className = 'thai text-sm text-gray-500 ml-9';
+                         p2.textContent = detail.th;
+                         detailsDiv.appendChild(p2);
+                    });
+                    section.appendChild(detailsDiv);
+                    
+                    const stepsDiv = document.createElement('div');
+                    stepsDiv.className = 'space-y-2';
+                     task.steps.forEach(step => {
+                         const p = document.createElement('p');
+                         p.className = 'text-md flex items-center';
+                         p.textContent = step.en;
+                         p.appendChild(createSpeakerButton(step.en));
+                         stepsDiv.appendChild(p);
+
+                         const p2 = document.createElement('p');
+                         p2.className = 'thai text-sm text-gray-500 ml-9';
+                         p2.textContent = step.th;
+                         stepsDiv.appendChild(p2);
+                    });
+                    section.appendChild(stepsDiv);
+                    tasksContainer.appendChild(section);
+                });
+            }
+
+            function addSpeakersToStaticContent() {
+                const elements = document.querySelectorAll('h1, h2, h3, p');
+                elements.forEach(el => {
+                    if (!el.classList.contains('thai') && el.textContent.trim() !== '' && !el.querySelector('.speak-btn')) {
+                        if (el.closest('#vocab-grid, #rules-list, #tasks-section-container, #additional-vocab-list')) return;
+
+                        el.classList.add('flex', 'items-center');
+                        if (el.parentElement.classList.contains('text-center')) {
+                           el.classList.add('justify-center');
+                        }
+                        el.appendChild(createSpeakerButton(el.textContent.trim()));
+                    }
+                });
+            }
+
+            function initializeApp() {
+                populateVocabGrid();
+                populateRulesList();
+                populateTasks();
+                populateAdditionalVocab();
+                addSpeakersToStaticContent();
+            }
+
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = initializeApp;
+            } else {
+                initializeApp();
+            }
+        });
+    </script>
+</body>
+</html>
