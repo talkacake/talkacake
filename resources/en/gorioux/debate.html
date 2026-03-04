@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilingual Lesson: Debate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #4f46e5; /* indigo-600 */
+            transition: color 0.2s;
+            padding: 0;
+            line-height: 1;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+        .speak-btn:hover {
+            color: #3730a3; /* indigo-800 */
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="max-w-3xl mx-auto p-4 sm:p-8 space-y-8">
+
+        <section class="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-indigo-600">Debate</h1>
+            <p class="thai text-2xl text-gray-500 mb-4">โต้วาที</p>
+        </section>
+
+        <div class="bg-white rounded-2xl shadow-lg">
+            <!-- Tab Navigation -->
+            <nav id="tab-nav" class="flex flex-wrap border-b border-gray-200">
+                <!-- Tab buttons will be injected here -->
+            </nav>
+
+            <!-- Tab Content -->
+            <div id="tab-content-container" class="p-6">
+                <!-- Tab content panes will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const content = {
+                sections: [
+                    { 
+                        title: "Quick Opinions", 
+                        thai_title: "ออกความเห็นแบบเร็วๆ",
+                        content: [
+                            { type: 'list', items: [
+                                { en: 'Teacher says a statement.', th: 'ครูพูดคำพูดหนึ่ง' },
+                                { en: "Students say 'Agree' or 'Disagree' + one reason.", th: 'นักเรียนพูดคำว่า เห็นด้วย หรือ ไม่เห็นด้วย + หนึ่งเหตุผล' }
+                            ]},
+                            { type: 'example', en: 'Statement: “Coffee is better than meetings.”', th_en: 'กาแฟดีกว่าการประชุม', answer: '“Agree. Coffee wakes me up. Meetings make me sleepy.”', th_answer: 'เห็นด้วย กาแฟทำให้ฉันตื่น การประชุมทำให้ฉันง่วง'},
+                            { type: 'subheading', text: 'Statements' },
+                            { type: 'list', items: [
+                                { en: 'Emails are more exciting than water cooler chats.', th: 'อีเมล์น่าตื่นเต้นกว่าการเม้ามอยกัน(ข้างตู้กดน้ำ)' },
+                                { en: 'Friday afternoons should be longer than Mondays.', th: 'วันศุกร์ตอนบ่ายควรยาวกว่าวันจันทร์' },
+                                { en: 'Office snacks are the best motivation.', th: 'ขนมที่ออฟฟิศเป็นแรงจูงใจที่ดีที่สุด' },
+                                { en: 'Printing documents is the greatest mystery in the office.', th: 'ปรินต์เอกสารเป็นความลึกลับที่มากที่สุดในออฟฟิศ (ปรินต์ยาก Difficult to print)' }
+                            ]},
+                             { type: 'subheading', text: 'Vocabulary' },
+                             { type: 'list', items: [
+                                { en: 'Coffee keeps me awake.', th: 'กาแฟทำให้ฉันตื่น (ไม่หลับ)' },
+                                { en: 'Coffee gives me energy.', th: 'กาแฟให้พลังงานฉัน' },
+                                { en: 'When we drink coffee, we’re not hungry or thirsty.', th: 'กินกาแฟแล้วไม่หิวอาหารหรือน้ำ' },
+                                { en: 'I have to drink coffee every day.', th: 'ต้องกินทุกวัน' },
+                                { en: 'Emails are more private.', th: 'อีเมล์เป็นส่วนตัวกว่า' },
+                                { en: 'Nobody knows', th: 'ไม่มีใครรู้' },
+                                { en: 'Facial expressions show feelings.', th: 'สีหน้าแสดงความรู้สึก' },
+                                { en: 'I like to chit-chat.', th: 'ชอบเม้ามอย' },
+                                { en: 'We can hear each other’s voices and see each other’s faces.', th: 'ได้ยินเสียงและเห็นหน้ากัน' },
+                                { en: 'We have to hide.', th: 'ต้องหลบซ่อน' },
+                                { en: 'No quantity limits', th: 'ไม่มีลิมิตปริมาณ' }
+                             ]}
+                        ]
+                    },
+                    {
+                        title: "This or That",
+                        thai_title: "นี่หรือนั่นโต้วาที",
+                        content: [
+                             { type: 'list', items: [
+                                { en: 'Teacher gives two options.', th: 'ครูให้สองออพชั่น' },
+                                { en: 'Students choose one and say why.', th: 'นักเรียนเลือกหนึ่ง และบอกว่าทำไม' }
+                            ]},
+                            { type: 'example', en: 'Topic: “Open office or private cubicle?”', th_en: 'ออฟฟิศแบบเปิด หรือมีผนังกั้น (พาทิชั่น)', answer: '“I choose private cubicle because I can talk on the phone without noise.”', th_answer: 'ฉันเลือกพาทิชั่นเพราะว่าฉันสามารถคุยโทรศัพท์ได้โดยไม่มีเสียง'},
+                            { type: 'subheading', text: 'Topics' },
+                            { type: 'list', items: [
+                                { en: 'Coffee or energy drinks?', th: 'กาแฟหรือเครื่องดื่มชูกำลัง' },
+                                { en: 'Working from home or working in the office?', th: 'ทำงานที่บ้านหรือที่ออฟฟิศ' },
+                                { en: 'Team lunches or solo snacks?', th: 'กินข้าวกลางวันกับทีมหรือฉายเดี่ยวกินขนมคนเดียว' },
+                                { en: 'Morning meetings or afternoon meetings?', th: 'ประชุมตอนเช้าหรือตอนบ่าย' }
+                            ]},
+                            { type: 'subheading', text: 'Vocabulary' },
+                            { type: 'list', items: [
+                                { en: 'I don’t want others to know my secrets.', th: 'ไม่อยากให้คนอื่นรู้ความลับ' },
+                                { en: 'eye contact', th: 'การสบสายตา' },
+                                { en: 'colleagues', th: 'เพื่อนร่วมงาน' },
+                                { en: 'If we have problems, it’s easy to talk to people.', th: 'ถ้ามีปัญหา คุยกับคนง่าย' },
+                                { en: 'With/For the same reason', th: 'ด้วยเหตุผลเดียวกัน' },
+                                { en: 'Your brain is not awake in the morning.', th: 'สมองไม่ตื่นตอนเช้า' },
+                                { en: 'Bitter', th: 'ขม' },
+                                { en: 'I want to save energy at home.', th: 'อยากประหยัดไฟที่บ้าน' },
+                                { en: 'I have more energy when working in the office.', th: 'ทำงานที่ออฟฟิศแล้วมีพลังงานมากกว่า' },
+                                { en: 'My home doesn’t have a printer.', th: 'บ้านไม่มีปรินเตอร์' },
+                                { en: 'I want to chit-chat with the team.', th: 'อยากเม้ามอยกับทีม' }
+                            ]}
+                        ]
+                    },
+                    {
+                        title: "Mini Debate",
+                        thai_title: "โต้วาทีทีมเล็กๆ",
+                        content: [
+                            { type: 'list', items: [
+                                { en: 'Breakout rooms: 2 teams of 2 students.', th: 'ห้องแยก 2 ทีม ทีมละ 2 คน' },
+                                { en: 'Each team supports or opposes a simple topic.', th: 'แต่ละทีมสนับสนุนหรือต่อต้านหัวข้อง่ายๆ' },
+                                { en: '10 minutes prep in breakout.', th: 'เตรียมตัว 10 นาที ในห้องแยก' },
+                                { en: 'Teams present in main room.', th: 'ทีมพรีเซนต์ในห้องหลัก (ห้องรวม)' }
+                            ]},
+                             { type: 'example', en: 'Topic: “Casual Friday should be every day.”', th_en: 'วันศุกร์แต่งตัวสบายๆควรมีทุกวัน', answer: '“We think casual Friday is better every day because people feel more comfortable and work better. Also, no one wants to wear suits all week!”', th_answer: 'พวกเราคิดว่า วันศุกร์ที่ให้แต่งตัวสบายๆ มีทุกวันดีกว่า เพราะคนจะรู้สึกสบายและทำงานได้ดีขึ้น แล้วก็ไม่มีใครอยากใส่สูททั้งอาทิตย์'},
+                             { type: 'subheading', text: 'Topics' },
+                             { type: 'list', items: [
+                                { en: 'Meetings should always have free snacks.', th: 'การประชุมควรมีขนมฟรีเสมอ' },
+                                { en: 'Office chairs with wheels are better than stationary chairs.', th: '' },
+                                { en: 'Working from home is more productive than working in the office.', th: '' },
+                                { en: 'The best way to start the day is with coffee, not emails.', th: '' }
+                             ]}
+                        ]
+                    },
+                     {
+                        title: "Agree/Disagree",
+                        thai_title: "ห่วงโซ่เห็นด้วย ไม่เห็นด้วย",
+                        content: [
+                             { type: 'list', items: [
+                                { en: 'Take turns saying Agree or Disagree with reason.', th: 'ผลัดกันบอกว่า เห็นด้วย หรือ ไม่เห็นด้วย พร้อมเหตุผล' },
+                                { en: 'Ask the next student a similar question.', th: 'ถามคนต่อไปด้วยคำถามคล้ายๆกัน' }
+                            ]},
+                            { type: 'example', en: 'Sentence: “The office printer is the biggest troublemaker.”', th_en: 'ปรินเตอร์ที่ออฟฟิศเป็นตัวปัญหาที่ใหญ่ที่สุดในออฟฟิศ', answer: '“Agree. The printer always jams and never works. What do you think?”', th_answer: 'เห็นด้วย ปรินเตอร์ติดบ่อย และไม่เคยเวิร์ค คุณคิดว่าไง?'},
+                            { type: 'subheading', text: 'Sentences' },
+                            { type: 'list', items: [
+                                { en: 'Reply-all emails should be banned forever.', th: 'การตอบอีเมลที่ตอบให้ครบทุกคน ควรถูกแบนตลอดไป' },
+                                { en: 'Office coffee tastes like water.', th: 'กาแฟออฟฟิศรสชาติเหมือนน้ำเปล่า' },
+                                { en: 'The boss’s jokes are actually funny.', th: 'มุกตลกของเจ้านายจริงๆแล้วตลกนะ' }
+                            ]},
+                             { type: 'subheading', text: 'Vocabulary' },
+                             { type: 'list', items: [
+                                 { en: 'We shouldn’t notify some people.', th: 'เราไม่ควรแจ้งบางคน' },
+                                 { en: 'Everyone has to know some topics.', th: 'ทุกคนต้องรู้บางเรื่อง' },
+                                 { en: 'We should click ‘CC’ instead of ‘Reply-all’.', th: 'ควรกด CC แทนการกด Reply-all' }
+                             ]}
+                        ]
+                    },
+                    {
+                        title: "Roleplay",
+                        content: [
+                             { type: 'list', items: [
+                                { en: 'Breakout rooms: pairs (3 pairs).', th: '' },
+                                { en: 'One student is host; the other is guest.', th: '' },
+                                { en: 'Host asks opinion questions.', th: '' },
+                                { en: 'Guest answers with reasons.', th: '' },
+                                { en: 'Switch roles after 12 minutes.', th: '' }
+                             ]},
+                            { type: 'example', en: 'Host: “Should we ban emails after 6 pm?”', th_en: '', answer: 'Guest: “Yes, because everyone needs time to relax. Emails after work make me stressed.”', th_answer: ''},
+                            { type: 'subheading', text: 'Questions' },
+                            { type: 'list', items: [
+                                { en: 'Should the office have a daily coffee break... or a daily snack break?', th: '' },
+                                { en: 'Is working in pajamas the future of office wear?', th: '' },
+                                { en: 'Who is the real boss: the manager or the office coffee machine?', th: '' },
+                                { en: 'Should meetings have a “no talking” time where everyone just listens?', th: '' },
+                                { en: 'Is the office printer secretly sabotaging us all?', th: '' },
+                                { en: 'Can email chains cause more stress than actual work?', th: '' },
+                                { en: 'Should the office have a karaoke competition every Friday?', th: '' },
+                                { en: 'Is the “reply all” button the most dangerous feature in email?', th: '' },
+                                { en: 'Are office plants just there to make people feel better or do they really help productivity?', th: '' },
+                                { en: 'Is it acceptable to pretend to be busy when the boss walks by?', th: '' }
+                            ]}
+                        ]
+                    },
+                    {
+                        title: "Reflection",
+                        content: [
+                            { type: 'list', items: [
+                                 { en: 'Share one favorite game.', th: '' },
+                                 { en: '1. Quick Opinions', th: '' },
+                                 { en: '2. This or That Debate I', th: '' },
+                                 { en: '3. Mini Team Debate III', th: '' },
+                                 { en: '4. Agree or Disagree Chain', th: '' },
+                                 { en: 'Share one new word learned.', th: '' }
+                            ]}
+                        ]
+                    },
+                    {
+                        title: "Vocabulary",
+                        content: [
+                            { type: 'list', items: [
+                                { en: 'Tax season', th: 'หน้าภาษี' },
+                                { en: 'Validation relationship', th: 'การยอมรับ(ความรู้สึก)ความสัมพันธ์' },
+                                { en: 'Empathy', th: 'ความเห็นอกเห็นใจ' },
+                                { en: 'Considerate', th: 'คำนึงถึงคนอื่น (คล้าย เกรงใจ)' }
+                            ]}
+                        ]
+                    }
+                ]
+            };
+            
+            function speak(text) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-GB';
+                const voices = window.speechSynthesis.getVoices();
+                const britishVoice = voices.find(voice => voice.lang === 'en-GB');
+                if (britishVoice) utterance.voice = britishVoice;
+                window.speechSynthesis.speak(utterance);
+            }
+
+            function createSpeakerButton(text) {
+                const button = document.createElement('button');
+                button.innerHTML = '🔊';
+                button.className = 'speak-btn';
+                button.setAttribute('aria-label', `Listen to "${text}"`);
+                button.onclick = (e) => { e.stopPropagation(); speak(text); };
+                return button;
+            }
+
+            function createBilingualListItem(item, container) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'p-3 bg-gray-50 rounded-lg';
+                
+                const enPara = document.createElement('p');
+                enPara.className = 'text-lg font-semibold flex items-center justify-between';
+                const enText = document.createElement('span');
+                enText.textContent = item.en;
+                enPara.appendChild(enText);
+                enPara.appendChild(createSpeakerButton(item.en));
+
+                const thPara = document.createElement('p');
+                thPara.className = 'thai text-md text-gray-500 text-right';
+                thPara.textContent = item.th || '';
+
+                itemDiv.appendChild(enPara);
+                if (item.th) {
+                    itemDiv.appendChild(thPara);
+                }
+                container.appendChild(itemDiv);
+            }
+            
+            function initializeApp() {
+                const tabContainer = document.getElementById('tab-nav');
+                const contentContainer = document.getElementById('tab-content-container');
+
+                content.sections.forEach((section, index) => {
+                    // Create Tab Button
+                    const button = document.createElement('button');
+                    button.className = 'tab-button p-4 font-semibold text-gray-600 hover:bg-indigo-50 transition-colors';
+                    if (index === 0) button.classList.add('active');
+                    button.textContent = section.title;
+                    button.dataset.target = `tab-${index}`;
+                    tabContainer.appendChild(button);
+
+                    // Create Tab Content Pane
+                    const pane = document.createElement('div');
+                    pane.id = `tab-${index}`;
+                    pane.className = 'tab-content';
+                    if (index === 0) pane.classList.add('active');
+                    
+                    if(section.thai_title) {
+                        const thaiTitle = document.createElement('p');
+                        thaiTitle.className = 'thai text-xl text-gray-500 mb-6';
+                        thaiTitle.textContent = section.thai_title;
+                        pane.appendChild(thaiTitle);
+                    }
+
+                    section.content.forEach(item => {
+                        if (item.type === 'list') {
+                            const listContainer = document.createElement('div');
+                            listContainer.className = 'space-y-4';
+                            item.items.forEach(li => createBilingualListItem(li, listContainer));
+                            pane.appendChild(listContainer);
+                        } else if (item.type === 'example') {
+                             const exampleDiv = document.createElement('div');
+                             exampleDiv.className = 'mt-4 p-4 border-l-4 border-indigo-200 bg-indigo-50 rounded-r-lg';
+                             const enP = document.createElement('p');
+                             enP.className = 'font-semibold';
+                             enP.innerHTML = `${item.en} <span class="thai text-gray-600">${item.th_en || ''}</span>`;
+                             const answerP = document.createElement('p');
+                             answerP.className = 'mt-1';
+                             answerP.innerHTML = `${item.answer} <span class="thai text-gray-600">${item.th_answer || ''}</span>`;
+                             exampleDiv.appendChild(enP);
+                             exampleDiv.appendChild(answerP);
+                             pane.appendChild(exampleDiv);
+                        } else if (item.type === 'subheading') {
+                            const h3 = document.createElement('h3');
+                            h3.className = 'text-2xl font-bold mt-6 mb-2';
+                            h3.textContent = item.text;
+                            pane.appendChild(h3);
+                        }
+                    });
+
+                    contentContainer.appendChild(pane);
+                });
+
+                // Add Speaker to all static text
+                document.querySelectorAll('h1, h2, h3, p').forEach(el => {
+                    if (el && !el.classList.contains('thai') && el.textContent.trim() && !el.querySelector('.speak-btn')) {
+                         const text = el.textContent.trim();
+                         el.classList.add('flex', 'items-center');
+                         if (el.parentElement && el.parentElement.classList.contains('text-center')) {
+                           el.classList.add('justify-center');
+                         }
+                         el.appendChild(createSpeakerButton(text));
+                    }
+                });
+                
+                // Tab switching logic
+                tabContainer.addEventListener('click', (e) => {
+                    if(e.target.classList.contains('tab-button')) {
+                        const targetId = e.target.dataset.target;
+
+                        tabContainer.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+
+                        contentContainer.querySelectorAll('.tab-content').forEach(pane => pane.classList.remove('active'));
+                        document.getElementById(targetId).classList.add('active');
+                    }
+                });
+            }
+
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = initializeApp;
+            } else {
+                initializeApp();
+            }
+        });
+    </script>
+</body>
+</html>
+
