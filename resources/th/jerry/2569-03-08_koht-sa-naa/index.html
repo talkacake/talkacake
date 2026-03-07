@@ -4,14 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>บทเรียนภาษาไทย: โฆษณา</title>
-    <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 2. Babel Standalone สำหรับประมวลผล JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <style>
       body { margin: 0; padding: 0; background-color: #f8fafc; min-height: 100vh; }
-      /* ป้องกันหน้าจอขาวระหว่างโหลด */
       #root:empty::before {
         content: "กำลังโหลดบทเรียน... (Loading...)";
         display: flex;
@@ -22,11 +17,6 @@
         font-family: sans-serif;
       }
     </style>
-  </head>
-  <body>
-    <div id="root"></div>
-
-    <!-- 3. Import Map เพื่อจัดการ Library -->
     <script type="importmap">
       {
         "imports": {
@@ -36,46 +26,36 @@
         }
       }
     </script>
+  </head>
+  <body>
+    <div id="root"></div>
 
-    <!-- 4. ส่วนการโหลด App -->
-    <script type="text/babel" data-type="module">
+    <script type="module">
       import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      
-      /**
-       * แก้ไข: ปรับปรุงการคำนวณ URL เพื่อป้องกันการเกิด URL ซ้ำซ้อน (Duplicated URL)
-       * โดยการดึงเฉพาะ Base Path จาก window.location.href โดยตรง
-       */
+      import { createRoot } from 'react-dom/client';
+
       const loadApp = async () => {
         try {
-          // ดึง URL ปัจจุบันและตัดชื่อไฟล์ออกเพื่อหาโฟลเดอร์หลัก
-          const currentHref = window.location.href.split('?')[0].split('#')[0];
-          const basePath = currentHref.substring(0, currentHref.lastIndexOf('/') + 1);
-          
-          // ตรวจสอบว่า basePath ลงท้ายด้วย / หรือไม่ ถ้าไม่ให้เติมเข้าไป
-          const sanitizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
-          const appUrl = sanitizedBasePath + 'src/2569-03-08_koht-sa-naa.js';
-          
-          console.log("กำลังโหลดไฟล์จาก:", appUrl);
-          
-          // ใช้ dynamic import เพื่อโหลดไฟล์ Component
+          const basePath = window.location.pathname.endsWith('/')
+            ? window.location.pathname
+            : window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+
+          const appUrl = `${basePath}src/2569-03-08_koht-sa-naa.js`;
+
+          console.log('Loading:', appUrl);
+
           const module = await import(appUrl);
           const App = module.default;
 
-          const rootElement = document.getElementById('root');
-          const root = ReactDOM.createRoot(rootElement);
-          root.render(<App />);
+          const root = createRoot(document.getElementById('root'));
+          root.render(React.createElement(App));
         } catch (error) {
-          console.error("เกิดข้อผิดพลาดในการโหลด App:", error);
+          console.error(error);
           document.getElementById('root').innerHTML = `
-            <div style="padding: 40px; color: #ef4444; text-align: center; font-family: sans-serif;">
-              <h3 style="font-size: 1.5rem; margin-bottom: 10px;">❌ เกิดข้อผิดพลาดในการโหลดระบบ</h3>
-              <p style="color: #64748b;">ไม่สามารถโหลดไฟล์: 2569-03-08_koht-sa-naa.js</p>
-              <div style="margin-top: 20px; font-size: 0.9rem; background: #fee2e2; padding: 15px; border-radius: 8px; display: inline-block; text-align: left; max-width: 80%;">
-                <strong>วิธีแก้ไข:</strong><br/>
-                1. ตรวจสอบว่ามีไฟล์ชื่อ <code>2569-03-08_koht-sa-naa.js</code> อยู่ในโฟลเดอร์ <code>src</code> หรือไม่<br/>
-                2. ตรวจสอบว่าในไฟล์ <code>.js</code> มีคำว่า <code>export default App;</code> อยู่ท้ายไฟล์หรือไม่
-              </div>
+            <div style="padding:40px;color:#ef4444;text-align:center;font-family:sans-serif;">
+              <h3>❌ เกิดข้อผิดพลาดในการโหลดระบบ</h3>
+              <p>ไม่สามารถโหลดไฟล์ src/2569-03-08_koht-sa-naa.js</p>
+              <pre style="white-space:pre-wrap;text-align:left;background:#fee2e2;padding:12px;border-radius:8px;display:inline-block;max-width:90%;">${String(error)}</pre>
             </div>
           `;
         }
