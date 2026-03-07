@@ -43,15 +43,18 @@
       import ReactDOM from 'react-dom/client';
       
       /**
-       * แก้ไข: เปลี่ยนวิธีสร้าง URL จากการใช้ new URL() เป็นการใช้ string manipulation 
-       * เพื่อหลีกเลี่ยงข้อผิดพลาด "Invalid URL" ในบาง Browser Environment
+       * แก้ไข: ปรับปรุงการคำนวณ URL เพื่อป้องกันการเกิด URL ซ้ำซ้อน (Duplicated URL)
+       * โดยการดึงเฉพาะ Base Path จาก window.location.href โดยตรง
        */
       const loadApp = async () => {
         try {
-          // คำนวณ Base Path จากตำแหน่งปัจจุบัน
-          const currentPath = window.location.pathname;
-          const basePath = window.location.origin + currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-          const appUrl = basePath + 'src/2569-03-08_koht-sa-naa.js';
+          // ดึง URL ปัจจุบันและตัดชื่อไฟล์ออกเพื่อหาโฟลเดอร์หลัก
+          const currentHref = window.location.href.split('?')[0].split('#')[0];
+          const basePath = currentHref.substring(0, currentHref.lastIndexOf('/') + 1);
+          
+          // ตรวจสอบว่า basePath ลงท้ายด้วย / หรือไม่ ถ้าไม่ให้เติมเข้าไป
+          const sanitizedBasePath = basePath.endsWith('/') ? basePath : basePath + '/';
+          const appUrl = sanitizedBasePath + 'src/2569-03-08_koht-sa-naa.js';
           
           console.log("กำลังโหลดไฟล์จาก:", appUrl);
           
