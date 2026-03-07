@@ -4,10 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>บทเรียนภาษาไทย: โฆษณา</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
-      body { margin: 0; padding: 0; background-color: #f8fafc; min-height: 100vh; }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f8fafc;
+        min-height: 100vh;
+      }
+
       #root:empty::before {
         content: "กำลังโหลดบทเรียน... (Loading...)";
         display: flex;
@@ -33,33 +41,376 @@
     </script>
 
     <script type="text/babel" data-type="module">
-      import React from 'react';
+      import React, { useState, useEffect } from 'react';
       import { createRoot } from 'react-dom/client';
+      import {
+        Play,
+        Volume2,
+        Languages,
+        RefreshCcw,
+        Tv,
+        MessageSquare,
+        Users,
+        BookOpen,
+        Star,
+        HelpCircle
+      } from 'lucide-react';
 
-      const loadApp = async () => {
-        try {
-          const appUrl = './src/2569-03-08_koht-sa-naa.js';
-          console.log("กำลังโหลดไฟล์จาก:", appUrl);
+      const App = () => {
+        const [showIpaGlobal, setShowIpaGlobal] = useState(false);
+        const [showEnGlobal, setShowEnGlobal] = useState(false);
+        const [randomVocab, setRandomVocab] = useState(null);
+        const [currentSection, setCurrentSection] = useState('review');
 
-          const module = await import(appUrl);
-          const App = module.default;
+        const vocabList = [
+          { th: "ปิ้งนานไม่พอ", ipa: "bpîng naan mâi pɔɔ", en: "Not toast long enough", emoji: "🍞🔥" },
+          { th: "ก็ได้", ipa: "kɔ̂ɔ-dâay", en: "Can also be / Whatever", emoji: "🤷‍♂️" },
+          { th: "สีอ่อน", ipa: "sǐi ɔ̀ɔn", en: "Light colour", emoji: "🎨" },
+          { th: "ตลอด", ipa: "dtà-lɔ̀ɔt", en: "Always / Throughout", emoji: "⏳🔁" },
+          { th: "กลับจากฟิตเนส", ipa: "glàp jàak fít-nêet", en: "Return from the gym", emoji: "🏋️‍♂️🏠" },
+          { th: "ก็เลย", ipa: "gɔ̂ɔ-ləəi", en: "So", emoji: "➡️" },
+          { th: "การเงิน", ipa: "gaan ngən", en: "Finance", emoji: "💰📊" },
+          { th: "กิจกรรม", ipa: "kìt-cà-kam", en: "Activities", emoji: "🎯🎲" },
+          { th: "เกี๊ยว", ipa: "gíao", en: "Dumplings", emoji: "🥟" },
+          { th: "เกี่ยวกับ", ipa: "kìaw-kàp", en: "About", emoji: "ℹ️" },
+          { th: "ของฝาก", ipa: "khɔ̌ɔng fàak", en: "Souvenirs", emoji: "🎁🛍️" },
+          { th: "เบา", ipa: "bao", en: "Light", emoji: "💡🪶" },
+          { th: "ขับรถ", ipa: "khàp-rót", en: "Drive", emoji: "🚗" },
+          { th: "หุ้น", ipa: "hûn", en: "Stocks", emoji: "📈💹" },
+          { th: "ขาย", ipa: "khǎai", en: "Sell", emoji: "💰🛒" },
+          { th: "ครึ่ง", ipa: "krʉ̂ng", en: "Half", emoji: "½" },
+          { th: "ทำความสะอาด", ipa: "tam kwaam sà àat", en: "To clean", emoji: "🧹🧼" },
+          { th: "เงียบ", ipa: "ngîap", en: "Quiet", emoji: "🤫🔇" },
+          { th: "จำ", ipa: "cam", en: "Remember", emoji: "🧠💭" },
+          { th: "สนุก", ipa: "sà-nùk", en: "Fun", emoji: "🎉😄" }
+        ];
 
-          const rootElement = document.getElementById('root');
-          const root = createRoot(rootElement);
-          root.render(<App />);
-        } catch (error) {
-          console.error("เกิดข้อผิดพลาดในการโหลด App:", error);
-          document.getElementById('root').innerHTML = `
-            <div style="padding: 40px; color: #ef4444; text-align: center; font-family: sans-serif;">
-              <h3 style="font-size: 1.5rem; margin-bottom: 10px;">❌ เกิดข้อผิดพลาดในการโหลดระบบ</h3>
-              <p style="color: #64748b;">ไม่สามารถโหลดไฟล์: ./src/2569-03-08_koht-sa-naa.js</p>
-              <pre style="margin-top:20px; font-size:0.9rem; background:#fee2e2; padding:15px; border-radius:8px; display:inline-block; text-align:left; max-width:80%; white-space:pre-wrap;">${String(error)}</pre>
-            </div>
-          `;
-        }
+        const targetVocab = [
+          { th: "พากย์", ipa: "pâak", en: "To dub / To voiceover", emoji: "🎙️🎬" },
+          { th: "ทน", ipa: "ton", en: "To endure / To stand", emoji: "🧘‍♀️⏳" },
+          { th: "เสีย", ipa: "sǐa", en: "To lose / Waste", emoji: "📉🗑️" },
+          { th: "รูปแบบใหม่", ipa: "rûup-bɛ̀ɛp mài", en: "New format / Style", emoji: "🆕✨" },
+          { th: "สะดวก", ipa: "sà-dùak", en: "Convenient", emoji: "🚀✅" }
+        ];
+
+        const speak = (text) => {
+          if (!window.speechSynthesis) return;
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'th-TH';
+          window.speechSynthesis.speak(utterance);
+        };
+
+        const ThaiText = ({ th, ipa, en, className = "" }) => {
+          const [showIpa, setShowIpa] = useState(false);
+          const [showEn, setShowEn] = useState(false);
+
+          return (
+            <span className={`inline-flex flex-col align-middle mb-1 p-1 rounded-lg bg-white shadow-sm border border-gray-100 ${className}`}>
+              <span className="flex items-center gap-1 flex-wrap">
+                <span className="text-lg font-bold text-slate-800">{th}</span>
+                <button
+                  onClick={() => speak(th)}
+                  className="p-1 hover:bg-blue-100 rounded-full text-blue-500 transition-colors"
+                  type="button"
+                >
+                  <Volume2 size={16} />
+                </button>
+                <button
+                  onClick={() => setShowIpa(!showIpa)}
+                  className={`px-1.5 py-0.5 text-[10px] font-mono rounded ${showIpa || showIpaGlobal ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-600'}`}
+                  type="button"
+                >
+                  IPA
+                </button>
+                <button
+                  onClick={() => setShowEn(!showEn)}
+                  className={`px-1.5 py-0.5 text-[10px] font-mono rounded ${showEn || showEnGlobal ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-600'}`}
+                  type="button"
+                >
+                  EN
+                </button>
+              </span>
+              {(showIpa || showIpaGlobal) && (
+                <span className="text-[11px] text-amber-700 font-mono block leading-tight">{ipa}</span>
+              )}
+              {(showEn || showEnGlobal) && (
+                <span className="text-[11px] text-emerald-700 italic block leading-tight">{en}</span>
+              )}
+            </span>
+          );
+        };
+
+        const SectionTitle = ({ th, ipa, en, icon: Icon }) => (
+          <div className="flex items-center gap-3 mb-6 border-b pb-4">
+            {Icon && <Icon className="text-blue-600" size={32} />}
+            <ThaiText th={th} ipa={ipa} en={en} className="bg-transparent shadow-none border-none p-0" />
+          </div>
+        );
+
+        const pickRandomVocab = () => {
+          const randomIndex = Math.floor(Math.random() * vocabList.length);
+          setRandomVocab(vocabList[randomIndex]);
+        };
+
+        useEffect(() => {
+          pickRandomVocab();
+        }, []);
+
+        return (
+          <div className="max-w-4xl mx-auto p-4 md:p-8 bg-slate-50 min-h-screen font-sans text-slate-900 overflow-x-hidden">
+            <header className="mb-8 text-center flex flex-col items-center">
+              <h1 className="text-3xl font-extrabold text-blue-800 mb-4 flex items-center gap-2">
+                โฆษณา 📺✨
+              </h1>
+
+              <div className="flex gap-3 justify-center bg-white p-2 rounded-2xl shadow-md border border-slate-200">
+                <button
+                  onClick={() => setShowIpaGlobal(!showIpaGlobal)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm transition-all ${showIpaGlobal ? 'bg-amber-500 text-white' : 'bg-slate-100'}`}
+                  type="button"
+                >
+                  <Languages size={16} /> IPA {showIpaGlobal ? 'ON' : 'OFF'}
+                </button>
+                <button
+                  onClick={() => setShowEnGlobal(!showEnGlobal)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm transition-all ${showEnGlobal ? 'bg-emerald-500 text-white' : 'bg-slate-100'}`}
+                  type="button"
+                >
+                  <BookOpen size={16} /> EN {showEnGlobal ? 'ON' : 'OFF'}
+                </button>
+              </div>
+            </header>
+
+            <nav className="flex flex-wrap gap-2 mb-6 justify-center">
+              {[
+                { id: 'review', th: 'ทบทวน', ipa: 'tóp-tuan', en: 'Review', icon: RefreshCcw },
+                { id: 'video', th: 'วิดีโอ', ipa: 'wí-dii-oo', en: 'Video', icon: Tv },
+                { id: 'vocab', th: 'คำศัพท์ใหม่', ipa: 'kam-sàp mài', en: 'New Vocab', icon: Star },
+                { id: 'tasks', th: 'กิจกรรม', ipa: 'kìt-cà-kam', en: 'Activities', icon: MessageSquare }
+              ].map((nav) => (
+                <button
+                  key={nav.id}
+                  onClick={() => setCurrentSection(nav.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all shadow-sm text-sm ${currentSection === nav.id ? 'bg-blue-600 text-white scale-105' : 'bg-white hover:bg-blue-50'}`}
+                  type="button"
+                >
+                  <nav.icon size={16} />
+                  {nav.th}
+                </button>
+              ))}
+            </nav>
+
+            <main className="bg-white rounded-3xl p-5 md:p-8 shadow-xl border border-slate-100">
+              {currentSection === 'review' && (
+                <div>
+                  <SectionTitle th="ทบทวนคำศัพท์เก่า" ipa="tóp-tuan kam-sàp gào" en="Review Old Vocabulary" icon={RefreshCcw} />
+                  <div className="text-center py-8 bg-blue-50 rounded-3xl border-2 border-dashed border-blue-200">
+                    <ThaiText
+                      th="สุ่มคำศัพท์เพื่อแต่งประโยค"
+                      ipa="sùm kam-sàp pʉ̂a dtɛ̀ng bprà-yòok"
+                      en="Randomly pick a word to make a sentence"
+                      className="mb-4 bg-transparent border-none shadow-none"
+                    />
+
+                    {randomVocab && (
+                      <div className="flex flex-col items-center gap-3 my-6 p-6 bg-white rounded-2xl shadow-lg w-fit mx-auto min-w-[260px]">
+                        <span className="text-5xl mb-1">{randomVocab.emoji}</span>
+                        <ThaiText
+                          th={randomVocab.th}
+                          ipa={randomVocab.ipa}
+                          en={randomVocab.en}
+                          className="text-xl"
+                        />
+                      </div>
+                    )}
+
+                    <button
+                      onClick={pickRandomVocab}
+                      className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 mx-auto shadow-md"
+                      type="button"
+                    >
+                      <RefreshCcw size={18} /> สุ่มใหม่ (Random New)
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {currentSection === 'video' && (
+                <div>
+                  <SectionTitle th="ดูวิดีโอโฆษณา" ipa="duu wí-dii-oo kôot-sà-naa" en="Watch the Ad Video" icon={Tv} />
+                  <div className="grid md:grid-cols-2 gap-6 items-start">
+                    <div className="aspect-[9/16] max-h-[500px] w-full bg-slate-200 rounded-3xl overflow-hidden shadow-xl relative mx-auto md:mx-0">
+                      <iframe
+                        src="https://www.tiktok.com/embed/7341218608225242370"
+                        className="w-full h-full border-0"
+                        allow="autoplay"
+                        allowFullScreen
+                        title="TikTok video"
+                      ></iframe>
+                    </div>
+
+                    <div className="space-y-4">
+                      <ThaiText th="บทพูดในวิดีโอ" ipa="bòt-phûut nai wí-dii-oo" en="Script in video" className="font-bold" />
+
+                      <div className="bg-slate-50 p-4 rounded-2xl border space-y-4 overflow-y-auto max-h-[400px]">
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-slate-500 block text-xs">Farang:</span>
+                          <span>Hey! "Hello!"</span>
+                        </div>
+
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-blue-600 block text-xs">Thai 1:</span>
+                          <ThaiText th="มันต้องการ 'โล่ห์'" ipa="man dtɔ̂ɔng-gaan lôo" en="It wants a shield." />
+                        </div>
+
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-slate-500 block text-xs">Farang:</span>
+                          <span>What are you doing? It looks so much "fun".</span>
+                        </div>
+
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-blue-600 block text-xs">Thai 1:</span>
+                          <ThaiText th="มันจะ 'ฟัน' น่ะ" ipa="man jà fan nâ" en="It's going to slash/cut." />
+                        </div>
+
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-slate-500 block text-xs">Farang:</span>
+                          <span>Hey...Hey! Take it "easy", "come on".</span>
+                        </div>
+
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-blue-600 block text-xs">Thai 1:</span>
+                          <ThaiText
+                            th="เฮ้ย! มันจะย่ำยี 'แม่ศรี' และนาง 'คำอ่อน' เมียพี่"
+                            ipa="hə́əi! man jà yâm-yii mɛ̂ɛ-sǐi lɛ́ naang kham-ɔ̀ɔn mia pîi"
+                            en="Hey! It will trample Mae Sri and Nang Kam On, my wives."
+                          />
+                        </div>
+
+                        <div className="leading-relaxed">
+                          <span className="font-bold text-red-600 block text-xs">Thai 2:</span>
+                          <ThaiText
+                            th="เสียเลือดทนได้...เสียเมีย สุดจะทน"
+                            ipa="sǐa lʉ̂at ton dâai... sǐa mia sùt jà ton"
+                            en="Losing blood is bearable... but losing a wife is beyond endurance."
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <ThaiText th="คำถามความเข้าใจ" ipa="kham-thǎam kwaam-khâo-jai" en="Comprehension Questions" className="font-bold" />
+                        <div className="space-y-3 mt-2">
+                          <div className="p-3 border rounded-xl bg-white">
+                            <ThaiText th="1. ทำไมคนไทยถึงเข้าใจผิด?" ipa="tam-mai kon thai tʉ̌ng khâo-jai phìt" en="Why did the Thai people misunderstand?" />
+                          </div>
+                          <div className="p-3 border rounded-xl bg-white">
+                            <ThaiText th="2. วิดีโอนี้ต้องการสื่อสารอะไร?" ipa="wí-dii-oo níi dtɔ̂ɔng-gaan sʉ̀ʉ-sǎan à-rai" en="What is this video trying to communicate?" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentSection === 'vocab' && (
+                <div>
+                  <SectionTitle th="คำศัพท์ใหม่" ipa="kam-sàp mài" en="New Vocabulary" icon={Star} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {targetVocab.map((v, i) => (
+                      <div key={i} className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border hover:shadow-md transition-shadow">
+                        <span className="text-3xl bg-white p-2 rounded-xl shadow-sm">{v.emoji}</span>
+                        <ThaiText th={v.th} ipa={v.ipa} en={v.en} className="bg-transparent border-none shadow-none" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {currentSection === 'tasks' && (
+                <div className="space-y-6">
+                  <SectionTitle th="กิจกรรมฝึกพูด" ipa="kìt-cà-kam fʉ̀k phûut" en="Speaking Activities" icon={MessageSquare} />
+
+                  <div className="bg-orange-50 p-5 rounded-2xl border border-orange-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="text-orange-600" size={20} />
+                      <ThaiText th="สถานการณ์จำลอง" ipa="sà-thǎa-ná-gaan cam-lɔɔng" en="Role-play Scenario" className="font-bold bg-transparent shadow-none" />
+                    </div>
+                    <ThaiText
+                      th="คุณต้องพากย์วิดีโอที่มีรูปแบบใหม่ให้เพื่อนฟัง เพื่อนจะเข้าใจไหม?"
+                      ipa="khun dtɔ̂ng pâak wí-dii-oo thîi mii rûup-bɛ̀ɛp mài hâi pʉ̂an fang, pʉ̂an jà khâo-jai mǎi"
+                      en="You have to dub a video in a new format for a friend. Will they understand?"
+                    />
+                  </div>
+
+                  <div className="bg-purple-50 p-5 rounded-2xl border border-purple-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MessageSquare className="text-purple-600" size={20} />
+                      <ThaiText th="โต้วาที" ipa="dtôo-waa-thii" en="Debate" className="font-bold bg-transparent shadow-none" />
+                    </div>
+                    <ThaiText
+                      th="ดูหนังพากย์ไทย กับ ดูซับไตเติ้ล แบบไหนสะดวกกว่ากัน?"
+                      ipa="duu năng pâak thai gàp duu sáp-tai-dtə̂l, bɛ̀ɛp nǎi sà-dùak gwàa gan"
+                      en="Watching Thai-dubbed movies vs. with subtitles: which is more convenient?"
+                    />
+                  </div>
+
+                  <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <HelpCircle className="text-blue-600" size={20} />
+                      <ThaiText th="สัมภาษณ์" ipa="sǎm-phâat" en="Interview" className="font-bold bg-transparent shadow-none" />
+                    </div>
+                    <ThaiText
+                      th="ถามเพื่อนว่า เคยเสียอะไรที่ทนไม่ได้ไหม? และทำอย่างไร?"
+                      ipa="thǎam pʉ̂an wâa kəəi sǐa à-rai thîi ton mâi dâai mǎi? lɛ́ tam yàang-rai"
+                      en="Ask your friend: Have you ever lost something you couldn't endure? What did you do?"
+                    />
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-100">
+                    <div className="bg-slate-800 text-white p-5 rounded-3xl">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Star className="text-yellow-400" size={20} />
+                        <ThaiText th="กิจกรรมเพิ่มเติม" ipa="kìt-cà-kam phə̂əm-dtəəm" en="Extension Activities" className="bg-transparent text-white border-none shadow-none" />
+                      </div>
+
+                      <ul className="space-y-4">
+                        <li className="flex items-start gap-2">
+                          <span className="bg-white/20 px-2 py-0.5 rounded text-xs mt-1">1</span>
+                          <ThaiText
+                            th="เล่าเรื่อง: คุณเคยพากย์เสียงคนอื่นเพื่อแกล้งเพื่อนไหม?"
+                            ipa="lâo rʉ̂ang: khun kəəi pâak sǐang kon ʉ̀ʉn pʉ̂a glɛ̂ɛng pʉ̂an mǎi"
+                            en="Storytelling: Have you ever dubbed someone else's voice to prank a friend?"
+                            className="bg-transparent border-none p-0 shadow-none text-white"
+                          />
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="bg-white/20 px-2 py-0.5 rounded text-xs mt-1">2</span>
+                          <ThaiText
+                            th="พรีเซนต์: แนะนำแอพพลิเคชั่นที่มีรูปแบบใหม่และสะดวกต่อการเรียนภาษา"
+                            ipa="phrii-sên: nɛ́-nam ɛ̀ɛp-plí-kee-chân thîi mii rûup-bɛ̀ɛp mài lɛ́ sà-dùak dtɔ̀ɔ gaan rian phaa-sǎa"
+                            en="Presentation: Recommend an app with a new format that is convenient for language learning."
+                            className="bg-transparent border-none p-0 shadow-none text-white"
+                          />
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </main>
+
+            <footer className="mt-8 text-center text-slate-400 pb-8 text-xs">
+              <p>โฆษณา - บทเรียนภาษาไทย (Task-Based Speaking)</p>
+              <p className="mt-1">© 2024 Interactive Learning System</p>
+            </footer>
+          </div>
+        );
       };
 
-      loadApp();
+      const root = createRoot(document.getElementById('root'));
+      root.render(<App />);
     </script>
   </body>
 </html>
