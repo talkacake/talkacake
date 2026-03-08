@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: Math & Numbers</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts (Sarabun for Thai) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4; /* Light green bg */
+        }
+        .thai-text {
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Data: Vocabulary Review
+        const reviewVocab = [
+            { thai: "แนะนำ", ipa: "Naɛ́-nam", en: "introduce / recommend", emoji: "👋" },
+            { thai: "ตัว", ipa: "dtua", en: "Self / Body", emoji: "🧍" },
+            { thai: "... กัน", ipa: "... gan", en: "Let's ... / together", emoji: "👯" },
+            { thai: "ก่อน", ipa: "gòon", en: "first / before", emoji: "⏮️" },
+            { thai: "แล้ว", ipa: "Láew", en: "and / then / already", emoji: "➡️" },
+            { thai: "เป็น", ipa: "bpen", en: "to be / is / am / are", emoji: "🟰" },
+            { thai: "ที่ไหน", ipa: "thîi-năi", en: "Where?", emoji: "📍" },
+            { thai: "คน", ipa: "khon", en: "person / people", emoji: "🧑‍🤝‍🧑" },
+            { thai: "กรุงเทพฯ", ipa: "Krung-thêp", en: "Bangkok", emoji: "🏙️" },
+            { thai: "ช่วยถือหน่อย", ipa: "Chûay thǔe nòi", en: "Can you help me hold it?", emoji: "🤲" },
+            { thai: "ช่วย", ipa: "Chûay", en: "help", emoji: "🆘" },
+            { thai: "ถือ", ipa: "thǔe", en: "hold", emoji: "✊" },
+            { thai: "หน่อย", ipa: "nòi", en: "a bit / please", emoji: "🤏" },
+            { thai: "อีก", ipa: "Ìik", en: "More / again", emoji: "➕" },
+            { thai: "ครบ", ipa: "khróp", en: "Complete", emoji: "✅" },
+            { thai: "แท่ง", ipa: "thâeng", en: "Sticks (classifier)", emoji: "🥢" },
+            { thai: "หนึ่ง - เก้าสิบเก้า", ipa: "nùeng - gâo sìp gâo", en: "Numbers 1-99", emoji: "🔢" },
+        ];
+
+        // Data: Main Script
+        const dialogueScript = [
+            { speaker: "MC", thai: "6 + 5 แปลว่า เท่าไรเหรอ", ipa: "hòk bùak hâa bplae-wâa thâo-rài rǒe", en: "What does 6 + 5 mean?", emoji: "🤔" },
+            { speaker: "หลิง", thai: "11 ไง", ipa: "sìp-èt ngai", en: "11, obviously.", emoji: "💁‍♀️" },
+            { speaker: "ออม", thai: "พี่หลิงหลิงบอกว่า 6 + 5 = 11", ipa: "phîi lĭng-lĭng bòk wâa hòk bùak hâa thâo-gàp sìp-èt", en: "P'Lingling says 6 + 5 = 11.", emoji: "🗣️" },
+            { speaker: "หลิง", thai: "6 + 5 ไม่เท่ากับ 11 เหรอคะ", ipa: "hòk bùak hâa mâi thâo-gàp sìp-èt rǒe ká", en: "Doesn't 6 + 5 equal 11?", emoji: "🤨" },
+            { speaker: "MC", thai: "แล้ว 0 + 7 ล่ะ", ipa: "láew sǔun bùak jèt lâ", en: "Then what about 0 + 7?", emoji: "0️⃣" },
+            { speaker: "ออม", thai: "ถ้า 0 + 7 จะเป็น...", ipa: "thâa sǔun bùak jèt jà bpen...", en: "If 0 + 7, it will be...", emoji: "💭" },
+            { speaker: "ออม", thai: "เอาใหม่", ipa: "ao mài", en: "Let's start over.", emoji: "🔄" },
+            { speaker: "ออม", thai: "ถ้า 6 + 5 ต้อง...", ipa: "thâa hòk bùak hâa dtông...", en: "If 6 + 5, must...", emoji: "☝️" },
+            { speaker: "ออม", thai: "เอา 5 ไว้ในใจ", ipa: "ao hâa wái nai jai", en: "Keep 5 in mind (heart).", emoji: "❤️" },
+            { speaker: "ออม", thai: "ชูนิ้วขึ้นมา 6", ipa: "chuu níw khûen maa hòk", en: "Hold up 6 fingers.", emoji: "🖐️☝️" },
+            { speaker: "ออม", thai: "นับต่อจาก 5", ipa: "náp dtòo jàak hâa", en: "Count on from 5.", emoji: "wd" },
+            { speaker: "ออม", thai: "6 7 8 9 10 11", ipa: "hòk jèt bpàet gâo sìp sìp-èt", en: "6 7 8 9 10 11", emoji: "🔢" },
+            { speaker: "หลิง", thai: "ต้องไปเรียนใหม่ละ", ipa: "dtông bpai rian mài lá", en: "I need to go study again.", emoji: "📚" },
+            { speaker: "MC", thai: "แล้ว 0 + 7 ล่ะ", ipa: "láew sǔun bùak jèt lâ", en: "And what about 0 + 7?", emoji: "❓" },
+            { speaker: "ออม", thai: "0 + 7", ipa: "sǔun bùak jèt", en: "0 + 7", emoji: "7️⃣" },
+            { speaker: "ออม", thai: "0 ไม่มีค่า", ipa: "sǔun mâi mii khâa", en: "0 has no value.", emoji: "🚫" },
+            { speaker: "ออม", thai: "ได้ 7 เหมือนเดิม", ipa: "dâai jèt mǔean-doem", en: "Get 7 just like before.", emoji: "🔙" },
+            { speaker: "หลิง", thai: "0 ไม่มีอะไรนะ", ipa: "sǔun mâi mii à-rai ná", en: "0 has nothing, right?", emoji: "📭" },
+            { speaker: "ออม", thai: "0 ไม่มีค่า เท่ากับ 7 เหมือนเดิม", ipa: "sǔun mâi mii khâa thâo-gàp jèt mǔean-doem", en: "0 has no value, equals 7 as before.", emoji: "🟰" },
+            { speaker: "ออม", thai: "แล้วก็... เสร็จแล้ว", ipa: "láew gô... sèt láew", en: "And... finished.", emoji: "🏁" },
+            { speaker: "หลิง", thai: "น้องออมตอนเด็กๆ ใช่ไหม", ipa: "nóng aom dton dèk-dèk châi-mái", en: "Was that Nong Orm when she was young?", emoji: "👧" },
+        ];
+
+        // Data: Grammar/Practice
+        const practiceData = [
+            { thai: "เท่าไร", ipa: "thâo-rài", en: "How much?", emoji: "💰" },
+            { thai: "แล้ว ... ล่ะ", ipa: "láew ... lâ", en: "What about ...?", emoji: "🤷" },
+            { thai: "ถ้า", ipa: "thâa", en: "If", emoji: "🤔" },
+            { thai: "ใช่ไหม", ipa: "châi-mái", en: "Right? / Is it?", emoji: "❓" },
+            { thai: "บวก (+)", ipa: "bùak", en: "Plus", emoji: "➕" },
+            { thai: "เท่ากับ (=)", ipa: "thâo-gàp", en: "Equals", emoji: "🟰" },
+        ];
+
+        // TTS Helper
+        const speak = (text) => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9; // Slightly slower for students
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // Component: Single Row Item
+        const LessonItem = ({ item, showSpeaker = true }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className="bg-white rounded-xl shadow-sm p-4 mb-4 border-l-4 border-green-500">
+                    {/* Top Row: Speaker & Thai */}
+                    <div className="flex items-start gap-3">
+                        <button 
+                            onClick={() => speak(item.thai)}
+                            className="bg-green-100 hover:bg-green-200 text-green-700 p-3 rounded-full transition-colors flex-shrink-0"
+                            aria-label="Listen"
+                        >
+                            <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                        <div className="flex-grow">
+                             {showSpeaker && item.speaker && (
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">
+                                    {item.speaker}
+                                </span>
+                            )}
+                            <h3 className="text-2xl font-bold text-gray-800 leading-normal font-thai">
+                                {item.thai} <span className="ml-2 text-xl">{item.emoji}</span>
+                            </h3>
+                        </div>
+                    </div>
+
+                    {/* Controls Row */}
+                    <div className="flex gap-2 mt-4">
+                        <button 
+                            onClick={() => setShowIPA(!showIPA)}
+                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                        >
+                            {showIPA ? 'ซ่อน IPA' : 'IPA'}
+                        </button>
+                        <button 
+                            onClick={() => setShowEN(!showEN)}
+                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                        >
+                            {showEN ? 'ซ่อน EN' : 'EN'}
+                        </button>
+                    </div>
+
+                    {/* Hidden Content Area */}
+                    <div className="mt-3 space-y-2">
+                        {showIPA && (
+                            <div className="p-2 bg-purple-50 rounded text-purple-800 font-mono text-lg animate-fade-in">
+                                /{item.ipa}/
+                            </div>
+                        )}
+                        {showEN && (
+                            <div className="p-2 bg-blue-50 rounded text-blue-800 italic text-base animate-fade-in">
+                                "{item.en}"
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const SectionHeader = ({ icon, title, subtitle }) => (
+            <div className="flex items-center gap-3 mb-6 mt-8 pb-2 border-b-2 border-green-100">
+                <div className="p-2 bg-green-500 text-white rounded-lg">
+                    <i className={`ph ${icon} text-2xl`}></i>
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-green-800">{title}</h2>
+                    <p className="text-sm text-green-600">{subtitle}</p>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            return (
+                <div className="max-w-2xl mx-auto min-h-screen pb-12">
+                    {/* Header */}
+                    <header className="bg-green-600 text-white p-6 shadow-lg rounded-b-3xl mb-8">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h1 className="text-3xl font-bold mb-2">เรียนภาษาไทย 🇹🇭</h1>
+                                <p className="opacity-90 text-sm">Interactive Speaking Lesson</p>
+                            </div>
+                            <div className="text-4xl">🐘</div>
+                        </div>
+                    </header>
+
+                    <div className="px-4">
+                        {/* 1. Review Section */}
+                        <SectionHeader 
+                            icon="ph-arrows-clockwise" 
+                            title="ทบทวนคำศัพท์" 
+                            subtitle="Vocabulary Review" 
+                        />
+                        <div className="grid gap-4">
+                            {reviewVocab.map((item, idx) => (
+                                <LessonItem key={idx} item={item} showSpeaker={false} />
+                            ))}
+                        </div>
+
+                        {/* 2. Video Script Section */}
+                        <SectionHeader 
+                            icon="ph-video-camera" 
+                            title="บทสนทนา: คณิตศาสตร์" 
+                            subtitle="Dialogue: Math Class" 
+                        />
+                        <div className="grid gap-4">
+                            {dialogueScript.map((item, idx) => (
+                                <LessonItem key={idx} item={item} />
+                            ))}
+                        </div>
+
+                        {/* 3. Practice Section */}
+                        <SectionHeader 
+                            icon="ph-calculator" 
+                            title="ฝึกฝนเพิ่มเติม" 
+                            subtitle="Numbers & Grammar Practice" 
+                        />
+                        <div className="grid gap-4">
+                            {practiceData.map((item, idx) => (
+                                <LessonItem key={idx} item={item} showSpeaker={false} />
+                            ))}
+                        </div>
+
+                        {/* Interactive Number Challenge */}
+                        <div className="bg-orange-50 rounded-xl p-6 mt-8 border border-orange-200 text-center">
+                            <h3 className="text-lg font-bold text-orange-800 mb-4">🔢 ลองอ่านตัวเลขเหล่านี้ (Read these numbers)</h3>
+                            <div className="flex flex-wrap justify-center gap-3">
+                                {['081-234-5678', '19/4', '11 + 5 = 16', '30 + 20 = 50'].map((num, i) => (
+                                    <button 
+                                        key={i}
+                                        onClick={() => speak(num.replace(/-/g, '').replace(/\//g, ' tháp '))}
+                                        className="bg-white px-4 py-2 rounded shadow text-xl font-bold text-orange-600 hover:bg-orange-100 active:scale-95 transition-transform"
+                                    >
+                                        {num}
+                                    </button>
+                                ))}
+                            </div>
+                            <p className="text-xs text-orange-500 mt-3">*Click to check pronunciation</p>
+                        </div>
+
+                    </div>
+                    
+                    <footer className="text-center text-gray-400 text-sm mt-12 mb-6">
+                        Designed for 1:1 Thai Learning
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
