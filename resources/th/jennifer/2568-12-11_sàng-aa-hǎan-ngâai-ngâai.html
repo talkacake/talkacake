@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: Simple Ordering</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts (Sarabun for Thai) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fffbeb; /* Warm paper background */
+        }
+        .thai-font {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceShort {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-bounce-short {
+            animation: bounceShort 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // TTS Helper
+        const speak = (text) => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // --- DATA ---
+
+        // 0. Jumbled Sentences Data (Updated)
+        const jumbledSentences = [
+            {
+                id: 1,
+                english: "Where are you from?",
+                correctIds: [1, 2, 3],
+                words: [
+                    { id: 3, text: "ที่ไหน", ipa: "thîi-năi" },
+                    { id: 1, text: "เป็น", ipa: "bpen" }, 
+                    { id: 2, text: "คน", ipa: "khon" }
+                ],
+                fullThai: "เป็นคนที่ไหน",
+                ipa: "bpen khon thîi-năi"
+            },
+            {
+                id: 2,
+                english: "Must tell (me) first.",
+                correctIds: [1, 2, 3],
+                words: [
+                    { id: 3, text: "ก่อน", ipa: "gòon" },
+                    { id: 1, text: "ต้อง", ipa: "dtông" },
+                    { id: 2, text: "บอก", ipa: "bòk" }
+                ],
+                fullThai: "ต้องบอกก่อน",
+                ipa: "dtông bòk gòon"
+            },
+            {
+                id: 3,
+                english: "What will you recommend?",
+                correctIds: [1, 2, 3],
+                words: [
+                    { id: 3, text: "อะไร", ipa: "a-rai" },
+                    { id: 2, text: "แนะนำ", ipa: "náe-nam" },
+                    { id: 1, text: "จะ", ipa: "jà" }
+                ],
+                fullThai: "จะแนะนำอะไร",
+                ipa: "jà náe-nam a-rai"
+            }
+        ];
+
+        // 1. Script Data
+        const dialogueScript = [
+            { 
+                speaker: "ออม", 
+                thai: "เอา 5 ไว้ในใจ", 
+                ipa: "ao hâa wái nai jai", 
+                en: "Keep 5 in mind (heart)", 
+                emoji: "❤️",
+                vocab: ["เอา (take)", "ไว้ (keep)", "ใน (in)", "ใจ (heart/mind)"]
+            },
+            { 
+                speaker: "ออม", 
+                thai: "ชูนิ้วขึ้นมา 6", 
+                ipa: "chuu níw khûen maa hòk", 
+                en: "Hold up 6 fingers", 
+                emoji: "🖐️☝️",
+                vocab: ["ชู (lift/show)", "นิ้ว (finger)", "ขึ้นมา (up)"]
+            },
+            { 
+                speaker: "ออม", 
+                thai: "นับต่อจาก 5", 
+                ipa: "náp dtòo jàak hâa", 
+                en: "Count on from 5", 
+                emoji: "", 
+                vocab: ["นับ (count)", "ต่อ (continue/next)", "จาก (from)"]
+            },
+            { 
+                speaker: "ออม", 
+                thai: "6 7 8 9 10 11", 
+                ipa: "hòk ... sìp-èt", 
+                en: "6 7 8 9 10 11", 
+                emoji: "🔢",
+                vocab: []
+            },
+        ];
+
+        // 2. Menu Items (Loan Words)
+        const menuItems = [
+            // Drinks
+            { id: 'coke', thai: "โค้ก", ipa: "Khóok", en: "Coke", type: "drink", emoji: "🥤" },
+            { id: 'americano', thai: "อเมริกาโน่", ipa: "A-mee-ri-gaa-nôo", en: "Americano", type: "drink", emoji: "☕" },
+            { id: 'chocolate', thai: "ช็อกโกแล็ต", ipa: "Chók-goo-láet", en: "Chocolate", type: "drink", emoji: "🍫" },
+            { id: 'matcha', thai: "มัทฉะ", ipa: "Mát-chà", en: "Matcha", type: "drink", emoji: "🍵" },
+            // Food
+            { id: 'padthai', thai: "ผัดไทย", ipa: "Phàt-thai", en: "Pad Thai", type: "dish", emoji: "🍜🇹🇭" },
+            { id: 'tomyum', thai: "ต้มยำกุ้ง", ipa: "Dtôm-yam-gûng", en: "Tom Yum Kung", type: "dish", emoji: "🥘🦐" },
+            { id: 'pasta', thai: "พาสต้า", ipa: "Phâas-dtâa", en: "Pasta", type: "dish", emoji: "🍝" },
+            { id: 'pizza', thai: "พิซซ่า", ipa: "Phít-sâa", en: "Pizza", type: "piece", emoji: "🍕" },
+            { id: 'pancake', thai: "แพนเค้ก", ipa: "Phaen-khéek", en: "Pancake", type: "piece", emoji: "🥞" },
+        ];
+
+        // 3. Quiz Data (Letter Hunt)
+        const letterQuizData = [
+            {
+                letter: "น",
+                name: "Noo-Nu",
+                question: "คำไหนมี 'น'?",
+                options: [
+                    { text: "เอา", correct: false },
+                    { text: "นับ", correct: true },
+                    { text: "ชู", correct: false }
+                ]
+            },
+            {
+                letter: "ก",
+                name: "Gor-Gai",
+                question: "คำไหนมี 'ก'?",
+                options: [
+                    { text: "ไว้", correct: false },
+                    { text: "ใจ", correct: false },
+                    { text: "ช็อกโกแล็ต", correct: true }
+                ]
+            },
+            {
+                letter: "า",
+                name: "Sara-Aa",
+                question: "คำไหนมี 'า'?",
+                options: [
+                    { text: "นิ้ว", correct: false },
+                    { text: "พาสต้า", correct: true },
+                    { text: "นับ", correct: false }
+                ]
+            }
+        ];
+
+        // UI Texts
+        const uiText = {
+            mainTitle: { thai: "สั่งอาหารง่ายๆ", ipa: "sàng aa-hǎan ngâai-ngâai", en: "Simple Food Ordering" },
+            sectionReview: { thai: "ทบทวนประโยค", ipa: "thóp-thuan bprà-yòok", en: "Review Sentences" },
+            gameInstruction: { thai: "เรียงคำให้ถูกต้อง:", ipa: "riang kham hâi thùuk-dtông", en: "Order the words correctly:" },
+            section1: { thai: "วิธีนับเลข (จากวิดีโอ)", ipa: "wí-thii náp lêek", en: "How to count (from video)" },
+            section2: { thai: "ฝึกสั่งอาหาร", ipa: "fùek sàng aa-hǎan", en: "Practice Ordering Food" },
+            section3: { thai: "ตามหาตัวอักษร", ipa: "dtaam hǎa dtua àk-sǒon", en: "Letter Hunt" },
+            instructionHunt: { thai: "หาตัวอักษรเหล่านี้ในหน้าจอ", ipa: "hǎa dtua àk-sǒon lào-níi nai nâa-joo", en: "Find these letters on the screen" },
+            instructionOrder: { thai: "เลือกเมนู + จำนวน", ipa: "lûeak mee-nuu + jam-nuan", en: "Choose Menu + Number" },
+            reset: { thai: "เริ่มใหม่", ipa: "rôem mài", en: "Reset" },
+        };
+
+        // --- COMPONENTS ---
+
+        const InteractiveText = ({ textObj, size = "lg", color = "text-gray-800", icon = null }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+            const txtSize = size === "xl" ? "text-2xl" : (size === "lg" ? "text-xl" : (size === "md" ? "text-lg" : "text-base"));
+            
+            return (
+                <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                        {icon && <i className={`ph ${icon} text-2xl text-amber-600`}></i>}
+                        <button onClick={() => speak(textObj.thai)} className="text-amber-600 hover:text-amber-800 flex-shrink-0">
+                            <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                        <h3 className={`${txtSize} font-bold ${color} thai-font leading-snug`}>{textObj.thai}</h3>
+                    </div>
+                    <div className="flex gap-2 ml-9">
+                        <button onClick={() => setShowIPA(!showIPA)} className={`text-xs px-2 py-0.5 rounded border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-300 text-gray-400'}`}>IPA</button>
+                        <button onClick={() => setShowEN(!showEN)} className={`text-xs px-2 py-0.5 rounded border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'border-gray-300 text-gray-400'}`}>EN</button>
+                    </div>
+                    {(showIPA || showEN) && (
+                        <div className="ml-9 space-y-1">
+                            {showIPA && <div className="text-purple-600 text-sm font-mono">/{textObj.ipa}/</div>}
+                            {showEN && <div className="text-blue-600 text-sm italic">"{textObj.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Jumbled Game Component
+        const JumbledGame = ({ data }) => {
+            const [currentPool, setCurrentPool] = useState([...data.words].sort(() => Math.random() - 0.5));
+            const [userAnswer, setUserAnswer] = useState([]);
+            const [isCorrect, setIsCorrect] = useState(null);
+
+            const handleWordClick = (wordObj, index) => {
+                if (isCorrect === true) return;
+                const newPool = [...currentPool];
+                newPool.splice(index, 1);
+                setCurrentPool(newPool);
+                setUserAnswer([...userAnswer, wordObj]);
+                setIsCorrect(null);
+            };
+
+            const handleAnswerClick = (wordObj, index) => {
+                if (isCorrect === true) return;
+                const newAns = [...userAnswer];
+                newAns.splice(index, 1);
+                setUserAnswer(newAns);
+                setCurrentPool([...currentPool, wordObj]);
+                setIsCorrect(null);
+            };
+
+            const checkAnswer = () => {
+                const answerIds = userAnswer.map(w => w.id).join(",");
+                const correctIds = data.correctIds.join(",");
+                
+                if (answerIds === correctIds) {
+                    setIsCorrect(true);
+                    speak(data.fullThai);
+                } else {
+                    setIsCorrect(false);
+                    speak("Mai chai");
+                }
+            };
+
+            const reset = () => {
+                setCurrentPool([...data.words].sort(() => Math.random() - 0.5));
+                setUserAnswer([]);
+                setIsCorrect(null);
+            };
+
+            return (
+                <div className="bg-white rounded-xl shadow p-5 mb-6 border-2 border-dashed border-amber-200">
+                    <InteractiveText textObj={uiText.gameInstruction} size="sm" color="text-gray-500" />
+                    
+                    <p className="text-lg font-bold text-amber-900 mb-4 bg-amber-50 p-3 rounded-lg border border-amber-100">
+                        "{data.english}"
+                    </p>
+                    
+                    {/* Answer Area */}
+                    <div className="min-h-[60px] bg-gray-50 rounded-lg p-2 mb-4 flex flex-wrap gap-2 items-center border border-gray-200">
+                        {userAnswer.length === 0 && <span className="text-gray-300 text-sm italic w-full text-center">แตะคำศัพท์ (Tap words)</span>}
+                        {userAnswer.map((wordObj, idx) => (
+                            <button 
+                                key={idx} 
+                                onClick={() => handleAnswerClick(wordObj, idx)}
+                                className="bg-amber-500 text-white px-3 py-2 rounded shadow text-lg animate-bounce-short"
+                            >
+                                {wordObj.text}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Word Pool */}
+                    <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                        {currentPool.map((wordObj, idx) => (
+                            <button 
+                                key={idx} 
+                                onClick={() => handleWordClick(wordObj, idx)}
+                                className="bg-white border-2 border-amber-400 text-amber-800 px-3 py-2 rounded shadow-sm hover:bg-amber-50 active:scale-95 transition-transform"
+                            >
+                                {wordObj.text}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Controls */}
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                        <button onClick={reset} className="text-gray-400 hover:text-gray-600 text-sm flex items-center gap-1">
+                            <i className="ph ph-arrow-counter-clockwise"></i> เริ่มใหม่
+                        </button>
+                        
+                        {isCorrect === true ? (
+                            <div className="flex items-center gap-2 animate-pop">
+                                <span className="text-green-600 font-bold flex items-center gap-1">
+                                    <i className="ph ph-check-circle text-xl"></i> ถูกต้อง!
+                                </span>
+                                <button onClick={() => speak(data.fullThai)} className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">
+                                    <i className="ph ph-speaker-high"></i>
+                                </button>
+                            </div>
+                        ) : (
+                             <button 
+                                onClick={checkAnswer}
+                                className={`px-4 py-2 rounded-lg font-bold text-white shadow transition-colors ${userAnswer.length > 0 ? 'bg-amber-600 hover:bg-amber-700' : 'bg-gray-300 cursor-not-allowed'}`}
+                                disabled={userAnswer.length === 0}
+                            >
+                                ตรวจ (Check)
+                            </button>
+                        )}
+                        {isCorrect === false && <span className="text-red-500 text-sm font-bold animate-pulse">ผิด (Wrong)</span>}
+                    </div>
+                </div>
+            );
+        };
+
+        const ScriptItem = ({ item }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className="bg-white rounded-xl shadow-sm p-4 mb-4 border-l-4 border-amber-500">
+                    <div className="flex items-start gap-3">
+                        <button onClick={() => speak(item.thai)} className="btn-press bg-amber-100 text-amber-700 p-3 rounded-full flex-shrink-0">
+                            <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                        <div className="flex-grow pt-1">
+                            <h3 className="text-2xl font-bold text-gray-800 thai-font leading-relaxed">
+                                {item.thai} <span className="ml-1 text-xl">{item.emoji}</span>
+                            </h3>
+                        </div>
+                    </div>
+                    <div className="flex gap-2 mt-4 ml-12">
+                        <button onClick={() => setShowIPA(!showIPA)} className={`px-3 py-1 rounded-lg text-xs font-bold border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'bg-gray-50 text-gray-400'}`}>IPA</button>
+                        <button onClick={() => setShowEN(!showEN)} className={`px-3 py-1 rounded-lg text-xs font-bold border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'bg-gray-50 text-gray-400'}`}>EN</button>
+                    </div>
+                    {(showIPA || showEN) && (
+                        <div className="mt-3 ml-12 space-y-2">
+                            {showIPA && <div className="text-purple-800 font-mono text-lg">/{item.ipa}/</div>}
+                            {showEN && <div className="text-blue-800 italic text-base">"{item.en}"</div>}
+                            {showEN && item.vocab && item.vocab.length > 0 && (
+                                <div className="mt-2 pt-2 border-t border-gray-100">
+                                    <p className="text-xs text-gray-400 mb-1">คำศัพท์ (Vocab):</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {item.vocab.map((v, i) => (
+                                            <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">{v}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const OrderGame = () => {
+            const [step, setStep] = useState(1); // 1: Choose Item, 2: Choose Number, 3: Result
+            const [selection, setSelection] = useState({ item: null, number: null });
+
+            const handleItemClick = (item) => {
+                setSelection({ ...selection, item: item });
+                speak(item.thai);
+                setStep(2);
+            };
+
+            const handleNumberClick = (num) => {
+                const newSel = { ...selection, number: num };
+                setSelection(newSel);
+                setStep(3);
+                setTimeout(() => speak(`${newSel.item.thai} ${num}`), 300);
+            };
+
+            const reset = () => {
+                setStep(1);
+                setSelection({ item: null, number: null });
+            };
+
+            return (
+                <div className="bg-white rounded-xl shadow-lg border-2 border-orange-100 overflow-hidden">
+                    {/* Display Area */}
+                    <div className="bg-orange-50 p-6 text-center min-h-[160px] flex flex-col items-center justify-center">
+                        {step === 1 && <p className="text-gray-400 animate-pulse">เลือกเมนู (Select Menu)...</p>}
+                        
+                        <div className="flex items-center justify-center gap-2 flex-wrap">
+                            {/* Part 1: Item */}
+                            {selection.item && (
+                                <div className="animate-pop flex flex-col items-center">
+                                    <span className="text-4xl mb-2">{selection.item.emoji}</span>
+                                    <span className="text-2xl font-bold text-gray-800">{selection.item.thai}</span>
+                                    <span className="text-xs text-purple-500 font-mono">/{selection.item.ipa}/</span>
+                                </div>
+                            )}
+
+                            {/* Part 2: Number */}
+                            {selection.number && (
+                                <div className="animate-pop flex items-center gap-2 ml-2">
+                                    <span className="text-3xl font-bold text-blue-600 bg-white px-3 py-1 rounded shadow-sm">+ {selection.number}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {step === 3 && (
+                            <button onClick={() => speak(`${selection.item.thai} ${selection.number}`)} className="mt-4 bg-orange-200 text-orange-800 p-2 rounded-full hover:bg-orange-300">
+                                <i className="ph ph-speaker-high text-2xl"></i>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Controls Area */}
+                    <div className="p-4 bg-white">
+                        {/* Step 1: Menu Grid */}
+                        {step === 1 && (
+                            <div className="grid grid-cols-3 gap-3">
+                                {menuItems.map((item) => (
+                                    <button 
+                                        key={item.id}
+                                        onClick={() => handleItemClick(item)}
+                                        className="flex flex-col items-center p-3 rounded-lg border border-gray-100 hover:border-orange-300 hover:bg-orange-50 transition-all btn-press"
+                                    >
+                                        <span className="text-3xl mb-1">{item.emoji}</span>
+                                        <span className="text-sm font-bold text-gray-700 text-center">{item.thai}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Step 2: Number Grid */}
+                        {step === 2 && (
+                            <div>
+                                <p className="text-center text-gray-500 mb-3 text-sm">เลือกจำนวน (Select Quantity)</p>
+                                <div className="grid grid-cols-5 gap-3">
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                        <button 
+                                            key={num}
+                                            onClick={() => handleNumberClick(num)}
+                                            className="bg-blue-50 text-blue-800 font-bold text-xl py-3 rounded-lg hover:bg-blue-100 border border-blue-200 btn-press"
+                                        >
+                                            {num}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button onClick={reset} className="w-full mt-4 text-gray-400 text-sm">ย้อนกลับ (Back)</button>
+                            </div>
+                        )}
+
+                        {/* Step 3: Result Actions */}
+                        {step === 3 && (
+                            <div className="text-center">
+                                <button 
+                                    onClick={reset}
+                                    className="bg-green-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-600 transition-transform btn-press flex items-center gap-2 mx-auto"
+                                >
+                                    <i className="ph ph-arrow-counter-clockwise text-xl"></i>
+                                    <span>สั่งอีกครั้ง (Order Again)</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const QuizCard = ({ questionData }) => {
+            const [status, setStatus] = useState(null); // null, correct, wrong
+
+            const check = (isCorrect, text) => {
+                if(status === 'correct') return;
+                if(isCorrect) {
+                    setStatus('correct');
+                    speak("ถูกต้อง " + text);
+                } else {
+                    setStatus('wrong');
+                    speak("ไม่ใช่ " + text);
+                    setTimeout(() => setStatus(null), 1000); // Reset wrong after 1s to allow retry
+                }
+            };
+
+            return (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100 mb-4">
+                    <div className="flex items-center gap-3 mb-3 border-b border-purple-50 pb-2">
+                        <span className="text-4xl font-bold text-purple-700">{questionData.letter}</span>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-purple-400 uppercase font-bold tracking-wider">{questionData.name}</span>
+                            <span className="text-sm font-bold text-gray-600">{questionData.question}</span>
+                        </div>
+                        <button onClick={() => speak(questionData.letter)} className="ml-auto text-purple-400 hover:text-purple-600">
+                             <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2">
+                        {questionData.options.map((opt, i) => (
+                            <button 
+                                key={i}
+                                onClick={() => check(opt.correct, opt.text)}
+                                className={`
+                                    py-2 px-1 rounded-lg font-bold text-lg transition-all
+                                    ${status === 'correct' && opt.correct ? 'bg-green-500 text-white scale-105' : ''}
+                                    ${status === 'correct' && !opt.correct ? 'bg-gray-100 text-gray-300' : ''}
+                                    ${status === 'wrong' && !opt.correct ? 'bg-red-100 text-red-500' : ''}
+                                    ${status === null ? 'bg-purple-50 text-purple-800 hover:bg-purple-100' : ''}
+                                `}
+                            >
+                                {opt.text}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        const LetterQuiz = () => {
+            return (
+                <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
+                    {letterQuizData.map((q, i) => (
+                        <QuizCard key={i} questionData={q} />
+                    ))}
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <div className="max-w-md mx-auto min-h-screen pb-20 bg-gray-50">
+                    {/* Header */}
+                    <header className="bg-amber-500 text-white p-6 rounded-b-3xl shadow-md mb-8 sticky top-0 z-50">
+                        <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                                <InteractiveText 
+                                    textObj={uiText.mainTitle} 
+                                    size="xl" 
+                                    color="text-white" 
+                                />
+                            </div>
+                            <div className="text-4xl filter drop-shadow-md">🍜</div>
+                        </div>
+                    </header>
+
+                    <div className="px-4 space-y-10">
+                        
+                        {/* Section 0: Review (New) */}
+                        <section>
+                            <InteractiveText 
+                                textObj={uiText.sectionReview} 
+                                icon="ph-arrows-clockwise" 
+                                size="lg" 
+                            />
+                            {jumbledSentences.map(game => (
+                                <JumbledGame key={game.id} data={game} />
+                            ))}
+                        </section>
+
+                        {/* Section 1: Video Script */}
+                        <section>
+                            <InteractiveText 
+                                textObj={uiText.section1} 
+                                icon="ph-hand-pointing" 
+                                size="lg" 
+                            />
+                            {dialogueScript.map((item, idx) => (
+                                <ScriptItem key={idx} item={item} />
+                            ))}
+                        </section>
+
+                        {/* Section 2: Ordering Game */}
+                        <section>
+                            <InteractiveText 
+                                textObj={uiText.section2} 
+                                icon="ph-shopping-cart" 
+                                size="lg" 
+                            />
+                            
+                            <div className="mb-2 flex items-center gap-2 text-sm text-gray-500 bg-white p-2 rounded-lg border border-gray-200">
+                                <i className="ph ph-info text-blue-500"></i>
+                                <span>Pattern: <b>Menu</b> + <b>Number</b></span>
+                            </div>
+
+                            <OrderGame />
+                        </section>
+
+                        {/* Section 3: Letter Quiz (Updated) */}
+                        <section>
+                            <InteractiveText 
+                                textObj={uiText.section3} 
+                                icon="ph-magnifying-glass" 
+                                size="lg" 
+                            />
+                            
+                            {/* Updated Instruction with TTS/Toggle */}
+                            <InteractiveText 
+                                textObj={uiText.instructionHunt}
+                                size="md"
+                                color="text-gray-600"
+                            />
+                            
+                            <LetterQuiz />
+                        </section>
+
+                    </div>
+                    
+                    <footer className="text-center text-gray-400 text-xs mt-12 mb-6 font-mono">
+                       
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
