@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: Ordering Drinks</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts (Sarabun for Thai) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fffbeb; /* Warm paper background */
+        }
+        .thai-font {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceShort {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-bounce-short {
+            animation: bounceShort 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // TTS Helper
+        const speak = (text) => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // --- DATA ---
+
+        // 1. Review Sentences
+        const reviewSentences = [
+            {
+                id: 1,
+                english: "What do you want to order?",
+                correctIds: [1, 2, 3],
+                words: [
+                    { id: 3, text: "อะไร", ipa: "à-rai" }, 
+                    { id: 2, text: "สั่ง", ipa: "sàng" }, 
+                    { id: 1, text: "คุณ", ipa: "khun" }
+                ],
+                fullThai: "คุณสั่งอะไร",
+                ipa: "Khun sàng à-rai"
+            },
+            {
+                id: 2,
+                english: "How many shrimps (do you) want?",
+                correctIds: [1, 2, 3, 4],
+                words: [
+                    { id: 4, text: "ตัว", ipa: "dtua" },
+                    { id: 3, text: "กี่", ipa: "gìi" },
+                    { id: 2, text: "กุ้ง", ipa: "gûng" },
+                    { id: 1, text: "เอา", ipa: "ao" }
+                ],
+                fullThai: "เอากุ้งกี่ตัว",
+                ipa: "Ao gûng gìi dtua"
+            },
+            {
+                id: 3,
+                english: "I will recommend food.",
+                correctIds: [1, 2, 3, 4],
+                words: [
+                    { id: 4, text: "อาหาร", ipa: "aa-hǎan" },
+                    { id: 3, text: "แนะนำ", ipa: "náe-nam" },
+                    { id: 2, text: "จะ", ipa: "jà" },
+                    { id: 1, text: "ฉัน", ipa: "chán" }
+                ],
+                fullThai: "ฉันจะแนะนำอาหาร",
+                ipa: "Chán jà náe-nam aa-hǎan"
+            }
+        ];
+
+        // 2. New Vocab
+        const newVocab = [
+            { thai: "แก้ว", ipa: "gâeo", en: "glass / cup (classifier)", emoji: "🥤" },
+            { thai: "ร้อน", ipa: "rón", en: "hot", emoji: "🔥" },
+            { thai: "น้ำตาล", ipa: "nám-dtaan", en: "sugar", emoji: "🍬" },
+            { thai: "บาท", ipa: "bàat", en: "Baht (currency)", emoji: "฿" },
+            { thai: "รับ", ipa: "ráp", en: "receive / accept (formal 'want')", emoji: "🤲" },
+        ];
+
+        // 3. Script Data
+        const dialogueScript = [
+            { speaker: "Staff", thai: "สวัสดีค่ะ รับอะไรดีคะ", ipa: "sà-wàt-dii khâ, ráp à-rai dii khá", en: "Hello, what would you like?", emoji: "👩‍🍳", vocab: ["รับ (receive)", "อะไร (what)", "ดี (good)"] },
+            { speaker: "Lin", thai: "เอาอเมริกาโน่ร้อน 2 แก้ว", ipa: "ao a-mee-ri-gaa-nôo rón sǒong gâeo", en: "I want 2 hot Americanos.", emoji: "☕🔥", vocab: ["เอา (want)", "ร้อน (hot)", "แก้ว (cups)"] },
+            { speaker: "Lin", thai: "ไม่น้ำตาลค่ะ", ipa: "mâi nám-dtaan khâ", en: "No sugar.", emoji: "🚫🍬", vocab: ["ไม่ (no)", "น้ำตาล (sugar)"] },
+            { speaker: "Staff", thai: "ได้ค่ะ", ipa: "dâai khâ", en: "Okay.", emoji: "👌", vocab: [] },
+            { speaker: "Staff", thai: "ของคุณ...", ipa: "khǒong khun...", en: "For Khun... (Your name?)", emoji: "❓", vocab: ["ของ (of)"] },
+            { speaker: "Lin", thai: "คุณลินค่ะ", ipa: "khun lin khâ", en: "Khun Lin.", emoji: "👩", vocab: [] },
+            { speaker: "Staff", thai: "คุณลินนะคะ", ipa: "khun lin ná khá", en: "Khun Lin, right/okay.", emoji: "📝", vocab: [] },
+            { speaker: "Staff", thai: "ทั้งหมด 155 บาท", ipa: "tháng-mòt nùeng-róoi hâa-sìp-hâa bàat", en: "Total 155 Baht.", emoji: "💰", vocab: ["ทั้งหมด (total)", "บาท (Baht)"] },
+            { speaker: "Staff", thai: "สแกนตรงนี้ได้เลยค่ะ", ipa: "sà-gaen dtrong-níi dâai loei khâ", en: "You can scan right here.", emoji: "📱", vocab: ["สแกน (scan)", "ตรงนี้ (here)"] },
+            { speaker: "Lin", thai: "เรียบร้อยนะคะ", ipa: "rîap-róoi ná khá", en: "Done/Finished.", emoji: "✅", vocab: ["เรียบร้อย (done)"] },
+            { speaker: "Staff", thai: "ขอบคุณค่ะ", ipa: "khòop-khun khâ", en: "Thank you.", emoji: "🙏", vocab: [] },
+        ];
+
+        // 4. Drink Builder Data
+        const drinks = [
+            { id: 'americano', thai: "อเมริกาโน่", ipa: "a-mee-ri-gaa-nôo", emoji: "☕" },
+            { id: 'cocoa', thai: "ช็อกโกแล็ต", ipa: "chók-goo-láet", emoji: "🍫" },
+            { id: 'matcha', thai: "มัทฉะ", ipa: "mát-chà", emoji: "🍵" },
+        ];
+        
+        const options = [
+            { id: 'hot', thai: "ร้อน", ipa: "rón", emoji: "🔥" },
+            { id: 'sugar', thai: "หวาน", ipa: "wǎan", emoji: "🍬" }, 
+            { id: 'no_sugar', thai: "ไม่น้ำตาล", ipa: "mâi nám-dtaan", emoji: "🚫🍬" }, 
+        ];
+
+        // 5. Letter Quiz Data
+        const letterQuizData = [
+            {
+                letter: "ร",
+                name: "Ror Ruea",
+                question: "คำไหนมี 'ร'?",
+                options: [
+                    { text: "แก้ว", correct: false },
+                    { text: "ร้อน", correct: true },
+                    { text: "น้ำตาล", correct: false }
+                ]
+            },
+            {
+                letter: "แ",
+                name: "Sara Ae",
+                question: "คำไหนมี 'แ'?",
+                options: [
+                    { text: "คุณ", correct: false },
+                    { text: "บาท", correct: false },
+                    { text: "สแกน", correct: true }
+                ]
+            },
+            {
+                letter: "น",
+                name: "Nor Nu",
+                question: "คำไหนมี 'น'?",
+                options: [
+                    { text: "รับ", correct: false },
+                    { text: "น้ำตาล", correct: true },
+                    { text: "เอา", correct: false }
+                ]
+            }
+        ];
+
+        // UI Texts
+        const uiText = {
+            mainTitle: { thai: "สั่งน้ำ", ipa: "sàng nám", en: "Ordering Drinks" },
+            sectionReview: { thai: "ทบทวนคำศัพท์", ipa: "thóp-thuan kham-sàp", en: "Vocabulary Review" },
+            sectionVocab: { thai: "คำศัพท์ใหม่ (5 คำ)", ipa: "kham-sàp mài", en: "New Vocabulary (5 words)" },
+            sectionDialogue: { thai: "บทสนทนา", ipa: "bòt sǒn-thá-naa", en: "Dialogue" },
+            sectionPractice: { thai: "ฝึกสั่งน้ำ", ipa: "fùek sàng nám", en: "Practice Ordering" },
+            gameInstruction: { thai: "เรียงประโยค:", ipa: "riang bprà-yòok", en: "Arrange the sentence:" },
+            instructionListen: { thai: "ฟังและบอกว่า ได้ยินอะไร", ipa: "fang láe bòok wâa dâai-yin à-rai", en: "Listen and tell what you hear" },
+            sectionExtension: { thai: "ตามหาตัวอักษร", ipa: "dtaam hǎa dtua àk-sǒon", en: "Letter Hunt" },
+            instructionHunt: { thai: "หาตัวอักษรเหล่านี้ในหน้าจอ", ipa: "hǎa dtua àk-sǒon lào-níi nai nâa-joo", en: "Find these letters on the screen" },
+        };
+
+        // --- COMPONENTS ---
+
+        const InteractiveText = ({ textObj, size = "lg", color = "text-gray-800", icon = null }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+            const txtSize = size === "xl" ? "text-2xl" : (size === "lg" ? "text-xl" : (size === "md" ? "text-lg" : "text-base"));
+            
+            return (
+                <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                        {icon && <i className={`ph ${icon} text-2xl text-amber-600`}></i>}
+                        <button onClick={() => speak(textObj.thai)} className="text-amber-600 hover:text-amber-800 flex-shrink-0">
+                            <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                        <h3 className={`${txtSize} font-bold ${color} thai-font leading-snug`}>{textObj.thai}</h3>
+                    </div>
+                    <div className="flex gap-2 ml-9">
+                        <button onClick={() => setShowIPA(!showIPA)} className={`text-xs px-2 py-0.5 rounded border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-300 text-gray-400'}`}>IPA</button>
+                        <button onClick={() => setShowEN(!showEN)} className={`text-xs px-2 py-0.5 rounded border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'border-gray-300 text-gray-400'}`}>EN</button>
+                    </div>
+                    {(showIPA || showEN) && (
+                        <div className="ml-9 space-y-1">
+                            {showIPA && <div className="text-purple-600 text-sm font-mono">/{textObj.ipa}/</div>}
+                            {showEN && <div className="text-blue-600 text-sm italic">"{textObj.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const VocabCard = ({ item }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className="bg-white p-3 rounded-lg shadow-sm border border-amber-100">
+                    <div className="flex items-start gap-3 mb-2">
+                        <span className="text-3xl mt-1">{item.emoji}</span>
+                        <div className="flex-grow">
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-lg thai-font">{item.thai}</span>
+                                <button onClick={() => speak(item.thai)} className="text-amber-500 hover:text-amber-700">
+                                    <i className="ph ph-speaker-high"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Toggles */}
+                    <div className="flex gap-2 ml-10 mb-2">
+                        <button onClick={() => setShowIPA(!showIPA)} className={`text-xs px-2 py-0.5 rounded border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-200 text-gray-400'}`}>IPA</button>
+                        <button onClick={() => setShowEN(!showEN)} className={`text-xs px-2 py-0.5 rounded border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'border-gray-200 text-gray-400'}`}>EN</button>
+                    </div>
+
+                    {/* Hidden Content */}
+                    {(showIPA || showEN) && (
+                        <div className="ml-10 space-y-1">
+                            {showIPA && <div className="text-xs text-purple-600 font-mono">/{item.ipa}/</div>}
+                            {showEN && <div className="text-xs text-gray-500 italic">"{item.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const JumbledGame = ({ data }) => {
+            const [currentPool, setCurrentPool] = useState([...data.words].sort(() => Math.random() - 0.5));
+            const [userAnswer, setUserAnswer] = useState([]);
+            const [isCorrect, setIsCorrect] = useState(null);
+
+            const handleWordClick = (wordObj, index) => {
+                if (isCorrect === true) return;
+                const newPool = [...currentPool];
+                newPool.splice(index, 1);
+                setCurrentPool(newPool);
+                setUserAnswer([...userAnswer, wordObj]);
+                setIsCorrect(null);
+            };
+
+            const handleAnswerClick = (wordObj, index) => {
+                if (isCorrect === true) return;
+                const newAns = [...userAnswer];
+                newAns.splice(index, 1);
+                setUserAnswer(newAns);
+                setCurrentPool([...currentPool, wordObj]);
+                setIsCorrect(null);
+            };
+
+            const checkAnswer = () => {
+                const answerIds = userAnswer.map(w => w.id).join(",");
+                const correctIds = data.correctIds.join(",");
+                
+                if (answerIds === correctIds) {
+                    setIsCorrect(true);
+                    speak(data.fullThai);
+                } else {
+                    setIsCorrect(false);
+                    speak("Mai chai");
+                }
+            };
+
+            const reset = () => {
+                setCurrentPool([...data.words].sort(() => Math.random() - 0.5));
+                setUserAnswer([]);
+                setIsCorrect(null);
+            };
+
+            return (
+                <div className="bg-white rounded-xl shadow p-4 mb-4 border-2 border-dashed border-amber-200">
+                    <div className="mb-2 text-sm text-gray-500 flex justify-between">
+                         <InteractiveText textObj={uiText.gameInstruction} size="sm" color="text-gray-500" />
+                    </div>
+                    <p className="text-md font-bold text-amber-900 mb-4 bg-amber-50 p-2 rounded border border-amber-100">
+                        "{data.english}"
+                    </p>
+                    
+                    <div className="min-h-[50px] bg-gray-50 rounded p-2 mb-3 flex flex-wrap gap-2 items-center border border-gray-200">
+                        {userAnswer.length === 0 && <span className="text-gray-300 text-sm italic w-full text-center">...</span>}
+                        {userAnswer.map((wordObj, idx) => (
+                            <button key={idx} onClick={() => handleAnswerClick(wordObj, idx)} className="bg-amber-500 text-white px-3 py-1 rounded shadow animate-bounce-short">
+                                {wordObj.text}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                        {currentPool.map((wordObj, idx) => (
+                            <button key={idx} onClick={() => handleWordClick(wordObj, idx)} className="bg-white border border-amber-400 text-amber-800 px-3 py-1 rounded shadow-sm hover:bg-amber-50">
+                                {wordObj.text}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex justify-between items-center border-t pt-2 border-gray-100">
+                        <button onClick={reset} className="text-gray-400 text-xs"><i className="ph ph-arrow-counter-clockwise"></i> Reset</button>
+                        {isCorrect === true ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-green-600 font-bold text-sm"><i className="ph ph-check-circle"></i> ถูกต้อง!</span>
+                                <button onClick={() => speak(data.fullThai)} className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs"><i className="ph ph-speaker-high"></i></button>
+                            </div>
+                        ) : (
+                             <button onClick={checkAnswer} className={`px-4 py-1 rounded text-sm font-bold text-white ${userAnswer.length > 0 ? 'bg-amber-600' : 'bg-gray-300'}`} disabled={userAnswer.length === 0}>Check</button>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const ScriptItem = ({ item }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className={`rounded-xl shadow-sm p-3 mb-3 border-l-4 ${item.speaker === 'Lin' ? 'bg-blue-50 border-blue-400' : 'bg-white border-amber-500'}`}>
+                    <div className="flex items-start gap-3">
+                        <button onClick={() => speak(item.thai)} className={`btn-press p-2 rounded-full flex-shrink-0 ${item.speaker === 'Lin' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-700'}`}>
+                            <i className="ph ph-speaker-high text-lg"></i>
+                        </button>
+                        <div className="flex-grow">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">{item.speaker}</span>
+                            <h3 className="text-xl font-bold text-gray-800 thai-font leading-relaxed">
+                                {item.thai} <span className="ml-1">{item.emoji}</span>
+                            </h3>
+                        </div>
+                    </div>
+                    <div className="flex gap-2 mt-2 ml-11">
+                        <button onClick={() => setShowIPA(!showIPA)} className="px-2 py-0.5 rounded text-xs border border-gray-300 text-gray-500">IPA</button>
+                        <button onClick={() => setShowEN(!showEN)} className="px-2 py-0.5 rounded text-xs border border-gray-300 text-gray-500">EN</button>
+                    </div>
+                    {(showIPA || showEN) && (
+                        <div className="mt-2 ml-11 space-y-1 bg-white/50 p-2 rounded">
+                            {showIPA && <div className="text-purple-800 font-mono text-sm">/{item.ipa}/</div>}
+                            {showEN && <div className="text-blue-800 italic text-sm">"{item.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const DrinkBuilder = () => {
+            const [drink, setDrink] = useState(null);
+            const [temp, setTemp] = useState(null); // Hot
+            const [sugar, setSugar] = useState(null);
+            const [amount, setAmount] = useState(1);
+
+            const speakOrder = () => {
+                if(!drink) return;
+                // Pattern: Drink + Temp + Amount + Classifier + Sugar
+                // e.g., "Americano Hot 2 Cups No Sugar"
+                let sentence = `${drink.thai}`;
+                if (temp) sentence += ` ${temp.thai}`;
+                sentence += ` ${amount} แก้ว`; // Hardcoded classifier for this drill
+                if (sugar) sentence += ` ${sugar.thai}`;
+                
+                speak(sentence);
+            };
+
+            return (
+                <div className="bg-white rounded-xl shadow-lg border-2 border-orange-100 p-4">
+                    {/* Display */}
+                    <div className="bg-orange-50 rounded-lg p-4 text-center mb-4 min-h-[100px] flex flex-col justify-center items-center">
+                        <div className="flex items-center gap-2 flex-wrap justify-center text-xl font-bold text-gray-800">
+                            {drink ? <span>{drink.thai}</span> : <span className="text-gray-300">...</span>}
+                            {temp && <span className="text-red-500">{temp.thai}</span>}
+                            {drink && <span className="bg-white px-2 rounded shadow-sm text-blue-600">{amount} แก้ว</span>}
+                            {sugar && <span className="text-purple-600 text-sm">({sugar.thai})</span>}
+                        </div>
+                        {drink && (
+                            <button onClick={speakOrder} className="mt-2 bg-orange-200 text-orange-800 p-2 rounded-full">
+                                <i className="ph ph-speaker-high text-xl"></i>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Controls */}
+                    <div className="space-y-3">
+                        {/* 1. Drink */}
+                        <div>
+                            <p className="text-xs text-gray-400 mb-1 font-bold">1. เมนู (Menu)</p>
+                            <div className="flex gap-2">
+                                {drinks.map(d => (
+                                    <button key={d.id} onClick={() => {setDrink(d); speak(d.thai);}} className={`flex-1 p-2 rounded border text-sm flex flex-col items-center gap-1 ${drink?.id === d.id ? 'bg-orange-100 border-orange-400' : 'border-gray-200'}`}>
+                                        <span className="text-xl">{d.emoji}</span>
+                                        <span className="text-xs">{d.thai}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 2. Options */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <p className="text-xs text-gray-400 mb-1 font-bold">2. ร้อน (Hot)</p>
+                                <button onClick={() => {setTemp(options[0]); speak(options[0].thai);}} className={`w-full p-2 rounded border text-sm flex items-center justify-center gap-2 ${temp?.id === 'hot' ? 'bg-red-50 border-red-400 text-red-600' : 'border-gray-200'}`}>
+                                    <span>🔥</span> ร้อน
+                                </button>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-400 mb-1 font-bold">3. จำนวน (Amount)</p>
+                                <div className="flex items-center justify-center gap-3 border rounded p-1 bg-gray-50">
+                                    <button onClick={() => setAmount(Math.max(1, amount-1))} className="w-6 h-6 bg-white rounded shadow text-gray-600">-</button>
+                                    <span className="font-bold text-lg w-4 text-center">{amount}</span>
+                                    <button onClick={() => setAmount(Math.min(10, amount+1))} className="w-6 h-6 bg-white rounded shadow text-blue-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* 4. Sugar */}
+                         <div>
+                            <p className="text-xs text-gray-400 mb-1 font-bold">4. น้ำตาล (Sugar)</p>
+                             <div className="flex gap-2">
+                                <button onClick={() => {setSugar(options[2]); speak(options[2].thai);}} className={`flex-1 p-2 rounded border text-sm ${sugar?.id === 'no_sugar' ? 'bg-purple-50 border-purple-400 text-purple-600' : 'border-gray-200'}`}>
+                                    🚫🍬 ไม่น้ำตาล
+                                </button>
+                                <button onClick={() => setSugar(null)} className="px-3 rounded border border-gray-200 text-gray-400 text-xs">
+                                    Normal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const QuizCard = ({ questionData }) => {
+            const [status, setStatus] = useState(null); // null, correct, wrong
+
+            const check = (isCorrect, text) => {
+                if(status === 'correct') return;
+                if(isCorrect) {
+                    setStatus('correct');
+                    speak("ถูกต้อง " + text);
+                } else {
+                    setStatus('wrong');
+                    speak("ไม่ใช่ " + text);
+                    setTimeout(() => setStatus(null), 1000); // Reset wrong after 1s
+                }
+            };
+
+            return (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100 mb-4">
+                    <div className="flex items-center gap-3 mb-3 border-b border-purple-50 pb-2">
+                        <span className="text-4xl font-bold text-purple-700">{questionData.letter}</span>
+                        <div className="flex flex-col">
+                            <span className="text-xs text-purple-400 uppercase font-bold tracking-wider">{questionData.name}</span>
+                            <span className="text-sm font-bold text-gray-600">{questionData.question}</span>
+                        </div>
+                        <button onClick={() => speak(questionData.letter)} className="ml-auto text-purple-400 hover:text-purple-600">
+                             <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2">
+                        {questionData.options.map((opt, i) => (
+                            <button 
+                                key={i}
+                                onClick={() => check(opt.correct, opt.text)}
+                                className={`
+                                    py-2 px-1 rounded-lg font-bold text-lg transition-all
+                                    ${status === 'correct' && opt.correct ? 'bg-green-500 text-white scale-105' : ''}
+                                    ${status === 'correct' && !opt.correct ? 'bg-gray-100 text-gray-300' : ''}
+                                    ${status === 'wrong' && !opt.correct ? 'bg-red-100 text-red-500' : ''}
+                                    ${status === null ? 'bg-purple-50 text-purple-800 hover:bg-purple-100' : ''}
+                                `}
+                            >
+                                {opt.text}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const LetterQuiz = () => {
+            return (
+                <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
+                    {letterQuizData.map((q, i) => (
+                        <QuizCard key={i} questionData={q} />
+                    ))}
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <div className="max-w-md mx-auto min-h-screen pb-20 bg-gray-50">
+                    {/* Header */}
+                    <header className="bg-amber-500 text-white p-6 rounded-b-3xl shadow-md mb-8 sticky top-0 z-50">
+                        <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                                <InteractiveText 
+                                    textObj={uiText.mainTitle} 
+                                    size="xl" 
+                                    color="text-white" 
+                                />
+                            </div>
+                            <div className="text-4xl filter drop-shadow-md">🥤</div>
+                        </div>
+                    </header>
+
+                    <div className="px-4 space-y-10">
+                        
+                        {/* 1. Review */}
+                        <section>
+                            <InteractiveText textObj={uiText.sectionReview} icon="ph-arrows-clockwise" size="lg" />
+                            {reviewSentences.map(game => (
+                                <JumbledGame key={game.id} data={game} />
+                            ))}
+                        </section>
+
+                        {/* 2. New Vocab */}
+                        <section>
+                            <InteractiveText textObj={uiText.sectionVocab} icon="ph-lightbulb" size="lg" />
+                            <div className="grid grid-cols-2 gap-2">
+                                {newVocab.map((item, idx) => (
+                                    <VocabCard key={idx} item={item} />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 3. Script */}
+                        <section>
+                            <InteractiveText textObj={uiText.sectionDialogue} icon="ph-chats-circle" size="lg" />
+                            
+                            {/* Video Link */}
+                            <div className="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
+                                <InteractiveText textObj={uiText.instructionListen} size="md" color="text-blue-800" />
+                                <a 
+                                    href="https://drive.google.com/open?id=1geCLMZwKzRKhfbf1PwwbHBgjS0-5CV4a&usp=drive_fs" 
+                                    target="_blank" 
+                                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-full font-bold hover:bg-blue-700 transition-colors shadow-sm"
+                                >
+                                    <i className="ph ph-play-circle text-xl"></i>
+                                    ดูวิดีโอ (Watch Video)
+                                </a>
+                            </div>
+
+                            {dialogueScript.map((item, idx) => (
+                                <ScriptItem key={idx} item={item} />
+                            ))}
+                        </section>
+
+                         {/* 4. Practice */}
+                         <section>
+                            <InteractiveText textObj={uiText.sectionPractice} icon="ph-coffee" size="lg" />
+                            <DrinkBuilder />
+                        </section>
+
+                        {/* 5. Extension: Letter Hunt */}
+                        <section>
+                            <InteractiveText textObj={uiText.sectionExtension} icon="ph-magnifying-glass" size="lg" />
+                            <InteractiveText textObj={uiText.instructionHunt} size="md" color="text-gray-600" />
+                            <LetterQuiz />
+                        </section>
+
+                    </div>
+                    
+                    <footer className="text-center text-gray-400 text-xs mt-12 mb-6 font-mono">
+                        
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
