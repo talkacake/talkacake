@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This or That?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #fdf2f8; /* A very light pink */
+            color: #581c87; /* A deep purple */
+        }
+        .lesson-card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #fbcfe8; /* Light pink border */
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .lesson-header {
+            background-image: linear-gradient(to right, #ec4899, #d946ef);
+            color: white;
+            padding: 2rem;
+            border-bottom: 5px solid #fbcfe8;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #db2777;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #be185d;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 10px rgba(0,0,0,0.1);
+        }
+        .btn-secondary {
+            background-color: #f3e8ff;
+            color: #9333ea;
+        }
+        .btn-secondary:hover {
+            background-color: #e9d5ff;
+        }
+        details > summary {
+            cursor: pointer;
+            padding: 1.25rem;
+            background-color: #fce7f3;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.125rem;
+            list-style: none; /* Hides the default marker */
+            position: relative;
+            transition: background-color 0.2s;
+        }
+        details > summary:hover {
+            background-color: #fbcfe8;
+        }
+        details > summary::-webkit-details-marker {
+            display: none; /* Hides marker for Chrome/Safari */
+        }
+        details[open] > summary {
+            background-color: #fbcfe8;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .summary-icon {
+            transition: transform 0.3s ease;
+        }
+        details[open] .summary-icon {
+            transform: rotate(180deg);
+        }
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 500;
+            border-radius: 12px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        .flashcard-front {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+        .flashcard-back {
+            background: #c084fc;
+            color: white;
+            transform: rotateY(180deg);
+        }
+        .phonetic, .english {
+            color: #c084fc;
+            font-style: italic;
+            display: block;
+        }
+        .audio-btn {
+            cursor: pointer;
+            color: #9333ea;
+            display: inline-block;
+            margin-left: 0.25rem;
+            vertical-align: middle;
+        }
+        .audio-btn:hover {
+            color: #7e22ce;
+        }
+        .info-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.7rem;
+            line-height: 1;
+            margin-left: 0.35rem;
+            vertical-align: middle;
+            border: 1px solid;
+        }
+        .ipa-btn {
+            background-color: #f3e8ff;
+            color: #9333ea;
+            border-color: #c084fc;
+        }
+        .ipa-btn:hover {
+            background-color: #e9d5ff;
+        }
+        .en-btn {
+            background-color: #fce7f3;
+            color: #db2777;
+            border-color: #f9a8d4;
+        }
+        .en-btn:hover {
+            background-color: #fbcfe8;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-2xl mx-auto">
+        <div class="lesson-card">
+            <div class="lesson-header text-center">
+                <h1 class="text-3xl sm:text-4xl font-bold">This or That?</h1>
+                <p class="mt-2 text-lg opacity-90">Based on a fun clip with Aimee and Bonnie!</p>
+            </div>
+
+            <div class="p-5 sm:p-8 space-y-8">
+
+                <!-- Part 1: Warmer / Review -->
+                <details open>
+                    <summary class="flex justify-between items-center">
+                        <span>💖 Part 1: Quick Review!</span>
+                        <i data-lucide="chevron-down" class="summary-icon"></i>
+                    </summary>
+                    <div class="p-5 border border-t-0 border-pink-200 rounded-b-lg space-y-4">
+                        <p>Let's remember some romantic phrases from last time. Click the IPA and EN buttons to see the phonetics and translation!</p>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <p class="font-semibold">How do you say "I love you"?</p>
+                            <p class="text-lg mt-1">
+                                <span class="thai-text">ฉันรักคุณค่ะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('ฉันรักคุณค่ะ', event)"></i>
+                                <span class="phonetic hidden text-purple-600">(chán rák khun kâ)</span>
+                                <span class="english hidden text-purple-600">I love you.</span>
+                            </p>
+                        </div>
+                         <div class="bg-purple-50 p-4 rounded-lg">
+                            <p class="font-semibold">How do you say "You are cute"?</p>
+                             <p class="text-lg mt-1">
+                                <span class="thai-text">คุณน่ารักค่ะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('คุณน่ารักค่ะ', event)"></i>
+                                <span class="phonetic hidden text-purple-600">(khun nâa rák kâ)</span>
+                                <span class="english hidden text-purple-600">You are cute.</span>
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Part 2: Listening Practice -->
+                <details>
+                    <summary class="flex justify-between items-center">
+                        <span>
+                            🎧 Part 2: 
+                            <span class="thai-text">ฟังและบอกว่า ได้ยินอะไร</span>
+                            <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                            <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                            <i data-lucide="volume-2" class="audio-btn inline-block h-5 w-5" onclick="speak('ฟังและบอกว่า ได้ยินอะไร', event)"></i>
+                            <span class="phonetic hidden text-purple-600 text-base font-normal">(fang lɛ́ bɔ̀ɔk wâa dâi yin à-rai)</span>
+                            <span class="english hidden text-purple-600 text-base font-normal">(Listen and say what you hear)</span>
+                        </span>
+                        <i data-lucide="chevron-down" class="summary-icon"></i>
+                    </summary>
+                    <div class="p-5 border border-t-0 border-pink-200 rounded-b-lg space-y-4">
+                        <p>First, watch this short video clip. Listen carefully to how Aimee and Bonnie introduce themselves.</p>
+                        <a href="https://www.youtube.com/shorts/FBsw1zl1XBE" target="_blank" class="btn btn-primary w-full">
+                            <i data-lucide="youtube" class="mr-2"></i> Click here to watch the video
+                        </a>
+                        <p class="mt-4">Did you hear them say this? Click to check.</p>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <p class="text-lg">
+                                <span class="thai-text">สวัสดีค่ะ เอมี่ ทสร ค่ะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('สวัสดีค่ะ เอมี่ ทสร ค่ะ', event)"></i>
+                                <span class="phonetic hidden text-purple-600">(sà wàt dii kâ eemîi tɔɔ sɔ̌ɔn kâ)</span>
+                                <span class="english hidden text-purple-600">Hello, I'm Aimee Tasorn.</span>
+                            </p>
+                        </div>
+                         <div class="bg-purple-50 p-4 rounded-lg">
+                             <p class="text-lg">
+                                <span class="thai-text">สวัสดีค่ะ บอนนี่ ค่ะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('สวัสดีค่ะ บอนนี่ ค่ะ', event)"></i>
+                                <span class="phonetic hidden text-purple-600">(sà wàt dii kâ bɔɔn-nîi kâ)</span>
+                                <span class="english hidden text-purple-600">Hello, I'm Bonnie.</span>
+                            </p>
+                        </div>
+                    </div>
+                </details>
+                
+                <!-- Part 3: Real Name vs. Nickname -->
+                <details>
+                    <summary class="flex justify-between items-center">
+                        <span>📛 Part 3: What's in a Name?</span>
+                        <i data-lucide="chevron-down" class="summary-icon"></i>
+                    </summary>
+                    <div class="p-5 border border-t-0 border-pink-200 rounded-b-lg space-y-4">
+                        <p>In Thailand, people have a formal name and a nickname. Let's look at Aimee's introduction:</p>
+                        <div class="text-center bg-purple-50 p-4 rounded-lg">
+                             <p class="text-lg">
+                                <span class="thai-text">เอมี่ ทสร</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('เอมี่ ทสร', event)"></i>
+                                <span class="phonetic hidden text-purple-600">(eemîi tɔɔ sɔ̌ɔn)</span>
+                            </p>
+                        </div>
+                        <p>Here's the breakdown:</p>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong><span class="thai-text">ชื่อจริง</span><button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('ชื่อจริง', event)"></i><span class="phonetic hidden text-purple-600">(chʉ̂ʉ jing)</span><span class="english hidden text-purple-600">"real name"</span></strong>: <strong><span class="thai-text">จริง</span><button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('จริง', event)"></i><span class="phonetic hidden text-purple-600">(jing)</span><span class="english hidden text-purple-600">"real" or "true"</span></strong>. Aimee's real name is <span class="font-semibold">ทสร (tɔɔ sɔ̌ɔn)</span>.</li>
+                            <li><strong><span class="thai-text">ชื่อเล่น</span><button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('ชื่อเล่น', event)"></i><span class="phonetic hidden text-purple-600">(chʉ̂ʉ lên)</span><span class="english hidden text-purple-600">"nickname"</span></strong>: <strong><span class="thai-text">เล่น</span><button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('เล่น', event)"></i><span class="phonetic hidden text-purple-600">(lên)</span><span class="english hidden text-purple-600">"to play"</span></strong>. It's a "play name"! Aimee's nickname is <span class="font-semibold">เอมี่ (eemîi)</span>.</li>
+                        </ul>
+                        <p class="mt-4 font-semibold">Now you try! How would you introduce yourself with your real name and nickname?</p>
+                        <p>Structure: <code class="bg-pink-100 text-pink-700 p-1 rounded">ชื่อจริง (chʉ̂ʉ jing) [Your Real Name], ชื่อเล่น (chʉ̂ʉ lên) [Your Nickname] ค่ะ/ครับ (kâ/khráp)</code></p>
+                    </div>
+                </details>
+
+
+                <!-- Part 4: The Key Question -->
+                <details>
+                    <summary class="flex justify-between items-center">
+                        <span>❓ Part 4: The Key Question: "A or B?"</span>
+                        <i data-lucide="chevron-down" class="summary-icon"></i>
+                    </summary>
+                    <div class="p-5 border border-t-0 border-pink-200 rounded-b-lg space-y-4">
+                        <p>The host asks "This or That" questions. The key word is <strong class="text-xl"><span class="thai-text">หรือ</span><button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('หรือ', event)"></i><span class="phonetic hidden text-purple-600">(rʉ̌ʉ)</span><span class="english hidden text-purple-600">"or"</span></strong>.</p>
+                        <p>The structure is: <code class="bg-pink-100 text-pink-700 p-1 rounded">[A] + หรือ (rʉ̌ʉ) + [B] + คะ/ครับ (khá/khráp)</code></p>
+                         <div class="bg-purple-50 p-4 rounded-lg">
+                             <p class="text-lg">
+                                <span class="thai-text">พิธีกร: ส้มตำหรือสปาเกตตี้คะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('พิธีกร: ส้มตำหรือสปาเกตตี้คะ', event)"></i>
+                                <span class="phonetic hidden text-purple-600">(pí-tii-gɔɔn: sôm dtam rʉ̌ʉ sà-bpaa-gêt-dtîi khá)</span>
+                                <span class="english hidden text-purple-600">Host: Papaya salad or spaghetti?</span>
+                            </p>
+                        </div>
+                        <p>The question particle <strong class="text-xl"><span class="thai-text">คะ</span><button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('คะ', event)"></i><span class="phonetic hidden text-purple-600">(khá)</span></strong> has a high tone when asking a question.</p>
+                    </div>
+                </details>
+                
+                <!-- Part 5: New Vocabulary -->
+                <details>
+                     <summary class="flex justify-between items-center">
+                        <span>
+                            📚 Part 5: 
+                            <span class="thai-text">คำศัพท์ใหม่</span>
+                            <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                            <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                            <i data-lucide="volume-2" class="audio-btn inline-block h-5 w-5" onclick="speak('คำศัพท์ใหม่', event)"></i>
+                            <span class="phonetic hidden text-purple-600 text-base font-normal">(kham sàp mài)</span>
+                            <span class="english hidden text-purple-600 text-base font-normal">(New Vocab)</span>
+                        </span>
+                        <i data-lucide="chevron-down" class="summary-icon"></i>
+                    </summary>
+                     <div class="p-5 border border-t-0 border-pink-200 rounded-b-lg space-y-4">
+                        <p class="text-center text-purple-700">Let's learn the words from the game!</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">Papaya Salad</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('ส้มตำ', event)">ส้มตำ (sôm dtam)</div>
+                                </div>
+                            </div>
+                            <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">Talkative</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('พูดเก่ง', event)">พูดเก่ง (phûut gèng)</div>
+                                </div>
+                            </div>
+                            <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">Quiet</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('เงียบ', event)">เงียบ (ngîap)</div>
+                                </div>
+                            </div>
+                            <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">Cute</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('น่ารัก', event)">น่ารัก (nâa rák)</div>
+                                </div>
+                            </div>
+                            <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">Cool</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('เท่', event)">เท่ (thêe)</div>
+                                </div>
+                            </div>
+                            <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">Fierce / Strict</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('ดุ', event)">ดุ (dù)</div>
+                                </div>
+                            </div>
+                             <div class="flashcard-container" onclick="this.querySelector('.flashcard').classList.toggle('is-flipped')">
+                                <div class="flashcard">
+                                    <div class="flashcard-face flashcard-front">To pamper</div>
+                                    <div class="flashcard-face flashcard-back" onclick="speak('โอ๋', event)">โอ๋ (ǒo)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Part 6: Let's Play! -->
+                <details>
+                    <summary class="flex justify-between items-center">
+                        <span>🎮 Part 6: Let's Play "This or That"!</span>
+                        <i data-lucide="chevron-down" class="summary-icon"></i>
+                    </summary>
+                    <div class="p-5 border border-t-0 border-pink-200 rounded-b-lg space-y-6">
+                        <p class="text-center font-semibold">I'll be the host! Click your answer for each question.</p>
+                        
+                        <!-- Question 1 -->
+                        <div class="bg-fuchsia-50 p-4 rounded-xl">
+                            <p class="font-bold text-lg mb-4 text-center">
+                                <span class="thai-text">ส้มตำหรือสปาเกตตี้คะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('ส้มตำหรือสปาเกตตี้คะ', event)"></i>
+                                <span class="phonetic hidden text-sm font-normal">(sôm dtam rʉ̌ʉ sà-bpaa-gêt-dtîi khá)</span>
+                                <span class="english hidden text-sm font-normal">(Papaya salad or spaghetti?)</span>
+                            </p>
+                            <div class="flex justify-center gap-4">
+                                <button class="btn btn-secondary" onclick="playGame('game-1-response', 'ส้มตำ', 'ส้มตำ')">ส้มตำ (sôm dtam)</button>
+                                <button class="btn btn-secondary" onclick="playGame('game-1-response', 'สปาเกตตี้', 'ส้มตำ')">สปาเกตตี้ (sà-bpaa-gêt-dtîi)</button>
+                            </div>
+                            <p id="game-1-response" class="mt-3 text-pink-600 font-semibold hidden text-center"></p>
+                        </div>
+                        
+                        <!-- Question 2 -->
+                         <div class="bg-fuchsia-50 p-4 rounded-xl">
+                             <p class="font-bold text-lg mb-4 text-center">
+                                <span class="thai-text">พูดเก่งหรือเงียบคะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('พูดเก่งหรือเงียบคะ', event)"></i>
+                                <span class="phonetic hidden text-sm font-normal">(phûut gèng rʉ̌ʉ ngîap khá)</span>
+                                <span class="english hidden text-sm font-normal">(Talkative or quiet?)</span>
+                            </p>
+                            <div class="flex justify-center gap-4">
+                                <button class="btn btn-secondary" onclick="playGame('game-2-response', 'พูดเก่ง', 'เงียบ')">พูดเก่ง (phûut gèng)</button>
+                                <button class="btn btn-secondary" onclick="playGame('game-2-response', 'เงียบ', 'เงียบ')">เงียบ (ngîap)</button>
+                            </div>
+                            <p id="game-2-response" class="mt-3 text-pink-600 font-semibold hidden text-center"></p>
+                        </div>
+
+                         <!-- Question 3 -->
+                         <div class="bg-fuchsia-50 p-4 rounded-xl">
+                             <p class="font-bold text-lg mb-4 text-center">
+                                <span class="thai-text">น่ารักหรือเท่คะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('น่ารักหรือเท่คะ', event)"></i>
+                                <span class="phonetic hidden text-sm font-normal">(nâa rák rʉ̌ʉ thêe khá)</span>
+                                <span class="english hidden text-sm font-normal">(Cute or cool?)</span>
+                            </p>
+                            <div class="flex justify-center gap-4">
+                                <button class="btn btn-secondary" onclick="playGame('game-3-response', 'น่ารัก', 'เท่')">น่ารัก (nâa rák)</button>
+                                <button class="btn btn-secondary" onclick="playGame('game-3-response', 'เท่', 'เท่')">เท่ (thêe)</button>
+                            </div>
+                            <p id="game-3-response" class="mt-3 text-pink-600 font-semibold hidden text-center"></p>
+                        </div>
+
+                         <!-- Question 4 -->
+                         <div class="bg-fuchsia-50 p-4 rounded-xl">
+                            <p class="font-bold text-lg mb-4 text-center">
+                                <span class="thai-text">ดุหรือโอ๋คะ</span>
+                                <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                                <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                                <i data-lucide="volume-2" class="audio-btn" onclick="speak('ดุหรือโอ๋คะ', event)"></i>
+                                <span class="phonetic hidden text-sm font-normal">(dù rʉ̌ʉ ǒo khá)</span>
+                                <span class="english hidden text-sm font-normal">(Fierce or pampering?)</span>
+                            </p>
+                            <div class="flex justify-center gap-4">
+                                <button class="btn btn-secondary" onclick="playGame('game-4-response', 'ดุ', 'ดุ')">ดุ (dù)</button>
+                                <button class="btn btn-secondary" onclick="playGame('game-4-response', 'โอ๋', 'ดุ')">โอ๋ (ǒo)</button>
+                            </div>
+                            <p id="game-4-response" class="mt-3 text-pink-600 font-semibold hidden text-center"></p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Part 7: Your Mission! -->
+                <div class="text-center p-6 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl">
+                    <h2 class="text-2xl font-bold text-purple-800"> 
+                        <span class="thai-text">ภารกิจ</span>
+                        <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button>
+                        <button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button>
+                        <i data-lucide="volume-2" class="audio-btn" onclick="speak('ภารกิจ', event)"></i>
+                        <span class="phonetic hidden">(phaa-rá-gìt)</span>
+                        <span class="english hidden">(Mission)</span>
+                    </h2>
+                    <p class="mt-2 mb-4">Try asking a friend (or me!) a "This or That" question in Thai this week. For example: <strong><span class="thai-text">สวยหรือเท่คะ</span> <button class="info-btn ipa-btn" onclick="toggleVisibility(this, 'phonetic')">IPA</button><button class="info-btn en-btn" onclick="toggleVisibility(this, 'english')">EN</button><i data-lucide="volume-2" class="audio-btn" onclick="speak('สวยหรือเท่คะ', event)"></i> <span class="phonetic hidden">(sǔay rʉ̌ʉ thêe khá)</span><span class="english hidden">(Beautiful or cool?)</span></strong></p>
+                    <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                        <i data-lucide="check-circle-2" class="text-pink-500"></i>
+                        <span class="font-semibold text-purple-700">Mission Accepted!</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function speak(text, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            if ('speechSynthesis' in window) {
+                // Remove phonetics and translations from speech
+                const thaiText = text.split('(')[0].trim();
+                const utterance = new SpeechSynthesisUtterance(thaiText);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Sorry, your browser does not support text-to-speech.');
+            }
+        }
+
+        function toggleVisibility(button, type) {
+             if (event) {
+                event.stopPropagation();
+            }
+            const container = button.parentElement;
+            const targetSpan = container.querySelector(`.${type}`);
+            if (targetSpan) {
+                targetSpan.classList.toggle('hidden');
+            }
+        }
+        
+        function playGame(responseId, userChoice, correctChoice) {
+            const userChoiceThai = userChoice;
+            const correctChoiceThai = correctChoice;
+            speak(userChoiceThai);
+            const responseEl = document.getElementById(responseId);
+            let feedbackText = `You chose ${userChoiceThai}! Aimee and Bonnie chose ${correctChoiceThai}.`;
+            if(userChoice === correctChoice) {
+                feedbackText += " You have the same taste!"
+            }
+            responseEl.textContent = feedbackText;
+            responseEl.classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>
+
+
+
