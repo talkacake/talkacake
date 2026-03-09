@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Speaking Session</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #fdf2f8; /* Pink-50 */ }
+        .thai-text { font-weight: 600; color: #1f2937; line-height: 1.6; }
+        .ipa-text { font-family: 'Arial', sans-serif; color: #4f46e5; font-style: italic; }
+        .en-text { color: #4b5563; }
+        .btn-toggle { font-size: 0.75rem; padding: 2px 8px; border-radius: 9999px; margin-left: 4px; transition: all 0.2s; }
+        .btn-ipa { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .btn-en { background-color: #f3f4f6; color: #1f2937; border: 1px solid #d1d5db; }
+        .btn-ipa:hover { background-color: #c7d2fe; }
+        .btn-en:hover { background-color: #e5e7eb; }
+        .btn-speak { cursor: pointer; margin-left: 5px; font-size: 1.2rem; transition: transform 0.1s; }
+        .btn-speak:active { transform: scale(0.9); }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navigation / Header -->
+    <header class="bg-pink-500 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🇹🇭 ได้แต่นึกถึง</h1>
+            <span class="text-2xl">🗣️✨</span>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-4 space-y-8">
+
+        <!-- SECTION 1: VOCAB REVIEW -->
+        <section id="review" class="space-y-4">
+            <!-- Header -->
+            <div class="flex flex-col gap-2 mb-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🎲</span>
+                    <h2 class="text-2xl font-bold text-pink-700 Thai-text">ทบทวนคำศัพท์</h2>
+                    <button onclick="speak('ทบทวนคำศัพท์')" class="btn-speak">🔊</button>
+                    <button onclick="toggle('h-vocab-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                    <button onclick="toggle('h-vocab-en')" class="btn-toggle btn-en">EN</button>
+                </div>
+                <div id="h-vocab-ipa" class="hidden ipa-text ml-10">tóp-tuan kam-sàp</div>
+                <div id="h-vocab-en" class="hidden en-text ml-10">Vocabulary Review</div>
+            </div>
+
+            <!-- Instruction -->
+            <div class="mb-4">
+                <div class="flex flex-wrap items-baseline gap-2">
+                    <span class="thai-text text-gray-700">แต่งประโยคจากคำศัพท์ด้านล่าง</span>
+                    <button onclick="speak('แต่งประโยคจากคำศัพท์ด้านล่าง')" class="btn-speak">🔊</button>
+                    <button onclick="toggle('inst-vocab-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                    <button onclick="toggle('inst-vocab-en')" class="btn-toggle btn-en">EN</button>
+                </div>
+                <div id="inst-vocab-ipa" class="hidden ipa-text mt-1">dtɛ̀ng bprà-yòok jàak kam-sàp dâan lâang</div>
+                <div id="inst-vocab-en" class="hidden en-text mt-1">Make a sentence with the random word below!</div>
+            </div>
+            
+            <div class="card p-8 text-center border-2 border-pink-200 min-h-[250px] flex flex-col justify-center items-center relative">
+                <div id="vocab-display" class="w-full">
+                    <div class="flex flex-col items-center">
+                         <div class="flex flex-wrap justify-center items-baseline gap-2">
+                            <span class="text-gray-400 italic">คลิกปุ่มเพื่อเริ่ม...</span>
+                            <button onclick="speak('คลิกปุ่มเพื่อเริ่ม')" class="btn-speak text-sm">🔊</button>
+                            <button onclick="toggle('inst-click-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('inst-click-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="inst-click-ipa" class="hidden ipa-text mt-1 text-sm">klík bpùm pʉ̂a rə̂əm...</div>
+                        <div id="inst-click-en" class="hidden en-text mt-1 text-sm">Click the button to start...</div>
+                    </div>
+                </div>
+                
+                <button onclick="randomVocab()" class="mt-6 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1">
+                    🔄 สุ่มคำศัพท์
+                </button>
+            </div>
+        </section>
+
+        <hr class="border-pink-200">
+
+        <!-- SECTION 2: SONG LESSON -->
+        <section id="song" class="space-y-6">
+            <!-- Header -->
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🎵</span>
+                    <h2 class="text-2xl font-bold text-pink-700">เรียนจากเพลง</h2>
+                    <button onclick="speak('เรียนจากเพลง')" class="btn-speak">🔊</button>
+                    <button onclick="toggle('h-song-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                    <button onclick="toggle('h-song-en')" class="btn-toggle btn-en">EN</button>
+                </div>
+                <div id="h-song-ipa" class="hidden ipa-text ml-10">rian jàak pleeng</div>
+                <div id="h-song-en" class="hidden en-text ml-10">Learn from Song</div>
+            </div>
+
+            <!-- YouTube Embed & Instruction -->
+            <div class="card overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9 bg-black relative" style="padding-bottom: 56.25%;">
+                    <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/bTuYadBzDfA?start=186&end=212" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="p-4 bg-gray-50 text-sm text-gray-500 text-center flex flex-col items-center">
+                    <div class="flex flex-wrap justify-center items-baseline gap-2">
+                        <span>ฟังตั้งแต่นาทีที่ 3:06 - 3:32 🎧</span>
+                        <button onclick="speak('ฟังตั้งแต่นาทีที่ 3:06 ถึง 3:32')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('inst-listen-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('inst-listen-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="inst-listen-ipa" class="hidden ipa-text mt-1">fang dtâng-dtɛ̀ɛ naa-tii tîi...</div>
+                    <div id="inst-listen-en" class="hidden en-text mt-1">Listen from 3:06 - 3:32</div>
+                </div>
+            </div>
+
+            <!-- Interactive Lyrics -->
+            <div class="space-y-4">
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-lg font-bold text-gray-700">เนื้อเพลง 🎤</h3>
+                        <button onclick="speak('เนื้อเพลง')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('h-lyrics-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('h-lyrics-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="h-lyrics-ipa" class="hidden ipa-text text-sm">nʉ́a pleeng</div>
+                    <div id="h-lyrics-en" class="hidden en-text text-sm">Lyrics</div>
+                </div>
+                
+                <div class="card p-4 space-y-4">
+                    <!-- Line 1 -->
+                    <div class="border-b border-gray-100 pb-2">
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="thai-text text-xl text-pink-600">ได้แต่นึกถึงอดีต</span>
+                            <button onclick="speak('ได้แต่นึกถึงอดีต')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('lyric-1-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('lyric-1-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="lyric-1-ipa" class="hidden ipa-text mt-1">dâai dtɛ̀ɛ nʉ́k tʉ̌ng à-dìit</div>
+                        <div id="lyric-1-en" class="hidden en-text mt-1">Can only think about the past</div>
+                    </div>
+
+                    <!-- Line 2 -->
+                    <div class="border-b border-gray-100 pb-2">
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="thai-text text-xl text-pink-600">ที่ฉันเคยมีเธออยู่</span>
+                            <button onclick="speak('ที่ฉันเคยมีเธออยู่')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('lyric-2-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('lyric-2-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="lyric-2-ipa" class="hidden ipa-text mt-1">tîi chǎn kəəi mii təə yùu</div>
+                        <div id="lyric-2-en" class="hidden en-text mt-1">That I used to have you there</div>
+                    </div>
+
+                    <!-- Line 3 -->
+                    <div class="border-b border-gray-100 pb-2">
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="thai-text text-xl text-pink-600">แต่ก็รู้เธอคงไม่ย้อนมา</span>
+                            <button onclick="speak('แต่ก็รู้เธอคงไม่ย้อนมา')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('lyric-3-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('lyric-3-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="lyric-3-ipa" class="hidden ipa-text mt-1">dtɛ̀ɛ gɔ̂ɔ rúu təə kong mâi yɔ́ɔn maa</div>
+                        <div id="lyric-3-en" class="hidden en-text mt-1">But I know you probably won't come back</div>
+                    </div>
+
+                    <!-- Line 4 -->
+                    <div class="border-b border-gray-100 pb-2">
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="thai-text text-xl text-pink-600">มีแค่ฉันที่นึกถึงอดีต</span>
+                            <button onclick="speak('มีแค่ฉันที่นึกถึงอดีต')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('lyric-4-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('lyric-4-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="lyric-4-ipa" class="hidden ipa-text mt-1">mii kɛ̂ɛ chǎn tîi nʉ́k tʉ̌ng à-dìit</div>
+                        <div id="lyric-4-en" class="hidden en-text mt-1">There's only me who thinks about the past</div>
+                    </div>
+
+                    <!-- Line 5 -->
+                    <div class="border-b border-gray-100 pb-2">
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="thai-text text-xl text-pink-600">และเสียน้ำตาให้กับมัน</span>
+                            <button onclick="speak('และเสียน้ำตาให้กับมัน')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('lyric-5-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('lyric-5-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="lyric-5-ipa" class="hidden ipa-text mt-1">lɛ́ sǐa nám-dtaa hâi gàp man</div>
+                        <div id="lyric-5-en" class="hidden en-text mt-1">And waste tears on it</div>
+                    </div>
+
+                    <!-- Line 6 -->
+                    <div>
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="thai-text text-xl text-pink-600">เพราะฉันไม่เคยจะลืมมันได้เลย</span>
+                            <button onclick="speak('เพราะฉันไม่เคยจะลืมมันได้เลย')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('lyric-6-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('lyric-6-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="lyric-6-ipa" class="hidden ipa-text mt-1">prɔ́ chǎn mâi kəəi jà lʉʉm man dâai ləəi</div>
+                        <div id="lyric-6-en" class="hidden en-text mt-1">Because I never could forget it at all</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ACTIVITIES -->
+        <section id="activities" class="space-y-6">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🎭</span>
+                    <h2 class="text-2xl font-bold text-pink-700">กิจกรรมพูด</h2>
+                    <button onclick="speak('กิจกรรมพูด')" class="btn-speak">🔊</button>
+                    <button onclick="toggle('h-act-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                    <button onclick="toggle('h-act-en')" class="btn-toggle btn-en">EN</button>
+                </div>
+                <div id="h-act-ipa" class="hidden ipa-text ml-10">gìt-jà-gam pûut</div>
+                <div id="h-act-en" class="hidden en-text ml-10">Speaking Tasks</div>
+            </div>
+
+            <!-- Activity 1: Roleplay -->
+            <div class="card p-6 border-l-8 border-yellow-400">
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <h3 class="font-bold text-lg">1. บทบาทสมมติ: การพบกันอีกครั้ง 🎬</h3>
+                        <button onclick="speak('บทบาทสมมติ การพบกันอีกครั้ง')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act1-title-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act1-title-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act1-title-ipa" class="hidden ipa-text text-sm">bòt-bàat sǒm-mút: gaan póp gan ìik kráng</div>
+                    <div id="act1-title-en" class="hidden en-text text-sm">Role-play: The Dramatic Reunion</div>
+                </div>
+
+                <div class="mb-4 bg-gray-50 p-3 rounded">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <strong class="text-sm">สถานการณ์: คุณเจอแฟนเก่าที่เซเว่นตอนซื้อนม คุณยังเศร้าอยู่ แต่เขาดูมีความสุขมาก</strong>
+                        <button onclick="speak('สถานการณ์: คุณเจอแฟนเก่าที่เซเว่นตอนซื้อนม คุณยังเศร้าอยู่ แต่เขาดูมีความสุขมาก')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act1-scen-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act1-scen-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act1-scen-ipa" class="hidden ipa-text text-sm mt-1">sà-tǎan-ná-gaan: kun jəə fɛɛn gào tîi 7-11 dtɔɔn sʉ́ʉ nom. kun yang sâo yùu, dtɛ̀ɛ kǎo duu mii kwaam-sùk mâak</div>
+                    <div id="act1-scen-en" class="hidden en-text text-sm mt-1">Scenario: You meet your ex at a 7-11 while buying milk. You are still sad, but he/she is very happy.</div>
+                </div>
+
+                <!-- Dialogue Prompt -->
+                <div class="bg-yellow-50 p-4 rounded-lg space-y-3">
+                    <div class="flex flex-col">
+                        <div class="flex items-baseline gap-2">
+                            <span class="thai-text text-lg">A: ไม่เจอกันนานเลย... คุณดูมีความสุขนะ</span>
+                            <button onclick="speak('ไม่เจอกันนานเลย คุณดูมีความสุขนะ')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('act-1-1-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('act-1-1-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="act-1-1-ipa" class="hidden ipa-text text-sm ml-2">mâi jəə gan naan ləəi... kun duu mii kwaam sùk ná</div>
+                        <div id="act-1-1-en" class="hidden en-text text-sm ml-2">Haven't seen you for a long time... You look happy.</div>
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <div class="flex items-baseline gap-2">
+                            <span class="thai-text text-lg">B: ใช่! ชีวิตดีมาก แล้วคุณล่ะ?</span>
+                            <button onclick="speak('ใช่ ชีวิตดีมาก แล้วคุณล่ะ')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('act-1-2-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('act-1-2-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="act-1-2-ipa" class="hidden ipa-text text-sm ml-2">châi! chii-wít dii mâak. lɛ́ɛo kun lâ?</div>
+                        <div id="act-1-2-en" class="hidden en-text text-sm ml-2">Yes! Life is great. How about you?</div>
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <div class="flex items-baseline gap-2">
+                            <span class="thai-text text-lg">A: ผม/ฉัน ยังนึกถึงอดีตอยู่เลย...</span>
+                            <button onclick="speak('ผม ฉัน ยังนึกถึงอดีตอยู่เลย')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('act-1-3-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('act-1-3-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="act-1-3-ipa" class="hidden ipa-text text-sm ml-2">pǒm/chǎn yang nʉ́k tʉ̌ng à-dìit yùu ləəi...</div>
+                        <div id="act-1-3-en" class="hidden en-text text-sm ml-2">I still think about the past...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity 2: Funny Debate -->
+            <div class="card p-6 border-l-8 border-purple-400">
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <h3 class="font-bold text-lg">2. โต้วาทีเฮฮา: จำ หรือ ลืม 🤔</h3>
+                        <button onclick="speak('โต้วาทีเฮฮา: จำ หรือ ลืม')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act2-title-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act2-title-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act2-title-ipa" class="hidden ipa-text text-sm">dtôo-waa-tii hee-haa: jam rʉ̌ʉ lʉʉm</div>
+                    <div id="act2-title-en" class="hidden en-text text-sm">Funny Debate: Remember vs Forget</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <p class="text-sm text-gray-500">เถียงให้ชนะ! ใช้คำศัพท์: ลืม, จำ, อดีต</p>
+                        <button onclick="speak('เถียงให้ชนะ ใช้คำศัพท์: ลืม, จำ, อดีต')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act2-inst-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act2-inst-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act2-inst-ipa" class="hidden ipa-text text-sm">tǐang hâi chá-ná! chái kam-sàp: lʉʉm, jam, à-dìit</div>
+                    <div id="act2-inst-en" class="hidden en-text text-sm">Argue your side! Use vocab: forget, remember, past</div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-purple-50 p-3 rounded text-center">
+                        <div class="flex flex-col items-center gap-1 mb-2">
+                            <div class="flex items-center gap-2">
+                                <strong class="text-purple-700">ทีมลืม 🧠❌</strong>
+                                <button onclick="speak('ทีมลืม')" class="btn-speak text-sm">🔊</button>
+                            </div>
+                            <span class="text-xs text-gray-400">(Team Forget)</span>
+                        </div>
+                        <p class="text-sm mt-2">"ให้เพื่อนยืมเงิน"</p>
+                        <p class="text-sm">"วันเกิดตัวเอง"</p>
+                        <p class="text-sm">"รหัสผ่าน"</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded text-center">
+                         <div class="flex flex-col items-center gap-1 mb-2">
+                            <div class="flex items-center gap-2">
+                                <strong class="text-green-700">ทีมจำ 🧠✅</strong>
+                                <button onclick="speak('ทีมจำ')" class="btn-speak text-sm">🔊</button>
+                            </div>
+                            <span class="text-xs text-gray-400">(Team Remember)</span>
+                        </div>
+                        <p class="text-sm mt-2">"เรื่องน่าอาย"</p>
+                        <p class="text-sm">"ใครกินเค้กฉัน"</p>
+                        <p class="text-sm">"รหัส Netflix แฟนเก่า"</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="flex flex-wrap items-baseline gap-2 mb-1">
+                        <p class="font-semibold text-gray-600">ประโยคแนะนำ:</p>
+                        <button onclick="speak('ประโยคแนะนำ')" class="btn-speak">🔊</button>
+                    </div>
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <span class="thai-text text-lg">มันดีกว่าที่จะลืม เพราะว่า...</span>
+                        <button onclick="speak('มันดีกว่าที่จะลืม เพราะว่า')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act-2-1-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act-2-1-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act-2-1-ipa" class="hidden ipa-text text-sm mt-1">man dii gwàa tîi jà lʉʉm prɔ́ wâa...</div>
+                    <div id="act-2-1-en" class="hidden en-text text-sm mt-1">It's better to forget because...</div>
+                </div>
+            </div>
+
+            <!-- Activity 3: Interview -->
+            <div class="card p-6 border-l-8 border-blue-400">
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <h3 class="font-bold text-lg">3. สัมภาษณ์ผี 👻</h3>
+                        <button onclick="speak('สัมภาษณ์ผี')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act3-title-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act3-title-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act3-title-ipa" class="hidden ipa-text text-sm">sǎm-pâat pǐi</div>
+                    <div id="act3-title-en" class="hidden en-text text-sm">Interview a Ghost</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <p class="text-sm text-gray-500">คุณกำลังสัมภาษณ์ผีที่ไม่ยอมไปสวรรค์เพราะยังยึดติดกับอดีต</p>
+                        <button onclick="speak('คุณกำลังสัมภาษณ์ผีที่ไม่ยอมไปสวรรค์เพราะยังยึดติดกับอดีต')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('act3-inst-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('act3-inst-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="act3-inst-ipa" class="hidden ipa-text text-sm">kun gam-lang sǎm-pâat pǐi tîi mâi yɔɔm bpai sà-wǎn prɔ́ yang yʉ́t-dtìt gàp à-dìit</div>
+                    <div id="act3-inst-en" class="hidden en-text text-sm">You are interviewing a ghost who refuses to go to heaven because they are stuck in the past.</div>
+                </div>
+
+                <ul class="list-none space-y-3 text-gray-700">
+                    <li>
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span>Q1: ทำไมยังอยู่ที่นี่?</span>
+                            <button onclick="speak('ทำไมยังอยู่ที่นี่')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('q1-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('q1-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="q1-ipa" class="hidden ipa-text text-sm ml-4">tam-mai yang yùu tîi nîi?</div>
+                        <div id="q1-en" class="hidden en-text text-sm ml-4">Why are you still here?</div>
+                    </li>
+                    <li>
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span>Q2: รออะไรอยู่?</span>
+                            <button onclick="speak('รออะไรอยู่')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('q2-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('q2-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="q2-ipa" class="hidden ipa-text text-sm ml-4">rɔɔ à-rai yùu?</div>
+                        <div id="q2-en" class="hidden en-text text-sm ml-4">What are you waiting for?</div>
+                    </li>
+                    <li>
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span>Q3: อยากกินคุกกี้ S&P ไหม?</span>
+                            <button onclick="speak('อยากกินคุกกี้ S&P ไหม')" class="btn-speak">🔊</button>
+                            <button onclick="toggle('q3-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                            <button onclick="toggle('q3-en')" class="btn-toggle btn-en">EN</button>
+                        </div>
+                        <div id="q3-ipa" class="hidden ipa-text text-sm ml-4">yàak gin kúk-gîi S&P mǎi?</div>
+                        <div id="q3-en" class="hidden en-text text-sm ml-4">Do you want to eat S&P cookies?</div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECTION 4: EXTENSION -->
+        <section id="extension" class="space-y-6">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🚀</span>
+                    <h2 class="text-2xl font-bold text-gray-400">กิจกรรมเสริม</h2>
+                    <button onclick="speak('กิจกรรมเสริม')" class="btn-speak">🔊</button>
+                    <button onclick="toggle('h-ext-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                    <button onclick="toggle('h-ext-en')" class="btn-toggle btn-en">EN</button>
+                </div>
+                 <div id="h-ext-ipa" class="hidden ipa-text ml-10">gìt-jà-gam sěrm</div>
+                 <div id="h-ext-en" class="hidden en-text ml-10">Extension Activities</div>
+            </div>
+            
+            <div class="card p-6 bg-gray-50 border-2 border-dashed border-gray-300">
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <h3 class="font-bold text-lg">แต่งเรื่องต่อกัน ⛓️</h3>
+                        <button onclick="speak('แต่งเรื่องต่อกัน')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('ext1-title-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('ext1-title-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="ext1-title-ipa" class="hidden ipa-text text-sm">dtɛ̀ng rʉ̂ang dtɔ̀ɔ gan</div>
+                    <div id="ext1-title-en" class="hidden en-text text-sm">Story Chain</div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <p class="text-sm">ผลัดกันแต่งประโยคนึง แต่ต้องลงท้ายด้วยคำว่า <strong>"ไหม"</strong></p>
+                        <button onclick="speak('ผลัดกันแต่งประโยคนึง แต่ต้องลงท้ายด้วยคำว่า ไหม')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('ext1-inst-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                        <button onclick="toggle('ext1-inst-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="ext1-inst-ipa" class="hidden ipa-text text-sm mt-1">plàt gan dtɛ̀ng bprà-yòok nʉng, dtɛ̀ɛ dtɔ̂ng long-táai dûai kam wâa "mǎi"</div>
+                    <div id="ext1-inst-en" class="hidden en-text text-sm mt-1">Take turns adding one sentence, but must end with the word "mai" (question/silk/burn).</div>
+                </div>
+
+                <div class="bg-white p-3 rounded border">
+                    <div class="flex flex-wrap items-baseline gap-2">
+                        <p>เริ่ม: วันนี้คุณหิวไหม?</p>
+                        <button onclick="speak('เริ่ม: วันนี้คุณหิวไหม')" class="btn-speak">🔊</button>
+                        <button onclick="toggle('st-ex-ipa')" class="btn-toggle btn-ipa">IPA</button>
+                         <button onclick="toggle('st-ex-en')" class="btn-toggle btn-en">EN</button>
+                    </div>
+                    <div id="st-ex-ipa" class="hidden ipa-text text-sm ml-4">rə̂əm: wan-níi kun hǐu mǎi?</div>
+                    <div id="st-ex-en" class="hidden en-text text-sm ml-4">Start: Are you hungry today?</div>
+                    <p class="mt-2">ต่อไป: ...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center p-6 mt-12">
+        <p>Made for Thai Learning 🇹🇭</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Vocabulary Data (Parsed from your list)
+        const vocabList = [
+            {t: "ขนมปังปิ้ง", i: "kà nǒm bpang bpîng", e: "Toast"},
+            {t: "ปิ้งนานไม่พอ", i: "bpîng naan mâi pɔɔ", e: "Not toast long enough"},
+            {t: "ก็ได้", i: "kɔ̂ɔdâay", e: "Can also be / Whatever"},
+            {t: "สีอ่อน", i: "sǐi ɔ̀ɔn", e: "Light colour"},
+            {t: "ตลอด", i: "dtà lɔ̀ɔt", e: "Always / Throughout"},
+            {t: "กลับจากฟิตเนส", i: "glàp jàak fít nêet", e: "Return from the gym"},
+            {t: "ก็เลย", i: "gɔ̂ɔ ləəi", e: "So"},
+            {t: "ก็หวานนะ แต่มันไม่ได้อ่ะ", i: "gɔ̂ɔ wǎan ná dtɛ̀ɛ man mâi dâi à", e: "It's sweet, but it doesn't work."},
+            {t: "การ", i: "gaan", e: "prefix (verb to noun)"},
+            {t: "การเงิน", i: "gaan ngən", e: "Finance"},
+            {t: "การลงทุน", i: "gaan long tun", e: "Investment"},
+            {t: "กิจกรรม", i: "kìtcakam", e: "Activities"},
+            {t: "กินข้าวยัง", i: "kinkhâaw yaŋ", e: "Have you eaten yet?"},
+            {t: "ขาตั้งกล้อง", i: "kǎa dtâng glɔ̂ɔng", e: "Camera stand"},
+            {t: "เก็บ", i: "kèp", e: "Keep / Collect"},
+            {t: "เกิด", i: "gə̀ət", e: "born"},
+            {t: "นอนลง", i: "nɔɔn long", e: "lie down"},
+            {t: "พลิกตัว", i: "plík dtua", e: "Turn over (body)"},
+            {t: "นอนหงาย", i: "nɔɔn ngǎai", e: "Lie on your back"},
+            {t: "เกี๊ยว", i: "gíao", e: "Dumplings"},
+            {t: "เกี่ยวกับ", i: "kìawkàp", e: "About"},
+            {t: "ของฝาก", i: "kɔ̌ɔng fàak", e: "souvenirs"},
+            {t: "เกาหลี", i: "kawlǐi", e: "Korea(n)"},
+            {t: "เบา", i: "bao", e: "Light (weight)"},
+            {t: "ขอโทษนะครับ", i: "kɔ̌ɔ tôot ná kráp", e: "Excuse me"},
+            {t: "ขับรถ", i: "khàprót", e: "Drive"},
+            {t: "เพื่อนคนไทย", i: "pʉ̂an kon tai", e: "Thai friends"},
+            {t: "หวานไป", i: "wǎan bpai", e: "Too sweet"},
+            {t: "ขา", i: "kǎa", e: "Leg"},
+            {t: "น่าสนใจ", i: "nâa sǒn jai", e: "Interesting"},
+            {t: "หุ้น", i: "hûn", e: "Stocks"},
+            {t: "ขาย", i: "kǎai", e: "Sell"},
+            {t: "เข่า", i: "kào", e: "Knee"},
+            {t: "พา", i: "paa", e: "Take (someone)"},
+            {t: "แขน", i: "kɛ̌ɛn", e: "Arm"},
+            {t: "คง", i: "khoŋ", e: "probably"},
+            {t: "คน", i: "kon", e: "To stir / Person"},
+            {t: "ครึ่ง", i: "krʉ̂ng", e: "Half"},
+            {t: "คล้าย", i: "kláai", e: "similar"},
+            {t: "คอ", i: "kɔɔ", e: "Neck"},
+            {t: "คำพูด", i: "khamphûut", e: "Statement / Words"},
+            {t: "ที่นั่ง", i: "tîi nâng", e: "Seat"},
+            {t: "คืน", i: "khʉʉn", e: "Nights / Return"},
+            {t: "ใจเย็นหน่อย", i: "jai yen nòi", e: "Calm down a bit"},
+            {t: "เคารพคนอื่น", i: "kao róp kon ʉ̀ʉn", e: "Respect others"},
+            {t: "อาหารเช้า", i: "aa hǎan cháao", e: "Breakfast"},
+            {t: "ไข่คน", i: "kài kon", e: "scrambled eggs"},
+            {t: "พวกเรา", i: "pûak rao", e: "We/Us"},
+            {t: "มาหา", i: "maa hǎa", e: "come visit"},
+            {t: "อาหารเที่ยง", i: "aa hǎan tîang", e: "lunch"},
+            {t: "ค่าย", i: "kâai", e: "Camp"},
+            {t: "ขึ้น", i: "kʉ̂n", e: "Up"},
+            {t: "เขียน", i: "kǐan", e: "Write"},
+            {t: "ทำความสะอาด", i: "tam kwaam sà àat", e: "Clean"},
+            {t: "อีก", i: "ìik", e: "More / Again"},
+            {t: "แค่", i: "kɛ̂ɛ", e: "Just / Only"},
+            {t: "เหมือนกัน", i: "mʉ̌ankan", e: "Same"},
+            {t: "เคย", i: "kəəi", e: "ever / used to"},
+            {t: "เห็น", i: "hěn", e: "See"},
+            {t: "เป็น", i: "pen", e: "is/am/are"},
+            {t: "ตอน", i: "tɔɔn", e: "When (time)"},
+            {t: "ก่อน", i: "gɔ̀ɔn", e: "before"},
+            {t: "งานศิลปะ", i: "ngaan sǐn lá bpà", e: "artwork"},
+            {t: "เงียบ", i: "ngîap", e: "quiet"},
+            {t: "จมูก", i: "jà mùuk", e: "Nose"},
+            {t: "ทำให้", i: "tam hâi", e: "to make (someone do something)"},
+            {t: "เดิน", i: "dəən", e: "Walk"},
+            {t: "พอ", i: "pɔɔ", e: "enough"},
+            {t: "อาจจะ", i: "àat jà", e: "maybe"},
+            {t: "จังหวัด", i: "caŋwàt", e: "Province"},
+            {t: "จำ", i: "cam", e: "Remember"},
+            {t: "ช้า", i: "cháa", e: "slow"},
+            {t: "ชานมไข่มุก", i: "chaa nom kài múk", e: "Bubble Tea"},
+            {t: "ชื่อเล่น", i: "chʉ̂ʉlên", e: "Nickname"},
+            {t: "ซื้อ", i: "sʉ́ʉ", e: "Buy"},
+            {t: "ดนตรี", i: "dontrii", e: "Music"},
+            {t: "ดีกว่า", i: "diikwàa", e: "Better than"},
+            {t: "ดีขึ้น", i: "diikhʉ̂n", e: "Better than before"},
+            {t: "ได้ยิน", i: "dâi yin", e: "Hear"},
+            {t: "ดูแล", i: "duu lɛɛ", e: "Take care"},
+            {t: "จริงป่ะเนี่ย", i: "jing bpà nîa", e: "Is this true?"},
+            {t: "โคตร", i: "kôot", e: "F***** / Very (Slang)"},
+            {t: "ตรวจการบ้าน", i: "dtrùat gaan bâan", e: "Check homework"},
+            {t: "ตลก", i: "dtà lòk", e: "funny"},
+            {t: "ผจญภัย", i: "phaconphay", e: "Adventure"},
+            {t: "ต่อ", i: "dtɔ̀ɔ", e: "Per / Continue"},
+            {t: "ตั๋ว", i: "dtǔa", e: "Tickets"},
+            {t: "ตัวเล็ก", i: "dtua lék", e: "small (body)"},
+            {t: "วันธรรมดา", i: "wan tam má daa", e: "Weekdays"},
+            {t: "หยุดไม่ได้", i: "yùt mâi dâi", e: "Can't stop"},
+            {t: "สด", i: "sòt", e: "Fresh"},
+            {t: "ตา", i: "dtaa", e: "Eye"},
+            {t: "หนาว", i: "nǎao", e: "Cold"},
+            {t: "องศา", i: "ong sǎa", e: "Degree"},
+            {t: "แกง", i: "gɛɛng", e: "curry"},
+            {t: "ถ้า", i: "thâa", e: "If"},
+            {t: "ปิด", i: "bpìt", e: "close"},
+            {t: "เต้น", i: "dtên", e: "Dance"},
+            {t: "อดทน", i: "òt ton", e: "patient"},
+            {t: "โต", i: "dtoo", e: "Big"},
+            {t: "โต๊ะ", i: "tó", e: "Table"},
+            {t: "ถั่วฝักยาว", i: "thùafàkyaaw", e: "Green beans"},
+            {t: "ถาม", i: "thǎam", e: "Ask"},
+            {t: "ถ่ายรูป", i: "tàai rûup", e: "Take photos"},
+            {t: "ถูก", i: "thùuk", e: "Cheap / Correct"},
+            {t: "มหาลัย", i: "má hǎa lai", e: "Uni"},
+            {t: "หลัง", i: "lǎng", e: "After / Back"},
+            {t: "วง", i: "wong", e: "Band"},
+            {t: "กลอง", i: "glɔɔng", e: "Drums"},
+            {t: "เสียงร้อง", i: "sǐang rɔ́ɔng", e: "Singing voice"},
+            {t: "เต็มที่", i: "dtem tîi", e: "Fully / Best shot"},
+            {t: "ดีใจด้วย", i: "dii jai dûai", e: "Happy for you!"},
+            {t: "ยินดีด้วย", i: "yin dii dûai", e: "Congrats!"},
+            {t: "เมือง", i: "mʉaŋ", e: "City"},
+            {t: "ทอด", i: "thɔ̂ɔt", e: "Deep fry"},
+            {t: "ทอน", i: "thɔɔn", e: "Give change"},
+            {t: "นอก", i: "nɔ̂ɔk", e: "Outside"},
+            {t: "สนุก", i: "sà nùk", e: "fun"},
+            {t: "ทั้งคู่", i: "táng kûu", e: "Both"},
+            {t: "ประวัติศาสตร์", i: "bprà wàt sàat", e: "History"},
+            {t: "เก่า", i: "gào", e: "Old"},
+            {t: "ตลาด", i: "dtà làat", e: "Market"},
+            {t: "มะพร้าว", i: "má práao", e: "Coconut"},
+            {t: "ทั้งวัน", i: "táng wan", e: "Whole day"},
+            {t: "นม", i: "nom", e: "Milk"},
+            {t: "เรียก", i: "rîak", e: "Call"},
+            {t: "นวด", i: "nûat", e: "Massage"},
+            {t: "เท้า", i: "táao", e: "Foot"},
+            {t: "ลิฟต์", i: "líp", e: "Elevator"},
+            {t: "บันไดเลื่อน", i: "banday lʉ̂an", e: "Escalator"},
+            {t: "ทางหนีไฟ", i: "thaaŋ nǐi fay", e: "Fire exit"},
+            {t: "ที่จอดรถ", i: "thîi cɔ̀ɔt rót", e: "Parking lot"},
+            {t: "ใช้", i: "cháy", e: "Use"},
+            {t: "ข้างหน้า", i: "khâaŋnâa", e: "In front"},
+            {t: "ข้างหลัง", i: "khâaŋlǎŋ", e: "Behind"},
+            {t: "ทางออก", i: "thaaŋ ɔ̀ɔk", e: "Exit"},
+            {t: "ทางเข้า", i: "thaaŋ khâw", e: "Entrance"},
+            {t: "ชั้น", i: "chán", e: "Floor"},
+            {t: "แถม", i: "thɛ̌ɛm", e: "Giveaway"},
+            {t: "น้ำเปล่า", i: "náamplàaw", e: "Plain water"},
+            {t: "น่ากิน", i: "nâa gin", e: "Looks delicious"},
+            {t: "เนื้อเพลง", i: "nʉ́a pleeng", e: "Lyrics"},
+            {t: "น่าเบื่อ", i: "nâa bʉ̀a", e: "Boring"},
+            {t: "บางคน", i: "baang kon", e: "Some people"},
+            {t: "สูง", i: "sǔung", e: "Tall"},
+            {t: "นิ้ว", i: "níu", e: "Finger / Inch"},
+            {t: "ใน", i: "nai", e: "In"},
+            {t: "ทำงานเยอะ", i: "tam ngaan yə́", e: "Work a lot"},
+            {t: "ประถม", i: "bprà tǒm", e: "Primary (school)"},
+            {t: "ปาก", i: "bpàak", e: "Mouth"},
+            {t: "ป้าย", i: "bpâai", e: "Sign"},
+            {t: "ปีก", i: "pìik", e: "Wing"},
+            {t: "ผู้ใหญ่", i: "pûu yài", e: "Adult"},
+            {t: "บ่อย", i: "bɔ̀y", e: "Often"},
+            {t: "แบบ", i: "bɛ̀ɛp", e: "Type / Style"},
+            {t: "ฝึก", i: "fʉ̀k", e: "Practice"},
+            {t: "มือเปล่า", i: "mʉʉ bplàao", e: "Empty handed"},
+            {t: "เสียใจ", i: "sǐa jai", e: "Sad / Sorry"},
+            {t: "กล้อง", i: "klɔ̂ŋ", e: "Camera"},
+            {t: "เพลง", i: "pleeng", e: "Song"},
+            {t: "กีฬา", i: "kiilaa", e: "Sports"},
+            {t: "ฟัน", i: "fan", e: "Teeth"},
+            {t: "ตื่นนอน", i: "dtʉ̀ʉn nɔɔn", e: "Wake up"},
+            {t: "ทุกอย่าง", i: "thúkyàaŋ", e: "Everything"},
+            {t: "พยายาม", i: "pá yaa yaam", e: "Try"},
+            {t: "ไม่ได้ซื้อ", i: "mâi dâi sʉ́ʉ", e: "Didn't buy"},
+            {t: "เศร้า", i: "sâw", e: "Sad"},
+            {t: "ยาย", i: "yaay", e: "Grandma"},
+            {t: "ยินดีต้อนรับ", i: "yin dii dtɔ̂ɔn ráp", e: "Welcome"},
+            {t: "ยืน", i: "yʉʉn", e: "Stand"},
+            {t: "พร้อม", i: "prɔ́ɔm", e: "Ready"},
+            {t: "อ่าน", i: "àan", e: "Read"},
+            {t: "รองเท้า", i: "rɔɔng táao", e: "Shoes"},
+            {t: "ร้องเพลง", i: "rɔ́ɔŋphleeŋ", e: "Sing"},
+            {t: "พี่สาว", i: "pîi sǎao", e: "Older sister"},
+            {t: "รูป", i: "rûup", e: "Picture"},
+            {t: "เร็ว", i: "reo", e: "Fast"},
+            {t: "ตั้งใจ", i: "dtâng jai", e: "Intend / Focus"},
+            {t: "ยุ่ง", i: "yûng", e: "Busy"},
+            {t: "บ่าย", i: "bàay", e: "Afternoon"},
+            {t: "บางครั้ง", i: "baaŋkhráŋ", e: "Sometimes"},
+            {t: "เยอะ", i: "yə́", e: "A lot"},
+            {t: "เมื่อคืน", i: "mʉ̂akhʉʉn", e: "Last night"},
+            {t: "ตลอดเวลา", i: "talɔ̀ɔtweelaa", e: "All the time"},
+            {t: "มะรืนนี้", i: "márʉʉn níi", e: "Day after tomorrow"},
+            {t: "สุดท้าย", i: "sùttháay", e: "Last / Final"},
+            {t: "ร้องไห้", i: "rɔ́ɔng hâi", e: "Cry"},
+            {t: "เรื่อง", i: "rʉ̂ang", e: "Story / Matter"},
+            {t: "ลง", i: "loŋ", e: "Down"},
+            {t: "นาน", i: "naan", e: "Long (time)"},
+            {t: "มอง", i: "mɔɔŋ", e: "Look at"},
+            {t: "เธอ", i: "thəə", e: "You / She"},
+            {t: "เริ่ม", i: "rə̂əm", e: "Start"},
+            {t: "ตอนนี้", i: "tɔɔnníi", e: "Now"},
+            {t: "ลอง", i: "lɔɔng", e: "Try"},
+            {t: "ศิลปะ", i: "sǐn lá bpà", e: "Art"},
+            {t: "ศูนย์", i: "sǔun", e: "Zero / Center"},
+            {t: "ส่ง", i: "sòng", e: "Send"},
+            {t: "สอน", i: "sɔ̌ɔn", e: "Teach"},
+            {t: "สัก", i: "sàk", e: "Tattoo / Just a bit"},
+            {t: "ตั้งแต่", i: "tâŋtɛ̀ɛ", e: "Since"},
+            {t: "แรก", i: "rɛ̂ɛk", e: "First"},
+            {t: "คิดถึง", i: "khítthʉ̌ŋ", e: "Miss / Think of"},
+            {t: "แต่", i: "tɛ̀ɛ", e: "But"},
+            {t: "ความจริง", i: "khwaamciŋ", e: "Truth"},
+            {t: "ซ่อน", i: "sɔ̂n", e: "Hide"},
+            {t: "รอ", i: "rɔɔ", e: "Wait"},
+            {t: "เพราะว่า", i: "phrɔ́wâa", e: "Because"},
+            {t: "แพง", i: "phɛɛŋ", e: "Expensive"},
+            {t: "เล็ก", i: "lék", e: "Small"},
+            {t: "สิ่ง", i: "sìŋ", e: "Thing"},
+            {t: "หมด", i: "mòt", e: "Finished / Empty"},
+            {t: "น้ำแข็ง", i: "náamkhɛ̌ŋ", e: "Ice"},
+            {t: "ต้ม", i: "dtôm", e: "Boil"},
+            {t: "ใส่", i: "sài", e: "Put / Wear"},
+            {t: "ก๋วยเตี๋ยว", i: "kǔaytǐaw", e: "Noodles"},
+            {t: "เด็กเสิร์ฟ", i: "dèksə̀əp", e: "Waiter"},
+            {t: "เสียง", i: "sǐang", e: "Sound"},
+            {t: "ธรรมดา", i: "thammadaa", e: "Normal"},
+            {t: "เสื้อยืด", i: "sʉ̂a yʉ̂ʉt", e: "T-Shirt"},
+            {t: "พิเศษ", i: "phísèet", e: "Special"},
+            {t: "ลูกค้า", i: "lûukkháa", e: "Customer"},
+            {t: "เสร็จ", i: "sèt", e: "Finish"},
+            {t: "กระเทียม", i: "kràthiam", e: "Garlic"},
+            {t: "กลาง", i: "klaaŋ", e: "Middle"},
+            {t: "ขนมปัง", i: "khanǒmpaŋ", e: "Bread"},
+            {t: "ข้าวเที่ยง", i: "khâaw thîaŋ", e: "Lunch"},
+            {t: "เงินสด", i: "ŋənsòt", e: "Cash"},
+            {t: "ชิ้น", i: "chín", e: "Piece"},
+            {t: "ตรงนี้", i: "troŋníi", e: "Right here"},
+            {t: "หน้า", i: "nâa", e: "Face / Front"},
+            {t: "หลอด", i: "lɔ̀ɔt", e: "Straw"},
+            {t: "ถาด", i: "thàat", e: "Tray"},
+            {t: "ถุง", i: "thǔŋ", e: "Bag"},
+            {t: "น้ำตาล", i: "náamtaan", e: "Sugar"},
+            {t: "บอก", i: "bɔ̀ɔk", e: "Tell"},
+            {t: "บัตร", i: "bàt", e: "Card"},
+            {t: "ปกติ", i: "pòkkatì", e: "Normal"},
+            {t: "พ่อ", i: "phɔ̂ɔ", e: "Father"},
+            {t: "เมื่อวาน", i: "mʉ̂awaan", e: "Yesterday"},
+            {t: "ส้ม", i: "sôm", e: "Orange"},
+            {t: "สั่ง", i: "sàŋ", e: "Order"},
+            {t: "หน่อย", i: "nɔ̀y", e: "A bit / Please"},
+            {t: "เหนื่อย", i: "nʉ̀ai", e: "Tired"},
+            {t: "หมูสับ", i: "mǔu sàp", e: "Minced pork"},
+            {t: "หัวเราะ", i: "hǔa rɔ́", e: "Laugh"},
+            {t: "ห้าง", i: "hâaŋ", e: "Mall"},
+            {t: "หู", i: "hǔu", e: "Ear"},
+            {t: "เหมือนเดิม", i: "mʉ̌an dəəm", e: "Same as usual"},
+            {t: "ต้อง", i: "dtɔ̂ng", e: "Must"},
+            {t: "น้ำจิ้ม", i: "nám jîm", e: "Sauce"},
+            {t: "เห็ด", i: "hèt", e: "Mushroom"},
+            {t: "ใหญ่", i: "yày", e: "Big"},
+            {t: "ไหว", i: "wǎy", e: "Can handle"},
+            {t: "ให้", i: "hâi", e: "Give"},
+            {t: "หัวไหล่", i: "hǔa lài", e: "Shoulder"},
+            {t: "อร่อย", i: "à-ròi", e: "Delicious"},
+            {t: "อะไรก็ได้", i: "àray kɔ̂ɔdâay", e: "Anything"},
+            {t: "อากาศ", i: "aakàat", e: "Weather"},
+            {t: "อื่น", i: "ʉ̀ʉn", e: "Other"},
+            {t: "ดัง", i: "dang", e: "Loud / Famous"},
+            {t: "เนื้อ", i: "nʉ́a", e: "Meat"},
+            {t: "ยาก", i: "yâak", e: "Difficult"},
+            {t: "บทเรียน", i: "bòt rian", e: "Lesson"},
+            {t: "เกือบ", i: "gʉ̀ap", e: "Almost"},
+            {t: "ชม", i: "chom", e: "Admire"},
+            {t: "แก้", i: "gɛ̂ɛ", e: "Fix"},
+            {t: "ตาย", i: "dtaai", e: "Die"},
+            {t: "คล่อง", i: "klɔ̂ɔng", e: "Fluent"},
+            {t: "ทาน", i: "taan", e: "Eat (polite)"},
+            {t: "ไหน", i: "nǎi", e: "Where / Which"},
+            {t: "ชิม", i: "chím", e: "Taste"},
+            {t: "ขม", i: "khǒm", e: "Bitter"},
+            {t: "เดือน", i: "deuan", e: "Month"},
+            {t: "ยก", i: "yók", e: "Lift"},
+            {t: "ข้างนอก", i: "khâang nɔ̂ɔk", e: "Outside"},
+            {t: "ยาว", i: "yaao", e: "Long"},
+            {t: "นับ", i: "náp", e: "Count"},
+            {t: "แกล้ง", i: "glâaeng", e: "Tease"},
+            {t: "หล่อ", i: "lɔ̀ɔ", e: "Handsome"},
+            {t: "รสชาติ", i: "rót châat", e: "Taste"},
+            {t: "เชื่อ", i: "chʉ̂ʉa", e: "Believe"},
+            {t: "ซน", i: "son", e: "Naughty"},
+            {t: "หนัง", i: "năng", e: "Movie"},
+            {t: "สกปรก", i: "sòk-gà-bpròk", e: "Dirty"},
+            {t: "อายุ", i: "aa-yú", e: "Age"},
+            {t: "กระเป๋า", i: "grà-bpǎo", e: "Bag"},
+            {t: "ประโยค", i: "bprà-yòok", e: "Sentence"},
+            {t: "ขี้เกียจ", i: "kêe-gìat", e: "Lazy"},
+            {t: "สัญญา", i: "sǎn-yaa", e: "Promise"},
+            {t: "คิ้ว", i: "kíw", e: "Eyebrow"},
+            {t: "เข้ม", i: "kêmm", e: "Dark"},
+            {t: "นักแสดง", i: "nák-sà-dɛɛng", e: "Actor"},
+            {t: "มืด", i: "mʉ̂t", e: "Dark"},
+            {t: "ไฟ", i: "fai", e: "Light/Fire"}
+        ];
+
+        // 2. Logic for Random Vocab
+        function randomVocab() {
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const word = vocabList[randomIndex];
+            
+            const displayArea = document.getElementById('vocab-display');
+            
+            // Create the card content dynamically
+            displayArea.innerHTML = `
+                <div class="animate-pulse-once">
+                    <p class="text-4xl font-bold text-pink-600 mb-4 thai-text">${word.t}</p>
+                    
+                    <div class="flex justify-center gap-2 mb-4">
+                         <button onclick="speak('${word.t}')" class="btn-speak text-2xl">🔊</button>
+                    </div>
+
+                    <div class="flex justify-center gap-3">
+                        <button onclick="toggle('v-ipa')" class="px-4 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200">Show IPA</button>
+                        <button onclick="toggle('v-en')" class="px-4 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">Show Meaning</button>
+                    </div>
+
+                    <p id="v-ipa" class="hidden text-xl text-indigo-600 font-mono mt-4">${word.i}</p>
+                    <p id="v-en" class="hidden text-xl text-gray-700 mt-2 font-semibold">"${word.e}"</p>
+                </div>
+            `;
+        }
+
+        // 3. Logic for Toggles
+        function toggle(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // 4. Logic for TTS
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sorry, your browser doesn't support Text-to-Speech.");
+            }
+        }
+
+    </script>
+</body>
+</html>
