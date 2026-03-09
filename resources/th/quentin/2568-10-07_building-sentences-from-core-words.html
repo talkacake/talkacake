@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2 Thai Speaking Challenge: Sentence Building</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fefce8; /* Lemon Chiffon */
+        }
+        .thai-script {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        .phonetic {
+            font-style: italic;
+            color: #78716c; /* Stone-500 */
+        }
+        .translation {
+            color: #1d4ed8; /* Blue-700 */
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .audio-btn {
+            cursor: pointer;
+            color: #7c2d12; /* Amber-900 */
+            transition: color 0.2s, transform 0.2s;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 0.25rem;
+        }
+        .audio-btn:hover {
+            color: #451a03; /* Amber-950 */
+            transform: scale(1.1);
+        }
+        .activity-title {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #854d0e; /* Amber-700 */
+            border-bottom: 2px solid #fcd34d; /* Amber-400 */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .toggle-btn {
+            padding: 0.25rem 0.75rem;
+            border: 1px solid #dcae5b;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: white;
+            color: #854d0e;
+            transition: all 0.2s;
+            margin: 0 0.25rem;
+        }
+        .toggle-btn:hover {
+            background-color: #fef3c7; /* Amber-100 */
+        }
+        .toggle-btn.active {
+            background-color: #854d0e; /* Amber-700 */
+            color: white;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- Header -->
+        <header class="text-center mb-10 thai-container">
+            <h1 class="text-4xl md:text-5xl font-bold text-amber-800 thai-script inline-block">สร้างประโยคจากคำศัพท์หลัก</h1>
+            <button class="audio-btn" onclick="speak('สร้างประโยคจากคำศัพท์หลัก')">🔊</button>
+            <div class="mt-2">
+                <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+            </div>
+            <div class="details-container">
+                <p class="phonetic hidden">sâang bprà-yòok jàak kham-sàp làk</p>
+                <p class="translation hidden">Building Sentences from Core Words</p>
+            </div>
+        </header>
+
+        <!-- Vocabulary Cloud -->
+        <section class="mb-12">
+             <div class="card bg-amber-50">
+                <div class="thai-container text-center mb-4">
+                    <h3 class="font-bold text-lg thai-script inline-block">คำศัพท์วันนี้</h3>
+                    <button class="audio-btn" onclick="speak('คำศัพท์วันนี้')">🔊</button>
+                    <div class="mt-2">
+                        <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                        <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                    </div>
+                    <div class="details-container">
+                        <p class="phonetic hidden">kham-sàp wan-níi</p>
+                        <p class="translation hidden">Today's Words</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <script>
+                        const words = [
+                            { thai: 'ดี', phonetic: 'dii', meaning: 'good' }, { thai: 'คน', phonetic: 'khon', meaning: 'person' }, { thai: 'ใจ', phonetic: 'jai', meaning: 'heart/mind' },
+                            { thai: 'อาย', phonetic: 'aai', meaning: 'shy' }, { thai: 'ครู', phonetic: 'khruu', meaning: 'teacher' }, { thai: 'หนึ่ง', phonetic: 'nùeng', meaning: 'one' },
+                            { thai: 'สี่', phonetic: 'sìi', meaning: 'four' }, { thai: 'เจ็ด', phonetic: 'jèt', meaning: 'seven' }, { thai: 'จะ', phonetic: 'jà', meaning: 'will (future)' },
+                            { thai: 'เสร็จ', phonetic: 'sèt', meaning: 'to finish' }, { thai: 'ห้า', phonetic: 'hâa', meaning: 'five' }, { thai: 'เก้า', phonetic: 'gâo', meaning: 'nine' },
+                            { thai: 'นี่', phonetic: 'nîi', meaning: 'this' }, { thai: 'ใช่', phonetic: 'châi', meaning: 'yes / correct' }, { thai: 'ไม่', phonetic: 'mâi', meaning: 'no / not' },
+                            { thai: 'ฟ้า', phonetic: 'fáa', meaning: 'sky / blue' }, { thai: 'น้ำ', phonetic: 'náam', meaning: 'water' }, { thai: 'ใช้', phonetic: 'chái', meaning: 'to use' },
+                            { thai: 'รู้', phonetic: 'rúu', meaning: 'to know' }, { thai: 'รัก', phonetic: 'rák', meaning: 'to love' }, { thai: 'หมา', phonetic: 'mǎa', meaning: 'dog' },
+                            { thai: 'สูง', phonetic: 'sǔung', meaning: 'tall' }, { thai: 'หนังสือ', phonetic: 'nǎng-sǔue', meaning: 'book' }, { thai: 'หมู', phonetic: 'mǔu', meaning: 'pig' },
+                            { thai: 'ขาว', phonetic: 'khǎao', meaning: 'white' }
+                        ];
+                        words.forEach(word => {
+                            document.write(`
+                                <div class="card p-3 text-center thai-container shadow-sm">
+                                    <span class="thai-script">${word.thai}</span>
+                                    <button class="audio-btn" onclick="speak('${word.thai}')">🔊</button>
+                                    <div class="mt-2">
+                                        <button class="toggle-btn text-xs" onclick="toggleDetail(this)">IPA</button>
+                                        <button class="toggle-btn text-xs" onclick="toggleDetail(this)">EN</button>
+                                    </div>
+                                    <div class="details-container">
+                                        <p class="phonetic hidden text-sm mt-1">${word.phonetic}</p>
+                                        <p class="translation hidden text-sm mt-1">${word.meaning}</p>
+                                    </div>
+                                </div>
+                            `);
+                        });
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- Speaking Activity 1: Guessing Game -->
+        <section class="mb-12">
+            <div class="thai-container activity-title">
+                <h2 class="thai-script inline-block">กิจกรรมที่ 1: เกมทายคำ (นี่คืออะไร)</h2>
+                <button class="audio-btn" onclick="speak('กิจกรรมที่ 1 เกมทายคำ นี่คืออะไร')">🔊</button>
+                <div class="mt-2">
+                    <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                    <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                </div>
+                <div class="details-container">
+                    <p class="phonetic hidden text-base font-normal">gìt-jà-gam thîi nùeng: geem thaai kham (nîi khue à-rai)</p>
+                    <p class="translation hidden text-base font-normal">Activity 1: Guessing Game (What is this?)</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="thai-container mb-4">
+                    <p class="thai-script inline-block">ครูจะนึกถึงคำศัพท์หนึ่งคำ นักเรียนต้องถามคำถาม <strong class="thai-script">ใช่ไหม</strong> เพื่อทายว่าคืออะไร</p>
+                    <button class="audio-btn" onclick="speak('ครูจะนึกถึงคำศัพท์หนึ่งคำ นักเรียนต้องถามคำถาม ใช่ไหม เพื่อทายว่าคืออะไร')">🔊</button>
+                    <div class="mt-2">
+                        <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                        <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                    </div>
+                    <div class="details-container">
+                        <p class="phonetic hidden">khruu jà núek thǔeng kham-sàp nùeng kham, nák-rian dtâwng thǎam kham-thǎam châi-mǎi phûea thaai wâa khue à-rai</p>
+                        <p class="translation hidden">The teacher will think of a word. The student must ask "châi mǎi?" questions to guess what it is.</p>
+                    </div>
+                </div>
+                <div class="text-gray-600 space-y-2">
+                    <div class="thai-container">
+                        <p class="inline-block"><strong class="thai-script">ตัวอย่าง:</strong></p>
+                         <button class="audio-btn" onclick="speak('ตัวอย่าง')">🔊</button>
+                    </div>
+                    <div class="thai-container">
+                        <p class="inline-block"><strong class="thai-script">นักเรียน:</strong> <span class="thai-script">สีขาว ใช่ไหม</span></p>
+                        <button class="audio-btn" onclick="speak('นักเรียน สีขาว ใช่ไหม')">🔊</button>
+                        <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">nák-rian: sǐi khǎao, châi mǎi?</p>
+                            <p class="translation hidden">Student: White, right?</p>
+                        </div>
+                    </div>
+                     <div class="thai-container">
+                        <p class="inline-block"><strong class="thai-script">ครู:</strong> <span class="thai-script">ใช่</span></p>
+                         <button class="audio-btn" onclick="speak('ครู ใช่')">🔊</button>
+                         <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">khruu: châi</p>
+                            <p class="translation hidden">Teacher: Yes</p>
+                        </div>
+                    </div>
+                    <div class="thai-container">
+                        <p class="inline-block"><strong class="thai-script">นักเรียน:</strong> <span class="thai-script">เป็นคน ใช่ไหม</span></p>
+                        <button class="audio-btn" onclick="speak('นักเรียน เป็นคน ใช่ไหม')">🔊</button>
+                        <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">nák-rian: bpen khon, châi mǎi?</p>
+                            <p class="translation hidden">Student: Is it a person, right?</p>
+                        </div>
+                    </div>
+                    <div class="thai-container">
+                        <p class="inline-block"><strong class="thai-script">ครู:</strong> <span class="thai-script">ไม่ใช่</span></p>
+                         <button class="audio-btn" onclick="speak('ครู ไม่ใช่')">🔊</button>
+                         <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">khruu: mâi châi</p>
+                            <p class="translation hidden">Teacher: No</p>
+                        </div>
+                    </div>
+                     <div class="thai-container">
+                        <p class="inline-block"><strong class="thai-script">นักเรียน:</strong> <span class="thai-script">นี่หมา</span></p>
+                        <button class="audio-btn" onclick="speak('นักเรียน นี่หมา')">🔊</button>
+                        <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">nák-rian: nîi mǎa?</p>
+                            <p class="translation hidden">Student: Is this a dog?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Speaking Activity 2: Role-Play -->
+        <section class="mb-12">
+            <div class="thai-container activity-title">
+                <h2 class="thai-script inline-block">กิจกรรมที่ 2: บทบาทสมมติ (ที่ร้านหนังสือ)</h2>
+                 <button class="audio-btn" onclick="speak('กิจกรรมที่ 2 บทบาทสมมติ ที่ร้านหนังสือ')">🔊</button>
+                <div class="mt-2">
+                    <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                    <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                </div>
+                <div class="details-container">
+                    <p class="phonetic hidden text-base font-normal">gìt-jà-gam thîi sǎawng: bòt-bàat sǒm-mút (thîi ráan nǎng-sǔue)</p>
+                    <p class="translation hidden text-base font-normal">Activity 2: Role-Play (At the Bookstore)</p>
+                </div>
+            </div>
+            <div class="card bg-emerald-50 border-l-4 border-emerald-500 space-y-4">
+                <div class="thai-container">
+                    <p class="thai-script inline-block">นักเรียนเป็นลูกค้า ครูเป็นคนขายหนังสือ ให้นักเรียนลองสั่งซื้อหนังสือโดยใช้คำศัพท์ที่เรียนมา</p>
+                    <button class="audio-btn" onclick="speak('นักเรียนเป็นลูกค้า ครูเป็นคนขายหนังสือ ให้นักเรียนลองสั่งซื้อหนังสือโดยใช้คำศัพท์ที่เรียนมา')">🔊</button>
+                    <div class="mt-2">
+                        <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                        <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                    </div>
+                    <div class="details-container">
+                        <p class="phonetic hidden">nák-rian bpen lûuk-kháa, khruu bpen khon khǎai nǎng-sǔue. hâi nák-rian laawng sàng-súe nǎng-sǔue dooi chái kham-sàp thîi rian maa</p>
+                        <p class="translation hidden">The student is the customer, the teacher is the bookseller. Have the student try to order books using the vocabulary learned.</p>
+                    </div>
+                </div>
+                <div>
+                    <ul class="list-disc list-inside ml-4">
+                        <li class="thai-container">
+                            <span class="thai-script">บอกว่าต้องการหนังสือ</span>
+                            <button class="audio-btn" onclick="speak('บอกว่าต้องการหนังสือ')">🔊</button>
+                            <div class="mt-2">
+                                <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                                <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                            </div>
+                            <div class="details-container">
+                                <p class="phonetic hidden">bàawk wâa dtâwng-gaan nǎng-sǔue (chǎn jà ao nǎng-sǔue...)</p>
+                                <p class="translation hidden">Say that you want a book</p>
+                            </div>
+                        </li>
+                        <li class="thai-container">
+                            <span class="thai-script">บอกจำนวนที่ต้องการ</span>
+                             <button class="audio-btn" onclick="speak('บอกจำนวนที่ต้องการ')">🔊</button>
+                             <div class="mt-2">
+                                <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                                <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                            </div>
+                            <div class="details-container">
+                                <p class="phonetic hidden">bàawk jam-nuan thîi dtâwng-gaan (...hâa lêm)</p>
+                                <p class="translation hidden">Say the quantity you want</p>
+                            </div>
+                        </li>
+                        <li class="thai-container">
+                            <span class="thai-script">อธิบายหนังสือที่อยากได้</span>
+                             <button class="audio-btn" onclick="speak('อธิบายหนังสือที่อยากได้')">🔊</button>
+                             <div class="mt-2">
+                                <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                                <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                            </div>
+                            <div class="details-container">
+                                <p class="phonetic hidden">à-thí-baai nǎng-sǔue thîi yàak dâai (nǎng-sǔue sǐi fáa)</p>
+                                <p class="translation hidden">Describe the book you want</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Speaking Activity 3: Asking Questions -->
+        <section class="mb-12">
+            <div class="thai-container activity-title">
+                <h2 class="thai-script inline-block">กิจกรรมที่ 3: จะทำยังไงดี</h2>
+                <button class="audio-btn" onclick="speak('กิจกรรมที่ 3 จะทำยังไงดี')">🔊</button>
+                <div class="mt-2">
+                    <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                    <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                </div>
+                <div class="details-container">
+                    <p class="phonetic hidden text-base font-normal">gìt-jà-gam thîi sǎam: jà tham yang-ngai dii</p>
+                    <p class="translation hidden text-base font-normal">Activity 3: What Should I Do?</p>
+                </div>
+            </div>
+             <div class="card bg-sky-50 border-l-4 border-sky-500 space-y-4">
+                <div class="thai-container">
+                    <p class="thai-script">ครูจะบอกสถานการณ์ ให้นักเรียนลองพูดว่าจะทำอะไร หรือถามคำถามเกี่ยวกับสถานการณ์นั้น</p>
+                    <button class="audio-btn" onclick="speak('ครูจะบอกสถานการณ์ ให้นักเรียนลองพูดว่าจะทำอะไร หรือถามคำถามเกี่ยวกับสถานการณ์นั้น')">🔊</button>
+                     <div class="mt-2">
+                        <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                        <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                    </div>
+                    <div class="details-container">
+                        <p class="phonetic hidden">khruu jà bàawk sà-thǎa-ná-gaan, hâi nák-rian laawng phûut wâa jà tham à-rai, rǔue thǎam kham-thǎam gìao-gàp sà-thǎa-ná-gaan nán</p>
+                        <p class="translation hidden">The teacher will describe a situation. Have the student try to say what they will do, or ask questions about that situation.</p>
+                    </div>
+                </div>
+                <hr>
+                <ul class="list-disc list-inside ml-4 space-y-2">
+                    <li class="thai-container">
+                        <span class="thai-script">เห็นคนสูงและอาย</span>
+                        <button class="audio-btn" onclick="speak('เห็นคนสูงและอาย')">🔊</button>
+                        <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">hěn khon sǔung láe aai</p>
+                            <p class="translation hidden">You see a tall and shy person.</p>
+                        </div>
+                    </li>
+                    <li class="thai-container">
+                        <span class="thai-script">ครูจะใช้หมาขาว</span>
+                        <button class="audio-btn" onclick="speak('ครูจะใช้หมาขาว')">🔊</button>
+                        <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">khruu jà chái mǎa khǎao</p>
+                            <p class="translation hidden">The teacher is going to use a white dog.</p>
+                        </div>
+                    </li>
+                     <li class="thai-container">
+                        <span class="thai-script">งานยังไม่เสร็จ</span>
+                         <button class="audio-btn" onclick="speak('งานยังไม่เสร็จ')">🔊</button>
+                         <div class="mt-2">
+                            <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                            <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                        </div>
+                        <div class="details-container">
+                            <p class="phonetic hidden">ngaan yang mâi sèt</p>
+                            <p class="translation hidden">The work is not finished yet.</p>
+                        </div>
+                    </li>
+                </ul>
+             </div>
+        </section>
+
+        <!-- Speaking Activity 4: Free Practice -->
+        <section>
+             <div class="thai-container activity-title">
+                <h2 class="thai-script inline-block">กิจกรรมที่ 4: เล่าเรื่องอิสระ</h2>
+                <button class="audio-btn" onclick="speak('กิจกรรมที่ 4 เล่าเรื่องอิสระ')">🔊</button>
+                <div class="mt-2">
+                    <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                    <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                </div>
+                <div class="details-container">
+                    <p class="phonetic hidden text-base font-normal">gìt-jà-gam thîi sìi: lâo rûeang ìt-sà-rà</p>
+                    <p class="translation hidden text-base font-normal">Activity 4: Free Storytelling</p>
+                </div>
+            </div>
+             <div class="card">
+                <div class="thai-container mb-4">
+                    <p class="thai-script">ใช้คำศัพท์ทั้งหมดที่เรียนมาเพื่อสร้างเรื่องราวสั้นๆ พยายามพูดให้ได้มากที่สุด!</p>
+                    <button class="audio-btn" onclick="speak('ใช้คำศัพท์ทั้งหมดที่เรียนมาเพื่อสร้างเรื่องราวสั้นๆ พยายามพูดให้ได้มากที่สุด')">🔊</button>
+                    <div class="mt-2">
+                        <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                        <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                    </div>
+                    <div class="details-container">
+                        <p class="phonetic hidden">chái kham-sàp tháng-mòt thîi rian maa phûea sâang rûeang-raao sân sân. phá-yaa-yaam phûut hâi dâai mâak thîi-sùt!</p>
+                        <p class="translation hidden">Use all the words you've learned to create a short story. Try to speak as much as possible!</p>
+                    </div>
+                </div>
+                <div class="mt-4 thai-container">
+                    <strong class="thai-script">คำใบ้:</strong>
+                    <span class="thai-script">ลองพูดเกี่ยวกับ คน, ครู, หมา, หมู, หนังสือ, สีขาว, ความสูง, ท้องฟ้า</span>
+                     <button class="audio-btn" onclick="speak('คำใบ้ ลองพูดเกี่ยวกับ คน, ครู, หมา, หมู, หนังสือ, สีขาว, ความสูง, ท้องฟ้า')">🔊</button>
+                     <div class="mt-2">
+                        <button class="toggle-btn" onclick="toggleDetail(this)">IPA</button>
+                        <button class="toggle-btn" onclick="toggleDetail(this)">EN</button>
+                    </div>
+                    <div class="details-container">
+                        <p class="phonetic hidden">kham-bâi: laawng phûut gìao-gàp khon, khruu, mǎa, mǔu, nǎng-sǔue, sǐi khǎao, khwaam sǔung, tháwng fáa</p>
+                        <p class="translation hidden">Hint: Try talking about person, teacher, dog, pig, book, white, height, sky.</p>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12">
+            <p class="text-xs text-gray-500">Adapted from Thai for Beginners by Benjawan Poomsan Becker page 11</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- Text-to-Speech Functionality ---
+        const utterance = new SpeechSynthesisUtterance();
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.9;
+
+        function speak(text) {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            utterance.text = text;
+            speechSynthesis.speak(utterance);
+        }
+
+        // --- Toggle IPA/EN Visibility ---
+        function toggleDetail(btn) {
+            const container = btn.closest('.thai-container');
+            if (!container) return;
+
+            // Find the details container relative to the button's parent div
+            const detailsContainer = btn.parentElement.nextElementSibling;
+            
+            if (detailsContainer && detailsContainer.classList.contains('details-container')) {
+                 const detailType = btn.textContent.trim().toLowerCase() === 'ipa' ? 'phonetic' : 'translation';
+                const detailElement = detailsContainer.querySelector('.' + detailType);
+                if (detailElement) {
+                    detailElement.classList.toggle('hidden');
+                    btn.classList.toggle('active');
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
+
