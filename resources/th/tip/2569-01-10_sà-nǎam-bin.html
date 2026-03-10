@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สนามบิน (The Airport)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f9ff; /* Sky-50 */
+        }
+        .thai-text {
+            color: #0c4a6e; /* Sky-900 */
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9; /* Sky-500 */
+            border-radius: 4px;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active {
+            background-color: #0284c7; /* Sky-600 */
+            color: white;
+            border-color: #0284c7;
+        }
+        .card-anim {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b-2 border-sky-200">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-sky-700">✈️ สนามบิน (Airport)</h1>
+            <div class="flex gap-1">
+                <button onclick="toggleAll('ipa')" class="text-xs bg-sky-50 hover:bg-sky-100 px-2 py-1 rounded text-sky-800 border border-sky-200">All IPA</button>
+                <button onclick="toggleAll('en')" class="text-xs bg-sky-50 hover:bg-sky-100 px-2 py-1 rounded text-sky-800 border border-sky-200">All EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- SECTION 1: WARM UP (Random Vocab) -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">🧠</span>
+                <h2 class="text-xl font-bold text-gray-800">ทบทวนคำศัพท์ (Review)</h2>
+            </div>
+            
+            <div class="bg-blue-50 rounded-xl p-6 text-center border border-blue-100 min-h-[220px] flex flex-col justify-center items-center relative">
+                <div id="random-card-content" class="w-full">
+                    <p class="text-gray-400 italic">Ready?</p>
+                </div>
+                <button onclick="randomWord()" class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transform active:scale-95 transition-all flex items-center gap-2">
+                    <span>🎲</span> Next Word
+                </button>
+            </div>
+        </section>
+
+        <!-- SCENARIO 1: Flight Delay -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-red-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">⏰</span>
+                <div id="header-delay" class="flex-1"></div>
+            </div>
+            <div class="space-y-6" id="container-delay"></div>
+        </section>
+
+        <!-- SCENARIO 2: Carry-on Weight -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">⚖️</span>
+                <div id="header-weight" class="flex-1"></div>
+            </div>
+            <div class="space-y-6" id="container-weight"></div>
+        </section>
+
+        <!-- SCENARIO 3: Lost Luggage -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">🧳</span>
+                <div id="header-lost" class="flex-1"></div>
+            </div>
+            <div class="space-y-6" id="container-lost"></div>
+        </section>
+
+        <!-- SECTION 4: EXTENSION ACTIVITIES -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-pink-500">
+            <div class="flex items-center mb-6 gap-2">
+                <span class="text-2xl">🎭</span>
+                <div id="header-extension" class="flex-1"></div>
+            </div>
+
+            <!-- Immigration -->
+            <div class="mb-8">
+                <div id="header-imm" class="mb-4"></div>
+                <div class="space-y-6" id="container-imm"></div>
+            </div>
+
+            <!-- Gate Change -->
+            <div class="mb-8 pl-4 border-l-2 border-pink-100">
+                <div id="header-gate" class="mb-4"></div>
+                <div class="space-y-6" id="container-gate"></div>
+            </div>
+
+            <!-- SIM Card -->
+            <div class="pl-4 border-l-2 border-pink-100 mb-8">
+                <div id="header-sim" class="mb-4"></div>
+                <div class="space-y-6" id="container-sim"></div>
+            </div>
+
+            <!-- Missing Flight (New) -->
+            <div class="pl-4 border-l-2 border-red-200 bg-red-50 rounded-r-lg p-4">
+                <div id="header-miss" class="mb-4"></div>
+                <div class="space-y-6" id="container-miss"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Template for a Sentence Block -->
+    <template id="sentence-template">
+        <div class="item-container pb-4 last:pb-0">
+            <!-- Thai Row -->
+            <div class="flex items-start gap-3 mb-2">
+                <button class="speak-btn text-sky-600 hover:text-sky-800 mt-1 flex-shrink-0" title="Listen">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                </button>
+                <div class="thai-content font-semibold text-lg text-gray-800 leading-relaxed cursor-pointer select-none"></div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex gap-2 ml-9 mb-2">
+                <button class="ipa-toggle btn-toggle text-xs border border-gray-300 px-2 py-1 rounded text-gray-500 hover:bg-gray-50">IPA</button>
+                <button class="en-toggle btn-toggle text-xs border border-gray-300 px-2 py-1 rounded text-gray-500 hover:bg-gray-50">EN</button>
+            </div>
+
+            <!-- Hidden Content -->
+            <div class="ml-9 space-y-1">
+                <div class="ipa-display hidden text-sm font-mono text-indigo-600 bg-indigo-50 inline-block px-2 py-0.5 rounded"></div>
+                <div class="en-display hidden text-sm text-gray-600 italic"></div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // --- DATA SOURCES ---
+
+        // 1. HEADINGS
+        const uiData = {
+            headerDelay: {
+                thai: "1. เที่ยวบินล่าช้า",
+                ipa: "tîiao-bin lâa-cháa",
+                en: "1. Flight Delayed"
+            },
+            headerWeight: {
+                thai: "2. กระเป๋าหนักเกินไป",
+                ipa: "grà-bpǎo nàk gern-bpai",
+                en: "2. Carry-on bag is too heavy"
+            },
+            headerLost: {
+                thai: "3. กระเป๋าหาย",
+                ipa: "grà-bpǎo hǎai",
+                en: "3. Lost Luggage"
+            },
+            headerExtension: {
+                thai: "กิจกรรมเสริม: สถานการณ์อื่นๆ",
+                ipa: "gìt-jà-gam sěrm : sà-tǎan-ná-gaan èun-èun",
+                en: "Extension: Other Scenarios"
+            },
+            headerImm: {
+                thai: "A. ด่านตรวจคนเข้าเมือง (ตม.)",
+                ipa: "dàan dtrùat-kon-kâo-meuang (dtor-mor)",
+                en: "A. Immigration Checkpoint"
+            },
+            headerGate: {
+                thai: "B. เปลี่ยนเกต (Gate Change)",
+                ipa: "bplìian gêet",
+                en: "B. Gate Change"
+            },
+            headerSim: {
+                thai: "C. ซื้อซิมการ์ด",
+                ipa: "séu sim-gàat",
+                en: "C. Buying a SIM Card"
+            },
+            headerMiss: {
+                thai: "D. ตกเครื่อง",
+                ipa: "dtòk krûeang",
+                en: "D. Missing a Flight"
+            }
+        };
+
+        // 2. DIALOGUES
+
+        // Scenario 1: Delay
+        const dataDelay = [
+            {
+                thai: "A: ขอโทษครับ เที่ยวบินไปตุรกีล่าช้าเหรอครับ? 🇹🇷",
+                ipa: "A: kɔ̌ɔ-tôot kráp · tîiao-bin bpai dtù-rá-gee lâa-cháa rěu kráp?",
+                en: "A: Excuse me, is the flight to Turkey delayed?"
+            },
+            {
+                thai: "B: ใช่ค่ะ เนื่องจากฝนตกหนัก ต้องรออีก 2 ชั่วโมงค่ะ 🌧️",
+                ipa: "B: châi kâ · nûeang-jàak fǒn dtòk nàk · dtɔ̂ng rɔɔ ìik sɔ̌ɔng chûua-moong kâ",
+                en: "B: Yes, due to heavy rain. Have to wait another 2 hours."
+            },
+            {
+                thai: "A: นานจังเลย! ผมต้องไปประชุมด่วน มีเที่ยวบินอื่นไหมครับ? 👔",
+                ipa: "A: naan jang loei! pǒm dtɔ̂ng bpai bprà-chum dùuan · mii tîiao-bin èun mái kráp?",
+                en: "A: So long! I have an urgent meeting. Is there another flight?"
+            }
+        ];
+
+        // Scenario 2: Overweight
+        const dataWeight = [
+            {
+                thai: "B: ขอโทษค่ะ กระเป๋าถือขึ้นเครื่องหนักเกิน 7 กิโลนะคะ ⚖️",
+                ipa: "B: kɔ̌ɔ-tôot kâ · grà-bpǎo těu kêun krûeang nàk gern jèt gì-loo ná ká",
+                en: "B: Sorry, carry-on bag is over 7kg."
+            },
+            {
+                thai: "A: จริงเหรอครับ? เกินมาเท่าไรครับ? 🤔",
+                ipa: "A: jing rěu kráp? gern maa tâo-rài kráp?",
+                en: "A: Really? How much over?"
+            },
+            {
+                thai: "B: เกินมา 3 กิโลค่ะ... ต้องเอาของออก หรือ โหลดใต้ท้องเครื่องค่ะ 📦",
+                ipa: "B: gern maa sǎam gì-loo kâ... dtɔ̂ng ao kɔ̌ɔng ɔ̀ɔk rěu lòot dtâi tɔ́ɔng krûeang kâ",
+                en: "B: Over by 3kg. Must take items out or load it under the plane (check-in)."
+            },
+            {
+                thai: "A: งั้นผมขอเอาโน๊ตบุ๊คกับเสื้อผ้าออกได้ไหมครับ? 💻👕",
+                ipa: "A: ngán pǒm kɔ̌ɔ ao nóot-búk gàp sêua-pâa ɔ̀ɔk dâai mái kráp?",
+                en: "A: Then can I take the notebook and clothes out?"
+            }
+        ];
+
+        // Scenario 3: Lost Luggage
+        const dataLost = [
+            {
+                thai: "A: ช่วยด้วยครับ! ผมหา 'กระเป๋าเดินทาง' ไม่เจอครับ 🧳😰",
+                ipa: "A: chûuai dûuai kráp! pǒm hǎa 'grà-bpǎo dern-taang' mâi jer kráp",
+                en: "A: Help! I cannot find my suitcase."
+            },
+            {
+                thai: "B: ใจเย็นๆ นะคะ... กระเป๋าสีอะไรคะ? มีสัญลักษณ์อะไรไหม? 🏷️",
+                ipa: "B: jai yen-yen ná ká... grà-bpǎo sǐi à-rai ká? mii sǎn-yá-lák à-rai mái?",
+                en: "B: Calm down... What color is it? Any symbol/tag?"
+            },
+            {
+                thai: "A: สีม่วงครับ... มีที่ห้อยกระเป๋ารูป 'กระบองเพชร' ครับ 🟣🌵",
+                ipa: "A: sǐi mûuang kráp... mii tîi-hɔ̂i grà-bpǎo rûup 'grà-bɔɔng-pét' kráp",
+                en: "A: It's purple... Has a 'cactus' luggage tag."
+            },
+            {
+                thai: "B: รอสักครู่ค่ะ เดี๋ยวเช็คในระบบให้นะคะ 💻",
+                ipa: "B: rɔɔ sàk-krûu kâ · dǐiao chék nai rá-bòp hâi ná ká",
+                en: "B: Wait a moment. I'll check the system for you."
+            }
+        ];
+
+        // 3. EXTENSION SCENARIOS (SEPARATED & EXTENDED)
+        
+        // Immigration
+        const dataImm = [
+            {
+                thai: "ตม.: สวัสดีครับ ขอดูพาสปอร์ตหน่อยครับ 🛂",
+                ipa: "dtor-mor: sà-wàt-dii kráp · kɔ̌ɔ doo pâat-sà-bpɔ̀ɔt nɔ̀i kráp",
+                en: "Immigration: Hello, passport please."
+            },
+            {
+                thai: "A: นี่ครับ... 📘",
+                ipa: "A: nîi kráp...",
+                en: "A: Here you go."
+            },
+            {
+                thai: "ตม.: มาเที่ยวกี่วันครับ? พักที่ไหนครับ? 🗓️",
+                ipa: "dtor-mor: maa tîiao gìi wan kráp? pák tîi-nǎi kráp?",
+                en: "Immigration: How many days are you visiting? Where are you staying?"
+            },
+            {
+                thai: "A: มา 2 สัปดาห์ครับ พักที่โรงแรมสยามครับ 🏨",
+                ipa: "A: maa sɔ̌ɔng sàp-daa kráp · pák tîi roong-raaem sà-yǎam kráp",
+                en: "A: Coming for 2 weeks. Staying at Siam Hotel."
+            },
+            {
+                thai: "ตม.: โอเคครับ สแกนนิ้วด้วยครับ... เที่ยวให้สนุกครับ 👍",
+                ipa: "dtor-mor: oo-kee kráp · sà-gaaen níu dûuai kráp... tîiao hâi sà-nùk kráp",
+                en: "Immigration: Okay. Scan your fingers please... Enjoy your trip."
+            }
+        ];
+
+        // Gate Change
+        const dataGate = [
+            {
+                thai: "A: ขอโทษครับ เกต 42 ไปเชียงใหม่ใช่ไหมครับ? ✈️",
+                ipa: "A: kɔ̌ɔ-tôot kráp · gêet sìi-sìp-sɔ̌ɔng bpai chiiang-mài châi mái kráp?",
+                en: "A: Excuse me, Gate 42 is going to Chiang Mai, right?"
+            },
+            {
+                thai: "B: ไม่ใช่ค่ะ! เปลี่ยนไปเกต 55 แล้วค่ะ 📢",
+                ipa: "B: mâi châi kâ! bplìian bpai gêet hâa-sìp-hâa láaeo kâ",
+                en: "B: No! It has changed to Gate 55 already."
+            },
+            {
+                thai: "A: จริงเหรอครับ! ไกลไหมครับ? 🏃‍♂️",
+                ipa: "A: jing rěu kráp! glai mái kráp?",
+                en: "A: Really! Is it far?"
+            },
+            {
+                thai: "B: ไกลค่ะ ต้องเดินประมาณ 10 นาที... ตอนนี้เรียกขึ้นเครื่องแล้วค่ะ! ⚠️",
+                ipa: "B: glai kâ · dtɔ̂ng dern bprà-maan sìp naa-tii... dtɔɔn-níi rîiak kêun krûeang láaeo kâ!",
+                en: "B: It's far. Walk about 10 mins... They are boarding now!"
+            },
+            {
+                thai: "A: แย่แล้ว! ขอบคุณครับ (วิ่ง) 💨",
+                ipa: "A: yâae láaeo! kɔ̀ɔp-kun kráp",
+                en: "A: Oh no! Thank you (Runs)."
+            }
+        ];
+
+        // SIM Card
+        const dataSim = [
+            {
+                thai: "A: ซื้อซิมนักท่องเที่ยวได้ไหมครับ? เอาแบบเน็ตไม่จำกัด 📶",
+                ipa: "A: séu sim nák-tɔ̂ng-tîiao dâai mái kráp? ao bàaep nét mâi jam-gàt",
+                en: "A: Can I buy a tourist SIM? I want unlimited internet."
+            },
+            {
+                thai: "B: ได้ค่ะ มีแพ็กเกจ 7 วัน 299 บาทค่ะ 📱",
+                ipa: "B: dâai kâ · mii páek-gèet jèt wan sɔ̌ɔng-rɔ́ɔi-gâo-sìp-gâo bàat kâ",
+                en: "B: Yes, we have a 7-day package for 299 baht."
+            },
+            {
+                thai: "A: โอเคครับ ใช้บัตรเครดิตได้ไหมครับ? 💳",
+                ipa: "A: oo-kee kráp · chái bàt kre-dìt dâai mái kráp?",
+                en: "A: Okay. Can I use a credit card?"
+            },
+            {
+                thai: "B: ได้ค่ะ... ขอดูพาสปอร์ตด้วยค่ะ เดี๋ยวใส่ซิมให้ค่ะ 🛂",
+                ipa: "B: dâai kâ... kɔ̌ɔ doo pâat-sà-bpɔ̀ɔt dûuai kâ · dǐiao sài sim hâi kâ",
+                en: "B: Yes... Passport please. I'll insert the SIM for you."
+            },
+            {
+                thai: "B: เรียบร้อยค่ะ รีสตาร์ทเครื่องหนึ่งครั้งนะคะ 🔄",
+                ipa: "B: rîiap-rɔ́ɔi kâ · rii-sà-dtáat krûeang nèung kráng ná ká",
+                en: "B: All done. Please restart your phone once."
+            }
+        ];
+
+        // Missing Flight (New)
+        const dataMiss = [
+            {
+                thai: "A: ช่วยด้วยครับ! ผมตกเครื่องไปภูเก็ตครับ 😱",
+                ipa: "A: chûuai dûuai kráp! pǒm dtòk krûeang bpai puu-gèt kráp",
+                en: "A: Help! I missed the flight to Phuket."
+            },
+            {
+                thai: "B: เที่ยวบินอะไรคะ? ขอดูตั๋วหน่อยค่ะ 🎫",
+                ipa: "B: tîiao-bin à-rai ká? kɔ̌ɔ doo dtǔua nɔ̀i kâ",
+                en: "B: What flight? May I see the ticket?"
+            },
+            {
+                thai: "A: FD3025 ครับ... รถติดมากก็เลยมาสาย 🚗🚦",
+                ipa: "A: FD-sǎam-sǔun-sɔ̌ng-hâa kráp... rót dtìt mâak gɔ̂ɔ loei maa sǎai",
+                en: "A: FD3025... Traffic was very bad so I came late."
+            },
+            {
+                thai: "B: เครื่องออกไปแล้วค่ะ... คุณต้องซื้อตั๋วใหม่นะคะ 💸",
+                ipa: "B: krûeang ɔ̀ɔk bpai láaeo kâ... kun dtɔ̂ng séu dtǔua mài ná ká",
+                en: "B: The plane has left... You must buy a new ticket."
+            },
+            {
+                thai: "A: โห... มีเที่ยวต่อไปกี่โมงครับ? 😢",
+                ipa: "A: hǒo... mii tîiao dtɔ̀ɔ-bpai gìi moong kráp?",
+                en: "A: Oh no... What time is the next flight?"
+            }
+        ];
+
+        // 4. UPDATED VOCAB LIST
+        const vocabList = [
+            // Standard List
+            { t: "เดินดูธรรมชาติ 🌿", i: "dern-doo-tam-má-châat", e: "walk and look at nature" },
+            { t: "สวน 🌳", i: "sǔuan", e: "garden / park" },
+            { t: "นอกบ้าน 🏠", i: "nɔ̂ɔk-bâan", e: "outside" },
+            { t: "พืช 🌱", i: "pêut", e: "plants" },
+            { t: "ต้นไม้ 🌲", i: "dtôn-máai", e: "trees" },
+            { t: "กระบองเพชร 🌵", i: "grà-bɔɔng-pét", e: "cactus" },
+            { t: "อธิบาย 🗣️", i: "à-tí-baai", e: "describe / explain" },
+            { t: "ติดเชื้อ 🦠", i: "dtìt-chéua", e: "get infected" },
+            { t: "แพร่เชื้อ 🤧", i: "prâae-chéua", e: "spread the virus" },
+            { t: "จิตวิทยา 🧠", i: "jìt-dta-wít-tá-yaa", e: "psychology" },
+            { t: "มหาวิทยาลัย 🎓", i: "má-hǎa-wít-tá-yaa-lai", e: "university" },
+            { t: "ธุรกิจ 💼", i: "tú-rá-gìt", e: "business" },
+            { t: "การเมือง 🗳️", i: "gaan-meuang", e: "politics" },
+            { t: "วิชาเอก 📚", i: "wí-chaa-èek", e: "majors" },
+            { t: "ประวัติศาสตร์ 📜", i: "bprà-wàt-dtì-sàat", e: "history" },
+            { t: "กฎหมาย ⚖️", i: "gòt-mǎai", e: "laws" },
+            { t: "ศาล 🏛️", i: "sǎan", e: "court" },
+            { t: "ปริญญาตรี 🎓", i: "bprìn-yaa-dtree", e: "Bachelor's degree" },
+            { t: "ปริญญาโท 🎓", i: "bprìn-yaa-toh", e: "Master's degree" },
+            { t: "ปริญญาเอก 🎓", i: "bprìn-yaa-èek", e: "Doctoral degree" },
+            { t: "ทำงานให้ลูกความ 🤝", i: "tam-ngaan-hâi-lûuk-kwaam", e: "I work for clients." },
+            { t: "ปัญหาทางจิต 😵‍💫", i: "bpan-hǎa-taang-jìt", e: "mental problems" },
+            { t: "เครียด 🤯", i: "krîat", e: "stressed" },
+            { t: "แย่ลง 📉", i: "yâae-long", e: "worse than before" },
+            { t: "ชายหาด 🏖️", i: "chaai-hàat", e: "beaches" },
+            { t: "เรือ 🚤", i: "reua", e: "ferry, boat, ship" },
+            { t: "วันจันทร์ 💛", i: "wan-jan", e: "Monday" },
+            { t: "วันอังคาร 💗", i: "wan-ang-kaan", e: "Tuesday" },
+            { t: "วันพุธ 💚", i: "wan-pút", e: "Wednesday" },
+            { t: "วันศุกร์ 💙", i: "wan-sùk", e: "Friday" },
+            { t: "วันเสาร์ 💜", i: "wan-sǎo", e: "Saturday" },
+            { t: "มกราคม 📅", i: "má-grà-kom", e: "January" },
+            { t: "มีนาคม 📅", i: "mee-naa-kom", e: "March" },
+            { t: "เมษายน 📅", i: "may-sǎa-yon", e: "April" },
+            { t: "พฤษภาคม 📅", i: "préu-sà-paa-kom", e: "May" },
+            { t: "มิถุนายน 📅", i: "mí-tù-naa-yon", e: "June" },
+            { t: "กรกฎาคม 📅", i: "ga-rá-gà-daa-kom", e: "July" },
+            { t: "ตุลาคม 📅", i: "dtù-laa-kom", e: "October" },
+            { t: "พฤศจิกายน 📅", i: "prá-réut-sà-jì-gaa-yon", e: "November" },
+            { t: "ธันวาคม 📅", i: "tan-waa-kom", e: "December" },
+            { t: "ตี 5 ⏰", i: "dtee hâa", e: "5am" },
+            { t: "บ่าย ☀️", i: "bàai", e: "afternoon" },
+            { t: "เที่ยงคืน 🌙", i: "tîang-keun", e: "midnight" },
+            { t: "เที่ยง 🕛", i: "tîang", e: "noon" },
+            { t: "1 ทุ่ม 🕖", i: "neung tôom", e: "7pm" },
+            { t: "เมื่อวานซืน 📆", i: "mêua-waan-seun", e: "day before yesterday" },
+            { t: "ครอบครัว 👨‍👩‍👧‍👦", i: "krôp-kruua", e: "family" },
+            { t: "ชั่วโมง ⏳", i: "chûua-moong", e: "hours" },
+            { t: "กางเต๊นท์ ⛺", i: "gaang-dtén", e: "Camping (open a tent)" },
+            { t: "พี่น้อง 👫", i: "pêe-nóng", e: "siblings" },
+            { t: "น้องสาว 👧", i: "nóng-sǎo", e: "younger sister" },
+            { t: "ลูกสาว 👧", i: "lôok-sǎo", e: "daughter" },
+            { t: "ลูกพี่ลูกน้อง 👭", i: "lôok-pêe-lôok-nóng", e: "cousin" },
+            { t: "ลุง 👴", i: "lung", e: "uncle (older brother of mom and dad)" },
+            { t: "ลูกสาวของลูกพี่ลูกน้องพ่อ 👩", i: "lôok-sǎo kǒng...", e: "The daughter of dad's cousin" },
+            { t: "ป้า 👵", i: "bpâa", e: "aunt (older sister of mom and dad)" },
+            { t: "ลูกสาวของลุงพ่อ 👩", i: "lôok-sǎo kǒng...", e: "The daughter of dad's uncle" },
+            { t: "ซับซ้อน 🧩", i: "sùp-són", e: "complicated" },
+            { t: "วันแรงงาน 👷", i: "wan raang-ngaan", e: "Labor Day" },
+            { t: "สงครามเย็น ❄️", i: "sǒng-kraam yen", e: "Cold War" },
+            { t: "วันชาติ 🇹🇭", i: "wan châat", e: "National Day" },
+            { t: "วันประกาศอิสรภาพ 🎆", i: "wan bprà-gàat...", e: "Independence Day" },
+            { t: "พลุ 🎇", i: "plú", e: "fireworks" },
+            { t: "ทาส ⛓️", i: "tâat", e: "slaves" },
+            { t: "การเลิกทาส 🔓", i: "gaan lêrk tâat", e: "emancipation" },
+            { t: "เสื้อผ้า 👕", i: "seûa-pâa", e: "clothes" },
+            { t: "สุขภาพ 🏥", i: "sùk-khà-phâap", e: "health" },
+            { t: "สัมภาษณ์ 🎙️", i: "sǎm-phâat", e: "interview" },
+            { t: "สำเนียง 🗣️", i: "sǎm-niiang", e: "accent" },
+            { t: "ปฏิกิริยา 😲", i: "bpà-dtì-gì-rí-yaa", e: "reaction" },
+            { t: "สถานีวิทยุ 📻", i: "sà-thǎa-nii wít-thá-yú", e: "radio station" },
+            { t: "วง 🎸", i: "wong", e: "band" },
+            { t: "พ่อปู่ 👴", i: "phâw bpùu", e: "father-in-law" },
+            { t: "ของขวัญ 🎁", i: "khǎwng khwǎn", e: "gifts" },
+            { t: "ตุ้มหู 👂", i: "dtûm hǔu", e: "earrings" },
+            { t: "ไฟ 💡", i: "fai", e: "lights" },
+            { t: "ลำโพง 🔊", i: "lam-phoong", e: "speakers" },
+            { t: "แผน 🗺️", i: "phǎaen", e: "plans" },
+            { t: "บ้า 🤪", i: "bâa", e: "crazy" },
+            { t: "การระบาด(ใหญ่) 😷", i: "gaan rá-bàat yài", e: "pandemic" },
+            { t: "ม่วง 🟣", i: "mûuang", e: "purple" },
+            { t: "แล้วแต่ 🤷", i: "láaew-dtàae", e: "It depends" },
+            { t: "ส่วนหนึ่ง 🧩", i: "sùuan nèung", e: "a part / partially" },
+            { t: "พระอาทิตย์ขึ้น 🌅", i: "prá aa-thít khêun", e: "sunrise" },
+            { t: "ห้อง 🚪", i: "hâwng", e: "room" },
+            { t: "เพื่อนบ้าน 🏡", i: "pêuan bâan", e: "neighbor" },
+            { t: "แขก 👤", i: "khàaek", e: "guest" },
+            { t: "ผนัง 🧱", i: "phà-nǎng", e: "interior wall" },
+            { t: "มีความสุข 😊", i: "mii khwaam sùk", e: "happy" },
+            { t: "ดีใจ 😄", i: "dii jai", e: "happy/glad" },
+            { t: "ใจดี ❤️", i: "jai dii", e: "kind" },
+            { t: "พระราชา 👑", i: "prá raa-chaa", e: "King" },
+            { t: "ชวน 💌", i: "chuuan", e: "invite" },
+            { t: "กษัตริย์ 👑", i: "gà-sàt", e: "monarch" },
+            { t: "บทเรียน 📖", i: "bòt riian", e: "lessons" },
+            { t: "แฟ้ม 📁", i: "fɛ́ɛm", e: "folder" },
+            { t: "ป่า 🌳", i: "bpàa", e: "forest" },
+            { t: "อุทยานแห่งชาติ 🏞️", i: "ùt-tá-yaan hɛ̀ng châat", e: "National parks" },
+            { t: "ไก่ 🐓", i: "gài", e: "chicken" },
+            { t: "กลัว 😱", i: "glua", e: "afraid" },
+            { t: "ลักษณนาม 📏", i: "lák-sà-nà-naam", e: "classifier" },
+            { t: "คาดการณ์ 🤷‍♀️", i: "kâat-gaan", e: "predict" },
+            { t: "การทดสอบ 🧪", i: "gaan tóht-sòp", e: "tests" },
+            { t: "ตรวจ 🛂", i: "dtrùat", e: "check" },
+            { t: "ที่จอดรถ 🅿️", i: "têe jòt rót", e: "parking" },
+            { t: "ถึง 🛬", i: "tʉ̆ng", e: "arrive" },
+            { t: "พอ 👌", i: "por", e: "enough" },
+            { t: "ลดแอร์ ⬇️", i: "lót ɛɛ", e: "turn down A/C" },
+            { t: "สุภาพ 🙇", i: "sù-pâap", e: "polite" },
+            { t: "แรงไป 💪", i: "rɛɛng bpai", e: "too strong" },
+            { t: "ชิดซ้าย ⬅️", i: "chít sáai", e: "keep left" },
+            { t: "บัตร 💳", i: "bàt", e: "cards" },
+            { t: "โรงแรม 🏨", i: "rohng rɛɛm", e: "hotel" },
+            { t: "ตะวันตก ⬅️", i: "dtà-wan-dtòk", e: "west" },
+            { t: "ฝั่งตรงข้าม 🙅", i: "fàng dtrong kâam", e: "opposite side" },
+            { t: "แทน 🔂", i: "taen", e: "instead / replace" },
+            { t: "สุก 👨‍🍳", i: "sùk", e: "cooked" },
+            { t: "ไม่สุกมาก 🍳", i: "mâi sùk mâak", e: "not so cooked" },
+            { t: "กรอบ 🍟", i: "gròp", e: "crispy / crunchy" },
+            { t: "แถม 🆓", i: "tǎem", e: "give away for free" },
+            { t: "ด้นสด 🎭", i: "dôn sòt", e: "improvise" },
+            { t: "หล่น 🍁", i: "lòn", e: "To fall off (things)" },
+            { t: "ตะเกียบ 🥢", i: "dtà-gìap", e: "chopsticks" },
+            { t: "โต๊ะ 🍽️", i: "dtó", e: "tables" },
+            { t: "ผักบุ้งไฟแดง 🥬", i: "pàk-bûng fai daeng", e: "hot stir-fried morning glory" },
+            { t: "กระเฉด 🥬", i: "grà-chèet", e: "Water Mimosa" },
+            { t: "น้ำเก๊กฮวย 🫖", i: "náam gék-huai", e: "Chrysanthemum tea" },
+            { t: "น้ำอัญชัน 🧃", i: "náam an-chan", e: "butterfly tea" },
+            { t: "ช้อนกลาง 🥄", i: "cháwn glaang", e: "communual spoon" },
+            { t: "หลาน 👶", i: "lǎan", e: "niece/nephew/grandchild" },
+            { t: "เป็นหวัด 🤧", i: "bpen wàt", e: "have a cold" },
+            { t: "ข้น 🍜", i: "kôn", e: "condense" },
+            { t: "นมข้น 🥛", i: "nom kôn", e: "condense milk" },
+            { t: "งั้น 😀", i: "ngán", e: "so / then" },
+            { t: "ตัดสินใจ 🤔", i: "dtàt-sǐn-jai", e: "decide" },
+            { t: "เห็ด 🍄‍🟫", i: "hèt", e: "mushrooms" },
+            { t: "กดเอทีเอ็ม 🏧", i: "gòt ee-tee-em", e: "press ATM" },
+            { t: "เฉยๆ 🤷‍♀️", i: "chǒiey-chǒiey", e: "so so / simply" },
+            { t: "มะเขือเทศ 🍅", i: "má-kʉ̌a-têet", e: "tomatoes" },
+            { t: "หน้าต่าง 🪟", i: "nâa-dtàang", e: "windows" },
+            
+            // NEW ADDITIONS
+            { t: "มนุษย์ 🕺", i: "má-nút", e: "humans" },
+            { t: "พัดลม 🌬️", i: "pát-lom", e: "fans" },
+            { t: "เมา 🥴", i: "mao", e: "get drunk" },
+            { t: "เหตุผล 🤲", i: "hèet-pǒn", e: "reasons" },
+            { t: "บรรยากาศ ☄️", i: "ban-yaa-gàat", e: "atmosphere" },
+            { t: "หลังคา 🛖", i: "lǎng-kaa", e: "roof" },
+            { t: "ร่ม 🌂", i: "rôhm", e: "umbrella" },
+            { t: "กางร่ม ☂️", i: "gaang-rôhm", e: "unfold the umbrella" },
+            { t: "ทะเลสาบ 🏞️", i: "tá-lay-sàap", e: "lake" },
+            { t: "ห้วย 🏞️", i: "hûuay", e: "creek" },
+            { t: "หนองน้ำ 🏞️", i: "nǒng-náam", e: "swamp" },
+            { t: "คลอง 🏞️", i: "klong", e: "canal" },
+            { t: "บึง 🏞️", i: "beung", e: "marsh" },
+            { t: "เกษตร 🌾", i: "gà-sèet", e: "agriculture" },
+            { t: "เปล 🛏️", i: "bpleh", e: "hammock" },
+            { t: "พื้นที่ 🚬", i: "péun têe", e: "space / area" },
+            { t: "มีที่ที่สูบบุหรี่ได้ 🚬", i: "mee-têe-têe...", e: "There are places that people can smoke." },
+            { t: "มุม 🏪", i: "mum", e: "corner" },
+            { t: "กำแพง 🪞", i: "gam-paang", e: "walls" },
+            { t: "เพชร 💎", i: "pét", e: "diamond" },
+            { t: "แดด 🌅", i: "dàet", e: "sunshine/sunlight" },
+            { t: "เต็ม 🌕", i: "dtem", e: "full" },
+            { t: "รหัส 🆘", i: "rá-hàt", e: "password" },
+            { t: "แยก 🗂️", i: "yâek", e: "separate / intersection / junciton" },
+            { t: "นานเท่าไร ⏳❓", i: "naan-tâo-rài", e: "how long" },
+            { t: "หนัก 🎸", i: "nàk", e: "heavy" },
+            { t: "ตุรกี 🇹🇷", i: "dtù-rá-gee", e: "Turkey (country)" }
+        ];
+
+        // --- RANDOMIZER FUNCTION ---
+        function randomWord() {
+            const container = document.getElementById('random-card-content');
+            const randomItem = vocabList[Math.floor(Math.random() * vocabList.length)];
+            
+            container.innerHTML = '';
+            
+            const card = document.createElement('div');
+            card.className = "card-anim";
+            
+            card.innerHTML = `
+                <div class="flex flex-col items-center gap-2">
+                    <button onclick="speakThai('${randomItem.t}')" class="text-sky-500 hover:text-sky-700 mb-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                    <h3 class="text-3xl font-bold text-gray-800 text-center mb-2 cursor-pointer" onclick="speakThai('${randomItem.t}')">${randomItem.t}</h3>
+                    
+                    <div class="flex gap-2 mb-3">
+                        <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="text-xs border border-sky-300 px-3 py-1 rounded text-sky-600 hover:bg-sky-100">Show IPA</button>
+                        <div class="hidden text-lg font-mono text-indigo-600 bg-indigo-50 px-2 rounded">${randomItem.i}</div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="text-xs border border-sky-300 px-3 py-1 rounded text-sky-600 hover:bg-sky-100">Show EN</button>
+                        <div class="hidden text-lg text-gray-600 font-semibold">${randomItem.e}</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderList(data, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; 
+            data.forEach(item => {
+                const el = createInteractiveElement(item);
+                el.classList.add('border-b', 'border-gray-100', 'pb-4'); 
+                container.appendChild(el);
+            });
+        }
+
+        function renderSingle(dataItem, targetId, customClass = '') {
+            const container = document.getElementById(targetId);
+            if(container) {
+                container.innerHTML = ''; 
+                const el = createInteractiveElement(dataItem);
+                if(customClass) {
+                    const thaiText = el.querySelector('.thai-content');
+                    thaiText.className = `thai-content cursor-pointer select-none leading-relaxed text-gray-800 ${customClass}`;
+                }
+                container.appendChild(el);
+            }
+        }
+
+        // Core Function
+        function createInteractiveElement(item) {
+            const template = document.getElementById('sentence-template');
+            const clone = template.content.cloneNode(true);
+            const root = clone.querySelector('div'); 
+
+            const thaiEl = clone.querySelector('.thai-content');
+            thaiEl.textContent = item.thai;
+            thaiEl.onclick = () => speakThai(item.thai);
+
+            clone.querySelector('.ipa-display').textContent = item.ipa;
+            clone.querySelector('.en-display').textContent = item.en;
+
+            const speakBtn = clone.querySelector('.speak-btn');
+            speakBtn.onclick = () => speakThai(item.thai);
+
+            const ipaBtn = clone.querySelector('.ipa-toggle');
+            const ipaDiv = clone.querySelector('.ipa-display');
+            ipaBtn.onclick = () => { ipaDiv.classList.toggle('hidden'); toggleBtnStyle(ipaBtn); };
+
+            const enBtn = clone.querySelector('.en-toggle');
+            const enDiv = clone.querySelector('.en-display');
+            enBtn.onclick = () => { enDiv.classList.toggle('hidden'); toggleBtnStyle(enBtn); };
+
+            ipaDiv.classList.add('all-ipa');
+            enDiv.classList.add('all-en');
+
+            return root;
+        }
+
+        function toggleBtnStyle(btn) {
+            btn.classList.toggle('active');
+        }
+
+        // --- TTS LOGIC ---
+        function speakThai(text) {
+            window.speechSynthesis.cancel();
+            const cleanText = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}]/gu, ''); 
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9; 
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(v => v.lang.includes('th'));
+            if (thaiVoice) utterance.voice = thaiVoice;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- TOGGLE ALL ---
+        function toggleAll(type) {
+            const targets = document.querySelectorAll(`.all-${type}`);
+            if(targets.length === 0) return;
+            const isHidden = targets[0].classList.contains('hidden');
+            targets.forEach(el => {
+                if (isHidden) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+            const allBtns = document.querySelectorAll(`.${type}-toggle`);
+            allBtns.forEach(btn => {
+                const isActive = btn.classList.contains('active');
+                if (isHidden && !isActive) toggleBtnStyle(btn);
+                if (!isHidden && isActive) toggleBtnStyle(btn);
+            });
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Headers
+            renderSingle(uiData.headerDelay, 'header-delay', 'text-xl font-bold');
+            renderSingle(uiData.headerWeight, 'header-weight', 'text-xl font-bold');
+            renderSingle(uiData.headerLost, 'header-lost', 'text-xl font-bold');
+            
+            // Extension Headers
+            renderSingle(uiData.headerExtension, 'header-extension', 'text-xl font-bold');
+            renderSingle(uiData.headerImm, 'header-imm', 'text-lg font-bold text-gray-700');
+            renderSingle(uiData.headerGate, 'header-gate', 'text-lg font-bold text-gray-700');
+            renderSingle(uiData.headerSim, 'header-sim', 'text-lg font-bold text-gray-700');
+            renderSingle(uiData.headerMiss, 'header-miss', 'text-lg font-bold text-red-700');
+
+            // Dialogue Lists
+            renderList(dataDelay, 'container-delay');
+            renderList(dataWeight, 'container-weight');
+            renderList(dataLost, 'container-lost');
+            
+            // Extension Lists
+            renderList(dataImm, 'container-imm');
+            renderList(dataGate, 'container-gate');
+            renderList(dataSim, 'container-sim');
+            renderList(dataMiss, 'container-miss');
+            
+            randomWord();
+            window.speechSynthesis.getVoices();
+        });
+
+    </script>
+</body>
+</html>
