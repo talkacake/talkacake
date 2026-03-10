@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทเรียนภาษาไทย: จ้องอะไร (What are you staring at?)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Google Fonts: Sarabun (for reading) & Noto Sans Thai -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4;
+            touch-action: manipulation;
+        }
+        .thai-text {
+            line-height: 1.8;
+        }
+        /* Custom scrollbar */
+        .vocab-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .vocab-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .vocab-scroll::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        .card-anim {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- DATA ---
+
+        // Consolidated List from User Request
+        const reviewVocabList = [
+            { t: "กลางคืน", i: "glaang kʉʉn", e: "At night", em: "🌑" },
+            { t: "กลางวัน", i: "glaang wan", e: "During the day", em: "☀️" },
+            { t: "กิจกรรม", i: "gìt jà gam", e: "Activities", em: "🏃" },
+            { t: "เกิดอะไรขึ้น", i: "gə̀ət à rai kʉ̂n", e: "What happened?", em: "❓" },
+            { t: "เกี่ยวกับ", i: "gìao gàp", e: "About / on the topic of", em: "📝" },
+            { t: "ขม", i: "kǒm", e: "Bitter", em: "☕" },
+            { t: "งอกอวัยวะใหม่ได้", i: "ngɔ̂ɔk à wai yá wá mài dâi", e: "Can grow organs back", em: "🦎" },
+            { t: "เงินสด", i: "ngən sòt", e: "Cash", em: "💵" },
+            { t: "จ่ายยังไง", i: "jàai yang ngai", e: "How do you want to pay?", em: "💳" },
+            { t: "ชา", i: "chaa", e: "Tea", em: "🍵" },
+            { t: "ชุมชนที่แข็งแรง", i: "chum chon tîi kɛ̌ng rɛɛng", e: "Strong communities", em: "🏘️" },
+            { t: "ซีอิ๊ว", i: "sii íu", e: "Soy sauce", em: "🍶" },
+            { t: "แต่งงาน", i: "dtɛ̀ng ngaan", e: "Get married", em: "💍" },
+            { t: "ทะเล", i: "tá lee", e: "Sea", em: "🌊" },
+            { t: "ที่แล้ว", i: "tîi lɛ́ɛo", e: "Last .. / ...ago", em: "⏮️" },
+            { t: "เที่ยงครึ่ง", i: "tîang krʉ̂ng", e: "Half past noon", em: "🕧" },
+            { t: "บัตร", i: "bàt", e: "Card", em: "💳" },
+            { t: "บ่ายหนึ่งโมง", i: "bàai nʉ̀ng moong", e: "13:00", em: "🕐" },
+            { t: "ประชุม", i: "bprà chum", e: "Have a meeting", em: "🤝" },
+            { t: "ปิด", i: "bpìt", e: "Close", em: "🔒" },
+            { t: "ฝาแฝด", i: "fǎa fɛ̀ɛt", e: "Twins", em: "👯" },
+            { t: "พระเยซู", i: "prá yee suu", e: "Jesus", em: "✝️" },
+            { t: "พัน", i: "pan", e: "Thousand", em: "1️⃣0️⃣0️⃣0️⃣" },
+            { t: "พิพิธภัณฑ์สัตว์น้ำ", i: "pí pít tá pan sàt náam", e: "Aquarium", em: "🐠" },
+            { t: "ภูเขา", i: "puu kǎo", e: "Mountain", em: "⛰️" },
+            { t: "ไม่เหมือน", i: "mâi mʉ̌an", e: "Not the same", em: "≠" },
+            { t: "ยา", i: "yaa", e: "Medicine", em: "💊" },
+            { t: "ร้านชำ", i: "ráan cham", e: "Grocery store", em: "🏪" },
+            { t: "รูปปั้น", i: "rûup bpân", e: "Statue", em: "🗿" },
+            { t: "ลึกกว่า", i: "lʉ́k gwàa", e: "Deeper", em: "⏬" },
+            { t: "ลูกค้า", i: "lûuk káa", e: "Customer", em: "🛍️" },
+            { t: "เริ่ม", i: "rə̂əm", e: "Start", em: "🎬" },
+            { t: "วันอังคาร", i: "wan ang kaan", e: "Tuesday", em: "🗓️" },
+            { t: "สังคม", i: "sǎng kom", e: "Society", em: "🌐" },
+            { t: "หน้าตา", i: "nâa dtaa", e: "Appearance", em: "👀" },
+            { t: "หม้อหุงข้าว", i: "mɔ̂ɔ hǔng kâao", e: "Rice cooker", em: "🍚" },
+            { t: "แหนม", i: "nɛ̌ɛm", e: "Fermented pork", em: "🥓" },
+            { t: "อย่างละหนึ่ง", i: "yàang lá nʉ̀ng", e: "one each", em: "☝️" },
+            { t: "อย่างอื่น", i: "yàang ʉ̀ʉn", e: "Other things", em: "📦" },
+            { t: "อะไรใหม่ๆ", i: "à rai mài mài", e: "New things", em: "✨" },
+            { t: "อาหารเฮลตี้หายาก", i: "aa hǎan heen dtîi hǎa yâak", e: "Healthy food is hard to find", em: "🥗" },
+            { t: "เหมือนเดิม", i: "mʉ̌an dəəm", e: "Same as usual", em: "🔄" },
+            { t: "เปรี้ยวเกินไป", i: "bprîao gəən bpai", e: "Too sour", em: "🍋" },
+            { t: "หัวหอม", i: "hǔa hɔ̌ɔm", e: "Onions", em: "🧅" },
+            { t: "สลับกัน", i: "sà láp gan", e: "Swap", em: "🔁" },
+            { t: "เลิก", i: "lə̂ək", e: "Break up", em: "💔" },
+            { t: "ไม่รู้ทำยังไง", i: "mâi rúu tam yang ngai", e: "Don't know how to make it", em: "🤷" },
+            { t: "เสื้อผ้า", i: "sʉ̂a pâa", e: "Clothes", em: "👕" },
+            { t: "ของใช้", i: "kɔ̌ɔng chái", e: "Utensils/Things to use", em: "🛠️" },
+            { t: "ประหยัด", i: "bprà yàt", e: "Frugal", em: "💰" },
+            { t: "เป็นไงจ๊ะแม่ค้า", i: "bpen ngai já mɛ̂ɛ káa", e: "How are you seller?", em: "👩‍💼" },
+            { t: "ไข่ต้มจ้ะ", i: "kài dtôm jâ", e: "Boiled eggs", em: "🥚" },
+            { t: "ขายยังไงจ๊ะแม่ค้า", i: "kǎai yang ngai já mɛ̂ɛ káa", e: "How do you sell it, seller?", em: "🏷️" },
+            { t: "ฟองละห้าบาทจ้า", i: "fɔɔng lá hâa bàat jâa", e: "5 baht each", em: "5️⃣" },
+            { t: "แม่ค้า ทำไมขายแพงอย่างนั้นน่ะ", i: "mɛ̂ɛ káa tam mai kǎai pɛɛng yàang nán nà", e: "Seller, why so expensive?", em: "💸" },
+            { t: "ค่าของแพงจ้า", i: "kâa kɔ̌ɔng pɛɛng jâa", e: "Cost is high", em: "📈" },
+            { t: "ตอนนี้ฟองนึงแปดบาทนะจ๊า", i: "dtɔɔn níi fɔɔng nʉng bpɛ̀ɛt bàat ná jáa", e: "Now 8 baht each", em: "8️⃣" },
+            { t: "ฉันขายห้าบาทขาดทุน", i: "chǎn kǎai hâa bàat kàat tun", e: "Selling 5 baht is a loss", em: "📉" },
+            { t: "เจ๊งกะบ๊ง", i: "jéng gà bóng", e: "Failed/Bankrupt", em: "🏚️" },
+            { t: "ทุกวันนี้", i: "túk wan níi", e: "These days", em: "📅" },
+            { t: "ญาติ", i: "yâat", e: "Relatives", em: "👨‍👩‍👧‍👦" },
+            { t: "รอ", i: "rɔɔ", e: "Wait", em: "⏳" },
+            { t: "วันพุธ", i: "wan pút", e: "Wednesday", em: "💚" },
+            { t: "วันสุดท้าย", i: "wan sùt táai", e: "Last day", em: "🔚" },
+            { t: "หลัง", i: "lǎng", e: "After", em: "👉" },
+            { t: "ตู้เย็น", i: "dtûu yen", e: "Fridge", em: "❄️" },
+            { t: "ดูเกือบจบแล้ว", i: "duu gʉ̀ap jòp lɛ́ɛo", e: "Almost finished watching", em: "📺" },
+            { t: "เหลือ", i: "lʉ̌a", e: "Left/Remaining", em: "🥣" },
+            { t: "บ่อย", i: "bɔ̀ɔi", e: "Often", em: "🔄" },
+            { t: "กระดาษ", i: "grà dàat", e: "Paper", em: "📄" },
+            { t: "ธุรกิจ", i: "tú rá gìt", e: "Business", em: "💼" },
+            { t: "ผ้าไหม", i: "pâa mǎi", e: "Silk", em: "🎗️" },
+            { t: "ช่วย", i: "chûai", e: "Help", em: "🆘" },
+            { t: "ผง", i: "pǒng", e: "Powder", em: "🌫️" },
+            { t: "เสื้อยืด", i: "sʉ̂a yʉ̂ʉt", e: "T-shirt", em: "👕" },
+            { t: "ช่อง", i: "chɔ̂ɔng", e: "Channel", em: "📺" },
+            { t: "เนื้อสัตว์", i: "nʉ́a sàt", e: "Meat", em: "🥩" },
+            { t: "อร่อยกว่า", i: "à rɔ̂ɔi gwàa", e: "More delicious", em: "😋" },
+            { t: "ไม่อร่อยเท่า", i: "mâi à rɔ̂ɔi tâo", e: "Not as delicious as", em: "😐" },
+            { t: "เนื้อ", i: "nʉ́a", e: "Beef", em: "🐄" },
+            { t: "วันที่", i: "wan tîi", e: "Date", em: "📅" },
+            { t: "รสชาติ", i: "rót châat", e: "Taste", em: "👅" },
+            { t: "น่ากลัว", i: "nâa glua", e: "Scary", em: "😱" },
+            { t: "อาชญากรรม", i: "àat chá yaa gam", e: "Crime", em: "🔫" },
+            { t: "ปิดตา", i: "bpìt dtaa", e: "Cover eyes", em: "🙈" },
+            { t: "ความรุนแรง", i: "kwaam run rɛɛng", e: "Violence", em: "💥" },
+            { t: "ดูยาว", i: "duu yaao", e: "Binge watch", em: "🍿" },
+            { t: "ไขคดี", i: "kǎi ká dii", e: "Solve crime", em: "🕵️" },
+            { t: "เลือด", i: "lʉ̂at", e: "Blood", em: "🩸" },
+            { t: "คนตาย", i: "kon dtaai", e: "Dead people", em: "💀" },
+            { t: "ความตั้งใจ", i: "kwaam dtâng jai", e: "Intention", em: "🎯" },
+            { t: "เพื่อนร่วมงาน", i: "pʉ̂an rûam ngaan", e: "Colleagues", em: "👥" },
+            { t: "ห้าง", i: "hâang", e: "Mall", em: "🏬" },
+            { t: "หา", i: "hǎa", e: "Search/Look for", em: "🔍" },
+            { t: "สูบบุหรี่", i: "sùup bù rìi", e: "Smoke", em: "🚬" },
+            { t: "ถาม", i: "tǎam", e: "Ask", em: "❓" },
+            { t: "ของฝาก", i: "kɔ̌ɔng fàak", e: "Souvenirs", em: "🎁" },
+            { t: "พอ", i: "pɔɔ", e: "Enough", em: "✋" },
+            { t: "ทอน", i: "tɔɔn", e: "The change (money)", em: "🪙" },
+            { t: "คน", i: "kon", e: "People", em: "🧍" },
+            { t: "ถุงเพิ่ม", i: "tǔng pə̂əm", e: "Extra bag", em: "🛍️" },
+            { t: "คันตา", i: "kan-dtaa", e: "Itchy eyes", em: "😣" },
+            { t: "ล้างหน้า", i: "láang-nâa", e: "Wash face", em: "🚿" },
+            { t: "ปัญหา", i: "bpan-hǎa", e: "Problems", em: "⚠️" },
+            { t: "อดทน", i: "òt-ton", e: "Patient", em: "🧘" },
+            { t: "เครื่องซักผ้า", i: "krʉ̂ʉang-sák-pâa", e: "Washing machine", em: "🧺" },
+            { t: "ส่วนลด", i: "sùan lót", e: "Discounts", em: "🏷️" },
+            { t: "ไม่แพงเท่าเดิม", i: "mâi pɛɛng tâo dəəm", e: "Not as expensive as before", em: "📉" },
+            { t: "น้ำรั่ว", i: "nám rûua", e: "Leaking", em: "💧" },
+            { t: "ดัง", i: "dang", e: "Famous", em: "📢" },
+            { t: "เมื่อก่อน", i: "mʉ̂ʉa-gɔ̀ɔn", e: "Back then", em: "🕰️" },
+            { t: "ถูก", i: "tùuk", e: "Cheap/Correct", em: "✅" },
+            { t: "ดูจบ", i: "duu jòp", e: "Finish watching", em: "🏁" },
+            { t: "พร", i: "pɔɔn", e: "Blessing", em: "🙏" },
+            { t: "ศร", i: "sɔ̌ɔn", e: "Arrow", em: "🏹" },
+            { t: "พลุ", i: "plú", e: "Fireworks", em: "🎆" },
+            { t: "พระราชา", i: "prá-raa-chaa", e: "King", em: "👑" },
+            { t: "นิสัย", i: "ní-sǎi", e: "Personalities", em: "🧠" },
+            { t: "คล้าย", i: "kláai", e: "Similar", em: "👯" },
+            { t: "ราศี", i: "raa sǐi", e: "Zodiac", em: "♈" },
+            { t: "เก่า", i: "gào", e: "Old", em: "🏺" },
+            { t: "สำคัญ", i: "săm-kan", e: "Important", em: "⭐" },
+            { t: "เข้มข้น", i: "kêhm-kôn", e: "Strong/Intense", em: "🔥" },
+            { t: "รักสามเศร้า", i: "rák săam sâo", e: "Love triangle", em: "🔺" },
+            { t: "ทั้งคู่", i: "táng kôo", e: "Both", em: "✌️" },
+            { t: "รัฐบาล", i: "rát-tà-baan", e: "Government", em: "🏛️" },
+            { t: "พรรค", i: "pák", e: "Party (political)", em: "🚩" },
+            { t: "เปลี่ยน", i: "bplìian", e: "Change", em: "🔄" },
+            { t: "ธรรมชาติ", i: "tam-má-châat", e: "Natural", em: "🌳" },
+            { t: "ยาว", i: "yaao", e: "Long", em: "📏" },
+            { t: "แท้", i: "táae", e: "Authentic", em: "💯" },
+            { t: "ตลก", i: "dtà-lòk", e: "Funny", em: "😂" },
+            { t: "จริงใจ", i: "jing-jai", e: "Sincere", em: "💖" },
+            { t: "ข้างนอก", i: "kâang nâawk", e: "Outdoor", em: "🏞️" },
+            { t: "พระพันปี", i: "prá-pan-bpii", e: "Queen Mother", em: "👸" },
+            { t: "เฉยๆ", i: "chəəy-chəəy", e: "So so", em: "😐" },
+            { t: "ฉลอง", i: "chà-lǎawng", e: "Celebrate", em: "🎉" },
+            { t: "ตกแต่ง", i: "dtòk-dtàeng", e: "Decorate", em: "🎀" },
+            { t: "ห้าทุ่ม", i: "hâa-tûm", e: "23:00", em: "🕚" },
+            { t: "หมูสามชั้น", i: "mǔu-sǎam-chán", e: "Pork belly", em: "🥓" },
+            { t: "สวนสัตว์", i: "sǔan-sàt", e: "Zoo", em: "🦁" },
+            { t: "น่าอึดอัด", i: "nâa-ʉ̀t-ʔàt", e: "Awkward", em: "😬" },
+            { t: "ไม่รู้จะทำตัวยังไง", i: "mâi rúu jà tham dtua yang-ngai", e: "Don't know how to act", em: "🤷" },
+            { t: "ลูกพลับ", i: "lûuk pláp", e: "Persimmon", em: "🍅" },
+            { t: "เที่ยงคืน", i: "thîang khʉ̄ʉn", e: "Midnight", em: "🌑" },
+            { t: "ต้องล้างหน้าทุกวัน", i: "dtɔ̂ng láang nâa thúk wan", e: "Have to wash face every day", em: "🧖" },
+            { t: "ดื่มหมดแก้วไม่ได้", i: "dʉ̀ʉm mòt gɛ̂ɛw mâi dâi", e: "Cannot bottom up", em: "🙅‍♂️" },
+            { t: "แฟนเก่า", i: "fɛɛn gào", e: "Ex-boyfriend/girlfriend", em: "💔" },
+            { t: "แล้วแต่", i: "lɛ́ɛw dtɛ̀ɛ", e: "It depends / Up to you", em: "🤷‍♀️" },
+            { t: "แก้ไข", i: "gɛ̂ɛ khǎi", e: "Solve / Fix", em: "🔧" }
+        ];
+
+        // New Target Vocab based on the Script (Staring/Compliments)
+        const targetVocab = [
+            { t: "จ้อง", i: "jɔ̂ng", e: "To stare", em: "👀" },
+            { t: "หน้าตาดี", i: "nâa-dtaa-dii", e: "Good looking", em: "✨" },
+            { t: "เหมือนกัน", i: "mʉ̌an-gan", e: "Same / As well / Too", em: "👯" },
+            { t: "เรา", i: "rao", e: "I / We / You (playful)", em: "🙋" },
+            { t: "อะไร", i: "à-rai", e: "What", em: "❓" },
+        ];
+
+        // Updated Script Data
+        const scriptData = [
+            { r: "เพียว", t: "จ้องอะไรอ่ะ", i: "jɔ̂ng à-rai à", e: "What are you staring at?", em: "😠" },
+            { r: "ล้อฟ", t: "หน้าตาดีเหมือนกันนะเรา", i: "nâa-dtaa-dii mʉ̌an-gan ná rao", e: "You look good too / I look good too.", em: "😏" },
+        ];
+
+        // --- COMPONENTS ---
+
+        const InteractiveText = ({ text, ipa, en, emoji, speaker, isHeader, isInstruction }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const speak = () => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const containerClass = isHeader 
+                ? "bg-transparent mb-4 w-full" 
+                : isInstruction 
+                    ? "bg-yellow-50 p-2 rounded-lg mb-2 w-full border border-yellow-100"
+                    : "bg-white p-4 rounded-xl shadow-md mb-4 border-l-4 border-blue-400 w-full hover:shadow-lg transition-shadow";
+
+            const textClass = isHeader
+                ? "text-2xl md:text-3xl text-gray-800 font-bold thai-text"
+                : isInstruction
+                    ? "text-lg text-gray-700 thai-text"
+                    : "text-xl md:text-2xl text-blue-900 font-medium thai-text";
+
+            return (
+                <div className={containerClass}>
+                    {speaker && <div className="text-sm text-gray-500 mb-1 font-bold">{speaker}</div>}
+                    <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 cursor-pointer" onClick={speak}>
+                            <p className={textClass}>
+                                {text} {emoji} <span className="text-gray-400 text-base inline-block align-middle">🔊</span>
+                            </p>
+                        </div>
+                        <div className="flex gap-1 flex-col sm:flex-row shrink-0">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setShowIPA(!showIPA); }}
+                                className={`px-2 py-1 text-xs rounded font-bold transition-colors ${showIPA ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-500'}`}
+                            >
+                                IPA
+                            </button>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setShowEN(!showEN); }}
+                                className={`px-2 py-1 text-xs rounded font-bold transition-colors ${showEN ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-500'}`}
+                            >
+                                EN
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {(showIPA || showEN) && (
+                        <div className="mt-2 space-y-1 animate-fade-in">
+                            {showIPA && <p className="text-blue-600 font-mono text-sm sm:text-base">{ipa}</p>}
+                            {showEN && <p className="text-gray-600 italic text-sm sm:text-base">{en}</p>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const VocabCard = ({ item }) => {
+            return (
+                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 flex flex-col items-center text-center h-full shadow-sm">
+                    <div className="text-4xl mb-2">{item.em}</div>
+                    <InteractiveText 
+                        text={item.t} 
+                        ipa={item.i} 
+                        en={item.e} 
+                        emoji=""
+                    />
+                </div>
+            );
+        };
+
+        const ReviewGame = () => {
+            const [currentCard, setCurrentCard] = useState(null);
+            const [isFlipped, setIsFlipped] = useState(false);
+
+            const pickCard = () => {
+                setIsFlipped(false);
+                const random = reviewVocabList[Math.floor(Math.random() * reviewVocabList.length)];
+                setCurrentCard(random);
+            };
+
+            const speak = (txt) => {
+                const u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'th-TH';
+                window.speechSynthesis.speak(u);
+            };
+
+            useEffect(() => { pickCard(); }, []);
+
+            if (!currentCard) return <div>Loading...</div>;
+
+            return (
+                <div className="flex flex-col items-center bg-indigo-50 p-6 rounded-2xl shadow-inner border border-indigo-100">
+                    <InteractiveText 
+                        text="ทบทวนคำศัพท์" 
+                        ipa="tóp-tuan kam-sàp" 
+                        en="Review Vocabulary" 
+                        emoji="🃏"
+                        isHeader={true}
+                    />
+                    
+                    <div className="w-full max-w-sm bg-white rounded-xl shadow-xl p-8 min-h-[250px] flex flex-col items-center justify-center relative mb-6 text-center card-anim">
+                        <div className="text-6xl mb-4">{currentCard.em}</div>
+                        <h3 
+                            className="text-3xl font-bold text-gray-800 mb-2 cursor-pointer thai-text"
+                            onClick={() => speak(currentCard.t)}
+                        >
+                            {currentCard.t} 🔊
+                        </h3>
+                        
+                        {isFlipped ? (
+                            <div className="mt-4 animate-fade-in">
+                                <p className="text-blue-600 font-mono text-lg mb-1">{currentCard.i}</p>
+                                <p className="text-gray-500 text-lg">{currentCard.e}</p>
+                            </div>
+                        ) : (
+                            <div className="mt-4">
+                                <InteractiveText 
+                                    text="แต่งประโยค หรือ ตอบคำถาม" 
+                                    ipa="dtɛ̀ng bprà-yòok rʉ̌ʉ dtɔ̀ɔp kam-tǎam" 
+                                    en="Make a sentence or answer a question" 
+                                    isInstruction={true}
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex gap-4 flex-wrap justify-center">
+                        <button 
+                            onClick={() => setIsFlipped(!isFlipped)}
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform active:scale-95 flex items-center gap-2"
+                        >
+                             <span>เฉลย (Reveal)</span>
+                        </button>
+                        <button 
+                            onClick={pickCard}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform active:scale-95 flex items-center gap-2"
+                        >
+                            <span>คำต่อไป (Next) ➡️</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [section, setSection] = useState('review');
+
+            return (
+                <div className="min-h-screen pb-12">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-50">
+                        <div className="max-w-4xl mx-auto flex justify-between items-center">
+                            <h1 className="text-xl font-bold flex items-center gap-2">
+                                👀 จ้องอะไร (Staring)
+                            </h1>
+                            <nav className="flex gap-2 text-sm overflow-x-auto">
+                                <button onClick={() => setSection('review')} className={`px-3 py-1 rounded-full whitespace-nowrap ${section === 'review' ? 'bg-white text-blue-600' : 'bg-blue-700/50'}`}>ทบทวน</button>
+                                <button onClick={() => setSection('vocab')} className={`px-3 py-1 rounded-full whitespace-nowrap ${section === 'vocab' ? 'bg-white text-blue-600' : 'bg-blue-700/50'}`}>ศัพท์ใหม่</button>
+                                <button onClick={() => setSection('story')} className={`px-3 py-1 rounded-full whitespace-nowrap ${section === 'story' ? 'bg-white text-blue-600' : 'bg-blue-700/50'}`}>เรื่องราว</button>
+                                <button onClick={() => setSection('activity')} className={`px-3 py-1 rounded-full whitespace-nowrap ${section === 'activity' ? 'bg-white text-blue-600' : 'bg-blue-700/50'}`}>กิจกรรม</button>
+                                <button onClick={() => setSection('extension')} className={`px-3 py-1 rounded-full whitespace-nowrap ${section === 'extension' ? 'bg-white text-blue-600' : 'bg-blue-700/50'}`}>ส่วนเสริม ✨</button>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <main className="max-w-3xl mx-auto p-4 space-y-8 mt-4">
+                        
+                        {/* SECTION 1: REVIEW */}
+                        {section === 'review' && (
+                            <section className="animate-fade-in">
+                                <ReviewGame />
+                                <div className="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                    <InteractiveText 
+                                        text="สำหรับครู: ใช้การ์ดสุ่มเพื่อถามคำถามนักเรียน"
+                                        ipa="sǎm-ràp kruu: chái gàat sùm pʉ̂a tǎam kam-tǎam nák-rian"
+                                        en="For Teacher: Use the random card to ask the student questions."
+                                        isInstruction={true}
+                                        emoji="💡"
+                                    />
+                                </div>
+                            </section>
+                        )}
+
+                        {/* SECTION 2: NEW VOCAB */}
+                        {section === 'vocab' && (
+                            <section className="animate-fade-in">
+                                <div className="mb-6 border-b-2 border-orange-200 pb-2">
+                                    <InteractiveText 
+                                        text="คำศัพท์ใหม่" 
+                                        ipa="kam-sàp mài" 
+                                        en="New Vocabulary"
+                                        isHeader={true}
+                                        emoji="🔑"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {targetVocab.map((v, i) => (
+                                        <VocabCard key={i} item={v} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* SECTION 3: STORY SCRIPT */}
+                        {section === 'story' && (
+                            <section className="animate-fade-in">
+                                <div className="mb-6 border-b-2 border-blue-200 pb-2">
+                                    <InteractiveText 
+                                        text="บทสนทนา" 
+                                        ipa="bòt sǒn-tá-naa" 
+                                        en="Dialogue"
+                                        isHeader={true}
+                                        emoji="🎬"
+                                    />
+                                </div>
+
+                                {/* Video Link & Instruction */}
+                                <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100 text-center">
+                                    <InteractiveText 
+                                        text="ดูวิดีโอก่อนอ่านบทสนทนา" 
+                                        ipa="duu wí-dii-oo gɔ̀ɔn àan bòt sǒn-tá-naa" 
+                                        en="Watch the video before reading the dialogue"
+                                        isInstruction={true}
+                                        emoji="👀"
+                                    />
+                                    <a 
+                                        href="https://www.youtube.com/shorts/ETzydBU6gPE" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="inline-block mt-2 bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 transition-colors shadow-lg flex items-center justify-center gap-2 mx-auto w-fit"
+                                    >
+                                        <span>▶️ Open YouTube Short</span>
+                                    </a>
+                                </div>
+
+                                <div className="space-y-2">
+                                    {scriptData.map((line, index) => (
+                                        <InteractiveText 
+                                            key={index}
+                                            speaker={line.r}
+                                            text={line.t}
+                                            ipa={line.i}
+                                            en={line.e}
+                                            emoji={line.em}
+                                        />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* SECTION 4: ACTIVITIES */}
+                        {section === 'activity' && (
+                            <section className="animate-fade-in space-y-6">
+                                <div className="mb-6 border-b-2 border-green-200 pb-2">
+                                    <InteractiveText 
+                                        text="กิจกรรมพูดคุย" 
+                                        ipa="gìt-jà-gam pûut-kui" 
+                                        en="Speaking Activity"
+                                        isHeader={true}
+                                        emoji="🗣️"
+                                    />
+                                </div>
+
+                                {/* Role Play */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                    <InteractiveText 
+                                        text="บทบาทสมมติ (Role Play)" 
+                                        ipa="bòt-bàat sǒm-mút" 
+                                        en="Role Play"
+                                        isHeader={true}
+                                        emoji="🎭"
+                                    />
+                                    <InteractiveText 
+                                        text="แสดงเป็น เพียว และ ลอฟต์" 
+                                        ipa="sà-dɛɛng bpen Pure lɛ́ Loft" 
+                                        en="Act as Pure and Loft"
+                                        isInstruction={true}
+                                    />
+                                    <InteractiveText 
+                                        text="ลอง จ้อง เพื่อน แล้วพูดบท" 
+                                        ipa="lɔɔng jɔ̂ng pʉ̂an lɛ́ɛo pûut bòt" 
+                                        en="Try staring at your friend and say the line"
+                                        isInstruction={true}
+                                        emoji="👁️"
+                                    />
+                                </div>
+
+                                {/* Discussion */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                    <InteractiveText 
+                                        text="ชวนคุย" 
+                                        ipa="chuan kui" 
+                                        en="Discussion"
+                                        isHeader={true}
+                                        emoji="💬"
+                                    />
+                                    <div className="space-y-4">
+                                        <InteractiveText 
+                                            text="คุณชอบให้คน จ้อง ไหม?"
+                                            ipa="kun chɔ̂ɔp hâi kon jɔ̂ng mǎi?"
+                                            en="Do you like people staring at you?"
+                                            emoji="🤔"
+                                        />
+                                        <InteractiveText 
+                                            text="คุณคิดว่า ตัวเอง หน้าตาดี ไหม?"
+                                            ipa="kun kít wâa dtua-eeng nâa-dtaa-dii mǎi?"
+                                            en="Do you think you are good looking?"
+                                            emoji="🪞"
+                                        />
+                                        <InteractiveText 
+                                            text="ใคร หน้าตาดี ที่สุดในโลก?"
+                                            ipa="krai nâa-dtaa-dii tîi-sùt nai lôok?"
+                                            en="Who is the best looking person in the world?"
+                                            emoji="🌎"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Game */}
+                                <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-xl shadow-md">
+                                    <InteractiveText 
+                                        text="เกม: ใครกันนะ?" 
+                                        ipa="game: krai gan ná?" 
+                                        en="Game: Who is it?"
+                                        isHeader={true}
+                                        emoji="❓"
+                                    />
+                                    <InteractiveText 
+                                        text="ครูจะอธิบาย หน้าตา นักเรียนทายว่าใคร" 
+                                        ipa="kruu jà à-tí-baai nâa-dtaa · nák-rian taai wâa krai" 
+                                        en="Teacher describes appearance, student guesses who."
+                                        isInstruction={true}
+                                    />
+                                    <div className="text-gray-600 mt-2 text-sm italic">
+                                        Example: "เขาเป็นผู้ชาย หล่อ ผมสั้น..." (He is a man, handsome, short hair...)
+                                    </div>
+                                </div>
+
+                            </section>
+                        )}
+                        
+                        {/* SECTION 5: EXTENSION ACTIVITIES */}
+                        {section === 'extension' && (
+                            <section className="animate-fade-in space-y-6">
+                                <div className="mb-6 border-b-2 border-purple-200 pb-2">
+                                    <InteractiveText 
+                                        text="กิจกรรมเสริม ฮาๆ" 
+                                        ipa="gìt-jà-gam sěrm haa-haa" 
+                                        en="Funny Extension Activities"
+                                        isHeader={true}
+                                        emoji="✨"
+                                    />
+                                </div>
+
+                                {/* 1. Funny Story Telling */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-purple-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-purple-200 w-16 h-16 rounded-full opacity-50"></div>
+                                    <InteractiveText 
+                                        text="1. แต่งเรื่องตลก (Funny Story)" 
+                                        ipa="1. dtɛ̀ng rʉ̂ang dtà-lòk" 
+                                        en="Compose a funny story using these words:"
+                                        isHeader={true}
+                                        emoji="📖"
+                                    />
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">ลูกพลับ (Persimmon)</span>
+                                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">แฟนเก่า (Ex)</span>
+                                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">จ้อง (Stare)</span>
+                                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">กลางคืน (At night)</span>
+                                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">น่ากลัว (Scary)</span>
+                                    </div>
+                                    <InteractiveText 
+                                        text="ลองแต่งเรื่องสั้นๆ ดูซิ!" 
+                                        ipa="lɔɔng dtɛ̀ng rʉ̂ang sân-sân duu sí!" 
+                                        en="Try to make a short story!"
+                                        isInstruction={true}
+                                    />
+                                </div>
+
+                                {/* 2. Funny Debate */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-200 w-16 h-16 rounded-full opacity-50"></div>
+                                    <InteractiveText 
+                                        text="2. ดีเบตฮาๆ (Funny Debate)" 
+                                        ipa="2. dii-bèet haa-haa" 
+                                        en="Choose a topic and argue!"
+                                        isHeader={true}
+                                        emoji="🎙️"
+                                    />
+                                    <div className="space-y-4">
+                                        <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                                            <InteractiveText 
+                                                text="หัวข้อ A: เป็นโสด ดีกว่า แต่งงาน" 
+                                                ipa="hǔa-kɔ̂ɔ A: bpen sòot · dii-gwàa · dtɛ̀ng-ngaan" 
+                                                en="Topic A: Being single is better than getting married."
+                                                emoji="💔 vs 💍"
+                                            />
+                                        </div>
+                                        <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                                            <InteractiveText 
+                                                text="หัวข้อ B: เงินสด สำคัญกว่า ความรัก" 
+                                                ipa="hǔa-kɔ̂ɔ B: ngən-sòt · sǎm-kan gwàa · kwaam-rák" 
+                                                en="Topic B: Cash is more important than love."
+                                                emoji="💵 vs ❤️"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 3. Funny Role Play */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-green-100 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-green-200 w-16 h-16 rounded-full opacity-50"></div>
+                                    <InteractiveText 
+                                        text="3. บทบาทสมมติสุดฮา" 
+                                        ipa="3. bòt-bàat sǒm-mút sùt haa" 
+                                        en="Hilarious Role Play: The Stingy Customer"
+                                        isHeader={true}
+                                        emoji="🎭"
+                                    />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                        <div className="bg-green-50 p-3 rounded-lg">
+                                            <strong className="text-green-800">A: ลูกค้า (Customer)</strong>
+                                            <p className="text-sm text-gray-600 mt-1">มีเงินแค่ 5 บาท แต่อยากซื้อของเยอะๆ (Has only 5 baht but wants to buy everything)</p>
+                                        </div>
+                                        <div className="bg-green-50 p-3 rounded-lg">
+                                            <strong className="text-green-800">B: แม่ค้า (Seller)</strong>
+                                            <p className="text-sm text-gray-600 mt-1">โมโหแล้ว จ้องหน้าลูกค้า (Angry and stares at customer)</p>
+                                        </div>
+                                    </div>
+                                    <InteractiveText 
+                                        text="เริ่มเลย! ใช้คำว่า: แพง, บาท, ไม่พอ" 
+                                        ipa="rə̂əm ləəi! chái kam wâa: pɛɛng, bàat, mâi pɔɔ" 
+                                        en="Start! Use words: Expensive, Baht, Not enough."
+                                        isInstruction={true}
+                                        emoji="🎬"
+                                    />
+                                </div>
+
+                            </section>
+                        )}
+
+                    </main>
+
+                    {/* Footer / Controls hint */}
+                    <div className="fixed bottom-4 right-4 bg-white/95 backdrop-blur p-2 rounded-lg shadow-lg border border-gray-200 z-50 max-w-[200px]">
+                         <InteractiveText 
+                            text="แตะที่ประโยคเพื่อฟังเสียง" 
+                            ipa="dtɛ̀ tîi bprà-yòok pʉ̂a fang sǐang" 
+                            en="Tap sentence to listen"
+                            isInstruction={true}
+                        />
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
