@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: Grab/Bolt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .thai-text {
+            color: #1f2937;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-teal-600">Grab/Bolt</h1>
+            <div class="flex gap-1">
+                <button onclick="toggleAll('ipa')" class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded text-gray-600">All IPA</button>
+                <button onclick="toggleAll('en')" class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded text-gray-600">All EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- SECTION 1: WARM UP & REVIEW -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-400">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">🧠</span>
+                <div id="header-review" class="flex-1"></div>
+            </div>
+            <div id="instr-review" class="mb-6 pl-2 border-l-2 border-gray-100"></div>
+            
+            <div class="space-y-6" id="review-container"></div>
+        </section>
+
+        <!-- SECTION 2: CONTEXT - TAXI/GRAB -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-teal-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">🚕</span>
+                <div id="header-taxi" class="flex-1"></div>
+            </div>
+            
+            <div class="space-y-6" id="taxi-container"></div>
+        </section>
+
+        <!-- SECTION 3: ROLE PLAY -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">🎭</span>
+                <div id="header-roleplay" class="flex-1"></div>
+            </div>
+            <div id="instr-roleplay" class="mb-6 pl-2 border-l-2 border-gray-100"></div>
+
+            <div class="space-y-4">
+                <!-- Scenario A -->
+                <div class="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                    <div id="title-scen-a" class="mb-2"></div>
+                    <div id="desc-scen-a"></div>
+                </div>
+                <!-- Scenario B -->
+                <div class="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                    <div id="title-scen-b" class="mb-2"></div>
+                    <div id="desc-scen-b"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: EXTENSION ACTIVITY (New) -->
+        <section class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-pink-500">
+            <div class="flex items-center mb-4 gap-2">
+                <span class="text-2xl">🎲</span>
+                <div id="header-extension" class="flex-1"></div>
+            </div>
+            <div id="instr-extension" class="mb-6 pl-2 border-l-2 border-gray-100"></div>
+            
+            <!-- Games/Debates List -->
+            <div class="space-y-6" id="extension-container"></div>
+        </section>
+
+    </div>
+
+    <!-- Template for a Sentence Block -->
+    <template id="sentence-template">
+        <div class="item-container pb-4 last:pb-0">
+            <!-- Thai Row -->
+            <div class="flex items-start gap-3 mb-2">
+                <button class="speak-btn text-teal-500 hover:text-teal-700 mt-1 flex-shrink-0" title="Listen">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                </button>
+                <div class="thai-content font-semibold text-lg text-gray-800 leading-relaxed cursor-pointer select-none"></div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex gap-2 ml-9 mb-2">
+                <button class="ipa-toggle btn-toggle text-xs border border-gray-300 px-2 py-1 rounded text-gray-500 hover:bg-gray-50">IPA</button>
+                <button class="en-toggle btn-toggle text-xs border border-gray-300 px-2 py-1 rounded text-gray-500 hover:bg-gray-50">EN</button>
+            </div>
+
+            <!-- Hidden Content -->
+            <div class="ml-9 space-y-1">
+                <div class="ipa-display hidden text-sm font-mono text-indigo-600 bg-indigo-50 inline-block px-2 py-0.5 rounded"></div>
+                <div class="en-display hidden text-sm text-gray-600 italic"></div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // --- DATA SOURCES ---
+
+        // 1. HEADINGS & INSTRUCTIONS
+        const uiData = {
+            // Review Section
+            headerReview: {
+                thai: "อุ่นเครื่อง: ทบทวนคำศัพท์",
+                ipa: "ùn-krûeang : tóp-tuuan kam-sàp",
+                en: "Warm Up: Review Vocabulary"
+            },
+            instrReview: {
+                thai: "ถามคำถามเหล่านี้เพื่อทบทวนคำศัพท์ที่เรียนไปแล้ว",
+                ipa: "tǎam kam-tǎam lào níi pêua tóp-tuuan kam-sàp tîi riian bpai láaeo",
+                en: "Ask these questions to review previous words."
+            },
+            // Taxi Section
+            headerTaxi: {
+                thai: "หัวข้อ: บทสนทนาบนรถแท็กซี่",
+                ipa: "hǔua-kɔ̂ɔ : bòt sǒn-tá-naa bon rót táek-sîi",
+                en: "Topic: Conversation in a Taxi"
+            },
+            // Roleplay Section
+            headerRoleplay: {
+                thai: "บทบาทสมมติ: คนขับรถเจ้าปัญหา",
+                ipa: "bòt-bàat sǒm-mút : kon-kàp-rót jâao bpan-hǎa",
+                en: "Role Play: The Problematic Driver"
+            },
+            instrRoleplay: {
+                thai: "นักเรียนเป็นผู้โดยสาร เลือกสถานการณ์ด้านล่าง",
+                ipa: "nák-riian bpen pûu-dooi-sǎan · lûeak sà-tǎan-ná-gaan dâan-lâang",
+                en: "Student is the passenger. Choose a scenario below."
+            },
+            titleScenA: {
+                thai: "สถานการณ์ A: รีบมาก ⏰",
+                ipa: "sà-tǎan-ná-gaan A : rîip mâak",
+                en: "Scenario A: In a rush"
+            },
+            descScenA: {
+                thai: "คุณไปประชุมสาย คนขับขับช้ามาก ช่วยบอกให้เขาเร่งหน่อยหรือขึ้นทางด่วนแบบสุภาพ",
+                ipa: "kun bpai bprà-chum sǎai · kon-kàp kàp cháa mâak · chûuai bɔ̀ɔk hâi kǎo rêng nɔ̀i rěu kêun taang-dùuan bàaep sù-pâap",
+                en: "You are late. Driver drives slow. Politely ask to hurry or take expressway."
+            },
+            titleScenB: {
+                thai: "สถานการณ์ B: หลงทาง 🗺️",
+                ipa: "sà-tǎan-ná-gaan B : lǒng taang",
+                en: "Scenario B: Lost / Wrong Turn"
+            },
+            descScenB: {
+                thai: "GPS บอกทางผิด คุณต้องบอกทางคนขับไปคอนโดเอง (เลี้ยวซ้าย, เลี้ยวขวา, ตรงไป, กลับรถ)",
+                ipa: "GPS bɔ̀ɔk taang pìt · kun dtɔ̂ng bɔ̀ɔk taang kon-kàp bpai kɔɔn-doo eeng (líiao-sáai, líiao-kwǎa, dtrong-bpai, glàp-rót)",
+                en: "GPS is wrong. Guide driver yourself (Turn left, right, straight, u-turn)."
+            },
+            // Extension Section
+            headerExtension: {
+                thai: "กิจกรรมเสริม: เกมและเรื่องตลก",
+                ipa: "gìt-jà-gam sěrm : geem láe rûeang dtà-lòk",
+                en: "Extension: Games & Funny Topics"
+            },
+            instrExtension: {
+                thai: "เลือกหัวข้อมาคุยเล่นกัน (ใช้คำศัพท์เก่าผสมคำศัพท์ใหม่)",
+                ipa: "lûeak hǔua-kɔ̂ɔ maa kui lên gan (chái kam-sàp gào pà-sǒm kam-sàp mài)",
+                en: "Pick a topic to chat about (Mix old vocab with new vocab)."
+            }
+        };
+
+        // 2. VOCABULARY REVIEW
+        const reviewData = [
+            {
+                thai: "ปกติแล้ว คุณชอบไปเดินดูธรรมชาติที่สวนสาธารณะไหม? 🌳",
+                ipa: "bpòk-gà-dtì láaeo · kun chôop bpai dern-doo-tam-má-châat tîi sǔuan-sǎa-taa-rá-ná mái?",
+                en: "Normally, do you like to go walk and look at nature in the park?"
+            },
+            {
+                thai: "ที่บ้านของคุณปลูกต้นไม้ หรือ กระบองเพชร บ้างไหม? 🌵",
+                ipa: "tîi bâan kɔ̌ɔng kun bplùuk dtôn-máai rěu grà-bɔɔng-pét bâang mái?",
+                en: "At your house, do you plant any trees or cactus?"
+            },
+            {
+                thai: "ช่วงนี้คุณเครียดเรื่องการเมืองหรือเศรษฐกิจไหม? 📉",
+                ipa: "chûuang níi kun krîat rûeang gaan-meuang rěu sèet-tà-gìt mái?",
+                en: "Lately, are you stressed about politics or the economy?"
+            },
+            {
+                thai: "คุณคิดว่าจิตวิทยาสำคัญต่อการทำงานธุรกิจไหม? 💼",
+                ipa: "kun kít wâa jìt-dta-wít-tá-yaa sǎm-kan dtɔ̀ɔ gaan-tam-ngaan tú-rá-gìt mái?",
+                en: "Do you think psychology is important for doing business?"
+            },
+            {
+                thai: "ตอนนี้สถานการณ์โควิดแย่ลง หรือ ดีขึ้น? 🦠",
+                ipa: "dtɔɔn-níi sà-tǎan-ná-gaan koo-wìt yâae-long rěu dii-kêun?",
+                en: "Right now, is the Covid situation getting worse or better?"
+            }
+        ];
+
+        // 3. TAXI CONVERSATION
+        const taxiData = [
+            {
+                thai: "A: ฮัลโหลพี่ครับ ถึงไหนแล้วครับ? มารับหน้าคอนโดได้เลยครับ 🏢",
+                ipa: "A: han-lǒo pîi kráp · tǔeng nǎi láaeo kráp? maa ráp nâa kɔɔn-doo dâai loei kráp",
+                en: "A: Hello (on phone). Where are you? You can pick me up in front of the condo."
+            },
+            {
+                thai: "B: ถึงแล้วครับ... สวัสดีครับ ไปไหนครับ? 🚕",
+                ipa: "B: tǔeng láaeo kráp... sà-wàt-dii kráp · bpai nǎi kráp?",
+                en: "B: I've arrived... Hello, where are you going?"
+            },
+            {
+                thai: "A: ไปเซ็นทรัลลาดพร้าวครับ... รบกวนช่วยเปิดแอร์แรงหน่อยได้ไหมครับ? ร้อนมาก 🥵",
+                ipa: "A: bpai sen-trân lâat-práao kráp... róp-guuan chûuai bpèut aae raaeng nɔ̀i dâai mái kráp? rɔ́ɔn mâak",
+                en: "A: Central Ladprao please... Could you please turn up the AC? It's very hot."
+            },
+            {
+                thai: "B: ได้ครับ... จะขึ้นทางด่วนไหมครับ? 🛣️",
+                ipa: "B: dâai kráp... jà kêun taang-dùuan mái kráp?",
+                en: "B: Sure... Do you want to take the expressway?"
+            },
+            {
+                thai: "A: ไม่รีบครับ ไปทางธรรมดาก็ได้ รถไม่น่าติด 🚗",
+                ipa: "A: mâi rîip kráp · bpai taang tam-má-daa gɔ̂ɔ dâai · rót mâi nâa dtìt",
+                en: "A: No rush. Normal way is fine. Traffic shouldn't be bad."
+            },
+            {
+                thai: "A: พี่ครับ เลี้ยวซ้ายข้างหน้า แล้วจอดตรง 7-11 นะครับ 🛑",
+                ipa: "A: pîi kráp · líiao-sáai khâang-nâa · láaeo jɔ̀ɔt dtrong sé-wên ná kráp",
+                en: "A: Brother, turn left ahead, then stop at the 7-11 please."
+            }
+        ];
+
+        // 4. EXTENSION ACTIVITIES
+        const extensionData = [
+            {
+                thai: "โต้วาทีฮาๆ: เป็น 'กระบองเพชร' ดีกว่าเป็น 'นักธุรกิจ' เพราะไม่ต้องเครียดเรื่องกฎหมาย 🌵🆚💼",
+                ipa: "dtôo-waa-tii haa-haa: bpen 'grà-bɔɔng-pét' dii-gwàa bpen 'nák-tú-rá-gìt' prɔ́ mâi dtông krîat rûeang gòt-mǎai",
+                en: "Funny Debate: Being a 'Cactus' is better than being a 'Businessman' because no stress about laws."
+            },
+            {
+                thai: "เกมจีบคนขับ Grab: ลองจีบคนขับรถ โดยต้องใช้คำว่า 'ศาล' และ 'ติดเชื้อ' ❤️🚕",
+                ipa: "geem jìip kon-kàp Grab: lɔɔng jìip kon-kàp rót · dooi dtông chái kam wâa 'sǎan' láe 'dtìt-chéua'",
+                en: "Flirting Game: Try to flirt with the Grab driver. You MUST use the words 'Court' and 'Infected'."
+            },
+            {
+                thai: "คำถามชวนคุย: ถ้ามหาวิทยาลัยเปิด 'วิชาเอกการนอน' คุณจะสมัครเรียนปริญญาเอกไหม? 😴🎓",
+                ipa: "kam-tǎam chuuan kui: tâa má-hǎa-wít-tá-yaa-lai bpèut 'wí-chaa-èek gaan-nɔɔn' kun jà sà-màk riian bprin-yaa-èek mái?",
+                en: "Discussion: If the university opened a 'Sleeping Major', would you apply for a Doctoral degree?"
+            },
+            {
+                thai: "สถานการณ์สมมติ: คนขับ Grab ร้องไห้หนักมากเพราะแฟนทิ้ง คุณจะใช้จิตวิทยาปลอบใจเขาอย่างไร? 😭🗣️",
+                ipa: "sà-tǎan-ná-gaan sǒm-mút: kon-kàp Grab rɔ́ɔng-hâi nàk mâak prɔ́ faaen tíng · kun jà chái jìt-dta-wít-tá-yaa bplɔ̀ɔp-jai kǎo yàang-rai?",
+                en: "Scenario: The Grab driver is crying hard because of a breakup. How do you use psychology to comfort him?"
+            }
+        ];
+
+        // --- RENDER FUNCTIONS ---
+
+        // Render a list of sentences (with dividers)
+        function renderList(data, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Clear
+            data.forEach(item => {
+                const el = createInteractiveElement(item);
+                el.classList.add('border-b', 'border-gray-100', 'pb-4'); // Add separator style
+                container.appendChild(el);
+            });
+        }
+
+        // Render a single element into a specific ID (for headers/instructions)
+        function renderSingle(dataItem, targetId, customClass = '') {
+            const container = document.getElementById(targetId);
+            if(container) {
+                container.innerHTML = ''; // Clear
+                const el = createInteractiveElement(dataItem);
+                if(customClass) {
+                    const thaiText = el.querySelector('.thai-content');
+                    thaiText.className = `thai-content cursor-pointer select-none leading-relaxed text-gray-800 ${customClass}`;
+                }
+                container.appendChild(el);
+            }
+        }
+
+        // Core Function: Create the DOM element from template
+        function createInteractiveElement(item) {
+            const template = document.getElementById('sentence-template');
+            const clone = template.content.cloneNode(true);
+            const root = clone.querySelector('div'); // Get the wrapper div
+
+            // Set Thai Content
+            const thaiEl = clone.querySelector('.thai-content');
+            thaiEl.textContent = item.thai;
+            thaiEl.onclick = () => speakThai(item.thai);
+
+            // Set Hidden Content
+            clone.querySelector('.ipa-display').textContent = item.ipa;
+            clone.querySelector('.en-display').textContent = item.en;
+
+            // Setup Speak Button
+            const speakBtn = clone.querySelector('.speak-btn');
+            speakBtn.onclick = () => speakThai(item.thai);
+
+            // Setup Toggles
+            const ipaBtn = clone.querySelector('.ipa-toggle');
+            const ipaDiv = clone.querySelector('.ipa-display');
+            
+            ipaBtn.onclick = () => {
+                ipaDiv.classList.toggle('hidden');
+                toggleBtnStyle(ipaBtn);
+            };
+
+            const enBtn = clone.querySelector('.en-toggle');
+            const enDiv = clone.querySelector('.en-display');
+            
+            enBtn.onclick = () => {
+                enDiv.classList.toggle('hidden');
+                toggleBtnStyle(enBtn);
+            };
+
+            // Assign generic classes for "Toggle All" feature
+            ipaDiv.classList.add('all-ipa');
+            enDiv.classList.add('all-en');
+
+            return root;
+        }
+
+        function toggleBtnStyle(btn) {
+            btn.classList.toggle('active');
+            btn.classList.toggle('bg-blue-500');
+            btn.classList.toggle('text-white');
+            btn.classList.toggle('border-blue-500');
+        }
+
+        // --- TTS LOGIC ---
+        function speakThai(text) {
+            window.speechSynthesis.cancel();
+            // Remove emojis before speaking to avoid weird reading
+            const cleanText = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}]/gu, ''); 
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9; 
+
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(v => v.lang.includes('th'));
+            if (thaiVoice) utterance.voice = thaiVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- TOGGLE ALL LOGIC ---
+        function toggleAll(type) {
+            const targets = document.querySelectorAll(`.all-${type}`);
+            if(targets.length === 0) return;
+            
+            const isHidden = targets[0].classList.contains('hidden');
+            
+            targets.forEach(el => {
+                if (isHidden) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+
+            // Update all buttons of that type to match state
+            const allBtns = document.querySelectorAll(`.${type}-toggle`);
+            allBtns.forEach(btn => {
+                if(isHidden) {
+                    if(!btn.classList.contains('active')) toggleBtnStyle(btn);
+                } else {
+                    if(btn.classList.contains('active')) toggleBtnStyle(btn);
+                }
+            });
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render Headers & Instructions
+            renderSingle(uiData.headerReview, 'header-review', 'text-xl font-bold');
+            renderSingle(uiData.instrReview, 'instr-review', 'text-gray-600 text-sm');
+            
+            renderSingle(uiData.headerTaxi, 'header-taxi', 'text-xl font-bold');
+            
+            renderSingle(uiData.headerRoleplay, 'header-roleplay', 'text-xl font-bold');
+            renderSingle(uiData.instrRoleplay, 'instr-roleplay', 'text-gray-600 text-sm');
+            
+            renderSingle(uiData.headerExtension, 'header-extension', 'text-xl font-bold');
+            renderSingle(uiData.instrExtension, 'instr-extension', 'text-gray-600 text-sm');
+
+            // Render Scenarios
+            renderSingle(uiData.titleScenA, 'title-scen-a', 'text-lg font-bold text-purple-700');
+            renderSingle(uiData.descScenA, 'desc-scen-a', 'text-gray-700 text-sm');
+            
+            renderSingle(uiData.titleScenB, 'title-scen-b', 'text-lg font-bold text-purple-700');
+            renderSingle(uiData.descScenB, 'desc-scen-b', 'text-gray-700 text-sm');
+
+            // Render Main Lists
+            renderList(reviewData, 'review-container');
+            renderList(taxiData, 'taxi-container');
+            renderList(extensionData, 'extension-container');
+            
+            window.speechSynthesis.getVoices();
+        });
+
+    </script>
+</body>
+</html>
