@@ -1343,9 +1343,10 @@
         let db = null;
         let auth = null;
         let currentUser = null;
+        let localSecrets = []; // Fallback memory
 
         try {
-            if (typeof __firebase_config !== 'undefined') {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                 const firebaseConfig = JSON.parse(__firebase_config);
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -1360,6 +1361,7 @@
                         }
                     } catch(err) {
                         console.error("Auth error:", err);
+                        fallbackToLocal();
                     }
                 };
 
@@ -1375,16 +1377,30 @@
                                 });
                             }
                             setupRealtimeListener();
+                        } else {
+                            fallbackToLocal();
                         }
                     });
                 });
             } else {
                 console.error("Firebase config is missing.");
-                const emptyMessage = document.getElementById('emptyMessage');
-                if (emptyMessage) emptyMessage.innerText = "Error: Database not connected.";
+                fallbackToLocal();
             }
         } catch(e) { 
             console.error("Firebase initialization error:", e); 
+            fallbackToLocal();
+        }
+
+        function fallbackToLocal() {
+            db = null;
+            const inputEl = document.getElementById('secretInput');
+            if (inputEl) {
+                inputEl.placeholder = "Local mode (resets on refresh)...";
+                inputEl.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') window.submitSecret();
+                });
+            }
+            renderLocalSecrets();
         }
 
         function setupRealtimeListener() {
@@ -1406,6 +1422,7 @@
                 renderSecrets(secrets);
             }, (err) => {
                 console.error("Snapshot error:", err);
+                fallbackToLocal();
             });
         }
 
@@ -1426,7 +1443,8 @@
                 textSpan.innerHTML = `<span class="font-bold text-purple-800">🕵️ Anonymous:</span> "${escapeHtml(secret.text || '')}"`;
                 msgDiv.appendChild(textSpan);
                 
-                if (currentUser && secret.userId === currentUser.uid) {
+                // Allow user to delete their own messages, or any message if in local mode
+                if ((currentUser && secret.userId === currentUser.uid) || !db) {
                     const deleteBtn = document.createElement('button');
                     deleteBtn.innerHTML = '❌';
                     deleteBtn.title = 'Remove message';
@@ -1439,6 +1457,10 @@
             });
         }
 
+        function renderLocalSecrets() {
+            renderSecrets(localSecrets);
+        }
+
         window.submitSecret = async function() {
             const input = document.getElementById('secretInput');
             if (!input) return;
@@ -1447,7 +1469,15 @@
             if (!text) return;
 
             if (!db || !currentUser) {
-                alert("Please wait for the database to connect!");
+                // Local Mode Submission
+                localSecrets.unshift({
+                    id: 'local_' + Date.now(),
+                    text: text,
+                    userId: 'local_user',
+                    timestamp: null
+                });
+                input.value = '';
+                renderLocalSecrets();
                 return;
             }
             
@@ -1465,7 +1495,13 @@
         };
 
         window.deleteSecret = async function(docId) {
-            if (!db || !currentUser) return;
+            if (!db || !currentUser) {
+                // Local Mode Deletion
+                localSecrets = localSecrets.filter(s => s.id !== docId);
+                renderLocalSecrets();
+                return;
+            }
+
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'secrets', docId);
             try {
                 await deleteDoc(docRef);
