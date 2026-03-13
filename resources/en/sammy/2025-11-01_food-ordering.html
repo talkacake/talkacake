@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordering Food</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fffaf0; /* Creamy background */
+            color: #3f3f46; 
+        }
+        .content-section {
+            display: none; 
+        }
+        .content-section.active {
+            display: block; 
+        }
+        .nav-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-button.active {
+            border-bottom-color: #f97316; /* Orange */
+            color: #ea580c; 
+        }
+        .thai-toggle-btn {
+            background-color: #f0f9ff; /* Light blue */
+            color: #0c4a6e; /* Darker blue text */
+            padding: 4px 8px;
+            border-radius: 9999px; /* Full rounded */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            margin-left: 8px; /* ml-2 */
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .thai-toggle-btn:hover {
+            background-color: #e0f2fe; /* Hover blue */
+        }
+        .thai-translation {
+            display: none;
+            font-size: 0.9em;
+            color: #6b7280; /* text-gray-500 */
+            margin-top: 4px;
+            padding-left: 8px;
+            border-left: 2px solid #a78bfa; /* purple for translation */
+        }
+        
+        /* Matching Game Styles */
+        .match-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #d1d5db; /* gray-300 */
+        }
+        .match-item:hover {
+            background-color: #fef9c3; /* yellow-100 */
+        }
+        .match-item.selected {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            border-color: #1d4ed8; /* blue-800 */
+        }
+        .match-item.matched {
+            background-color: #4ade80; /* green-400 */
+            color: #166534; /* green-800 */
+            border-color: #22c55e; /* green-500 */
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        /* Phrase Builder Styles */
+        .phrase-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .phrase-button.selected {
+            background-color: #2563eb;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Comprehension Question Styles */
+        .comprehension-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .comprehension-option:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        
+        /* Dialogue Quiz Styles */
+        .dialogue-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #d1d5db;
+        }
+        .dialogue-option:hover {
+            background-color: #fef3c7; /* amber-100 */
+        }
+        .dialogue-line {
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+            display: none; /* Start hidden */
+            margin-bottom: 1.5rem; /* space-y-6 */
+        }
+        .dialogue-line.active {
+            display: block; /* Become visible */
+            transform: scale(1);
+            opacity: 1;
+        }
+        .next-dialogue-btn {
+            background-color: #16a34a; /* green-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            transition: background-color 0.2s;
+        }
+        .next-dialogue-btn:hover {
+            background-color: #15803d; /* green-700 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-6 max-w-6xl">
+
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 speak">Ordering Food 🍔</h1>
+            <p class="text-lg text-gray-700 speak-sentence">Lesson 3: Can I get a coffee?</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:space-x-4 bg-white p-4 rounded-lg shadow-sm mb-6 sticky top-2 z-10">
+            <button id="nav-review" class="nav-button active" onclick="showSection('review')">
+                <span class="text-2xl hidden md:inline">📚</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Review</span>
+                <span class="block text-xs md:text-sm text-gray-500">(ทบทวน)</span>
+            </button>
+            <button id="nav-warmup" class="nav-button" onclick="showSection('warmup')">
+                <span class="text-2xl hidden md:inline">🔥</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Warm-up</span>
+                <span class="block text-xs md:text-sm text-gray-500">(อุ่นเครื่อง)</span>
+            </button>
+            <button id="nav-menu" class="nav-button" onclick="showSection('menu')">
+                <span class="text-2xl hidden md:inline">📖</span>
+                <span class="block text-sm md:text-lg font-semibold speak">The Menu</span>
+                <span class="block text-xs md:text-sm text-gray-500">(เมนู)</span>
+            </button>
+            <button id="nav-practice" class="nav-button" onclick="showSection('practice')">
+                <span class="text-2xl hidden md:inline">💬</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Practice</span>
+                <span class="block text-xs md:text-sm text-gray-500">(ฝึกฝน)</span>
+            </button>
+            <button id="nav-dialogue" class="nav-button" onclick="showSection('dialogue')">
+                <span class="text-2xl hidden md:inline">🗣️</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Dialogue</span>
+                <span class="block text-xs md:text-sm text-gray-500">(บทสนทนา)</span>
+            </button>
+            <button id="nav-vocabulary" class="nav-button" onclick="showSection('vocabulary')">
+                <span class="text-2xl hidden md:inline">💡</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Vocabulary</span>
+                <span class="block text-xs md:text-sm text-gray-500">(คำศัพท์เพิ่มเติม)</span>
+            </button>
+        </nav>
+
+        <main>
+            <!-- Review Section -->
+            <section id="review-section" class="content-section active bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 speak">Let's Review! (มาทบทวนกัน!)</h2>
+                <p class="text-gray-600 mb-6 speak-sentence">Let's practice words from Lesson 1 and 2.</p>
+                
+                <!-- Review Matching -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Review Matching</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-review">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the picture to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="review-col-1"></div>
+                            <div class="space-y-3" id="review-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('review')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Review Phrases -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Review Phrases</h3>
+                    <div class="space-y-4" id="review-phrase-builder">
+                        <!-- Phrase 1 -->
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="flex flex-wrap gap-3 mb-3">
+                                <button class="phrase-button review-p1-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="I'd like">I'd like...</button>
+                                <button class="phrase-button review-p1-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="a burger 🍔">a burger 🍔</button>
+                            </div>
+                            <div class="w-full bg-white border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <p class="text-2xl font-bold text-gray-500" id="review-p1-result">(Click above)</p>
+                            </div>
+                        </div>
+                        <!-- Phrase 2 -->
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="flex flex-wrap gap-3 mb-3">
+                                <button class="phrase-button review-p2-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The bed is">The bed is...</button>
+                                <button class="phrase-button review-p2-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the bedroom 🛏️">in the bedroom 🛏️</button>
+                            </div>
+                            <div class="w-full bg-white border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <p class="text-2xl font-bold text-gray-500" id="review-p2-result">(Click above)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Warm-up Section -->
+            <section id="warmup-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <!-- Let's Talk -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 speak">Let's Talk! (มาคุยกัน!)</h2>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <span class="text-lg font-medium text-gray-800 speak-sentence">Are you hungry?</span>
+                            <button class="thai-toggle-btn" data-thai="คุณหิวไหม?">TH</button>
+                            <p class="thai-translation">คุณหิวไหม?</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to eat?</span>
+                            <button class="thai-toggle-btn" data-thai="คุณชอบกินอะไร?">TH</button>
+                            <p class="thai-translation">คุณชอบกินอะไร?</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <span class="text-lg font-medium text-gray-800 speak-sentence">Do you like coffee? Do you like burgers?</span>
+                            <button class="thai-toggle-btn" data-thai="คุณชอบกาแฟไหม? คุณชอบเบอร์เกอร์ไหม?">TH</button>
+                            <p class="thai-translation">คุณชอบกาแฟไหม? คุณชอบเบอร์เกอร์ไหม?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Let's Watch -->
+                <div class="bg-amber-100 p-4 rounded-lg shadow-sm mt-8">
+                    <h2 class="text-2xl font-semibold text-amber-800 mb-2 speak-sentence">Let's Watch! (มาดูกัน!)</h2>
+                    <p class="text-amber-700 mb-4 speak-sentence">Watch this video, then answer the questions below.</p>
+                    
+                    <div class="aspect-video w-full max-w-lg mx-auto">
+                        <iframe class="w-full h-full rounded-lg shadow-md" src="https://www.youtube.com/embed/ZEaNB4FlsYU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Comprehension Questions -->
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 speak-sentence">Check Your Understanding (ตรวจสอบความเข้าใจ)</h3>
+                    <div class="space-y-6" id="comprehension-questions">
+                        <!-- Questions will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- The Menu Section -->
+            <section id="menu-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">The Menu (เมนู)</h2>
+
+                <!-- Food Matching -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Food (อาหาร)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-food">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the picture to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="food-col-1"></div>
+                            <div class="space-y-3" id="food-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('food')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Drinks Matching -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Drinks (เครื่องดื่ม)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-drinks">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the picture to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="drinks-col-1"></div>
+                            <div class="space-y-3" id="drinks-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('drinks')">Reset</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Practice Section -->
+            <section id="practice-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">Practice Ordering (ฝึกสั่งอาหาร)</h2>
+                
+                <div id="order-builder" class="space-y-6">
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">1. Choose Starter (เลือกคำเริ่มต้น)</h3>
+                        <div class="flex flex-wrap gap-3" id="phrase-starters">
+                            <button class="phrase-button order-starter-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="Can I get">Can I get...</button>
+                            <button class="phrase-button order-starter-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="I'd like">I'd like...</button>
+                            <button class="phrase-button order-starter-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="I'll have">I'll have...</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">2. Choose Size (Optional) (เลือกขนาด (ถ้ามี))</h3>
+                        <div class="flex flex-wrap gap-3" id="phrase-sizes">
+                            <button class="phrase-button order-size-btn text-lg font-medium bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-sm hover:bg-yellow-200 speak-sentence" data-value="a small">a small (S)</button>
+                            <button class="phrase-button order-size-btn text-lg font-medium bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-sm hover:bg-yellow-200 speak-sentence" data-value="a medium">a medium (M)</button>
+                            <button class="phrase-button order-size-btn text-lg font-medium bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-sm hover:bg-yellow-200 speak-sentence" data-value="a large">a large (L)</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">3. Choose Item (เลือกรายการ)</h3>
+                        <div class="flex flex-wrap gap-3" id="phrase-items">
+                            <button class="phrase-button order-item-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="coffee">coffee ☕</button>
+                            <button class="phrase-button order-item-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="burger">burger 🍔</button>
+                            <button class="phrase-button order-item-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="fries">fries 🍟</button>
+                            <button class="phrase-button order-item-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="salad">salad 🥗</button>
+                            <button class="phrase-button order-item-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="muffin">muffin 🧁</button>
+                            <button class="phrase-button order-item-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="soda">soda 🥤</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">4. Your Sentence (ประโยคของคุณ)</h3>
+                        <div id="order-result" class="w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center h-24 flex items-center justify-center">
+                            <p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" id="clear-order-btn">Clear</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Dialogue Quiz Section -->
+            <section id="dialogue-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">Dialogue Quiz (แบบทดสอบบทสนทนา)</h2>
+                
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <div class="space-y-6" id="dialogue-container">
+                        <!-- Dialogue lines will be injected by JS -->
+                    </div>
+                    <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-6 speak-sentence" id="reset-dialogue-btn">Restart</button>
+                </div>
+            </section>
+
+            <!-- Additional Vocabulary Section -->
+            <section id="vocabulary-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">Additional Vocabulary (คำศัพท์เพิ่มเติม)</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What did you eat?</span>
+                        <button class="thai-toggle-btn" data-thai="กินอะไรมา">TH</button>
+                        <p class="thai-translation">กินอะไรมา</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">vegetables</span>
+                        <button class="thai-toggle-btn" data-thai="ผัก">TH</button>
+                        <p class="thai-translation">ผัก</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What kind?</span>
+                        <button class="thai-toggle-btn" data-thai="แบบไหน">TH</button>
+                        <p class="thai-translation">แบบไหน</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Every kind of salad</span>
+                        <button class="thai-toggle-btn" data-thai="สลัดทุกแบบ">TH</button>
+                        <p class="thai-translation">สลัดทุกแบบ</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">with</span>
+                        <button class="thai-toggle-btn" data-thai="กับ">TH</button>
+                        <p class="thai-translation">กับ</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to have fries with?</span>
+                        <button class="thai-toggle-btn" data-thai="ชอบกินเฟรนฟรายกับอะไร">TH</button>
+                        <p class="thai-translation">ชอบกินเฟรนฟรายกับอะไร</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Anything else?</span>
+                        <button class="thai-toggle-btn" data-thai="เอาอะไรอีกไหม">TH</button>
+                        <p class="thai-translation">เอาอะไรอีกไหม</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">How would you like to pay?</span>
+                        <button class="thai-toggle-btn" data-thai="จ่ายยังไง">TH</button>
+                        <p class="thai-translation">จ่ายยังไง</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">Cash</span>
+                        <button class="thai-toggle-btn" data-thai="เงินสด">TH</button>
+                        <p class="thai-translation">เงินสด</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">Card</span>
+                        <button class="thai-toggle-btn" data-thai="บัตร">TH</button>
+                        <p class="thai-translation">บัตร</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">For here or to go?</span>
+                        <button class="thai-toggle-btn" data-thai="กินนี่ หรือกลับบ้าน">TH</button>
+                        <p class="thai-translation">กินนี่ หรือกลับบ้าน</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Would you like a bag?</span>
+                        <button class="thai-toggle-btn" data-thai="ถุงไหม">TH</button>
+                        <p class="thai-translation">ถุงไหม</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">say this line</span>
+                        <button class="thai-toggle-btn" data-thai="พูดบรรทัดนี้">TH</button>
+                        <p class="thai-translation">พูดบรรทัดนี้</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">garlic</span>
+                        <button class="thai-toggle-btn" data-thai="กระเทียม">TH</button>
+                        <p class="thai-translation">กระเทียม</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">wonton soup</span>
+                        <button class="thai-toggle-btn" data-thai="เกี๊ยวน้ำ">TH</button>
+                        <p class="thai-translation">เกี๊ยวน้ำ</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">fortune cookies</span>
+                        <button class="thai-toggle-btn" data-thai="คุกกี้เสี่ยงทาย">TH</button>
+                        <p class="thai-translation">คุกกี้เสี่ยงทาย</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">quick</span>
+                        <button class="thai-toggle-btn" data-thai="เร็ว">TH</button>
+                        <p class="thai-translation">เร็ว</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">That'll do it.</span>
+                        <button class="thai-toggle-btn" data-thai="แค่นี้น่าจะพอแล้วล่ะ">TH</button>
+                        <p class="thai-translation">แค่นี้น่าจะพอแล้วล่ะ</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">a full slab of baby backs</span>
+                        <button class="thai-toggle-btn" data-thai="ซี่โครง">TH</button>
+                        <p class="thai-translation">ซี่โครง</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">mashed potatoes</span>
+                        <button class="thai-toggle-btn" data-thai="มันฝรั่งบด">TH</button>
+                        <p class="thai-translation">มันฝรั่งบด</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak">glorious</span>
+                        <button class="thai-toggle-btn" data-thai="ทรงเกียรติ">TH</button>
+                        <p class="thai-translation">ทรงเกียรติ</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Straight up</span>
+                        <button class="thai-toggle-btn" data-thai="ไม่ผสม (เหล้า)">TH</button>
+                        <p class="thai-translation">ไม่ผสม (เหล้า)</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        const allSections = document.querySelectorAll('.content-section');
+        const allNavButtons = document.querySelectorAll('.nav-button');
+        
+        // TTS setup
+        const synth = window.speechSynthesis;
+        let americanVoice = null;
+
+        function setVoice() {
+            if (synth.getVoices().length > 0) {
+                americanVoice = synth.getVoices().find(voice => voice.lang === 'en-US' && (voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex'))) || synth.getVoices().find(voice => voice.lang === 'en-US');
+            }
+        }
+
+        if (synth) {
+            synth.onvoiceschanged = setVoice;
+            setVoice();
+        }
+
+        function speakText(text) {
+            if (synth && text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (americanVoice) {
+                    utterance.voice = americanVoice;
+                } else {
+                    utterance.lang = 'en-US';
+                }
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                synth.speak(utterance);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initGlobalClickListeners(); // Handles TTS and Toggles
+            initReview();
+            initComprehensionQuestions();
+            initMenu();
+            initOrderBuilder();
+            initDialogueQuiz();
+            
+            allNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const sectionId = button.id.replace('nav-', '');
+                    showSection(sectionId);
+                });
+            });
+
+            showSection('review'); // Start on Review
+        });
+        
+        function initGlobalClickListeners() {
+            document.body.addEventListener('click', (e) => {
+                const toggleBtn = e.target.closest('.thai-toggle-btn');
+                const speakElement = e.target.closest('.speak, .speak-sentence');
+                
+                // Handle Toggle Buttons
+                if (toggleBtn) {
+                    e.stopPropagation();
+                    const translationElement = toggleBtn.nextElementSibling;
+                    if (translationElement && translationElement.classList.contains('thai-translation')) {
+                        translationElement.style.display = translationElement.style.display === 'block' ? 'none' : 'block';
+                    }
+                    return; // Don't also trigger speak
+                }
+
+                // Handle Speak Elements
+                if (speakElement) {
+                    // Special cases to prevent speak from triggering other actions
+                    if (e.target.closest('.comprehension-option') && e.target.classList.contains('speak')) {
+                         e.stopPropagation(); 
+                    } 
+                    else if (e.target.closest('.dialogue-option') && e.target.classList.contains('speak')) {
+                         e.stopPropagation(); 
+                    }
+
+                    let text = (speakElement.dataset.speakText || speakElement.innerText)
+                                .split('(')[0]
+                                .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+                                .trim();
+                    speakText(text);
+                }
+            });
+        }
+
+
+        function showSection(sectionId) {
+            allSections.forEach(section => {
+                section.classList.toggle('active', section.id === `${sectionId}-section`);
+            });
+            allNavButtons.forEach(button => {
+                button.classList.toggle('active', button.id === `nav-${sectionId}`);
+            });
+        }
+        
+        // Section: Review
+        const reviewData = [
+            { id: 'r1', emoji: '☕', term: 'coffee table' },
+            { id: 'r2', emoji: '🍞', term: 'toaster' },
+            { id: 'r3', emoji: '🧰', term: 'toolbox' },
+            { id: 'r4', emoji: '💧', term: 'sink' },
+            { id: 'r5', emoji: '💡', term: 'lamp' }
+        ];
+
+        let selectedMatchItem = null;
+
+        function initReview() {
+            createMatchingGame('review', reviewData);
+            initReviewPhraseBuilders();
+        }
+
+        function initReviewPhraseBuilders() {
+            let p1Verb = '', p1Noun = '';
+            document.querySelectorAll('.review-p1-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (e.target.closest('.thai-toggle-btn')) return;
+                    if (btn.dataset.value === "I'd like") p1Verb = btn.dataset.value;
+                    else p1Noun = btn.dataset.value;
+                    btn.classList.add('selected');
+                    if (p1Verb && p1Noun) {
+                        const phrase = `${p1Verb} ${p1Noun}`.replace(/🍔/g, '').trim() + '.';
+                        document.getElementById('review-p1-result').innerText = phrase;
+                        speakText(phrase);
+                        setTimeout(() => {
+                             document.querySelectorAll('.review-p1-btn').forEach(b => b.classList.remove('selected'));
+                             p1Verb = ''; p1Noun = '';
+                             document.getElementById('review-p1-result').innerText = '(Click above)';
+                        }, 2000);
+                    }
+                });
+            });
+
+            let p2Verb = '', p2Noun = '';
+            document.querySelectorAll('.review-p2-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (e.target.closest('.thai-toggle-btn')) return;
+                    if (btn.dataset.value === "The bed is") p2Verb = btn.dataset.value;
+                    else p2Noun = btn.dataset.value;
+                    btn.classList.add('selected');
+                    if (p2Verb && p2Noun) {
+                        const phrase = `${p2Verb} ${p2Noun}`.replace(/🛏️/g, '').trim() + '.';
+                        document.getElementById('review-p2-result').innerText = phrase;
+                        speakText(phrase);
+                        setTimeout(() => {
+                             document.querySelectorAll('.review-p2-btn').forEach(b => b.classList.remove('selected'));
+                             p2Verb = ''; p2Noun = '';
+                             document.getElementById('review-p2-result').innerText = '(Click above)';
+                        }, 2000);
+                    }
+                });
+            });
+        }
+
+        // Section: Warm-up Comprehension
+        const comprehensionQuestions = [
+            {
+                question: "In Scene 1 (Regular Show), what does the customer order?",
+                thai: "ในฉากที่ 1 (Regular Show) ลูกค้าสั่งอะไร?",
+                options: ["Eggs Benedict", "A side salad", "Wonton Soup"],
+                answer: "Eggs Benedict"
+            },
+            {
+                question: "In Scene 3 (Dude, Where's My Car?), what phrase does the waiter keep saying?",
+                thai: "ในฉากที่ 3 (Dude, Where's My Car?) พนักงานเสิร์ฟพูดวลีอะไรซ้ำๆ?",
+                options: ["What would you like?", "And then?", "That's all?"],
+                answer: "And then?"
+            },
+            {
+                question: "In Scene 4 (Identity Thief), what does the woman (Customer 2) order?",
+                thai: "ในฉากที่ 4 (Identity Thief) ผู้หญิง (ลูกค้า 2) สั่งอะไร?",
+                options: ["Tomato soup", "A full slab of baby backs", "A salad"],
+                answer: "A full slab of baby backs"
+            },
+            {
+                question: "In Scene 5 (The Wolf of Wall Street), what drink do they order?",
+                thai: "ในฉากที่ 5 (The Wolf of Wall Street) พวกเขาสั่งเครื่องดื่มอะไร?",
+                options: ["Orange Juice", "Sweet Tea", "Absolut Martinis"],
+                answer: "Absolut Martinis"
+            }
+        ];
+
+
+        function initComprehensionQuestions() {
+            const container = document.getElementById('comprehension-questions');
+            container.innerHTML = '';
+            comprehensionQuestions.forEach((q, index) => {
+                const qBlock = document.createElement('div');
+                qBlock.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
+                
+                let optionsHTML = q.options.map(option => `
+                    <div class="comprehension-option p-3 rounded-lg border border-gray-300" data-answer="${q.answer}" data-selected="${option}">
+                        <span class="text-lg font-medium speak" data-speak-text="${option}">${option}</span>
+                    </div>
+                `).join('');
+
+                qBlock.innerHTML = `
+                    <div class="mb-3">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">${index + 1}. ${q.question}</span>
+                        <button class="thai-toggle-btn" data-thai="${q.thai}">TH</button>
+                        <p class="thai-translation">${q.thai}</p>
+                    </div>
+                    <div class="space-y-2" id="q-${index}-options">
+                        ${optionsHTML}
+                    </div>
+                    <p class="text-lg font-bold mt-3 hidden" id="q-${index}-feedback"></p>
+                `;
+                container.appendChild(qBlock);
+            });
+
+            container.addEventListener('click', (e) => {
+                const optionEl = e.target.closest('.comprehension-option');
+                if (!optionEl) return;
+                
+                if (e.target.classList.contains('speak')) {
+                    return;
+                }
+
+                const selected = optionEl.dataset.selected;
+                const answer = optionEl.dataset.answer;
+                const parent = optionEl.parentElement;
+                const feedbackEl = parent.nextElementSibling;
+
+                parent.querySelectorAll('.comprehension-option').forEach(el => {
+                    el.style.backgroundColor = '';
+                    el.style.borderColor = '#d1d5db';
+                });
+
+                if (selected === answer) {
+                    optionEl.style.backgroundColor = '#dcfce7'; // green-100
+                    optionEl.style.borderColor = '#22c55e'; // green-500
+                    feedbackEl.innerText = 'Correct! 👍';
+                    feedbackEl.className = 'text-lg font-bold mt-3 text-green-600';
+                    speakText('Correct!');
+                } else {
+                    optionEl.style.backgroundColor = '#fee2e2'; // red-100
+                    optionEl.style.borderColor = '#ef4444'; // red-500
+                    feedbackEl.innerText = 'Try again. 👎';
+                    feedbackEl.className = 'text-lg font-bold mt-3 text-red-600';
+                    speakText('Try again.');
+                }
+                feedbackEl.classList.remove('hidden');
+            });
+        }
+
+
+        // Section: Menu
+        const foodData = [
+            { id: 'f1', emoji: '🍔', term: 'burger' },
+            { id: 'f2', emoji: '🍟', term: 'fries' },
+            { id: 'f3', emoji: '🥪', term: 'sandwich' },
+            { id: 'f4', emoji: '🥗', term: 'salad' },
+            { id: 'f5', emoji: '🥐', term: 'croissant' },
+            { id: 'f6', emoji: '🧁', term: 'muffin' },
+            { id: 'f7', emoji: '🍪', term: 'cookie' }
+        ];
+        
+        const drinksData = [
+            { id: 'd1', emoji: '☕', term: 'coffee' },
+            { id: 'd2', emoji: '🥤', term: 'soda' },
+            { id: 'd3', emoji: '💧', term: 'water' }
+        ];
+
+        function initMenu() {
+            createMatchingGame('food', foodData);
+            createMatchingGame('drinks', drinksData);
+        }
+
+        // General Matching Game Functions
+        function shuffle(array) {
+            let newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        function createMatchingGame(gameId, data) {
+            const col1 = document.getElementById(`${gameId}-col-1`);
+            const col2 = document.getElementById(`${gameId}-col-2`);
+            
+            col1.innerHTML = '';
+            col2.innerHTML = '';
+
+            const definitions = shuffle(data);
+            const terms = shuffle(data);
+
+            definitions.forEach(item => {
+                col1.innerHTML += `
+                    <div class="match-item p-4 rounded-lg bg-white shadow-sm text-center" data-id="${item.id}" data-type="definition" onclick="selectMatchItem(this, '${gameId}')">
+                        <span class="text-4xl">${item.emoji}</span>
+                    </div>`;
+            });
+            
+            terms.forEach(item => {
+                col2.innerHTML += `
+                    <div class="match-item p-4 rounded-lg bg-white shadow-sm text-center speak" data-speak-text="${item.term}" data-id="${item.id}" data-type="term" onclick="selectMatchItem(this, '${gameId}')">
+                        <span class="text-xl font-medium">${item.term}</span>
+                    </div>`;
+            });
+        }
+
+        function selectMatchItem(element, gameId) {
+            if (element.classList.contains('matched')) return;
+
+            const type = element.dataset.type;
+            const id = element.dataset.id;
+            const gameContainer = document.getElementById(`match-game-${gameId}`);
+            let currentSelection = gameContainer.dataset.selectedItem ? JSON.parse(gameContainer.dataset.selectedItem) : null;
+
+            if (currentSelection) {
+                const selectedElement = document.querySelector(`#match-game-${gameId} [data-id="${currentSelection.id}"][data-type="${currentSelection.type}"]`);
+                
+                if (currentSelection.type !== type && currentSelection.id === id) {
+                    element.classList.add('matched');
+                    selectedElement.classList.add('matched');
+                    gameContainer.dataset.selectedItem = '';
+                    checkGameWin(gameId);
+                } else if (currentSelection.type === type) {
+                    selectedElement.classList.remove('selected');
+                    element.classList.add('selected');
+                    gameContainer.dataset.selectedItem = JSON.stringify({ type, id });
+                } else {
+                    selectedElement.classList.remove('selected');
+                    gameContainer.dataset.selectedItem = '';
+                }
+            } else {
+                element.classList.add('selected');
+                gameContainer.dataset.selectedItem = JSON.stringify({ type, id });
+            }
+        }
+
+        function checkGameWin(gameId) {
+            const gameContainer = document.getElementById(`match-game-${gameId}`);
+            const allItems = gameContainer.querySelectorAll('.match-item');
+            const allMatched = Array.from(allItems).every(item => item.classList.contains('matched'));
+            
+            if (allMatched) {
+                const p = gameContainer.querySelector('p');
+                p.innerText = 'Good job! 🎉';
+                speakText('Good job!');
+            }
+        }
+
+        function resetGame(gameId) {
+            document.getElementById(`match-game-${gameId}`).dataset.selectedItem = '';
+            const p = document.getElementById(`match-game-${gameId}`).querySelector('p');
+            p.innerText = 'Match the picture to the word.';
+            if (gameId === 'review') createMatchingGame('review', reviewData);
+            if (gameId === 'food') createMatchingGame('food', foodData);
+            if (gameId === 'drinks') createMatchingGame('drinks', drinksData);
+        }
+
+        // Section: Practice Ordering
+        let selectedStarter = '', selectedSize = '', selectedItem = '';
+
+        function initOrderBuilder() {
+            document.getElementById('phrase-starters').addEventListener('click', (e) => {
+                const btn = e.target.closest('.order-starter-btn');
+                if (!btn || e.target.closest('.thai-toggle-btn')) return;
+                document.querySelectorAll('.order-starter-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedStarter = btn.dataset.value;
+                updateOrderPhrase();
+            });
+            document.getElementById('phrase-sizes').addEventListener('click', (e) => {
+                const btn = e.target.closest('.order-size-btn');
+                if (!btn || e.target.closest('.thai-toggle-btn')) return;
+                document.querySelectorAll('.order-size-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedSize = btn.dataset.value;
+                updateOrderPhrase();
+            });
+            document.getElementById('phrase-items').addEventListener('click', (e) => {
+                const btn = e.target.closest('.order-item-btn');
+                if (!btn || e.target.closest('.thai-toggle-btn')) return;
+                document.querySelectorAll('.order-item-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedItem = btn.dataset.value;
+                updateOrderPhrase();
+            });
+            document.getElementById('clear-order-btn').addEventListener('click', clearOrder);
+        }
+
+        function clearOrder() {
+            selectedStarter = ''; selectedSize = ''; selectedItem = '';
+            document.querySelectorAll('#order-builder .phrase-button').forEach(b => b.classList.remove('selected'));
+            updateOrderPhrase();
+        }
+
+        function updateOrderPhrase() {
+            const resultBox = document.getElementById('order-result');
+            if (!selectedStarter && !selectedSize && !selectedItem) {
+                resultBox.innerHTML = `<p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>`;
+                return;
+            }
+            
+            let phrase = [selectedStarter, selectedSize, selectedItem].filter(Boolean).join(' ');
+            if (selectedStarter && selectedItem) { // Only show full phrase if starter and item are selected
+                 phrase += '.';
+                 resultBox.innerHTML = `<p class="text-3xl font-bold text-gray-900 speak-sentence">${phrase}</p>`;
+                 speakText(phrase);
+            } else {
+                 resultBox.innerHTML = `<p class="text-2xl font-bold text-gray-700 speak-sentence">${phrase}...</p>`;
+            }
+        }
+
+
+        // Section: Dialogue Quiz
+        const dialogueQuizData = [
+            {
+                type: 'barista',
+                line: "Hi, what can I get for you?",
+                thai: "สวัสดีครับ รับอะไรดีครับ?"
+            },
+            {
+                type: 'user',
+                options: [
+                    { text: "Can I get a large coffee?", correct: true, thai: "ขอกาแฟแก้วใหญ่ครับ" },
+                    { text: "Where is the bathroom?", correct: false, thai: "ห้องน้ำอยู่ที่ไหนครับ" },
+                    { text: "I am 18.", correct: false, thai: "ผมอายุ 18" }
+                ]
+            },
+            {
+                type: 'barista',
+                line: "Sure. Anything else?",
+                thai: "ได้ครับ รับอะไรเพิ่มไหมครับ?"
+            },
+            {
+                type: 'user',
+                options: [
+                    { text: "I need a sofa.", correct: false, thai: "ผมต้องการโซฟา" },
+                    { text: "That's all, thanks.", correct: true, thai: "แค่นี้ครับ ขอบคุณครับ" }
+                ]
+            },
+            {
+                type: 'barista',
+                line: "Okay. For here or to go?",
+                thai: "ครับ ทานที่นี่หรือกลับบ้านครับ?"
+            },
+            {
+                type: 'user',
+                options: [
+                    { text: "To go, please.", correct: true, thai: "กลับบ้านครับ" },
+                    { text: "Yes, please.", correct: false, thai: "ครับ ขอบคุณครับ" }
+                ]
+            },
+            {
+                type: 'barista',
+                line: "That will be $4.50. How would you like to pay?",
+                thai: "ทั้งหมด 4.50 ดอลลาร์ครับ ชำระเงินยังไงครับ?"
+            },
+            {
+                type: 'user',
+                options: [
+                    { text: "Thank you.", correct: false, thai: "ขอบคุณครับ" },
+                    { text: "By card, please.", correct: true, thai: "ด้วยบัตรครับ" }
+                ]
+            },
+            {
+                type: 'barista',
+                line: "Great. Can I get a name for the order?",
+                thai: "ยอดเยี่ยมครับ ขอชื่อสำหรับออเดอร์ด้วยครับ?"
+            },
+            {
+                type: 'user',
+                options: [
+                    { text: "My name is...", correct: true, thai: "ผมชื่อ..." },
+                    { text: "I am hungry.", correct: false, thai: "ผมหิว" }
+                ]
+            },
+            {
+                type: 'complete',
+                line: "Good job! You've completed the order! 🎉",
+                thai: "เก่งมาก! คุณสั่งอาหารเสร็จแล้ว!"
+            }
+        ];
+
+        let currentDialogueStep = 0;
+
+        function initDialogueQuiz() {
+            document.getElementById('reset-dialogue-btn').addEventListener('click', () => {
+                currentDialogueStep = 0;
+                loadDialogueStep();
+            });
+            loadDialogueStep();
+        }
+        
+        function loadDialogueStep() {
+            const container = document.getElementById('dialogue-container');
+            container.innerHTML = ''; // Clear container
+            
+            const step = dialogueQuizData[currentDialogueStep];
+            if (!step) return; 
+
+            const stepEl = document.createElement('div');
+            stepEl.className = 'dialogue-line';
+
+            if (step.type === 'barista') {
+                stepEl.classList.add('bg-blue-100', 'text-blue-800', 'p-4', 'rounded-lg');
+                stepEl.innerHTML = `
+                    <p class="font-bold speak">Barista:</p>
+                    <p class="text-xl speak-sentence">${step.line}</p>
+                    <button class="thai-toggle-btn" data-thai="${step.thai}">TH</button>
+                    <p class="thai-translation">${step.thai}</p>
+                    <button class="next-dialogue-btn speak-sentence" onclick="nextDialogueStep()">Next</button>
+                `;
+                container.appendChild(stepEl);
+                void stepEl.offsetWidth; // Force reflow
+                stepEl.classList.add('active');
+                speakText(step.line);
+
+            } else if (step.type === 'user') {
+                stepEl.classList.add('bg-gray-100', 'p-4', 'rounded-lg');
+                let optionsHTML = step.options.map(opt => `
+                    <div class="dialogue-option p-3 bg-white rounded-lg shadow-sm" data-correct="${opt.correct}">
+                        <span class="text-lg font-medium speak" data-speak-text="${opt.text}">${opt.text}</span>
+                        <button class="thai-toggle-btn" data-thai="${opt.thai}">TH</button>
+                        <p class="thai-translation">${opt.thai}</p>
+                    </div>
+                `).join('');
+                
+                stepEl.innerHTML = `
+                    <p class="font-bold text-gray-700 speak">You (Choose one):</p>
+                    <div class="space-y-2 mt-2" id="dialogue-options-${currentDialogueStep}">
+                        ${optionsHTML}
+                    </div>
+                `;
+                container.appendChild(stepEl);
+                void stepEl.offsetWidth; // Force reflow
+                stepEl.classList.add('active');
+
+                // Add click listeners to these new options
+                stepEl.querySelectorAll('.dialogue-option').forEach(optionEl => {
+                    optionEl.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('speak') || e.target.closest('.thai-toggle-btn')) return;
+
+                        const isCorrect = optionEl.dataset.correct === 'true';
+                        
+                        if (isCorrect) {
+                            optionEl.style.borderColor = '#22c55e';
+                            optionEl.style.backgroundColor = '#dcfce7';
+                            speakText(optionEl.querySelector('.speak').dataset.speakText);
+
+                            // Disable all options for this step
+                            optionEl.parentElement.querySelectorAll('.dialogue-option').forEach(el => {
+                                el.style.pointerEvents = 'none';
+                                if (el !== optionEl) el.style.opacity = '0.5';
+                            });
+
+                            // Move to next step
+                            setTimeout(() => {
+                                nextDialogueStep();
+                            }, 1000);
+                        } else {
+                            optionEl.style.borderColor = '#ef4444';
+                            optionEl.style.backgroundColor = '#fee2e2';
+                            speakText('Try again.');
+                            setTimeout(() => {
+                               optionEl.style.borderColor = '';
+                               optionEl.style.backgroundColor = '';
+                            }, 1000);
+                        }
+                    });
+                });
+
+            } else if (step.type === 'complete') {
+                 stepEl.classList.add('bg-green-100', 'text-green-800', 'p-4', 'rounded-lg');
+                 stepEl.innerHTML = `
+                    <p class="text-xl font-bold text-center speak-sentence">${step.line}</p>
+                    <button class="thai-toggle-btn" data-thai="${step.thai}">TH</button>
+                    <p class="thai-translation">${step.thai}</p>
+                 `;
+                 container.appendChild(stepEl);
+                 void stepEl.offsetWidth; // Force reflow
+                 stepEl.classList.add('active');
+                 speakText(step.line);
+            }
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function nextDialogueStep() {
+            currentDialogueStep++;
+            loadDialogueStep();
+        }
+
+    </script>
+</body>
+</html>
+
