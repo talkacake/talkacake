@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Lesson 🗳️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff; /* Light blue background */
+        }
+        h1, h2, h3 {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            border: 2px solid #bae6fd;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #0ea5e9;
+        }
+        .btn-icon {
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: #f3f4f6;
+            margin-left: 6px;
+            font-size: 0.9rem;
+            border: 1px solid #e5e7eb;
+        }
+        .btn-icon:hover { background-color: #e5e7eb; }
+        .btn-icon:active { transform: scale(0.95); }
+        
+        .script-box {
+            background-color: #f0f9ff;
+            border-left: 5px solid #0ea5e9;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .vocab-card-content {
+            animation: popIn 0.3s ease-out;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .star-btn {
+            background: #fbbf24;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .star-btn:active { transform: scale(0.9); }
+    </style>
+    <script>
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9; 
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleThai(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function addStar() {
+            const container = document.getElementById('star-container');
+            const star = document.createElement('span');
+            star.innerText = '⭐';
+            star.className = 'text-3xl animate-bounce inline-block mx-1';
+            container.appendChild(star);
+            speak('Great job!');
+        }
+    </script>
+</head>
+<body class="pb-12">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b-4 border-blue-400">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
+            <div>
+                <div class="flex items-center justify-center md:justify-start gap-2">
+                    <h1 class="text-2xl md:text-3xl font-bold text-blue-600">Election 🗳️📢</h1>
+                    <button onclick="speak('Election')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h1-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <div id="h1-th" class="hidden text-blue-500 font-bold mt-1">การเลือกตั้ง</div>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-xs md:text-sm bg-blue-100 text-blue-800 py-1 px-3 rounded-full font-semibold">News Lesson</span>
+                <span class="text-xs md:text-sm bg-yellow-100 text-yellow-800 py-1 px-3 rounded-full font-semibold">120 Mins</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-12">
+
+        <!-- PART 1: WARM UP -->
+        <section id="review" class="card p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🧠</span>
+                <h2 class="text-2xl font-bold text-gray-800">1. Warm Up</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('Warm Up')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-1-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-1-th" class="hidden text-gray-500 mb-6 text-center">1. อุ่นเครื่อง</p>
+            
+            <div class="text-center mb-6">
+                <p class="text-gray-600">Click to review a random word!</p>
+            </div>
+            
+            <div class="bg-blue-50 p-8 rounded-3xl border-4 border-blue-200 flex flex-col items-center justify-center space-y-6 min-h-[250px]">
+                <div id="wordDisplay" class="text-2xl md:text-3xl font-bold text-gray-800 text-center flex flex-col items-center justify-center w-full">
+                    <div class="text-6xl mb-4">🎲</div>
+                    <div>Ready?</div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="pickRandomWord()" class="bg-blue-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-600 transition transform active:scale-95">
+                        SPIN 🎰
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: THE STORY -->
+        <section id="story" class="card p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">📺</span>
+                <h2 class="text-2xl font-bold text-gray-800">2. Election Banners</h2>
+                 <div class="flex gap-2">
+                    <button onclick="speak('Election Banners')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-2-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-2-th" class="hidden text-gray-500 mb-6 text-center">2. ป้ายหาเสียงเลือกตั้ง</p>
+
+            <div class="mb-6 text-center">
+                <a href="https://www.tiktok.com/@thaipbsworld/video/7593225750736538897" target="_blank" class="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-bold shadow-md">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                    Watch Video
+                </a>
+            </div>
+
+            <div class="space-y-4">
+                <div class="script-box">
+                    <p class="text-lg text-gray-800">1. If you see these <strong>banners</strong>, it means the <strong>general election</strong> is coming! 🏙️</p>
+                    <div class="mt-2">
+                        <button onclick="speak('If you see these banners, it means the general election is coming!')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('s1-th')" class="btn-icon">🇹🇭</button>
+                        <p id="s1-th" class="hidden text-blue-600 mt-1 font-bold">ถ้าเห็นป้ายเหล่านี้ แปลว่าการเลือกตั้งทั่วไปกำลังจะมาถึง!</p>
+                    </div>
+                </div>
+
+                <div class="script-box">
+                    <p class="text-lg text-gray-800">2. A banner has a party <strong>logo</strong>, election <strong>pledges</strong>, a photo of the <strong>candidate</strong>, and their number. 1️⃣2️⃣3️⃣</p>
+                    <div class="mt-2">
+                        <button onclick="speak('A banner has a party logo, election pledges, a photo of the candidate, and their number.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('s2-th')" class="btn-icon">🇹🇭</button>
+                        <p id="s2-th" class="hidden text-blue-600 mt-1 font-bold">ป้ายจะมีโลโก้พรรค คำมั่นสัญญา รูปผู้สมัคร และเบอร์</p>
+                    </div>
+                </div>
+
+                <div class="script-box">
+                    <p class="text-lg text-gray-800">3. Some banners have QR codes so <strong>voters</strong> can read before they <strong>cast their ballot</strong>. 🗳️📱</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Some banners have QR codes so voters can read before they cast their ballot.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('s3-th')" class="btn-icon">🇹🇭</button>
+                        <p id="s3-th" class="hidden text-blue-600 mt-1 font-bold">บางป้ายมี QR code ให้ผู้มีสิทธิ์เลือกตั้งอ่านก่อนลงคะแนน</p>
+                    </div>
+                </div>
+
+                <div class="script-box">
+                    <p class="text-lg text-gray-800">4. Banners are <strong>not allowed</strong> in temples 🕌, schools 🏫, or government offices. They must not block the road. 🛑</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Banners are not allowed in temples, schools, or government offices. They must not block the road.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('s4-th')" class="btn-icon">🇹🇭</button>
+                        <p id="s4-th" class="hidden text-blue-600 mt-1 font-bold">ไม่อนุญาตให้ติดป้ายในวัด โรงเรียน หรือสถานที่ราชการ และห้ามขวางทาง</p>
+                    </div>
+                </div>
+
+                <div class="script-box">
+                    <p class="text-lg text-gray-800">5. If you <strong>vandalise</strong> (break/draw on) a banner, you might go to prison or pay a <strong>fine</strong> (6,000 baht). 👮‍♂️💰</p>
+                    <div class="mt-2">
+                        <button onclick="speak('If you vandalise a banner, you might go to prison or pay a fine.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('s5-th')" class="btn-icon">🇹🇭</button>
+                        <p id="s5-th" class="hidden text-blue-600 mt-1 font-bold">ถ้าคุณทำลายป้ายหาเสียง อาจติดคุกหรือโดนปรับ (6,000 บาท)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 3: COMPREHENSION CHECK -->
+        <section id="comprehension" class="card p-6 md:p-8 border-green-400 border-2">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">📝</span>
+                <h2 class="text-2xl font-bold text-gray-800">3. Comprehension Check</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('Comprehension Check')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-3-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-3-th" class="hidden text-gray-500 mb-6 text-center">3. ทดสอบความเข้าใจ</p>
+            
+            <div class="space-y-4">
+                 <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="font-bold text-lg mb-2">1. What can you see on a banner?</p>
+                    <div class="flex gap-2 mb-2">
+                        <button onclick="speak('What can you see on a banner?')" class="btn-icon text-sm">🔊 Listen</button>
+                        <button onclick="toggleThai('q-comp-1-th')" class="btn-icon text-sm">🇹🇭 TH</button>
+                    </div>
+                    <p id="q-comp-1-th" class="hidden text-green-600 mb-2 font-bold text-sm">บนป้ายหาเสียงมีอะไรบ้าง?</p>
+                    <div class="pl-4 text-gray-600 text-sm">
+                        <p>a) A menu and prices</p>
+                        <p>b) A logo, photo, and number</p>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="font-bold text-lg mb-2">2. Where are banners NOT allowed?</p>
+                    <div class="flex gap-2 mb-2">
+                        <button onclick="speak('Where are banners NOT allowed?')" class="btn-icon text-sm">🔊 Listen</button>
+                        <button onclick="toggleThai('q-comp-2-th')" class="btn-icon text-sm">🇹🇭 TH</button>
+                    </div>
+                    <p id="q-comp-2-th" class="hidden text-green-600 mb-2 font-bold text-sm">ที่ไหนบ้างที่ห้ามติดป้าย?</p>
+                    <div class="pl-4 text-gray-600 text-sm">
+                        <p>a) Schools and Temples</p>
+                        <p>b) Markets and Malls</p>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="font-bold text-lg mb-2">3. What happens if you break a banner?</p>
+                    <div class="flex gap-2 mb-2">
+                        <button onclick="speak('What happens if you break a banner?')" class="btn-icon text-sm">🔊 Listen</button>
+                        <button onclick="toggleThai('q-comp-3-th')" class="btn-icon text-sm">🇹🇭 TH</button>
+                    </div>
+                    <p id="q-comp-3-th" class="hidden text-green-600 mb-2 font-bold text-sm">จะเกิดอะไรขึ้นถ้าคุณทำลายป้าย?</p>
+                    <div class="pl-4 text-gray-600 text-sm">
+                        <p>a) You get a free ice cream</p>
+                        <p>b) You pay a fine or go to prison</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 4: GRAMMAR CORNER (New Section) -->
+        <section id="grammar" class="card p-6 md:p-8 border-purple-400 border-4">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">📏</span>
+                <h2 class="text-2xl font-bold text-gray-800">4. Grammar Corner: Rules (Can vs. Cannot)</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('Grammar Corner. Rules. Can versus Cannot.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-gram-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-gram-th" class="hidden text-gray-500 mb-6 text-center">4. มุมไวยากรณ์: กฎระเบียบ (ทำได้ vs ทำไม่ได้)</p>
+
+            <div class="bg-purple-50 rounded-xl p-6 mb-6">
+                <h3 class="font-bold text-purple-800 text-lg mb-4">Structure: Can / Cannot 🚫✅</h3>
+                
+                <!-- Rule 1 -->
+                <div class="mb-4">
+                    <p class="text-lg font-bold text-gray-700">1. Allowed (OK) = Can</p>
+                    <div class="ml-4 mt-2 space-y-2">
+                        <p>• You <strong>can</strong> read QR codes.</p>
+                        <p>• You <strong>can</strong> vote.</p>
+                        <div class="flex gap-2 mt-1">
+                             <button onclick="speak('You can read QR codes. You can vote.')" class="btn-icon text-xs">🔊 Listen</button>
+                             <button onclick="toggleThai('g-ex1-th')" class="btn-icon text-xs">🇹🇭</button>
+                        </div>
+                        <p id="g-ex1-th" class="hidden text-purple-600 text-sm">คุณสามารถสแกน QR code ได้ / คุณสามารถเลือกตั้งได้</p>
+                    </div>
+                </div>
+
+                <!-- Rule 2 -->
+                <div class="mb-4">
+                    <p class="text-lg font-bold text-gray-700">2. Not Allowed (No) = Cannot / Can't</p>
+                    <div class="ml-4 mt-2 space-y-2">
+                        <p>• Banners <strong>cannot</strong> be in temples.</p>
+                        <p>• You <strong>cannot</strong> draw on banners.</p>
+                        <div class="flex gap-2 mt-1">
+                             <button onclick="speak('Banners cannot be in temples. You cannot draw on banners.')" class="btn-icon text-xs">🔊 Listen</button>
+                             <button onclick="toggleThai('g-ex2-th')" class="btn-icon text-xs">🇹🇭</button>
+                        </div>
+                         <p id="g-ex2-th" class="hidden text-purple-600 text-sm">ห้ามติดป้ายในวัด / ห้ามขีดเขียนบนป้าย</p>
+                    </div>
+                </div>
+            </div>
+
+             <div class="border-t-2 border-purple-100 pt-6">
+                <h3 class="font-bold text-gray-800 mb-4">✍️ Practice: Fill in the blanks (can / cannot)</h3>
+                
+                <div class="space-y-4">
+                    <div class="p-3 bg-white border rounded-lg">
+                        <p class="mb-2">1. You ___________ put banners in schools.</p>
+                        <input type="text" class="w-full border-b-2 border-purple-300 outline-none text-purple-700 font-bold" placeholder="Answer...">
+                    </div>
+
+                    <div class="p-3 bg-white border rounded-lg">
+                        <p class="mb-2">2. Voters ___________ read the pledges.</p>
+                        <input type="text" class="w-full border-b-2 border-purple-300 outline-none text-purple-700 font-bold" placeholder="Answer...">
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex gap-2">
+                    <button onclick="speak('You cannot put banners in schools. Voters can read the pledges.')" class="btn-icon bg-purple-100">🔊 Check Answers (Listen)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 5: NEW VOCABULARY -->
+        <section id="vocab" class="card p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">📚</span>
+                <h2 class="text-2xl font-bold text-gray-800">5. New Words</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('New Words')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-4-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-4-th" class="hidden text-gray-500 mb-6 text-center">5. คำศัพท์ใหม่</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Card 1 -->
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-3xl block mb-2">📢</span>
+                            <h3 class="text-xl font-bold text-gray-800">Banner</h3>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="speak('Banner')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v1-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <p id="v1-th" class="hidden text-blue-600 font-bold mt-2">ป้ายหาเสียง / ธงราว</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-3xl block mb-2">🤝</span>
+                            <h3 class="text-xl font-bold text-gray-800">Pledge</h3>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="speak('Pledge')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v2-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <p id="v2-th" class="hidden text-blue-600 font-bold mt-2">คำมั่นสัญญา (นโยบายหาเสียง)</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-3xl block mb-2">👤</span>
+                            <h3 class="text-xl font-bold text-gray-800">Candidate</h3>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="speak('Candidate')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v3-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <p id="v3-th" class="hidden text-blue-600 font-bold mt-2">ผู้สมัครรับเลือกตั้ง</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-3xl block mb-2">🗳️</span>
+                            <h3 class="text-xl font-bold text-gray-800">Cast a ballot</h3>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="speak('Cast a ballot')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v4-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <p id="v4-th" class="hidden text-blue-600 font-bold mt-2">ลงคะแนนเสียง</p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-3xl block mb-2">🖌️</span>
+                            <h3 class="text-xl font-bold text-gray-800">Vandalise</h3>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="speak('Vandalise')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v5-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <p id="v5-th" class="hidden text-blue-600 font-bold mt-2">ทำลายทรัพย์สินสาธารณะ (เช่น ขีดเขียน/พ่นสี)</p>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="bg-white border-2 border-gray-200 p-4 rounded-xl">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-3xl block mb-2">💵</span>
+                            <h3 class="text-xl font-bold text-gray-800">Fine</h3>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button onclick="speak('Fine')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v6-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <p id="v6-th" class="hidden text-blue-600 font-bold mt-2">ค่าปรับ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 6: DISCUSSION -->
+        <section id="discussion" class="card p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🤔</span>
+                <h2 class="text-2xl font-bold text-gray-800">6. Discussion</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('Discussion')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-5-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-5-th" class="hidden text-gray-500 mb-6 text-center">6. อภิปราย</p>
+            
+            <div class="space-y-4">
+                 <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="font-bold text-lg mb-2">1. Do you read the banners on the street?</p>
+                    <div class="flex gap-2">
+                        <button onclick="speak('Do you read the banners on the street?')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('q1-th')" class="btn-icon">🇹🇭</button>
+                    </div>
+                    <p id="q1-th" class="hidden text-gray-500 mt-1">คุณอ่านป้ายหาเสียงข้างถนนไหม?</p>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="font-bold text-lg mb-2">2. Have you ever seen a vandalised banner? (Broken or drawn on?)</p>
+                    <div class="flex gap-2">
+                        <button onclick="speak('Have you ever seen a vandalised banner?')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('q2-th')" class="btn-icon">🇹🇭</button>
+                    </div>
+                    <p id="q2-th" class="hidden text-gray-500 mt-1">คุณเคยเห็นป้ายหาเสียงที่ถูกทำลายไหม? (พัง หรือถูกเขียนทับ)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 7: BREAKOUT ROOMS -->
+        <section id="breakout" class="card p-6 md:p-8 border-purple-400 border-4">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">👥</span>
+                <h2 class="text-2xl font-bold text-gray-800">7. Breakout Rooms</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('Breakout Rooms')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-6-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-6-th" class="hidden text-gray-500 mb-6 text-center">7. กิจกรรมกลุ่มย่อย (Breakout Rooms)</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Activity 1 -->
+                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                    <div class="flex flex-col gap-2 mb-3">
+                        <h3 class="font-bold text-purple-800 text-lg">Activity A: Design a Party 🎨</h3>
+                        <div class="flex gap-2">
+                            <button onclick="speak('Activity A: Design a Party. Work in pairs.')" class="btn-icon text-xs">🔊 Listen</button>
+                            <button onclick="toggleThai('br-1-th')" class="btn-icon text-xs">🇹🇭 TH</button>
+                        </div>
+                        <p id="br-1-th" class="hidden text-purple-600 text-sm font-bold">กิจกรรม A: ออกแบบพรรคการเมือง (ทำงานคู่)</p>
+                    </div>
+                    <ul class="list-disc pl-5 text-gray-700 space-y-3">
+                        <li>
+                            <strong>Step 1:</strong> Create a Party Name (e.g., The Pizza Party).
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="speak('Step 1: Create a Party Name, for example, The Pizza Party.')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('br-a-s1-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                            <p id="br-a-s1-th" class="hidden text-purple-600 text-xs mt-1">ขั้นตอนที่ 1: ตั้งชื่อพรรค (เช่น พรรคพิซซ่า)</p>
+                        </li>
+                        <li>
+                            <strong>Step 2:</strong> Draw a Logo.
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="speak('Step 2: Draw a Logo.')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('br-a-s2-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                            <p id="br-a-s2-th" class="hidden text-purple-600 text-xs mt-1">ขั้นตอนที่ 2: วาดโลโก้</p>
+                        </li>
+                        <li>
+                            <strong>Step 3:</strong> Write 2 Pledges (e.g., Free Pizza every Friday).
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="speak('Step 3: Write 2 Pledges, for example, Free Pizza every Friday.')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('br-a-s3-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                            <p id="br-a-s3-th" class="hidden text-purple-600 text-xs mt-1">ขั้นตอนที่ 3: เขียนนโยบาย 2 ข้อ (เช่น แจกพิซซ่าฟรีทุกวันศุกร์)</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Activity 2 -->
+                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                    <div class="flex flex-col gap-2 mb-3">
+                        <h3 class="font-bold text-purple-800 text-lg">Activity B: The Interview 🎤</h3>
+                        <div class="flex gap-2">
+                            <button onclick="speak('Activity B: The Interview. Student A is a Candidate. Student B is a Voter.')" class="btn-icon text-xs">🔊 Listen</button>
+                            <button onclick="toggleThai('br-2-th')" class="btn-icon text-xs">🇹🇭 TH</button>
+                        </div>
+                        <p id="br-2-th" class="hidden text-purple-600 text-sm font-bold">กิจกรรม B: สัมภาษณ์ (A เป็นผู้สมัคร, B เป็นคนเลือกตั้ง)</p>
+                    </div>
+                    <ul class="list-disc pl-5 text-gray-700 space-y-3">
+                        <li>
+                            <strong>Student A:</strong> "Vote for me! I promise to..."
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="speak('Student A: Vote for me! I promise to...')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('br-b-s1-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                             <p id="br-b-s1-th" class="hidden text-purple-600 text-xs mt-1">นักเรียน A: เลือกผมนะ! ผมสัญญาว่าจะ...</p>
+                        </li>
+                        <li>
+                            <strong>Student B:</strong> "Why should I vote for you?" / "What about traffic?"
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="speak('Student B: Why should I vote for you? What about traffic?')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('br-b-s2-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                             <p id="br-b-s2-th" class="hidden text-purple-600 text-xs mt-1">นักเรียน B: ทำไมฉันต้องเลือกคุณ? / แล้วเรื่องรถติดล่ะ?</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 8: EXTENSION ACTIVITIES (Fun!) -->
+        <section id="extension" class="card p-6 md:p-8 border-yellow-400 border-4">
+             <div class="flex flex-col mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🎭</span>
+                    <h2 class="text-2xl font-bold text-gray-800">8. Extension Activities (Fun!)</h2>
+                    <div class="flex gap-2">
+                        <button onclick="speak('Extension Activities. Fun!')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('h2-7-th')" class="btn-icon">🇹🇭</button>
+                    </div>
+                </div>
+                <p id="h2-7-th" class="hidden text-gray-500 mb-6 text-center">8. กิจกรรมเสริม (สนุกๆ!) - สำหรับเรียนตัวต่อตัว</p>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- 1. Funny Interview -->
+                <div class="bg-blue-50 rounded-lg p-5 border border-blue-200">
+                    <h3 class="font-bold text-blue-800 text-lg mb-2">1. The Crazy Candidate Interview 🎤</h3>
+                    <p class="text-gray-700 mb-2"><strong>Situation:</strong> You are a candidate for the "Happy Party". I will interview you.</p>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button onclick="speak('Situation: You are a candidate for the Happy Party. I will interview you.')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-1-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-1-th" class="hidden text-blue-600 text-sm mb-3 font-bold">สถานการณ์: คุณคือผู้สมัครจาก "พรรคมีความสุข" ครูจะสัมภาษณ์คุณ</p>
+                    
+                    <div class="bg-white p-3 rounded">
+                        <p class="italic text-gray-600">Q: "What is your main pledge?" <br> A: "Free ice cream for everyone!" / "No work on Mondays!"</p>
+                         <div class="flex flex-wrap gap-2 mt-2">
+                            <button onclick="speak('What is your main pledge? Free ice cream for everyone! No work on Mondays!')" class="btn-icon text-xs">🔊 Listen</button>
+                            <button onclick="toggleThai('ext-1a-th')" class="btn-icon text-xs">🇹🇭 TH</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Role Play -->
+                <div class="bg-pink-50 rounded-lg p-5 border border-pink-200">
+                    <h3 class="font-bold text-pink-800 text-lg mb-2">2. The Banner Detective 🕵️‍♂️</h3>
+                    <p class="text-gray-700 mb-2"><strong>Situation:</strong> You are a police officer. I am drawing a mustache on a banner!</p>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button onclick="speak('Situation: You are a police officer. I am drawing a mustache on a banner!')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-2-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-2-th" class="hidden text-pink-600 text-sm mb-3 font-bold">สถานการณ์: คุณเป็นตำรวจ ครูวาดหนวดบนป้ายหาเสียง! จับครูหน่อย!</p>
+                    
+                    <div class="bg-white p-3 rounded">
+                        <p class="italic text-gray-600">Police: "Hey! What are you doing?" <br> Me: "I'm making him handsome!" <br> Police: "That is vandalism! Pay 6,000 baht!"</p>
+                         <div class="flex flex-wrap gap-2 mt-2">
+                            <button onclick="speak('Hey! What are you doing? Im making him handsome! That is vandalism! Pay 6000 baht!')" class="btn-icon text-xs">🔊 Listen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Funny Debate -->
+                <div class="bg-yellow-50 rounded-lg p-5 border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 text-lg mb-2">3. Funny Debate 🥊</h3>
+                    <p class="text-gray-700 mb-2"><strong>Topic:</strong> "Cats should be allowed to vote."</p>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button onclick="speak('Topic: Cats should be allowed to vote.')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-3-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-3-th" class="hidden text-yellow-600 text-sm mb-3 font-bold">หัวข้อ: "ควรอนุญาตให้แมวเลือกตั้งได้"</p>
+                    
+                     <div class="bg-white p-3 rounded">
+                        <p class="italic text-gray-600">Side A: Yes! Cats are smart. <br> Side B: No! Cats will vote for fish!</p>
+                         <div class="flex flex-wrap gap-2 mt-2">
+                            <button onclick="speak('Side A: Yes! Cats are smart. Side B: No! Cats will vote for fish!')" class="btn-icon text-xs">🔊 Listen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Story Telling -->
+                <div class="bg-green-50 rounded-lg p-5 border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg mb-2">4. Crazy Story 📖</h3>
+                    <p class="text-gray-700 mb-2"><strong>Prompt:</strong> "I went to cast my ballot, but the box ate my paper..."</p>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button onclick="speak('I went to cast my ballot, but the box ate my paper...')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-4-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-4-th" class="hidden text-green-600 text-sm mb-3 font-bold">เรื่องเล่าสุดเพี้ยน: "ฉันไปหย่อนบัตรเลือกตั้ง แต่กล่องมันกินกระดาษฉัน..." (แต่งเรื่องต่อ!)</p>
+                </div>
+
+                <!-- 5. Mini Presentation -->
+                <div class="bg-indigo-50 rounded-lg p-5 border border-indigo-200">
+                    <h3 class="font-bold text-indigo-800 text-lg mb-2">5. My Perfect Party 🎨</h3>
+                    <p class="text-gray-700 mb-2"><strong>Task:</strong> Create a new party. What is the name? What is the logo? What are 3 pledges?</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speak('Task: Create a new party. What is the name? What is the logo? What are 3 pledges?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-5-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-5-th" class="hidden text-indigo-600 text-sm mt-2 font-bold">ภารกิจ: ตั้งพรรคใหม่ ชื่ออะไร? โลโก้อะไร? มีนโยบาย 3 ข้ออะไรบ้าง?</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PART 9: REWARDS -->
+        <section id="rewards" class="card p-6 md:p-8 bg-yellow-50 border-yellow-400 border-4">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🌟</span>
+                <h2 class="text-2xl font-bold text-gray-800">9. Your Rewards</h2>
+                <div class="flex gap-2">
+                    <button onclick="speak('Your Rewards')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-9-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <p id="h2-9-th" class="hidden text-gray-500 mb-6 text-center">9. รางวัลของคุณ</p>
+
+            <div class="text-center">
+                <p class="text-lg mb-4 text-gray-700 font-bold">Did you finish a task? Click the star to get a reward!</p>
+                <button onclick="addStar()" class="star-btn shadow-lg animate-pulse hover:animate-none transform hover:scale-110">⭐</button>
+                <div id="star-container" class="mt-6 min-h-[50px] flex flex-wrap justify-center gap-2 p-4 bg-white rounded-xl border border-yellow-200">
+                    <!-- Stars appear here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Large vocabulary list
+        const vocabData = [
+            {en: "Experience", th: "ประสบการณ์"}, {en: "Travel", th: "ท่องเที่ยว"}, {en: "Eat bugs", th: "กินแมลง"},
+            {en: "Live", th: "อาศัยอยู่"}, {en: "Birthday", th: "วันเกิด"}, {en: "Snake", th: "งู"},
+            {en: "Mole", th: "ตุ่น"}, {en: "Rat / Mouse", th: "หนู"}, {en: "Fat", th: "ไขมัน"},
+            {en: "Mountain", th: "ภูเขา"}, {en: "Fishing", th: "ตกปลา"}, {en: "Cactus", th: "กระบองเพชร"},
+            {en: "Fertiliser", th: "ปุ๋ย"}, {en: "Seedlings", th: "ต้นกล้า"}, {en: "Cold", th: "หนาว"},
+            {en: "Windy", th: "ลมแรง"}, {en: "National park", th: "อุทยานแห่งชาติ"}, {en: "Textbook", th: "หนังสือเรียน"},
+            {en: "Satellite", th: "ดาวเทียม"}, {en: "Evidence", th: "หลักฐาน"}, {en: "Vibe", th: "บรรยากาศ"},
+            {en: "Fermented fish", th: "ปลาร้า"}, {en: "Keep a diary", th: "เขียนไดอารี่"}, {en: "Useful", th: "มีประโยชน์"},
+            {en: "Island", th: "เกาะ"}, {en: "City", th: "เมือง"}, {en: "Roasted duck", th: "เป็ดย่าง"},
+            {en: "Beans", th: "ถั่ว"}, {en: "Cannabis", th: "กัญชา"}, {en: "Detergent", th: "ผงซักฟอก"},
+            {en: "Luggage", th: "กระเป๋าเดินทาง"}, {en: "Haunted house", th: "บ้านผีสิง"}, {en: "Celebrate", th: "ฉลอง"},
+            {en: "Equipment", th: "อุปกรณ์"}, {en: "Preserve eyesight", th: "ถนอมสายตา"}, {en: "Improve focus", th: "พัฒนาโฟกัส"},
+            {en: "Hiking", th: "เดินป่า"}, {en: "Healing", th: "ฮีลใจ"}, {en: "Wildlife", th: "สัตว์ป่า"},
+            {en: "Costume", th: "เครื่องแต่งกาย"}, {en: "Exchange student", th: "นักเรียนแลกเปลี่ยน"}, {en: "PhD", th: "ป.เอก"},
+            {en: "Stationery", th: "เครื่องเขียน"}, {en: "Town hall", th: "ศาลากลาง"}, {en: "Tipsy", th: "กึ่มๆ"},
+            {en: "Motivation", th: "แรงจูงใจ"}, {en: "Beauty contest", th: "ประกวดนางงาม"}, {en: "Make a wish", th: "อธิษฐาน"},
+            {en: "Corals", th: "ปะการัง"}, {en: "Floods", th: "น้ำท่วม"}, {en: "Sweat", th: "เหงื่อ"},
+            {en: "Inequality", th: "ความเหลื่อมล้ำ"}, {en: "Embarrassed", th: "รู้สึกอับอาย"}, {en: "Dignity", th: "ศักดิ์ศรี"},
+            {en: "Pouring rain", th: "ฝนถล่ม"}, {en: "Dam", th: "เขื่อน"}, {en: "Faint", th: "เป็นลม"},
+            {en: "Inhaler", th: "ยาดม"}, {en: "Thunder", th: "ฟ้าร้อง"}, {en: "Victims", th: "ผู้ประสบภัย"},
+            {en: "Society", th: "สังคม"}, {en: "Mindfulness", th: "สติ"}, {en: "Tourist attractions", th: "สถานที่ท่องเที่ยว"},
+            {en: "Foreigners", th: "ต่างชาติ"}, {en: "Weekend", th: "เสาร์อาทิตย์"}, {en: "Red envelopes", th: "ซองแดง"},
+            {en: "Caring", th: "เอาใจใส่"}, {en: "Donate", th: "บริจาค"}, {en: "Make merit", th: "ทำบุญ"},
+            {en: "Lucky draw", th: "จับฉลาก"}, {en: "Justice", th: "ความยุติธรรม"}, {en: "Equality", th: "ความเท่าเทียม"},
+            {en: "Tax refund", th: "คืนภาษี"}, {en: "Grasshoppers", th: "ตั๊กแตน"}, {en: "Push-ups", th: "วิดพื้น"},
+            {en: "Catfish", th: "ปลาดุก"}, {en: "Park", th: "สวน"}, {en: "Rehearse", th: "ซ้อม"},
+            {en: "Employee", th: "พนักงาน"}, {en: "Mall", th: "ห้าง"}, {en: "Have to", th: "ต้อง"},
+            {en: "Snorkeling", th: "ดำน้ำผิวน้ำ"}, {en: "Overseas", th: "ต่างประเทศ"}, {en: "E-sport", th: "อีสปอร์ต"},
+            {en: "Billion", th: "พันล้าน"}, {en: "Passive income", th: "รายได้แบบไม่ต้องทำอะไร"}, {en: "Manga", th: "มังงะ"},
+            {en: "Universe", th: "จักรวาล"}, {en: "Childhood", th: "วัยเด็ก"}, {en: "Cremation", th: "การเผาศพ"},
+            {en: "Shelter", th: "ที่พักอาศัย"}, {en: "Colleagues", th: "เพื่อนร่วมงาน"}, {en: "Fussy", th: "จู้จี้"},
+            {en: "Election", th: "การเลือกตั้ง"},
+            {en: "Have you eaten?", th: "กินข้าวยัง"},
+            {en: "boiled eggs", th: "ไข่ต้ม"},
+            {en: "justice", th: "ความยุติธรรม"},
+            {en: "equality", th: "ความเท่าเทียม"},
+            {en: "injustice", th: "ความไม่ยุติธรรม"},
+            {en: "My hometown has beautiful national parks.", th: "บ้านเกิดของฉันมีอุทยานแห่งชาติที่สวยงาม"},
+            {en: "political parties", th: "พรรคการเมือง"},
+            {en: "doctor's note", th: "ใบรับรองแพทย์"},
+            {en: "What do you want to cut down on?", th: "อยากลดอะไร"},
+            {en: "beauty", th: "ความสวย"}
+        ];
+        
+        const emojis = ['🗣️', '📝', '🧠', '💡', '✨', '🔥', '🎲', '🎯', '🚀', '🌟'];
+
+        function pickRandomWord() {
+            const display = document.getElementById('wordDisplay');
+            
+            // Animation start
+            display.style.opacity = '0';
+            
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * vocabData.length);
+                const item = vocabData[randomIndex];
+                const uniqueId = 'rand-' + Math.random().toString(36).substr(2, 9);
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                display.innerHTML = `
+                    <div class="vocab-card-content flex flex-col items-center gap-2">
+                        <div class="text-4xl animate-bounce">${randomEmoji}</div>
+                        <div class="text-2xl font-bold text-blue-900">${item.en}</div>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="speak('${item.en.replace(/'/g, "\\'")}')" class="btn-icon">🔊 Listen</button>
+                            <button onclick="toggleThai('${uniqueId}')" class="btn-icon">🇹🇭 TH</button>
+                        </div>
+                        <div id="${uniqueId}" class="hidden text-lg text-gray-500 font-bold mt-2">${item.th}</div>
+                    </div>
+                `;
+                
+                // Animation end
+                display.style.opacity = '1';
+            }, 200);
+        }
+    </script>
+</body>
+</html>
