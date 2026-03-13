@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First English Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fffbeb; 
+            color: #3f3f46; 
+        }
+        .content-section {
+            display: none; 
+        }
+        .content-section.active {
+            display: block; 
+        }
+        .nav-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-button.active {
+            border-bottom-color: #2563eb; 
+            color: #1e40af; 
+        }
+        .phrase-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .phrase-button.selected {
+            background-color: #2563eb;
+            color: white;
+            transform: scale(1.05);
+        }
+        .thai-toggle-btn {
+            background-color: #e0f2fe; /* Light blue */
+            color: #0c4a6e; /* Darker blue text */
+            padding: 4px 8px;
+            border-radius: 9999px; /* Full rounded */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            margin-left: 8px; /* ml-2 */
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .thai-toggle-btn:hover {
+            background-color: #bfdbfe; /* Hover blue */
+        }
+        .thai-translation {
+            display: none;
+            font-size: 0.9em;
+            color: #6b7280; /* text-gray-500 */
+            margin-top: 4px;
+            padding-left: 8px;
+            border-left: 2px solid #a78bfa; /* purple for translation */
+        }
+        
+        /* Matching Game Styles */
+        .match-item {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb; /* border-gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #ffffff; /* bg-white */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-sm */
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        .match-item:hover {
+            border-color: #93c5fd; /* hover:border-blue-300 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+        .match-item.selected {
+            border-color: #2563eb; /* border-blue-600 */
+            background-color: #dbeafe; /* bg-blue-100 */
+            transform: scale(1.03);
+        }
+        .match-item.correct {
+            background-color: #d1fae5; /* bg-green-200 */
+            border-color: #10b981; /* border-green-500 */
+            color: #065f46; /* text-green-800 */
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .match-item.incorrect {
+            background-color: #fee2e2; /* bg-red-200 */
+            border-color: #ef4444; /* border-red-500 */
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-6 max-w-6xl">
+
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 speak">Hello! 👋</h1>
+            <p class="text-lg text-gray-700 speak-sentence">Welcome to your first English lesson.</p>
+        </header>
+
+        <nav class="flex justify-center space-x-2 md:space-x-6 bg-white p-4 rounded-lg shadow-sm mb-6 sticky top-2 z-10">
+            <button id="nav-warmup" class="nav-button active" onclick="showSection('warmup')">
+                <span class="text-2xl hidden md:inline">🔥</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Warm-up</span>
+                <span class="block text-xs md:text-sm text-gray-500">(อบอุ่นร่างกาย)</span>
+            </button>
+            <button id="nav-words" class="nav-button" onclick="showSection('words')">
+                <span class="text-2xl hidden md:inline">📖</span>
+                <span class="block text-sm md:text-lg font-semibold speak">My Words</span>
+                <span class="block text-xs md:text-sm text-gray-500">(คำของฉัน)</span>
+            </button>
+            <button id="nav-phrases" class="nav-button" onclick="showSection('phrases')">
+                <span class="text-2xl hidden md:inline">💬</span>
+                <span class="block text-sm md:text-lg font-semibold speak">My Phrases</span>
+                <span class="block text-xs md:text-sm text-gray-500">(วลีของฉัน)</span>
+            </button>
+            <button id="nav-info" class="nav-button" onclick="showSection('info')">
+                <span class="text-2xl hidden md:inline">🛠️</span>
+                <span class="block text-sm md:text-lg font-semibold speak">My Info</span>
+                <span class="block text-xs md:text-sm text-gray-500">(ข้อมูล)</span>
+            </button>
+        </nav>
+
+        <main>
+            <section id="warmup-section" class="content-section active bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2 speak">Let's Talk! (มาคุยกัน!)</h2>
+                <p class="text-gray-700 mb-6 speak-sentence">These are some questions to help us practice speaking English. (นี่คือคำถามบางส่วนที่จะช่วยให้เราฝึกพูดภาษาอังกฤษ)</p>
+                
+                <div class="space-y-4">
+                    <!-- Warm-up Questions --><div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">How are you?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณเป็นอย่างไรบ้าง?">TH</button>
+                        <p class="thai-translation">คุณเป็นอย่างไรบ้าง?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What's your name?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชื่ออะไร?">TH</button>
+                        <p class="thai-translation">คุณชื่ออะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Where are you from?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณมาจากที่ไหน?">TH</button>
+                        <p class="thai-translation">คุณมาจากที่ไหน?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Where are you now?</span>
+                        <button class="thai-toggle-btn" data-thai="ตอนนี้คุณอยู่ที่ไหน?">TH</button>
+                        <p class="thai-translation">ตอนนี้คุณอยู่ที่ไหน?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Is it cold there?</span>
+                        <button class="thai-toggle-btn" data-thai="ที่นั่นหนาวไหม?">TH</button>
+                        <p class="thai-translation">ที่นั่นหนาวไหม?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">How many degrees is it over there?</span>
+                        <button class="thai-toggle-btn" data-thai="อุณหภูมิที่นั่นกี่องศา?">TH</button>
+                        <p class="thai-translation">อุณหภูมิที่นั่นกี่องศา?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What language do you speak?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณพูดภาษาอะไร?">TH</button>
+                        <p class="thai-translation">คุณพูดภาษาอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you do?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณทำอะไร?">TH</button>
+                        <p class="thai-translation">คุณทำอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to do in your free time?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบทำอะไรในเวลาว่าง?">TH</button>
+                        <p class="thai-translation">คุณชอบทำอะไรในเวลาว่าง?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Do you cook?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณทำอาหารไหม?">TH</button>
+                        <p class="thai-translation">คุณทำอาหารไหม?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to cook?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบทำอาหารอะไร?">TH</button>
+                        <p class="thai-translation">คุณชอบทำอาหารอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to eat?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบกินอะไร?">TH</button>
+                        <p class="thai-translation">คุณชอบกินอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to drink?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบดื่มอะไร?">TH</button>
+                        <p class="thai-translation">คุณชอบดื่มอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Where do you like to go?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบไปที่ไหน?">TH</button>
+                        <p class="thai-translation">คุณชอบไปที่ไหน?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to watch?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบดูอะไร?">TH</button>
+                        <p class="thai-translation">คุณชอบดูอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What do you like to listen to?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณชอบฟังอะไร?">TH</button>
+                        <p class="thai-translation">คุณชอบฟังอะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">How long have you learned English?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณเรียนภาษาอังกฤษมานานแค่ไหนแล้ว?">TH</button>
+                        <p class="thai-translation">คุณเรียนภาษาอังกฤษมานานแค่ไหนแล้ว?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">How did you learn English?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณเรียนภาษาอังกฤษมาได้อย่างไร?">TH</button>
+                        <p class="thai-translation">คุณเรียนภาษาอังกฤษมาได้อย่างไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">Why do you want to learn English again?</span>
+                        <button class="thai-toggle-btn" data-thai="ทำไมคุณถึงต้องการเรียนภาษาอังกฤษอีกครั้ง?">TH</button>
+                        <p class="thai-translation">ทำไมคุณถึงต้องการเรียนภาษาอังกฤษอีกครั้ง?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What's your goal?</span>
+                        <button class="thai-toggle-btn" data-thai="เป้าหมายของคุณคืออะไร?">TH</button>
+                        <p class="thai-translation">เป้าหมายของคุณคืออะไร?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">What are you struggling with?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณกำลังประสบปัญหาอะไรอยู่?">TH</button>
+                        <p class="thai-translation">คุณกำลังประสบปัญหาอะไรอยู่?</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">How old are you?</span>
+                        <button class="thai-toggle-btn" data-thai="คุณอายุเท่าไหร่?">TH</button>
+                        <p class="thai-translation">คุณอายุเท่าไหร่?</p>
+                    </div>
+
+                    <div class="bg-amber-100 p-4 rounded-lg shadow-sm mt-8">
+                        <p class="text-xl font-semibold text-amber-800 mb-2 speak-sentence">Which one are you?</p>
+                        <button class="thai-toggle-btn" data-thai="คุณเป็นคนแบบไหน?">TH</button>
+                        <p class="thai-translation mb-4">คุณเป็นคนแบบไหน?</p>
+                        <div class="aspect-video w-full max-w-lg mx-auto">
+                            <iframe class="w-full h-full rounded-lg shadow-md" src="https://www.youtube.com/embed/EJ0E8fErFns?si=q05-jPCK8iv97tKy" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="words-section" class="content-section hidden bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2 speak">My Words (คำของฉัน)</h2>
+                <button class="thai-toggle-btn speak-sentence" data-thai="คลิกคำจำกัดความทางด้านซ้าย จากนั้นคลิกคำภาษาอังกฤษที่ตรงกันทางด้านขวา">Click a definition on the left, then click the matching English word on the right.</button>
+                <p class="thai-translation mb-6">คลิกคำจำกัดความทางด้านซ้าย จากนั้นคลิกคำภาษาอังกฤษที่ตรงกันทางด้านขวา</p>
+                
+                <div id="matching-game-container" class="grid grid-cols-2 gap-4 md:gap-8 max-w-2xl mx-auto">
+                    <div id="matching-terms" class="space-y-3">
+                        <!-- Term items will be injected here -->
+                    </div>
+                    <div id="matching-words" class="space-y-3">
+                        <!-- Word items will be injected here -->
+                    </div>
+                </div>
+                <div id="matching-feedback" class="mt-6 text-center text-2xl font-semibold text-green-600"></div>
+            </section>
+
+            <section id="phrases-section" class="content-section hidden bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2 speak">My Phrases (วลีของฉัน)</h2>
+                <button class="thai-toggle-btn speak-sentence" data-thai="คลิกปุ่มจากแต่ละกล่องเพื่อสร้างประโยค">Click a button from each box to build a sentence.</button>
+                <p class="thai-translation mb-6">คลิกปุ่มจากแต่ละกล่องเพื่อสร้างประโยค</p>
+                
+                <div id="phrase-builder" class="space-y-6">
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">1. Choose Action (เลือกการกระทำ)</h3>
+                        <div class="flex flex-wrap gap-3" id="phrase-verbs">
+                            <button class="phrase-button verb-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="I want">I want... (ฉันต้องการ) ✋</button>
+                            <button class="phrase-button verb-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="I need">I need... (ฉันจำเป็นต้อง) ❗</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">2. Choose Thing (เลือกสิ่งของ)</h3>
+                        <div class="flex flex-wrap gap-3" id="phrase-nouns">
+                            <button class="phrase-button noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="water">water 💧</button>
+                            <button class="phrase-button noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="food">food 🍎</button>
+                            <button class="phrase-button noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="the bathroom">the bathroom 🚻</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h3 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">3. Your Sentence (ประโยคของคุณ)</h3>
+                        <div id="phrase-result" class="w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center h-24 flex items-center justify-center">
+                            <p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="info-section" class="content-section hidden bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">Survival Kit (ชุดเอาตัวรอด)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4 speak-sentence">Number Questions (คำถามตัวเลข)</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak">How much? 💲</span>
+                                <button class="thai-toggle-btn" data-thai="ราคาเท่าไหร่?">TH</button>
+                                <p class="thai-translation">ราคาเท่าไหร่?</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak-sentence">How tall are you?</span>
+                                <button class="thai-toggle-btn" data-thai="คุณสูงเท่าไหร่?">TH</button>
+                                <p class="thai-translation">คุณสูงเท่าไหร่?</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak-sentence">What's your ID number?</span>
+                                <button class="thai-toggle-btn" data-thai="หมายเลขบัตรประชาชนของคุณคืออะไร?">TH</button>
+                                <p class="thai-translation">หมายเลขบัตรประชาชนของคุณคืออะไร?</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak-sentence">What's your phone number?</span>
+                                <button class="thai-toggle-btn" data-thai="หมายเลขโทรศัพท์ของคุณคืออะไร?">TH</button>
+                                <p class="thai-translation">หมายเลขโทรศัพท์ของคุณคืออะไร?</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak-sentence">What's your room number?</span>
+                                <button class="thai-toggle-btn" data-thai="หมายเลขห้องของคุณคืออะไร?">TH</button>
+                                <p class="thai-translation">หมายเลขห้องของคุณคืออะไร?</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak-sentence">What grade are you in?</span>
+                                <button class="thai-toggle-btn" data-thai="คุณอยู่ชั้นอะไร?">TH</button>
+                                <p class="thai-translation">คุณอยู่ชั้นอะไร?</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow">
+                                <span class="text-lg font-medium text-yellow-900 speak-sentence">What's your shoe size?</span>
+                                <button class="thai-toggle-btn" data-thai="คุณใส่รองเท้าเบอร์อะไร?">TH</button>
+                                <p class="thai-translation">คุณใส่รองเท้าเบอร์อะไร?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4 speak-sentence">My Numbers (ตัวเลขของฉัน)</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">1</span> - <span class="speak">one</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">2</span> - <span class="speak">two</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">3</span> - <span class="speak">three</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">4</span> - <span class="speak">four</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">5</span> - <span class="speak">five</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">6</span> - <span class="speak">six</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">7</span> - <span class="speak">seven</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">8</span> - <span class="speak">eight</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">9</span> - <span class="speak">nine</span></div>
+                            <div class="p-3 bg-gray-100 rounded text-center"><span class="font-bold text-lg speak">10</span> - <span class="speak">ten</span></div>
+                        </div>
+                        <div class="p-4 bg-blue-100 text-blue-800 rounded text-center mt-4 shadow">
+                            <span class="font-semibold speak-sentence">How old are you?</span>
+                            <button class="thai-toggle-btn" data-thai="คุณอายุเท่าไหร่?">TH</button>
+                            <p class="thai-translation mb-2">คุณอายุเท่าไหร่?</p>
+                            <p class="text-xl font-bold speak-sentence">I am <span class="text-3xl speak">18</span> (eighteen).</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const allSections = document.querySelectorAll('.content-section');
+        const allNavButtons = document.querySelectorAll('.nav-button');
+        let selectedVerb = '';
+        let selectedNoun = '';
+
+        // TTS setup
+        const synth = window.speechSynthesis;
+        let americanVoice = null;
+
+        function setVoice() {
+            if (synth.getVoices().length > 0) {
+                americanVoice = synth.getVoices().find(voice => voice.lang === 'en-US' && voice.name.includes('Google') || voice.lang === 'en-US' && voice.name.includes('Samantha') || voice.lang === 'en-US');
+            }
+        }
+
+        if (synth) {
+            synth.onvoiceschanged = setVoice;
+            setVoice(); // Try to set immediately if voices are already loaded
+        }
+
+        function speakText(text) {
+            if (synth && text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (americanVoice) {
+                    utterance.voice = americanVoice;
+                } else {
+                    utterance.lang = 'en-US'; // Fallback to a generic en-US if specific voice not found
+                }
+                utterance.rate = 0.9; // Slightly slower for learner
+                utterance.pitch = 1;
+                synth.speak(utterance);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMatchingGame(); // Replaced initFlashcards
+            initPhraseBuilder();
+            initToggleButtons(); // Initialize toggle buttons
+            
+            allNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const sectionId = button.id.replace('nav-', '');
+                    showSection(sectionId);
+                });
+            });
+
+            // Add click listeners for TTS to elements with 'speak' and 'speak-sentence' class
+            document.querySelectorAll('.speak').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    // Prevent immediate parent clicks if child also has speak class
+                    if (e.target.tagName !== 'BUTTON' && e.target.closest('.thai-toggle-btn')) return;
+                    
+                    const textToSpeak = element.dataset.speak || element.innerText.split('(')[0].trim();
+                    speakText(textToSpeak);
+                });
+            });
+
+            document.querySelectorAll('.speak-sentence').forEach(element => {
+                element.addEventListener('click', (e) => {
+                     // Prevent immediate parent clicks if child also has speak class
+                    if (e.target.tagName !== 'BUTTON' && e.target.closest('.thai-toggle-btn')) return;
+                    
+                    const textToSpeak = element.dataset.speak || element.innerText.split('(')[0].trim();
+                    speakText(textToSpeak);
+                });
+            });
+
+            // Initial section display
+            showSection('warmup');
+        });
+
+        function showSection(sectionId) {
+            allSections.forEach(section => {
+                if (section.id === `${sectionId}-section`) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+            allNavButtons.forEach(button => {
+                if (button.id === `nav-${sectionId}`) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+        
+        function initMatchingGame() {
+            const termsContainer = document.getElementById('matching-terms');
+            const wordsContainer = document.getElementById('matching-words');
+            const feedbackEl = document.getElementById('matching-feedback');
+            
+            if (!termsContainer || !wordsContainer) return;
+
+            const vocabulary = [
+                { id: 1, term: 'Water', emoji: '💧', definition: '(Drink)', thai: 'น้ำ' },
+                { id: 2, term: 'Food', emoji: '🍎', definition: '(Something to eat)', thai: 'อาหาร' },
+                { id: 3, term: 'Bathroom', emoji: '🚻', definition: '(Restroom)', thai: 'ห้องน้ำ' },
+                { id: 4, term: 'Want', emoji: '✋', definition: '(Reaching gesture)', thai: 'ต้องการ' },
+                { id: 5, term: 'Need', emoji: '❗', definition: '(Urgent gesture)', thai: 'จำเป็นต้อง' },
+                { id: 6, term: 'Thank You', emoji: '🙏', definition: '(Gesture of thanks)', thai: 'ขอบคุณ' }
+            ];
+
+            let terms = vocabulary.map(v => ({ id: v.id, emoji: v.emoji, definition: v.definition, term: v.term }));
+            let words = vocabulary.map(v => ({ id: v.id, term: v.term }));
+
+            // Shuffle the words array
+            words.sort(() => Math.random() - 0.5);
+
+            let selectedTerm = null;
+            let selectedWord = null;
+            let correctMatches = 0;
+
+            termsContainer.innerHTML = '';
+            wordsContainer.innerHTML = '';
+            feedbackEl.innerHTML = '';
+
+            terms.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'match-item term-item';
+                btn.dataset.matchId = item.id;
+                btn.innerHTML = `
+                    <span class="text-4xl speak" data-speak="${item.term}">${item.emoji}</span>
+                    <span class="block text-sm text-gray-600 mt-1 speak" data-speak="${item.definition}">${item.definition}</span>
+                `;
+                btn.onclick = () => selectTerm(btn, item.id);
+                termsContainer.appendChild(btn);
+            });
+
+            words.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'match-item word-item';
+                btn.dataset.matchId = item.id;
+                btn.innerHTML = `<span class="text-xl font-semibold speak" data-speak="${item.term}">${item.term}</span>`;
+                btn.onclick = () => selectWord(btn, item.id);
+                wordsContainer.appendChild(btn);
+            });
+            
+            // Re-bind TTS for new elements
+            initTTSForElements(termsContainer);
+            initTTSForElements(wordsContainer);
+
+            function selectTerm(btn, id) {
+                if (btn.classList.contains('correct') || selectedTerm?.el === btn) return;
+
+                // Deselect previous term
+                if (selectedTerm) {
+                    selectedTerm.el.classList.remove('selected');
+                }
+                
+                selectedTerm = { el: btn, id: id };
+                btn.classList.add('selected');
+                speakText(btn.querySelector('.speak').dataset.speak);
+                
+                checkForMatch();
+            }
+
+            function selectWord(btn, id) {
+                if (btn.classList.contains('correct') || selectedWord?.el === btn) return;
+
+                // Deselect previous word
+                if (selectedWord) {
+                    selectedWord.el.classList.remove('selected');
+                }
+
+                selectedWord = { el: btn, id: id };
+                btn.classList.add('selected');
+                speakText(btn.querySelector('.speak').dataset.speak);
+
+                checkForMatch();
+            }
+
+            function checkForMatch() {
+                if (selectedTerm && selectedWord) {
+                    if (selectedTerm.id === selectedWord.id) {
+                        // Correct match
+                        selectedTerm.el.classList.add('correct');
+                        selectedWord.el.classList.add('correct');
+                        selectedTerm.el.classList.remove('selected');
+                        selectedWord.el.classList.remove('selected');
+                        selectedTerm.el.disabled = true;
+                        selectedWord.el.disabled = true;
+                        
+                        selectedTerm = null;
+                        selectedWord = null;
+                        correctMatches++;
+
+                        if (correctMatches === vocabulary.length) {
+                            feedbackEl.innerHTML = "🎉 Good Job! You matched them all! (เก่งมาก! คุณจับคู่ได้ทั้งหมด!)";
+                        }
+                    } else {
+                        // Incorrect match
+                        selectedTerm.el.classList.add('incorrect');
+                        selectedWord.el.classList.add('incorrect');
+                        
+                        let termEl = selectedTerm.el;
+                        let wordEl = selectedWord.el;
+                        
+                        setTimeout(() => {
+                            termEl.classList.remove('incorrect', 'selected');
+                            wordEl.classList.remove('incorrect', 'selected');
+                        }, 800);
+
+                        selectedTerm = null;
+                        selectedWord = null;
+                    }
+                }
+            }
+        }
+
+        function initPhraseBuilder() {
+            const verbContainer = document.getElementById('phrase-verbs');
+            const nounContainer = document.getElementById('phrase-nouns');
+            const resultBox = document.getElementById('phrase-result');
+            const verbButtons = verbContainer.querySelectorAll('.verb-btn');
+            const nounButtons = nounContainer.querySelectorAll('.noun-btn');
+
+            verbContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('.verb-btn');
+                if (!button) return;
+
+                verbButtons.forEach(btn => btn.classList.remove('selected'));
+                button.classList.add('selected');
+                selectedVerb = button.dataset.value;
+                updatePhraseResult();
+                speakText(selectedVerb);
+            });
+
+            nounContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('.noun-btn');
+                if (!button) return;
+
+                nounButtons.forEach(btn => btn.classList.remove('selected'));
+                button.classList.add('selected');
+                selectedNoun = button.dataset.value;
+                updatePhraseResult();
+                speakText(selectedNoun);
+            });
+
+            function updatePhraseResult() {
+                if (selectedVerb && selectedNoun) {
+                    let phrase = `${selectedVerb} ${selectedNoun}.`;
+                    if (selectedNoun === 'the bathroom') {
+                        // Special handling for "bathroom" with "want/need"
+                        if(selectedVerb === 'I want') {
+                             phrase = `I want to use the bathroom.`;
+                        } else { // "I need"
+                             phrase = `I need to use the bathroom.`;
+                        }
+                    }
+                    resultBox.innerHTML = `<p class="text-3xl font-bold text-gray-900 speak-sentence">${phrase}</p>`;
+                    speakText(phrase);
+                } else if (selectedVerb) {
+                    resultBox.innerHTML = `<p class="text-2xl font-bold text-gray-700 speak-sentence">${selectedVerb} ...</p>`;
+                    speakText(`${selectedVerb}.`);
+                } else {
+                     resultBox.innerHTML = `<p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>`;
+                }
+                 // Re-attach TTS listener to the new phrase
+                const newPhrase = resultBox.querySelector('.speak-sentence');
+                if (newPhrase) {
+                    newPhrase.addEventListener('click', () => speakText(newPhrase.innerText));
+                }
+            }
+        }
+        
+        function initTTSForElements(container) {
+             container.querySelectorAll('.speak').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON' && e.target.closest('.thai-toggle-btn')) return;
+                    const textToSpeak = element.dataset.speak || element.innerText.split('(')[0].trim();
+                    speakText(textToSpeak);
+                });
+            });
+        }
+
+        function initToggleButtons() {
+            document.querySelectorAll('.thai-toggle-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent parent elements from also being clicked (e.g., flashcard flip)
+                    const translationElement = button.nextElementSibling; // Assumes translation is the next sibling p tag
+                    if (translationElement && translationElement.classList.contains('thai-translation')) {
+                        translationElement.style.display = translationElement.style.display === 'block' ? 'none' : 'block';
+                    }
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>
+
+
