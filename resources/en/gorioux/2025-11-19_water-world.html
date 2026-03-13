@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Lesson: Water World - Floods & Dams</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #082f49; /* Deep Blue */
+            background-image: 
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: #f0f9ff; /* Very light blue text */
+        }
+        .thai-translation {
+            font-family: 'Sarabun', sans-serif;
+            color: #94a3b8; /* Slate 400 */
+            display: block;
+            margin-top: 4px;
+        }
+        .tts-icon {
+            cursor: pointer;
+            display: inline-block;
+            margin-right: 8px;
+            transition: transform 0.2s ease;
+            user-select: none;
+            color: #38bdf8; /* Light Blue */
+        }
+        .tts-icon:hover {
+            transform: scale(1.2);
+        }
+        .game-card {
+            background-color: rgba(15, 23, 42, 0.6); /* Dark Slate, Translucent */
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #0ea5e9; /* Sky Blue Border */
+            border-left: 8px solid #0284c7; /* Darker Sky Blue */
+        }
+        .game-card h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #38bdf8; /* Light Blue */
+            margin-bottom: 0.5rem;
+        }
+        .phrase-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        .phrase-item:last-child {
+            border-bottom: none;
+        }
+        .toggle-th-btn {
+            background-color: #0ea5e9;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+            border: none;
+            vertical-align: middle;
+        }
+        .toggle-th-btn:hover {
+            background-color: #0284c7;
+        }
+        .translatable-item {
+            margin-bottom: 8px;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 1rem;
+            background-color: #0c4a6e;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 2px solid #38bdf8;
+        }
+        .team-score-box {
+            text-align: center;
+        }
+        .team-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+        }
+        .team-name {
+            display: block;
+            font-size: 1.2rem;
+            color: #7dd3fc;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .score-btn {
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 4px 12px;
+            margin: 0 2px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .score-btn:hover {
+            background-color: #0284c7;
+        }
+        .video-link-container {
+            background-color: #000;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        /* Simple Script Styling */
+        .script-line {
+            background-color: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .script-line strong {
+            color: #7dd3fc;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="translatable-item">
+                <h1 class="text-5xl font-bold">
+                    <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Water World: Floods & Dams</span>
+                    <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                </h1>
+                <span class="thai-translation" style="display: none;">โลกแห่งน้ำ: น้ำท่วมและเขื่อน</span>
+            </div>
+            <div class="translatable-item mt-2">
+                <p class="text-2xl" style="color: #7dd3fc;">
+                    <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Easy English for a Rainy Day!</span>
+                    <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                </p>
+                <span class="thai-translation" style="display: none;">ภาษาอังกฤษง่ายๆ สำหรับวันฝนตก!</span>
+            </div>
+        </header>
+
+        <!-- Scoreboard with Buttons -->
+        <div class="scoreboard">
+            <div class="team-score-box">
+                <span class="team-name">Team Water</span>
+                <div class="team-score" id="team-a-score">0</div>
+                <div class="mt-2">
+                    <button class="score-btn" onclick="addPoints('A', 1)">+1</button>
+                    <button class="score-btn" onclick="addPoints('A', 5)">+5</button>
+                </div>
+            </div>
+            <div class="team-score-box">
+                <span class="team-name">Team Dam</span>
+                <div class="team-score" id="team-b-score">0</div>
+                <div class="mt-2">
+                    <button class="score-btn" onclick="addPoints('B', 1)">+1</button>
+                    <button class="score-btn" onclick="addPoints('B', 5)">+5</button>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mb-8">
+            <button onclick="resetScores()" class="text-sm text-slate-400 hover:text-white underline cursor-pointer">Reset Scores</button>
+        </div>
+
+        <!-- Main Content -->
+        <main>
+
+            <!-- Part 1: Review (Simplified) -->
+            <section id="part1" class="mb-12">
+                <div class="translatable-item">
+                    <h2 class="text-3xl font-bold border-b-4 border-sky-500 pb-2 mb-6">
+                        <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Activity 1: The Time Machine Review</span>
+                        <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                    </h2>
+                    <p class="thai-translation -mt-4 mb-6" style="display: none;">กิจกรรมที่ 1: ทบทวนไทม์แมชชีน</p>
+                </div>
+
+                <div class="game-card">
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">Match the Sentence! (10 points)</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">จับคู่ประโยค! (10 คะแนน)</p>
+                    </div>
+                    
+                    <!-- Changed from <p> to <div> for valid HTML structure inside translatable-item -->
+                    <div class="mb-4 translatable-item">
+                        <div>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Look at the time words. Choose the correct sentence.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </div>
+                        <p class="thai-translation" style="display: none;">ดูคำบอกเวลา แล้วเลือกประโยคที่ถูกต้อง</p>
+                    </div>
+
+                    <!-- Quiz Item 1 -->
+                    <div class="mb-6 p-4 bg-sky-900 rounded-lg">
+                        <strong class="text-xl text-yellow-300">1. Yesterday...</strong>
+                        <ul class="mt-2 space-y-2">
+                            <li class="translatable-item">
+                                <span class="tts-icon" onclick="speakText('A: I swim in the pool.')">🔊</span><span class="english-text">A: I swim in the pool.</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                                <span class="thai-translation" style="display: none;">A: ฉันว่ายน้ำในสระ</span>
+                            </li>
+                            <li class="translatable-item">
+                                <span class="tts-icon" onclick="speakText('B: I swam in the pool.')">🔊</span><span class="english-text">B: I swam in the pool.</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                                <span class="thai-translation" style="display: none;">B: ฉันว่ายน้ำในสระ (อดีต)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Quiz Item 2 -->
+                    <div class="mb-6 p-4 bg-sky-900 rounded-lg">
+                        <strong class="text-xl text-yellow-300">2. Tomorrow...</strong>
+                        <ul class="mt-2 space-y-2">
+                            <li class="translatable-item">
+                                <span class="tts-icon" onclick="speakText('A: I am going to eat pizza.')">🔊</span><span class="english-text">A: I am going to eat pizza.</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                                <span class="thai-translation" style="display: none;">A: ฉันจะกินพิซซ่า</span>
+                            </li>
+                            <li class="translatable-item">
+                                <span class="tts-icon" onclick="speakText('B: I ate pizza.')">🔊</span><span class="english-text">B: I ate pizza.</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                                <span class="thai-translation" style="display: none;">B: ฉันกินพิซซ่าแล้ว</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Quiz Item 3 -->
+                    <div class="p-4 bg-sky-900 rounded-lg">
+                        <strong class="text-xl text-yellow-300">3. Experience (Life)...</strong>
+                        <ul class="mt-2 space-y-2">
+                            <li class="translatable-item">
+                                <span class="tts-icon" onclick="speakText('A: I have been to Japan.')">🔊</span><span class="english-text">A: I have been to Japan.</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                                <span class="thai-translation" style="display: none;">A: ฉันเคยไปญี่ปุ่น</span>
+                            </li>
+                            <li class="translatable-item">
+                                <span class="tts-icon" onclick="speakText('B: I go to Japan.')">🔊</span><span class="english-text">B: I go to Japan.</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                                <span class="thai-translation" style="display: none;">B: ฉันไปญี่ปุ่น</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 2: The Video & Vocab -->
+            <section id="part2" class="mb-12">
+                <div class="translatable-item">
+                    <h2 class="text-3xl font-bold border-b-4 border-sky-500 pb-2 mb-6">
+                        <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Activity 2: Bangkok is Flooding!</span>
+                        <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                    </h2>
+                    <p class="thai-translation -mt-4 mb-6" style="display: none;">กิจกรรมที่ 2: กรุงเทพน้ำท่วม!</p>
+                </div>
+
+                <div class="game-card">
+                    <!-- 1. Vocabulary First -->
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">Step 1: Easy Vocabulary</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">ขั้นตอนที่ 1: คำศัพท์ง่ายๆ</p>
+                    </div>
+
+                    <div class="useful-phrases">
+                        <div class="phrase-item translatable-item"><span><span class="tts-icon" onclick="speakText('Flood')">🔊</span><span class="english-text">Flood / Flooding</span></span> <span class="thai-translation" style="display: none;">น้ำท่วม / กำลังท่วม</span></div>
+                        <div class="phrase-item translatable-item"><span><span class="tts-icon" onclick="speakText('Water level')">🔊</span><span class="english-text">Water level</span></span> <span class="thai-translation" style="display: none;">ระดับน้ำ</span></div>
+                        <div class="phrase-item translatable-item"><span><span class="tts-icon" onclick="speakText('Pouring')">🔊</span><span class="english-text">Pouring (rain)</span></span> <span class="thai-translation" style="display: none;">ฝนตกหนักมาก / เทลงมา</span></div>
+                        <div class="phrase-item translatable-item"><span><span class="tts-icon" onclick="speakText('Insane')">🔊</span><span class="english-text">Insane / Crazy</span></span> <span class="thai-translation" style="display: none;">บ้าไปแล้ว / ไม่น่าเชื่อ (ใช้แสดงความตกใจ)</span></div>
+                        <div class="phrase-item translatable-item"><span><span class="tts-icon" onclick="speakText('River')">🔊</span><span class="english-text">River</span></span> <span class="thai-translation" style="display: none;">แม่น้ำ</span></div>
+                        <div class="phrase-item translatable-item"><span><span class="tts-icon" onclick="speakText('Dam')">🔊</span><span class="english-text">Dam</span></span> <span class="thai-translation" style="display: none;">เขื่อน</span></div>
+                    </div>
+
+                    <!-- 2. Video Link -->
+                    <div class="video-link-container">
+                        <p class="mb-2 text-white">**Teacher: Please click to play the video:**</p>
+                        <a href="https://www.tiktok.com/@talmagemitchell/video/7572516570279185694" target="_blank" class="text-yellow-300 text-xl underline hover:text-yellow-100">
+                            Click here to watch: Bangkok Flooding
+                        </a>
+                    </div>
+
+                    <!-- 3. Simple Script -->
+                    <div class="mt-8">
+                        <div class="translatable-item">
+                            <h3>
+                                <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                                <span class="english-text">Step 2: Read the Script</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            </h3>
+                            <p class="thai-translation mb-4" style="display: none;">ขั้นตอนที่ 2: อ่านบทพูด</p>
+                        </div>
+
+                        <div class="script-line translatable-item">
+                            <span class="tts-icon" onclick="speakText('So Bangkok is flooding right now.')">🔊</span><span class="english-text"><strong>Man:</strong> So Bangkok is flooding right now.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ตอนนี้กรุงเทพน้ำกำลังท่วม</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <span class="tts-icon" onclick="speakText('Look at this. It is insane.')">🔊</span><span class="english-text"><strong>Man:</strong> Look at this. It is insane.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ดูนี่สิ มันบ้ามาก (ไม่น่าเชื่อ)</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <span class="tts-icon" onclick="speakText('There is water pouring all over.')">🔊</span><span class="english-text"><strong>Man:</strong> There is water pouring all over.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">มีน้ำไหลเทไปทั่วเลย</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <span class="tts-icon" onclick="speakText('Look at the water level here.')">🔊</span><span class="english-text"><strong>Man:</strong> Look at the water level here.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ดูระดับน้ำตรงนี้สิ</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <span class="tts-icon" onclick="speakText('This has been going on for a week.')">🔊</span><span class="english-text"><strong>Man:</strong> This has been going on for a week.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">มันเป็นแบบนี้มาอาทิตย์นึงแล้ว</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 3: Main Game - The Dam Manager -->
+            <section id="part3" class="mb-12">
+                <div class="translatable-item">
+                    <h2 class="text-3xl font-bold border-b-4 border-sky-500 pb-2 mb-6">
+                        <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Activity 3: The Dam Manager Game</span>
+                        <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                    </h2>
+                    <p class="thai-translation -mt-4 mb-6" style="display: none;">กิจกรรมที่ 3: เกมผู้จัดการเขื่อน</p>
+                </div>
+
+                <div class="game-card">
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">How to Play</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">วิธีเล่น</p>
+                    </div>
+                    
+                    <ul class="list-disc list-inside space-y-3 mb-4">
+                        <li class="translatable-item">
+                            <span class="tts-icon" onclick="speakText('You are the Manager of the Dam.')">🔊</span><span class="english-text">You are the **Manager** of the Dam.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">คุณคือ **ผู้จัดการ** เขื่อน</span>
+                        </li>
+                        <li class="translatable-item">
+                            <span class="tts-icon" onclick="speakText('Teacher will tell you the weather.')">🔊</span><span class="english-text">Teacher will tell you the **weather**.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ครูจะบอก **สภาพอากาศ**</span>
+                        </li>
+                        <li class="translatable-item">
+                            <span class="tts-icon" onclick="speakText('You must choose: Open the Dam or Close the Dam?')">🔊</span><span class="english-text">You must choose: **Open the Dam** or **Close the Dam**?</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">คุณต้องเลือก: **เปิดเขื่อน** หรือ **ปิดเขื่อน**?</span>
+                        </li>
+                    </ul>
+
+                    <!-- Scenario 1 -->
+                    <div class="p-4 bg-sky-900 rounded-lg mb-4">
+                        <div class="translatable-item">
+                            <strong class="text-xl text-yellow-300 block mb-2">Scenario 1: Heavy Rain</strong>
+                            <div>
+                                <span class="tts-icon" onclick="speakText('It is raining very hard in the North. The dam is full. What do you do?')">🔊</span><span class="english-text">It is raining very hard in the North. The dam is full. What do you do?</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            </div>
+                            <span class="thai-translation" style="display: none;">ฝนตกหนักมากทางภาคเหนือ น้ำเต็มเขื่อนแล้ว คุณจะทำอย่างไร?</span>
+                        </div>
+                        <div class="flex gap-4 mt-2">
+                            <button class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded">A: Open the Dam (Release water)</button>
+                            <button class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded">B: Close the Dam (Keep water)</button>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 2 -->
+                    <div class="p-4 bg-sky-900 rounded-lg">
+                        <div class="translatable-item">
+                            <strong class="text-xl text-yellow-300 block mb-2">Scenario 2: No Rain (Dry)</strong>
+                            <div>
+                                <span class="tts-icon" onclick="speakText('There is no rain. The farmers need water for rice. What do you do?')">🔊</span><span class="english-text">There is no rain. The farmers need water for rice. What do you do?</span>
+                                <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            </div>
+                            <span class="thai-translation" style="display: none;">ฝนไม่ตกเลย ชาวนาต้องการน้ำไปปลูกข้าว คุณจะทำอย่างไร?</span>
+                        </div>
+                        <div class="flex gap-4 mt-2">
+                            <button class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded">A: Open the Dam a little bit</button>
+                            <button class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded">B: Close the Dam completely</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 4: Speaking Role-play -->
+            <section id="part4" class="mb-12">
+                <div class="translatable-item">
+                    <h2 class="text-3xl font-bold border-b-4 border-sky-500 pb-2 mb-6">
+                        <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Activity 4: The TV Reporter</span>
+                        <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                    </h2>
+                    <p class="thai-translation -mt-4 mb-6" style="display: none;">กิจกรรมที่ 4: นักข่าวทีวี</p>
+                </div>
+
+                <div class="game-card">
+                    <div class="mb-4 translatable-item">
+                        <div>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Work in pairs. One is the **Studio News Anchor**. One is the **Reporter** at the river.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </div>
+                        <p class="thai-translation" style="display: none;">จับคู่กัน คนหนึ่งเป็น **ผู้ประกาศข่าวในสตูดิโอ** อีกคนเป็น **นักข่าว** ริมแม่น้ำ</p>
+                    </div>
+
+                    <div class="useful-phrases">
+                        <div class="script-line translatable-item">
+                            <strong>Anchor:</strong> <span class="tts-icon" onclick="speakText('Hello. How is the weather there?')">🔊</span><span class="english-text">Hello. How is the weather there?</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">สวัสดี อากาศที่นั่นเป็นอย่างไรบ้าง?</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Reporter:</strong> <span class="tts-icon" onclick="speakText('It is raining! The water is rising!')">🔊</span><span class="english-text">It is raining! The water is rising!</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ฝนกำลังตก! น้ำกำลังขึ้น!</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Anchor:</strong> <span class="tts-icon" onclick="speakText('Is it dangerous?')">🔊</span><span class="english-text">Is it dangerous?</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">มันอันตรายไหม?</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Reporter:</strong> <span class="tts-icon" onclick="speakText('Yes! The water level is very high.')">🔊</span><span class="english-text">Yes! The water level is very high.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ใช่! ระดับน้ำสูงมาก</span>
+                        </div>
+                         <div class="script-line translatable-item">
+                            <strong>Anchor:</strong> <span class="tts-icon" onclick="speakText('Stay safe! Goodbye.')">🔊</span><span class="english-text">Stay safe! Goodbye.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ระวังตัวด้วย! สวัสดี</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Extension Activities (Hidden specific student count requirement) -->
+            <section id="extension" class="mb-12">
+                <div class="translatable-item">
+                    <h2 class="text-3xl font-bold border-b-4 border-purple-500 pb-2 mb-6">
+                        <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Extension Activities</span>
+                        <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                    </h2>
+                    <p class="thai-translation -mt-4 mb-6" style="display: none;">กิจกรรมเสริม</p>
+                </div>
+
+                <div class="game-card" style="border-left-color: #a855f7;">
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">Game: My Survival Bag</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">เกม: กระเป๋ายังชีพของฉัน</p>
+                    </div>
+                    
+                    <div class="mb-4 translatable-item">
+                        <div>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">The flood is coming! You have a bag. You can only choose **3 things**. What do you put in your bag?</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </div>
+                        <p class="thai-translation" style="display: none;">น้ำท่วมกำลังมา! คุณมีกระเป๋า 1 ใบ คุณเลือกของได้แค่ **3 อย่าง** คุณจะใส่อะไรลงไป?</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="phrase-item bg-sky-900 rounded">Mama Noodles (มาม่า)</div>
+                        <div class="phrase-item bg-sky-900 rounded">Clean Water (น้ำสะอาด)</div>
+                        <div class="phrase-item bg-sky-900 rounded">Phone & Charger (โทรศัพท์ & สายชาร์จ)</div>
+                        <div class="phrase-item bg-sky-900 rounded">Money (เงิน)</div>
+                        <div class="phrase-item bg-sky-900 rounded">Flashlight (ไฟฉาย)</div>
+                        <div class="phrase-item bg-sky-900 rounded">Cat / Dog (แมว/หมา)</div>
+                    </div>
+                    
+                    <p class="mt-4 font-bold text-yellow-300">Student says: "I will take ________, ________, and ________ because..."</p>
+                </div>
+
+                <!-- Extension Activity 5: The Rescue Call -->
+                <div class="game-card" style="border-left-color: #a855f7;">
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">Activity 5: The Rescue Call (Role-play)</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">กิจกรรมที่ 5: โทรขอความช่วยเหลือ (บทบาทสมมติ)</p>
+                    </div>
+                    
+                    <p class="mb-4 translatable-item">
+                        <div>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">**Situation:** The water is rising fast! Call for help.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </div>
+                        <p class="thai-translation" style="display: none;">**สถานการณ์:** น้ำกำลังขึ้นเร็วมาก! โทรขอความช่วยเหลือ</p>
+                    </p>
+
+                    <div class="useful-phrases">
+                        <div class="script-line translatable-item">
+                            <strong>Student A (Caller):</strong> <span class="tts-icon" onclick="speakText('Help! My house is flooding!')">🔊</span><span class="english-text">Help! My house is **flooding**!</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ช่วยด้วย! น้ำท่วมบ้านฉัน!</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Student B (Police):</strong> <span class="tts-icon" onclick="speakText('Calm down. Where are you?')">🔊</span><span class="english-text">Calm down. Where are you?</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ใจเย็นๆ คุณอยู่ที่ไหน?</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Student A:</strong> <span class="tts-icon" onclick="speakText('I am near the river. The water level is very high!')">🔊</span><span class="english-text">I am near the **river**. The **water level** is very high!</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ฉันอยู่ใกล้แม่น้ำ ระดับน้ำสูงมาก!</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Student B:</strong> <span class="tts-icon" onclick="speakText('Is it raining?')">🔊</span><span class="english-text">Is it raining?</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ฝนตกไหม?</span>
+                        </div>
+                        <div class="script-line translatable-item">
+                            <strong>Student A:</strong> <span class="tts-icon" onclick="speakText('Yes! It is pouring! It is insane!')">🔊</span><span class="english-text">Yes! It is **pouring**! It is **insane**!</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ใช่! ฝนตกหนักมาก! มันบ้ามาก!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extension Activity 6: Draw and Describe -->
+                <div class="game-card" style="border-left-color: #a855f7;">
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">Activity 6: Draw the Weather</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">กิจกรรมที่ 6: วาดภาพสภาพอากาศ</p>
+                    </div>
+                    
+                    <ul class="list-disc list-inside space-y-3 mb-4">
+                        <li class="translatable-item">
+                            <span class="tts-icon" onclick="speakText('Grab a paper and pen.')">🔊</span><span class="english-text">Grab a paper and pen.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">หยิบกระดาษและปากกา</span>
+                        </li>
+                        <li class="translatable-item">
+                            <span class="tts-icon" onclick="speakText('Teacher speaks. Students draw.')">🔊</span><span class="english-text">Teacher speaks. Students draw.</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">ครูพูด นักเรียนวาด</span>
+                        </li>
+                    </ul>
+
+                    <div class="p-4 bg-sky-900 rounded-lg">
+                        <strong class="text-yellow-300 block mb-2">Teacher Instructions (Read slowly):</strong>
+                        <p class="mb-2 text-white">1. Draw a big <strong>river</strong>.</p>
+                        <p class="mb-2 text-white">2. Draw a <strong>dam</strong> in the river.</p>
+                        <p class="mb-2 text-white">3. It is <strong>pouring</strong> rain.</p>
+                        <p class="mb-2 text-white">4. The <strong>water level</strong> is very high (over the dam!).</p>
+                        <p class="mb-2 text-white">5. Draw a house that is <strong>flooded</strong>.</p>
+                    </div>
+                    <p class="mt-4 text-white">**After drawing:** Students show the picture and describe it using the vocab.</p>
+                </div>
+
+                <!-- Extension Activity 7: The Weather Forecast -->
+                <div class="game-card" style="border-left-color: #a855f7;">
+                    <div class="translatable-item">
+                        <h3>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span>
+                            <span class="english-text">Activity 7: The Tomorrow Forecast</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </h3>
+                        <p class="thai-translation mb-4" style="display: none;">กิจกรรมที่ 7: พยากรณ์อากาศวันพรุ่งนี้</p>
+                    </div>
+                    
+                    <p class="mb-4 translatable-item">
+                        <div>
+                            <span class="tts-icon" onclick="speakText(this.nextElementSibling.innerText)">🔊</span><span class="english-text">Take turns being the weather person. Predict tomorrow!</span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                        </div>
+                        <p class="thai-translation" style="display: none;">ผลัดกันเป็นนักพยากรณ์อากาศ ทายเหตุการณ์พรุ่งนี้!</p>
+                    </p>
+
+                    <div class="useful-phrases">
+                        <div class="phrase-item translatable-item">
+                            <span><span class="tts-icon" onclick="speakText('I think it is going to flood tomorrow.')">🔊</span><span class="english-text">"I think it is going to **flood** tomorrow."</span></span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">"ฉันคิดว่าพรุ่งนี้น้ำจะท่วม"</span>
+                        </div>
+                        <div class="phrase-item translatable-item">
+                            <span><span class="tts-icon" onclick="speakText('I think the water level will go down.')">🔊</span><span class="english-text">"I think the **water level** will go down."</span></span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">"ฉันคิดว่าระดับน้ำจะลดลง"</span>
+                        </div>
+                        <div class="phrase-item translatable-item">
+                            <span><span class="tts-icon" onclick="speakText('I think the dam will break!')">🔊</span><span class="english-text">"I think the **dam** will break!"</span></span>
+                            <button class="toggle-th-btn" onclick="toggleTranslation(this)">TH</button>
+                            <span class="thai-translation" style="display: none;">"ฉันคิดว่าเขื่อนจะแตก!"</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Text-to-Speech Functionality ---
+        const synth = window.speechSynthesis;
+
+        function speakText(textToSpeak) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const cleanText = textToSpeak.replace('🔊', '').trim();
+            if (cleanText) {
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'en-US';
+                utterance.pitch = 1;
+                utterance.rate = 0.9;
+                utterance.volume = 1;
+                synth.speak(utterance);
+            }
+        }
+
+        // --- Translation Toggle Functionality ---
+        function toggleTranslation(buttonEl) {
+            const container = buttonEl.closest('.translatable-item');
+            if (container) {
+                const thaiEl = container.querySelector('.thai-translation');
+                if (thaiEl) {
+                    if (thaiEl.style.display === 'none' || thaiEl.style.display === '') {
+                        if (thaiEl.tagName === 'SPAN') {
+                            thaiEl.style.display = 'inline-block';
+                        } else {
+                            thaiEl.style.display = 'block';
+                        }
+                    } else {
+                        thaiEl.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // --- Scoreboard Logic ---
+        let teamAScore = 0;
+        let teamBScore = 0;
+        const teamAScoreEl = document.getElementById('team-a-score');
+        const teamBScoreEl = document.getElementById('team-b-score');
+
+        function addPoints(team, points) {
+            if (team === 'A') {
+                teamAScore += points;
+                teamAScoreEl.innerText = teamAScore;
+            } else if (team === 'B') {
+                teamBScore += points;
+                teamBScoreEl.innerText = teamBScore;
+            }
+        }
+        
+        function resetScores() {
+            teamAScore = 0;
+            teamBScore = 0;
+            teamAScoreEl.innerText = 0;
+            teamBScoreEl.innerText = 0;
+        }
+    </script>
+</body>
+</html>
