@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Children's Day & Dreams 🎈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff1f2; /* Light pink background */
+        }
+        h1, h2, h3 {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            border: 2px solid #fecdd3;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #f43f5e;
+        }
+        .btn-primary {
+            background-color: #f43f5e;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px rgba(244, 63, 94, 0.3);
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #be123c;
+            transform: scale(1.05);
+        }
+        .dream-bubble {
+            background-color: #e0f2fe;
+            border-left: 5px solid #0ea5e9;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .advice-bubble {
+            background-color: #dcfce7;
+            border-left: 5px solid #22c55e;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .btn-icon {
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background-color: #f3f4f6;
+            margin-left: 4px;
+            font-size: 0.9rem;
+        }
+        .btn-icon:hover { background-color: #e5e7eb; }
+        .btn-icon:active { transform: scale(0.9); }
+    </style>
+    <script>
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleThai(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+    </script>
+</head>
+<body class="pb-12">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 border-b-4 border-pink-400">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <div>
+                <div class="flex items-center justify-center md:justify-start gap-2">
+                    <h1 class="text-2xl md:text-3xl font-bold text-pink-600">Children's Day & Dreams 🎈🧸</h1>
+                    <button onclick="speak('Children\'s Day and Dreams')" class="btn-icon" title="Listen">🔊</button>
+                    <button onclick="toggleThai('h1-th')" class="btn-icon" title="Translate">🇹🇭</button>
+                </div>
+                <p id="h1-th" class="hidden text-pink-500 font-bold mt-1">วันเด็กและความฝัน</p>
+            </div>
+            <span class="text-xs md:text-sm bg-pink-100 text-pink-800 py-1 px-3 rounded-full font-semibold mt-2 md:mt-0">120 Mins</span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-12">
+
+        <!-- PART 1: REVIEW -->
+        <section id="review" class="card p-6 md:p-8">
+            <div class="flex flex-col mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🎡</span>
+                    <h2 class="text-2xl font-bold text-gray-800">1. Vocab Review</h2>
+                    <button onclick="speak('Vocab Review')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-1-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="h2-1-th" class="hidden text-gray-500 ml-12 mt-1">1. ทบทวนคำศัพท์</p>
+            </div>
+            
+            <div class="text-center mb-6">
+                <p class="text-gray-600 inline">Click to get a random word/sentence. Make a new sentence!</p>
+                <button onclick="speak('Click to get a random word or sentence. Make a new sentence!')" class="btn-icon">🔊</button>
+                <button onclick="toggleThai('inst-1-th')" class="btn-icon">🇹🇭</button>
+                <p id="inst-1-th" class="hidden text-gray-500 mt-1">คลิกเพื่อสุ่มคำศัพท์/ประโยค แล้วแต่งประโยคใหม่!</p>
+            </div>
+            
+            <div class="bg-yellow-50 p-8 rounded-3xl border-4 border-yellow-200 flex flex-col items-center justify-center space-y-6">
+                <div id="wordDisplay" class="text-2xl md:text-3xl font-bold text-gray-800 text-center min-h-[80px] flex flex-col items-center justify-center">
+                    <div>Ready to start?</div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button onclick="pickRandomWord()" class="btn-primary bg-yellow-500 hover:bg-yellow-600 border-none">
+                        🎲 Spin
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: DREAMS VIDEO -->
+        <section id="dreams" class="card p-6 md:p-8">
+            <div class="flex flex-col mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">💭</span>
+                    <h2 class="text-2xl font-bold text-gray-800">2. What is your Dream?</h2>
+                    <button onclick="speak('What is your Dream?')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-2-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="h2-2-th" class="hidden text-gray-500 ml-12 mt-1">2. ความฝันของคุณคืออะไร?</p>
+            </div>
+            
+            <div class="bg-blue-50 rounded-xl p-6 mb-6">
+                <div class="mb-4">
+                    <p class="font-bold text-blue-800 inline">Watch the video and listen: What do the kids want?</p>
+                    <button onclick="speak('Watch the video and listen: What do the kids want?')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('inst-2-th')" class="btn-icon">🇹🇭</button>
+                    <p id="inst-2-th" class="hidden text-blue-600 mt-1">ดูวิดีโอและฟัง: เด็กๆ ต้องการอะไร?</p>
+                </div>
+                <a href="https://www.facebook.com/watch/?v=880366381379100" target="_blank" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.53-3.89 3.77-3.89c1.07 0 2.2.19 2.2.19v2.42h-1.24c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/></svg>
+                    Watch Video 1
+                </a>
+            </div>
+
+            <div class="mb-3">
+                <h3 class="font-bold text-gray-700 inline">📝 Sentences from the video:</h3>
+                <button onclick="speak('Sentences from the video')" class="btn-icon">🔊</button>
+                <button onclick="toggleThai('h3-1-th')" class="btn-icon">🇹🇭</button>
+                <p id="h3-1-th" class="hidden text-gray-500 mt-1">ประโยคจากวิดีโอ:</p>
+            </div>
+
+            <div class="space-y-2 mb-8">
+                <div class="dream-bubble">
+                    🎢 My dream is a really fun <strong>roller coaster</strong>.
+                    <button onclick="speak('My dream is a really fun roller coaster.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s1-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s1-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือรถไฟเหาะที่สนุกมากๆ</p>
+                </div>
+                <div class="dream-bubble">
+                    🗼 My dream is to go to <strong>Tokyo</strong> together.
+                    <button onclick="speak('My dream is to go to Tokyo together.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s2-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s2-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือไปโตเกียวด้วยกัน</p>
+                </div>
+                <div class="dream-bubble">
+                    🦋 My dream is to do <strong>100fly</strong> (butterfly stroke).
+                    <button onclick="speak('My dream is to do 100 fly.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s3-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s3-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือว่ายท่าผีเสื้อ 100 เมตร</p>
+                </div>
+                <div class="dream-bubble">
+                    🏆 My dream is to <strong>win the world cup</strong>.
+                    <button onclick="speak('My dream is to win the world cup.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s4-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s4-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือชนะฟุตบอลโลก</p>
+                </div>
+                <div class="dream-bubble">
+                    💰 My dream is to have a <strong>billion</strong>.
+                    <button onclick="speak('My dream is to have a billion.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s5-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s5-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือมีเงินพันล้าน</p>
+                </div>
+                <div class="dream-bubble">
+                    🥇 My dream is to go to the <strong>Olympics</strong>.
+                    <button onclick="speak('My dream is to go to the Olympics.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s6-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s6-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือไปโอลิมปิก</p>
+                </div>
+                <div class="dream-bubble">
+                    🏨 My dream is to <strong>own a hotel</strong>.
+                    <button onclick="speak('My dream is to own a hotel.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s7-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s7-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือเป็นเจ้าของโรงแรม</p>
+                </div>
+                <div class="dream-bubble">
+                    🏴‍☠️ My dream is to finish <strong>One Piece</strong>.
+                    <button onclick="speak('My dream is to finish One Piece.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s8-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s8-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคืออ่าน One Piece ให้จบ</p>
+                </div>
+                <div class="dream-bubble">
+                    🍗 My dream is to eat the <strong>best chicken</strong> in the universe.
+                    <button onclick="speak('My dream is to eat the best chicken in the universe.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s9-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s9-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือกินไก่ที่อร่อยที่สุดในจักรวาล</p>
+                </div>
+                <div class="dream-bubble">
+                    ⚽ My dream is <strong>footballer</strong>.
+                    <button onclick="speak('My dream is footballer.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s10-th')" class="btn-icon">🇹🇭</button>
+                    <p id="s10-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของฉันคือนักฟุตบอล</p>
+                </div>
+            </div>
+
+            <div class="border-t-2 border-gray-100 pt-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <h3 class="text-xl font-bold text-pink-600">🗣️ Discussion:</h3>
+                    <button onclick="speak('Discussion')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('disc-1-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="disc-1-th" class="hidden text-gray-500 mb-2">อภิปราย:</p>
+                
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>
+                        What is <strong>your</strong> dream now?
+                        <button onclick="speak('What is your dream now?')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('q1-th')" class="btn-icon">🇹🇭</button>
+                        <p id="q1-th" class="hidden text-gray-500 text-sm mt-1">ความฝันของคุณตอนนี้คืออะไร?</p>
+                    </li>
+                    <li>
+                        What was your <strong>childhood dream</strong>? (When you were young...)
+                        <button onclick="speak('What was your childhood dream?')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('q2-th')" class="btn-icon">🇹🇭</button>
+                        <p id="q2-th" class="hidden text-gray-500 text-sm mt-1">ความฝันวัยเด็กของคุณคืออะไร?</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PART 3: ADVICE VIDEO -->
+        <section id="advice" class="card p-6 md:p-8">
+            <div class="flex flex-col mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🌍</span>
+                    <h2 class="text-2xl font-bold text-gray-800">3. Making the World Better</h2>
+                    <button onclick="speak('Making the World Better')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-3-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="h2-3-th" class="hidden text-gray-500 ml-12 mt-1">3. ทำให้โลกน่าอยู่ขึ้น</p>
+            </div>
+
+            <div class="bg-green-50 rounded-xl p-6 mb-6">
+                <div class="mb-4">
+                    <p class="font-bold text-green-800 inline">Watch Video 2: How can kids make the world a better place?</p>
+                    <button onclick="speak('Watch Video 2: How can kids make the world a better place?')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('inst-3-th')" class="btn-icon">🇹🇭</button>
+                    <p id="inst-3-th" class="hidden text-green-600 mt-1">ดูวิดีโอ 2: เด็กๆ จะทำให้โลกน่าอยู่ขึ้นได้อย่างไร?</p>
+                </div>
+                <a href="https://www.youtube.com/shorts/anoYD7QRDl4" target="_blank" class="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    Watch Video 2
+                </a>
+            </div>
+
+            <div class="mb-3">
+                <h3 class="font-bold text-gray-700 inline">👂 What did they say?</h3>
+                <button onclick="speak('What did they say?')" class="btn-icon">🔊</button>
+                <button onclick="toggleThai('h3-2-th')" class="btn-icon">🇹🇭</button>
+                <p id="h3-2-th" class="hidden text-gray-500 mt-1">พวกเขาพูดว่าอะไรบ้าง?</p>
+            </div>
+
+            <div class="space-y-2 mb-8">
+                <div class="advice-bubble">
+                    ♻️ By <strong>picking up trash</strong>.
+                    <button onclick="speak('By picking up trash.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a1-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a1-th" class="hidden text-gray-500 text-sm mt-1">โดยการเก็บขยะ</p>
+                </div>
+                <div class="advice-bubble">
+                    😊 By <strong>being nice</strong>.
+                    <button onclick="speak('By being nice.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a2-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a2-th" class="hidden text-gray-500 text-sm mt-1">โดยการเป็นคนนิสัยดี</p>
+                </div>
+                <div class="advice-bubble">
+                    💃 <strong>Dance</strong> and cheer people up.
+                    <button onclick="speak('Dance and cheer people up.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a3-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a3-th" class="hidden text-gray-500 text-sm mt-1">เต้นและให้กำลังใจผู้คน</p>
+                </div>
+                <div class="advice-bubble">
+                    🏠 By <strong>helping homeless people</strong>.
+                    <button onclick="speak('By helping homeless people.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a4-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a4-th" class="hidden text-gray-500 text-sm mt-1">โดยการช่วยเหลือคนไร้บ้าน</p>
+                </div>
+                <div class="advice-bubble">
+                    🤝 By seeing a <strong>need</strong> and helping with it.
+                    <button onclick="speak('By seeing a need and helping with it.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a5-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a5-th" class="hidden text-gray-500 text-sm mt-1">โดยการมองเห็นความต้องการแล้วเข้าไปช่วย</p>
+                </div>
+                <div class="advice-bubble">
+                    💖 By <strong>being kind</strong> to others.
+                    <button onclick="speak('By being kind to others.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a6-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a6-th" class="hidden text-gray-500 text-sm mt-1">โดยการใจดีกับผู้อื่น</p>
+                </div>
+                <div class="advice-bubble">
+                    🧹 They can <strong>clean the world</strong>.
+                    <button onclick="speak('They can clean the world.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('a7-th')" class="btn-icon">🇹🇭</button>
+                    <p id="a7-th" class="hidden text-gray-500 text-sm mt-1">พวกเขาสามารถทำความสะอาดโลกได้</p>
+                </div>
+            </div>
+
+            <div class="border-t-2 border-gray-100 pt-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <h3 class="text-xl font-bold text-pink-600">🗣️ Discussion:</h3>
+                    <button onclick="speak('Discussion')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('disc-2-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="disc-2-th" class="hidden text-gray-500 mb-2">อภิปราย:</p>
+
+                <p class="text-gray-700 mb-2">
+                    "They are the future... they have great minds."
+                    <button onclick="speak('They are the future... they have great minds.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('q3-th')" class="btn-icon">🇹🇭</button>
+                </p>
+                <p id="q3-th" class="hidden text-gray-500 text-sm mb-4">"พวกเขาคืออนาคต... พวกเขามีความคิดที่ยิ่งใหญ่"</p>
+
+                <ul class="list-disc pl-5 space-y-2 text-gray-700 mt-2">
+                    <li>
+                        How can <strong>adults</strong> make the world a better place?
+                        <button onclick="speak('How can adults make the world a better place?')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('q4-th')" class="btn-icon">🇹🇭</button>
+                        <p id="q4-th" class="hidden text-gray-500 text-sm mt-1">ผู้ใหญ่จะช่วยทำให้โลกน่าอยู่ขึ้นได้อย่างไร?</p>
+                    </li>
+                    <li>
+                        How can <strong>you</strong> make the world a better place?
+                        <button onclick="speak('How can you make the world a better place?')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('q5-th')" class="btn-icon">🇹🇭</button>
+                        <p id="q5-th" class="hidden text-gray-500 text-sm mt-1">คุณจะช่วยทำให้โลกน่าอยู่ขึ้นได้อย่างไร?</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PART 3.5: GRAMMAR CORNER (New) -->
+        <section id="grammar-corner" class="card p-6 md:p-8 border-purple-400 border-4">
+            <div class="flex flex-col mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">📚</span>
+                    <h2 class="text-2xl font-bold text-gray-800">3.5. Grammar Corner: Experiences</h2>
+                    <button onclick="speak('Grammar Corner. Experiences.')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-gram-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="h2-gram-th" class="hidden text-gray-500 ml-12 mt-1">3.5. มุมไวยากรณ์: ประสบการณ์ (เคยทำ...ไหม?)</p>
+            </div>
+
+            <div class="bg-purple-50 rounded-xl p-6 mb-6 border border-purple-200">
+                <h3 class="text-xl font-bold text-purple-700 mb-3">Structure: Have you ever...?</h3>
+                
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+                    <p class="text-lg font-mono text-center text-gray-700">
+                        Have you ever + <span class="text-red-500 font-bold">Verb 3</span> (Past Participle)?
+                    </p>
+                    <div class="text-center mt-2">
+                        <button onclick="speak('Have you ever plus Verb 3?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gram-struct-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gram-struct-th" class="hidden text-purple-600 text-sm mt-1">คุณเคย... (กริยาช่อง 3) ...ไหม?</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Example 1 -->
+                    <div class="bg-white p-3 rounded border border-gray-100">
+                        <p class="font-bold text-gray-800">Q: Have you ever <span class="text-red-500">eaten</span> bugs?</p>
+                        <p class="text-green-600">A: Yes, I have. <span class="text-gray-400">(เคย)</span></p>
+                        <p class="text-red-600">A: No, I haven't. <span class="text-gray-400">(ไม่เคย)</span></p>
+                        <div class="mt-1">
+                             <button onclick="speak('Have you ever eaten bugs? Yes I have. No I haven\'t.')" class="btn-icon text-xs">🔊 Listen</button>
+                        </div>
+                    </div>
+                    <!-- Example 2 -->
+                    <div class="bg-white p-3 rounded border border-gray-100">
+                        <p class="font-bold text-gray-800">Q: Have you ever <span class="text-red-500">seen</span> a ghost?</p>
+                        <p class="text-green-600">A: Yes, I have.</p>
+                        <p class="text-red-600">A: No, I haven't.</p>
+                        <div class="mt-1">
+                             <button onclick="speak('Have you ever seen a ghost? Yes I have. No I haven\'t.')" class="btn-icon text-xs">🔊 Listen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-center text-gray-600 italic">
+                Practice asking "Have you ever...?" before the next activity!
+                <button onclick="speak('Practice asking Have you ever before the next activity!')" class="btn-icon">🔊</button>
+                <button onclick="toggleThai('gram-tip-th')" class="btn-icon">🇹🇭</button>
+                <span id="gram-tip-th" class="hidden block text-sm text-purple-500 mt-1">ฝึกถาม "คุณเคย...ไหม?" ก่อนเริ่มกิจกรรมถัดไป!</span>
+            </p>
+        </section>
+
+        <!-- PART 4: BREAKOUT ROOM ACTIVITY -->
+        <section id="activity" class="card p-6 md:p-8 border-pink-500 border-4">
+            <div class="flex flex-col mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🕵️‍♀️</span>
+                    <h2 class="text-2xl font-bold text-gray-800">4. Find Someone Who...</h2>
+                    <button onclick="speak('Find Someone Who...')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-4-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="h2-4-th" class="hidden text-gray-500 ml-12 mt-1">4. ตามหาคนที่มีลักษณะ...</p>
+            </div>
+
+            <div class="bg-white rounded-lg p-4 border-2 border-dashed border-gray-300 mb-6">
+                <div class="text-center mb-2">
+                    <h3 class="font-bold text-lg inline text-pink-600">Instructions</h3>
+                    <button onclick="speak('Instructions')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h3-3-th')" class="btn-icon">🇹🇭</button>
+                    <p id="h3-3-th" class="hidden text-gray-500 text-sm">คำสั่ง</p>
+                </div>
+
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                    <li>
+                        <strong>Step 1 (Class):</strong> Take turns asking one question to a friend.
+                        <button onclick="speak('Step 1. Class. Take turns asking one question to a friend.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('st1-th')" class="btn-icon">🇹🇭</button>
+                        <p id="st1-th" class="hidden text-gray-500 text-sm mt-1">ขั้นตอนที่ 1 (ในห้อง): ผลัดกันถามคำถามเพื่อน 1 ข้อ</p>
+                    </li>
+                    <li>
+                        <strong>Step 2 (Breakout):</strong> Go to rooms (2-3 people). Ask <em>all</em> questions.
+                        <button onclick="speak('Step 2. Breakout. Go to rooms. Ask all questions.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('st2-th')" class="btn-icon">🇹🇭</button>
+                        <p id="st2-th" class="hidden text-gray-500 text-sm mt-1">ขั้นตอนที่ 2 (กลุ่มย่อย): เข้าห้องย่อย (2-3 คน) ถามคำถามทั้งหมด</p>
+                    </li>
+                    <li>
+                        <strong>Step 3 (Report):</strong> Come back and tell the teacher: <em>"Khun [Name] wants to..."</em>
+                        <button onclick="speak('Step 3. Report. Come back and tell the teacher.')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('st3-th')" class="btn-icon">🇹🇭</button>
+                        <p id="st3-th" class="hidden text-gray-500 text-sm mt-1">ขั้นตอนที่ 3 (รายงาน): กลับมาบอกครูว่า "คุณ... ต้องการ..."</p>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Card 1 -->
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Question 1 <button onclick="toggleThai('gq1-th')" class="btn-icon text-[10px] p-0 h-4 w-4">🇹🇭</button></p>
+                    <p id="gq1-th" class="hidden text-xs text-indigo-400 mb-1">คำถามที่ 1</p>
+                    <p class="font-bold text-lg text-indigo-900">Have you ever dreamed of owning a hotel?</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Have you ever dreamed of owning a hotel?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gqa1-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gqa1-th" class="hidden text-indigo-600 text-sm mt-1">คุณเคยฝันอยากเป็นเจ้าของโรงแรมไหม?</p>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Question 2 <button onclick="toggleThai('gq2-th')" class="btn-icon text-[10px] p-0 h-4 w-4">🇹🇭</button></p>
+                    <p id="gq2-th" class="hidden text-xs text-indigo-400 mb-1">คำถามที่ 2</p>
+                    <p class="font-bold text-lg text-indigo-900">Have you ever picked up trash on the street?</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Have you ever picked up trash on the street?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gqa2-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gqa2-th" class="hidden text-indigo-600 text-sm mt-1">คุณเคยเก็บขยะบนถนนไหม?</p>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Question 3 <button onclick="toggleThai('gq3-th')" class="btn-icon text-[10px] p-0 h-4 w-4">🇹🇭</button></p>
+                    <p id="gq3-th" class="hidden text-xs text-indigo-400 mb-1">คำถามที่ 3</p>
+                    <p class="font-bold text-lg text-indigo-900">Have you ever wanted to win a competition?</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Have you ever wanted to win a competition?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gqa3-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gqa3-th" class="hidden text-indigo-600 text-sm mt-1">คุณเคยอยากชนะการแข่งขันไหม?</p>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Question 4 <button onclick="toggleThai('gq4-th')" class="btn-icon text-[10px] p-0 h-4 w-4">🇹🇭</button></p>
+                    <p id="gq4-th" class="hidden text-xs text-indigo-400 mb-1">คำถามที่ 4</p>
+                    <p class="font-bold text-lg text-indigo-900">Have you ever helped a stranger?</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Have you ever helped a stranger?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gqa4-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gqa4-th" class="hidden text-indigo-600 text-sm mt-1">คุณเคยช่วยคนแปลกหน้าไหม?</p>
+                    </div>
+                </div>
+                <!-- Card 5 -->
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Question 5 <button onclick="toggleThai('gq5-th')" class="btn-icon text-[10px] p-0 h-4 w-4">🇹🇭</button></p>
+                    <p id="gq5-th" class="hidden text-xs text-indigo-400 mb-1">คำถามที่ 5</p>
+                    <p class="font-bold text-lg text-indigo-900">Have you ever dreamed of being rich (a billionaire)?</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Have you ever dreamed of being rich?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gqa5-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gqa5-th" class="hidden text-indigo-600 text-sm mt-1">คุณเคยฝันอยากรวย (เป็นมหาเศรษฐี) ไหม?</p>
+                    </div>
+                </div>
+                <!-- Card 6 -->
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-xs text-gray-500 font-bold uppercase mb-1">Question 6 <button onclick="toggleThai('gq6-th')" class="btn-icon text-[10px] p-0 h-4 w-4">🇹🇭</button></p>
+                    <p id="gq6-th" class="hidden text-xs text-indigo-400 mb-1">คำถามที่ 6</p>
+                    <p class="font-bold text-lg text-indigo-900">Have you ever tried to make someone happy?</p>
+                    <div class="mt-2">
+                        <button onclick="speak('Have you ever tried to make someone happy?')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('gqa6-th')" class="btn-icon">🇹🇭 TH</button>
+                        <p id="gqa6-th" class="hidden text-indigo-600 text-sm mt-1">คุณเคยพยายามทำให้ใครสักคนมีความสุขไหม?</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 5: EXTENSION ACTIVITIES (1-on-1 Focus) - NEW SECTION -->
+        <section id="extension" class="card p-6 md:p-8 border-yellow-400 border-4">
+             <div class="flex flex-col mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🎭</span>
+                    <h2 class="text-2xl font-bold text-gray-800">5. Extension Activities (Fun!)</h2>
+                    <button onclick="speak('Extension Activities. Fun!')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('h2-5-th')" class="btn-icon">🇹🇭</button>
+                </div>
+                <p id="h2-5-th" class="hidden text-gray-500 ml-12 mt-1">5. กิจกรรมเสริม (สนุกๆ!) - สำหรับเรียนตัวต่อตัวหรือกลุ่มเล็ก</p>
+            </div>
+
+            <div class="space-y-6">
+                
+                <!-- 1. Funny Debate -->
+                <div class="bg-yellow-50 rounded-lg p-5 border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 text-lg mb-2">1. Funny Debate 🥊</h3>
+                    <p class="text-gray-700 mb-2"><strong>Topic:</strong> "Being a child is better than being an adult."</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speak('Funny Debate. Topic: Being a child is better than being an adult.')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-1-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-1-th" class="hidden text-yellow-600 text-sm mt-2 font-bold">โต้ว่าทีตลก: "เป็นเด็กดีกว่าเป็นผู้ใหญ่" (เลือกข้างแล้วเถียงกัน!)</p>
+                </div>
+
+                <!-- 2. Funny Interview -->
+                <div class="bg-blue-50 rounded-lg p-5 border border-blue-200">
+                    <h3 class="font-bold text-blue-800 text-lg mb-2">2. Funny Interview 🎤</h3>
+                    <p class="text-gray-700 mb-2"><strong>Situation:</strong> You are a 7-year-old billionaire. I will interview you!</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speak('Funny Interview. Situation: You are a 7-year-old billionaire. I will interview you!')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-2-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-2-th" class="hidden text-blue-600 text-sm mt-2 font-bold">สัมภาษณ์ตลก: คุณคือมหาเศรษฐีอายุ 7 ขวบ! ครูจะสัมภาษณ์คุณ (ซื้ออะไร? กินอะไร?)</p>
+                </div>
+
+                <!-- 3. Funny Roleplay -->
+                <div class="bg-pink-50 rounded-lg p-5 border border-pink-200">
+                    <h3 class="font-bold text-pink-800 text-lg mb-2">3. Funny Roleplay 🧸</h3>
+                    <p class="text-gray-700 mb-2"><strong>Situation:</strong> Child vs. Parent. <br> Child: "I want to buy a real elephant!" <br> Parent: "No way!"</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speak('Funny Roleplay. Situation: Child versus Parent. Child says: I want to buy a real elephant! Parent says: No way!')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-3-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-3-th" class="hidden text-pink-600 text-sm mt-2 font-bold">บทบาทสมมติ: ลูก vs พ่อแม่. ลูก: "หนูอยากซื้อช้างตัวจริง!" พ่อแม่: "ไม่มีทาง!"</p>
+                </div>
+
+                <!-- 4. Story Telling -->
+                <div class="bg-green-50 rounded-lg p-5 border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg mb-2">4. Crazy Story 🐔</h3>
+                    <p class="text-gray-700 mb-2"><strong>Prompt:</strong> "One day, I woke up and I was a..." (Chicken? Alien? Robot?)</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speak('Crazy Story. Prompt: One day, I woke up and I was a chicken.')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-4-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-4-th" class="hidden text-green-600 text-sm mt-2 font-bold">เรื่องเล่าสุดเพี้ยน: "วันหนึ่งฉันตื่นขึ้นมาแล้วพบว่าฉันกลายเป็น..." (ไก่? เอเลี่ยน? หุ่นยนต์?)</p>
+                </div>
+
+                <!-- 5. Presentation -->
+                <div class="bg-indigo-50 rounded-lg p-5 border border-indigo-200">
+                    <h3 class="font-bold text-indigo-800 text-lg mb-2">5. Mini Presentation 👑</h3>
+                    <p class="text-gray-700 mb-2"><strong>Topic:</strong> "If I were the King/Queen of the World, I would change 3 things..."</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speak('Mini Presentation. Topic: If I were the King or Queen of the World, I would change 3 things.')" class="btn-icon">🔊 Listen</button>
+                        <button onclick="toggleThai('ext-5-th')" class="btn-icon">🇹🇭 TH</button>
+                    </div>
+                    <p id="ext-5-th" class="hidden text-indigo-600 text-sm mt-2 font-bold">นำเสนอ: "ถ้าฉันเป็นราชา/ราชินีของโลก ฉันจะเปลี่ยน 3 อย่าง..." (ฟรีไอศกรีม? ไม่มีโรงเรียน?)</p>
+                </div>
+
+            </div>
+        </section>
+
+         <!-- PART 8: ADDITIONAL VOCABULARY -->
+        <section id="additional-vocab" class="card p-6 border-l-8 border-teal-500">
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">8. Additional Vocabulary ➕</h2>
+                <button onclick="speak('Additional Vocabulary')" class="text-lg btn-icon">🔊</button>
+                <button onclick="toggleThai('h2-8-th')" class="text-lg btn-icon">🇹🇭</button>
+            </div>
+            <p id="h2-8-th" class="hidden text-gray-500 mb-4">คำศัพท์เพิ่มเติม</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="additional-vocab-grid">
+                <!-- Content injected via JS for brevity -->
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Data parsed from your input
+        const vocabData = [
+            { en: "Experiences", th: "ประสบการณ์" },
+            { en: "I have traveled to Poland.", th: "ฉันเคยไปเที่ยวที่โปแลนด์" },
+            { en: "I ate bugs.", th: "ฉันเคยกินแมลง" },
+            { en: "I lived in Canada.", th: "ฉันเคยอยู่แคนาดา" },
+            { en: "How long did you live in Canada?", th: "เคยอยู่แคนาดานานแค่ไหน" },
+            { en: "Tomorrow is my birthday.", th: "พรุ่งนี้วันเกิดฉัน" },
+            { en: "I ate snakes.", th: "เคยกินงู" },
+            { en: "Same as the chicken", th: "เหมือนไก่" },
+            { en: "mole", th: "ตุ่น" },
+            { en: "rat / mouse", th: "หนู" },
+            { en: "I have a house on the mountain.", th: "ฉันมีบ้านบนเขา" },
+            { en: "I like fishing.", th: "ฉันชอบตกปลา" },
+            { en: "I like growing cactuses.", th: "ฉันชอบปลูกต้นกระบองเพชร" },
+            { en: "how often", th: "บ่อยแค่ไหน" },
+            { en: "two times per week", th: "อาทิตย์ละสองครั้ง" },
+            { en: "pots", th: "กระถาง" },
+            { en: "soil", th: "ดิน" },
+            { en: "Fertiliser", th: "ปุ๋ย" },
+            { en: "seedlings", th: "ต้นกล้า" },
+            { en: "We have to fish where there are a lot of fishes.", th: "ต้องตกปลาที่ที่มีปลาเยอะๆ" },
+            { en: "cold", th: "หนาว" },
+            { en: "windy", th: "ลมแรง" },
+            { en: "national park", th: "อุทยานแห่งชาติ" },
+            { en: "Have you (ever) seen snow?", th: "เคยเห็นหิมะไหม" },
+            { en: "textbook", th: "หนังสือเรียน" },
+            { en: "satellite", th: "ดาวเทียม" },
+            { en: "ready-made", th: "สำเร็จรูป" },
+            { en: "The police collected evidence for investigation.", th: "ตำรวจเก็บหลักฐานไปทำการสืบสวนสอบสวน" },
+            { en: "vibe", th: "บรรยากาศ" },
+            { en: "Today, I've eaten papaya salad for lunch.", th: "วันนี้ฉันกินส้มตำตอนเที่ยงแล้ว" },
+            { en: "fermented fish", th: "ปลาร้า" },
+            { en: "keep a diary", th: "เขียนไดอารี่" },
+            { en: "Useful", th: "มีประโยชน์" },
+            { en: "I have caught a small cobra.", th: "เคยจับงูเห่าตัวเล็ก" },
+            { en: "island", th: "เกาะ" },
+            { en: "Crocodiles taste like pork.", th: "จรเข้รสชาติเหมือนหมู" },
+            { en: "roasted duck", th: "เป็ดย่าง" },
+            { en: "beans / nuts", th: "ถั่ว" },
+            { en: "He sold it.", th: "เขาขายแล้ว" },
+            { en: "I bring a cup to the classroom.", th: "ฉันเอาแก้วน้ำมาในห้องเรียน" },
+            { en: "I like to take photos.", th: "ฉันชอบถ่ายรูป" },
+            { en: "I had a headache.", th: "ฉันปวดหัว (อดีต)" },
+            { en: "He had a fever.", th: "เขาเป็นไข้ (อดีต)" },
+            { en: "I like to sell second-hand clothes.", th: "ชอบขายเสื้อผ้ามือสอง" },
+            { en: "I was alone.", th: "อยู่คนเดียว (อดีต)" },
+            { en: "I like to get wet.", th: "ชอบเปียก" },
+            { en: "detergent", th: "ผงซักฟอก" },
+            { en: "luggage", th: "กระเป๋าเดินทาง" },
+            { en: "It was muddy.", th: "มันเต็มไปด้วยโคลน" },
+            { en: "It was raining yesterday.", th: "เมื่อวานฝนตก" },
+            { en: "Haunted house", th: "บ้านผีสิง" },
+            { en: "celebrate", th: "ฉลอง" },
+            { en: "equipment", th: "อุปกรณ์" },
+            { en: "real-life experience", th: "ประสบการณ์ชีวิตจริง" },
+            { en: "Improve focus", th: "พัฒนาโฟกัส" },
+            { en: "improve memory and attention", th: "พัฒนาความจำและการจดจ่อ" },
+            { en: "It's healing.", th: "มันฮีลใจ" },
+            { en: "You can be close to nature.", th: "ใกล้ชิดธรรมชาติ" },
+            { en: "costume", th: "เครื่องแต่งกาย" },
+            { en: "take a vacation leave", th: "ลาพักร้อน" },
+            { en: "PhD", th: "ป.เอก" },
+            { en: "stationery", th: "เครื่องเขียน" },
+            { en: "Last weekend, I went to my hometown.", th: "เสาร์อาทิตย์ ฉันกลับบ้านเกิด" },
+            { en: "Have you booked the hotel?", th: "จองโรงแรมหรือยัง" },
+            { en: "tipsy", th: "กึ่มๆ" },
+            { en: "dress up", th: "แต่งตัว" },
+            { en: "motivation", th: "แรงจูงใจ" },
+            { en: "Tonight, I am going to the gym.", th: "คืนนี้ ฉันไปฟิตเนส" },
+            { en: "make a wish", th: "อธิษฐาน" },
+            { en: "corals", th: "ปะการัง" },
+            { en: "floods/flooding", th: "น้ำท่วม" },
+            { en: "I sent the documents.", th: "ส่งเอกสาร" },
+            { en: "sweat", th: "เหงื่อ" },
+            { en: "scary", th: "น่ากลัว" },
+            { en: "I have never been to China.", th: "ไม่เคยไปจีน" },
+            { en: "Tonight, I'm going to cook my dinner.", th: "คืนนี้จะทำข้าวเย็น" },
+            { en: "inequality", th: "ความเหลื่อมล้ำ" },
+            { en: "case studies", th: "กรณีศึกษา" },
+            { en: "embarrassed", th: "รู้สึกอับอาย" },
+            { en: "If someone says bad things to me, I say, Shut up!", th: "ถ้ามีคนพูดไม่ดี ฉันจะบอกว่า หุบปาก" },
+            { en: "All women have dignity like men.", th: "ผู้หญิงทุกคนมีศักดิ์ศรีเหมือนผู้ชาย" },
+            { en: "Pouring (rain)", th: "ฝนถล่ม / ฟ้ารั่ว" },
+            { en: "River", th: "แม่น้ำ" },
+            { en: "Dam", th: "เขื่อน" },
+            { en: "Take care of your health!", th: "รักษาสุขภาพด้วยนะ" },
+            { en: "My dog is drowning.", th: "หมากำลังจะจมน้ำ" },
+            { en: "inhaler", th: "ยาดม" },
+            { en: "thunder", th: "ฟ้าร้อง" },
+            { en: "I'm not into hiking.", th: "ไม่อินกับการเดินป่า" },
+            { en: "victims", th: "ผู้ประสบภัย" },
+            { en: "I'm scared of snakes.", th: "กลัวงู" },
+            { en: "society", th: "สังคม" },
+            { en: "elders / elderlies", th: "ผู้สูงอายุ" },
+            { en: "mindfulness", th: "สติ" },
+            { en: "I wear a helmet when I ride a motorbike.", th: "ฉันใส่หมวกกันน็อคตอนขี่มอไซค์" },
+            { en: "tourist attractions", th: "สถานที่ท่องเที่ยว" },
+            { en: "I want to win the lottery.", th: "อยากถูกหวย" },
+            { en: "weekend", th: "เสาร์อาทิตย์" },
+            { en: "red envelopes", th: "ซองแดง" },
+            { en: "caring", th: "เอาใจใส่" },
+            { en: "When I'm working, I must have mindfulness.", th: "ตอนทำงานต้องมีสติ" },
+            { en: "I always put fermented fish in my cooking.", th: "ฉันใส่ปลาร้าในอาหารที่ทำประจำ" },
+            { en: "presents / gifts", th: "ของขวัญ" },
+            { en: "donate", th: "บริจาค" },
+            { en: "instant noodles", th: "มาม่า (ทันที)" },
+            { en: "noon", th: "เที่ยงวัน" },
+            { en: "make merit", th: "ทำบุญ" },
+            { en: "boiled eggs", th: "ไข่ต้ม" },
+            { en: "lucky draw", th: "จับฉลาก" },
+            { en: "justice", th: "ความยุติธรรม" },
+            { en: "equality", th: "ความเท่าเทียม" },
+            { en: "medical certificate", th: "ใบรับรองแพทย์" },
+            { en: "crisps", th: "ขนมถุง" },
+            { en: "I am going to exercise in my room every day.", th: "ฉันจะออกกำลังกายในห้องทุกวัน" },
+            { en: "might", th: "อาจจะ" },
+            { en: "K'Nexty might hike.", th: "เขาอาจจะไปเดินป่า" },
+            { en: "beauty", th: "ความสวย" }
+        ];
+
+        const additionalVocab = [
+            { en: "Have you eaten?", th: "กินข้าวยัง" },
+            { en: "boiled eggs", th: "ไข่ต้ม" },
+            { en: "How's the New Year holiday?", th: "วันหยุดปีใหม่เป็นยังไงบ้าง" },
+            { en: "lucky draw", th: "จับฉลาก" },
+            { en: "justice", th: "ความยุติธรรม" },
+            { en: "equality", th: "ความเท่าเทียม" },
+            { en: "injustice", th: "ความไม่ยุติธรรม" },
+            { en: "My hometown has beautiful national parks.", th: "บ้านเกิดของฉันมีอุทยานแห่งชาติที่สวยงาม" },
+            { en: "When I do laundry, I use liquid detergent.", th: "ตอนซักผ้า ฉันใช้ผงซักฟอกแบบน้ำ" },
+            { en: "When I go hiking, there's pouring rain.", th: "ตอนไปเดินป่า มีฝนตกหนัก" },
+            { en: "While you're counting down, why were you tipsy?", th: "ตอนเคาน์ดาวน์ ทำไมคุณกึ่มๆ" },
+            { en: "Do you go hiking with your boyfriend?", th: "ไปเดินป่ากับแฟนไหม" },
+            { en: "paper clips", th: "คลิปหนีบกระดาษ" },
+            { en: "Do you like haunted houses?", th: "ชอบบ้านผีสิงไหม" },
+            { en: "Does Samut prakan have floods?", th: "สมุทรปราการมีน้ำท่วมไหม" },
+            { en: "There are high and low tides.", th: "มีน้ำขึ้นน้ำลง" },
+            { en: "political parties", th: "พรรคการเมือง" },
+            { en: "tax refund", th: "การได้คืนภาษี" },
+            { en: "Have you seen snow?", th: "เคยเห็นหิมะไหม" },
+            { en: "Have you eaten bugs?", th: "เคยกินแมลงไหม" },
+            { en: "grasshoppers", th: "ตั๊กแตน" },
+            { en: "doctor's note / medical certificate", th: "ใบรับรองแพทย์" },
+            { en: "Not really", th: "ไม่ค่อย" },
+            { en: "crisps", th: "ขนมถุง" },
+            { en: "push-ups", th: "วิดพื้น" },
+            { en: "What do you want to cut down on?", th: "อยากลดอะไร" },
+            { en: "What do you have to stick to this year?", th: "ปีนี้ต้องทำตามอะไร / ปีนี้ยังต้องทำอะไร(ต่อ)อยู่" },
+            { en: "I am going to exercise in my room every day.", th: "ฉันจะออกกำลังกายในห้องทุกวัน" },
+            { en: "7pm", th: "1 ทุ่ม" },
+            { en: "I'm going to the market to buy fish for cooking.", th: "จะไปตลาดไปซื้อปลามาทำอาหาร" },
+            { en: "catfish", th: "ปลาดุก" },
+            { en: "I'm going to run.", th: "จะไปวิ่ง" },
+            { en: "park", th: "สวน" },
+            { en: "I'm going to (go to) Central.", th: "จะไปเซ็นทรัล" },
+            { en: "What are you going to do there?", th: "จะไปทำอะไรที่นั่น" },
+            { en: "might", th: "อาจจะ" },
+            { en: "K'Nexty might hike.", th: "เขาอาจจะไปเดินป่า" },
+            { en: "K'Nexty might not work from office.", th: "เขาอาจจะไม่ทำงานจากออฟฟิศ" },
+            { en: "K'Nexty might have a boyfriend.", th: "เขาอาจจะมีแฟน" },
+            { en: "Which is the most likely?", th: "อะไรที่จะเป็นไปได้มากที่สุด" },
+            { en: "The road is under construction.", th: "เขาทำถนน" },
+            { en: "K'Tuktaa might find a husband.", th: "เขาอาจจะเจอสามี" },
+            { en: "K'Tuktaa might have a new car.", th: "เขาอาจจะมีรถใหม่" },
+            { en: "K'Tuktaa might buy a new phone.", th: "เขาอาจจะซื้อโทรศัพท์ใหม่" },
+            { en: "I want to drive to work myself.", th: "อยากขับรถไปทำงานเอง" },
+            { en: "K'Ice might buy a new car.", th: "เขาอาจจะมีรถใหม่" },
+            { en: "K'Ice might travel to another country. ", th: "เขาอาจจะเที่ยวประเทศอื่น" },
+            { en: "K'Ice wants me to buy K'Ice's old car.", th: "คุณไอซ์อยากให้ฉันซื้อรถเก่าของเขา" },
+            { en: "K'Puu might complete her bachelor's degree.", th: "คุณปูอาจจะเรียนตรีจบ" },
+            { en: "K'Puu might speak English well.", th: "คุณปูอาจจะพูดอังกฤษดี" },
+            { en: "K'Puu might get a pay raise.", th: "คุณปูอาจจะได้ขึ้นเงินเดือน" },
+            { en: "beauty", th: "ความสวย" },
+            { en: "rehearse for graduation ceremony(commencement)", th: "ซ้อมรับปริญญา" },
+            { en: "I went to my friend's garage to get my family's motorcycle fixed.", th: "ไปอู่ซ่อมรถเพื่อน เพื่อซ่อมมอเตอร์ไซค์ของครอบครัว" },
+            { en: "Department of Employment", th: "สำนักงานจัดหางาน" },
+            { en: "Chonburi Provincial Employment Office", th: "สำนักงานจัดหางานจังหวัดชลบุรี" },
+            { en: "How long did it take?", th: "ใช้เวลานานไหม (อดีต)" },
+            { en: "I took the car there for an hour.", th: "นั่งรถยนต์ไปหนึ่งชั่วโมง" },
+            { en: "employee", th: "พนักงาน" },
+            { en: "When will you have the ceremony?", th: "จะมีพิธีเมื่อไร" },
+            { en: "On the 25th", th: "วันที่ 25" },
+            { en: "Mall", th: "ห้าง" },
+            { en: "The government in Thailand has inequality.", th: "รัฐบาลไทยมีความเหลื่อมล้ำ" },
+            { en: "How often do you exercise in your room?", th: "ออกกำลังกายในห้องบ่อยแค่ไหน" },
+            { en: "twice a month", th: "เดือนละสองครั้ง" },
+            { en: "have to", th: "ต้อง" },
+            { en: "Have you been to Laan island?", th: "เคยไปเกาะล้านไหม" },
+            { en: "snorkeling", th: "ดำน้ำ (ผิวน้ำ)" },
+            { en: "There weren't many people.", th: "มีคนไม่เยอะ (อดีต)" },
+            { en: "Where do you like to travel to the most?", th: "ชอบไปเที่ยวที่ไหนที่สุด" },
+            { en: "overseas; abroad", th: "ต่างประเทศ" },
+            { en: "I've never been. / I've never gone.", th: "ไม่เคยไป" },
+            { en: "I got too excited and screamed.", th: "ตื่นเต้นเกินไป และกรี๊ด (อดีต)" },
+            { en: "white water rafting", th: "การล่องแก่ง" },
+            { en: "butterfly stroke", th: "ท่าผีเสื้อ (ว่ายน้ำ)" },
+            { en: "I'm scared of deep water.", th: "กลัวน้ำลึก" },
+            { en: "breast stroke", th: "ท่ากบ (หน้าอก)" },
+            { en: "back stroke", th: "ท่ากรรเชียง" },
+            { en: "Have you ever wanted to win the world cup?", th: "เคยอยากชนะเวิล์ดคัพไหม" },
+            { en: "I'm addicted to RoV.", th: "ติด RoV" },
+            { en: "e-sport", th: "เกมส์ (แข่งเล่นเกมส์)" },
+            { en: "billion", th: "1,000,000,000; a thousand million" },
+            { en: "Have you watched the olympic games?", th: "เคยดูโอลิมปิกส์" },
+            { en: "weight lifting", th: "การยกน้ำหนัก" },
+            { en: "gymnastics", th: "ยิมนาสนิก" },
+            { en: "passive income", th: "รายได้แบบไม่ต้องทำอะไร" },
+            { en: "I have to work hard.", th: "ต้องทำงานหนัก" },
+            { en: "put it on lease; sublet", th: "ปล่อยให้เช่า" },
+            { en: "I'm on installments.", th: "ผ่อนอยู่" },
+            { en: "manga", th: "หนังสือการ์ตูนญี่ปุ่น" },
+            { en: "universe", th: "จักรวาล" },
+            { en: "What is your favourite football team?", th: "ทีมโปรดของคุณคือทีมอะไร" },
+            { en: "I don't like watching football.", th: "ไม่ชอบดูฟุตบอล" },
+            { en: "Who is your favourite footballer?", th: "นักบอลคนโปรดของคุณคือใคร" },
+            { en: "He used to be on the same team as a national footballer.", th: "เขาเคยอยู่ทีมเดียวกันกับนักบอลทีมชาติ" },
+            { en: "Norwegian", th: "คนนอร์เวย์" },
+            { en: "My dream is to be an accountant.", th: "ความฝันของฉันคือเป็นนักบัญชี" },
+            { en: "grow", th: "เติบโต" },
+            { en: "My dream is to become an auditor.", th: "ความฝันของฉันคือเป็นผู้สอบบัญชี" },
+            { en: "childhood", th: "วัยเด็ก" },
+            { en: "Same as K.Earn", th: "เหมือนคุณเอิร์น" },
+            { en: "Nurses have to be with corpses.", th: "พยาบาลต้องอยู่กับศพ" },
+            { en: "cremation", th: "การเผาศพ" },
+            { en: "There aren't a lot of bins at the beach.", th: "ไม่มีถังขยะที่ชายหาดเยอะ" },
+            { en: "In your office, who's very nice to you?", th: "ในออฟฟิศ ใครที่ดีกับคุณมาก" },
+            { en: "How do you cheer people up?", th: "ให้กำลังใจคนยังไง" },
+            { en: "I shared my life experiences with them.", th: "แชร์ประสบการณ์ชีวิตกับพวกเขา" },
+            { en: "I listen to them.", th: "ฉันฟังพวกเขา" },
+            { en: "How do you help homeless people?", th: "ช่วยคนไร้บ้านยังไง" },
+            { en: "It was raining.", th: "ฝนตกอยู่ (อดีต)" },
+            { en: "I tried to take her down the stairs.", th: "พยายามช่วยพาเขาลงบันได" },
+            { en: "What do you think about the homeless in America?", th: "คิดยังไงกับพวกคนไร้บ้านในอเมริกา" },
+            { en: "There are many homeless people in America.", th: "มีคนไร้บ้านที่อเมริกาเยอะ" },
+            { en: "shelter", th: "ที่พักอาศัย" },
+            { en: "Tiktokers helped with housing.", th: "อินฟลูติ๊กต็อกช่วยเรื่องบ้าน" },
+            { en: "colleagues; co-workers", th: "เพื่อนร่วมงาน" },
+            { en: "Do you need colleagues to help you with closing financial statements?", th: "ต้องการเพื่อนร่วมงานมาช่วยปิดบัญชี" },
+            { en: "counsellors", th: "ที่ปรึกษา" },
+            { en: "Do you think who's the kindest?", th: "คิดว่า ใครใจดีที่สุด" },
+            { en: "Between your dad and mum, who's kinder?", th: "ระหว่างพ่อกับแม่ ใครใจดีกว่า" },
+            { en: "fussy", th: "ขี้บ่น; จู้จี้; จุกจิก" },
+            { en: "I think K.Tuktaa can clean up auditing.", th: "คิดว่า คุณตุ๊กตาจะสามารถเคลียร์งานออดิทได้" },
+            { en: "I think K.Tuktaa can be a clean auditor.", th: "คิดว่า คุณตุ๊กตาจะสามารถเป็นผู้ตรวจสอบบัญชีมือสะอาดได้" },
+            { en: "I think K.Earn records accounting cleanly.", th: "คิดว่า คุณเอิร์นบันทึกบัญชีอย่างเรียบร้อย" },
+            { en: "Not join hands with Cambodia and China", th: "ไม่ร่วมมือกับกัมพูชาและจีน" },
+            { en: "Grey Chinese", th: "จีนเทา" },
+            { en: "election", th: "การเลือกตั้ง" }
+        ];
+
+        function renderAdditionalVocab() {
+            const container = document.getElementById('additional-vocab-grid');
+            additionalVocab.forEach((item, index) => {
+                const thId = `add-vocab-${index}`;
+                const card = document.createElement('div');
+                card.className = "bg-white border border-gray-200 p-4 rounded-lg hover:shadow-md transition-shadow";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-lg text-gray-800 break-words">${item.en}</h3>
+                            <p id="${thId}" class="hidden text-sm text-teal-600 mt-2 font-bold">${item.th}</p>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                             <button onclick="speak('${item.en.replace(/'/g, "\\'")}')" class="text-sm btn-icon bg-gray-100 p-1 rounded hover:bg-gray-200">🔊</button>
+                             <button onclick="toggleThai('${thId}')" class="text-sm btn-icon bg-gray-100 p-1 rounded hover:bg-gray-200">🇹🇭</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function pickRandomWord() {
+            const container = document.getElementById('wordContainer');
+            
+            // Generate content
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const word = vocabList[randomIndex];
+            
+            // Unique ID for the new toggle
+            const thId = 'rand-th-' + Date.now();
+            
+            container.innerHTML = `
+                <div class="animate-bounce">
+                    <div class="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-2 px-2">${word.en}</div>
+                    <div class="flex gap-3 justify-center">
+                        <button onclick="speak('${word.en.replace(/'/g, "\\'")}')" class="text-xl btn-icon bg-white p-2 rounded-full shadow">🔊</button>
+                        <button onclick="toggleThai('${thId}')" class="text-xl btn-icon bg-white p-2 rounded-full shadow">🇹🇭</button>
+                    </div>
+                    <div id="${thId}" class="hidden text-gray-500 text-lg mt-2 font-bold">${word.th}</div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        renderAdditionalVocab();
+    </script>
+</body>
+</html>
