@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Household Items</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fefce8; /* Light yellow background */
+            color: #3f3f46; 
+        }
+        .content-section {
+            display: none; 
+        }
+        .content-section.active {
+            display: block; 
+        }
+        .nav-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-button.active {
+            border-bottom-color: #16a34a; /* Green */
+            color: #15803d; 
+        }
+        .thai-toggle-btn {
+            background-color: #f0f9ff; /* Light blue */
+            color: #0c4a6e; /* Darker blue text */
+            padding: 4px 8px;
+            border-radius: 9999px; /* Full rounded */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600; /* font-semibold */
+            margin-left: 8px; /* ml-2 */
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .thai-toggle-btn:hover {
+            background-color: #e0f2fe; /* Hover blue */
+        }
+        .thai-translation {
+            display: none;
+            font-size: 0.9em;
+            color: #6b7280; /* text-gray-500 */
+            margin-top: 4px;
+            padding-left: 8px;
+            border-left: 2px solid #a78bfa; /* purple for translation */
+        }
+        
+        /* Matching Game Styles */
+        .match-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #d1d5db; /* gray-300 */
+        }
+        .match-item:hover {
+            background-color: #fef9c3; /* yellow-100 */
+        }
+        .match-item.selected {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            border-color: #1d4ed8; /* blue-800 */
+        }
+        .match-item.matched {
+            background-color: #4ade80; /* green-400 */
+            color: #166534; /* green-800 */
+            border-color: #22c55e; /* green-500 */
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        /* Phrase Builder Styles */
+        .phrase-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .phrase-button.selected {
+            background-color: #2563eb;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Room Explorer Styles */
+        .room-selector {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .room-selector:hover {
+            transform: scale(1.03);
+            border-color: #fbbf24; /* amber-400 */
+        }
+        .room-selector.active {
+            border-color: #2563eb; /* blue-600 */
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
+        }
+        .room-items-container {
+            display: none;
+        }
+        .room-items-container.active {
+            display: block;
+        }
+
+        /* Comprehension Question Styles */
+        .comprehension-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .comprehension-option:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+
+        /* Extension Activity Styles */
+        .scavenger-item {
+            font-size: 1.125rem; /* text-lg */
+        }
+        .scavenger-item input:checked + label {
+            text-decoration: line-through;
+            color: #6b7280; /* text-gray-500 */
+        }
+        .scavenger-item label {
+            cursor: pointer;
+        }
+        .odd-one-out-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #d1d5db;
+        }
+        .odd-one-out-option:hover {
+            background-color: #fef9c3; /* yellow-100 */
+        }
+        .odd-one-out-option.selected-correct {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+        }
+        .odd-one-out-option.selected-wrong {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-6 max-w-6xl">
+
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 speak">Household Items 🛋️</h1>
+            <p class="text-lg text-gray-700 speak-sentence">Lesson 2: What's in my home?</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:space-x-6 bg-white p-4 rounded-lg shadow-sm mb-6 sticky top-2 z-10">
+            <button id="nav-warmup" class="nav-button active" onclick="showSection('warmup')">
+                <span class="text-2xl hidden md:inline">🔥</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Warm-up</span>
+                <span class="block text-xs md:text-sm text-gray-500">(อบอุ่นร่างกาย)</span>
+            </button>
+            <button id="nav-items" class="nav-button" onclick="showSection('items')">
+                <span class="text-2xl hidden md:inline">🛋️</span>
+                <span class="block text-sm md:text-lg font-semibold speak">My Items</span>
+                <span class="block text-xs md:text-sm text-gray-500">(ของใช้ของฉัน)</span>
+            </button>
+            <button id="nav-phrases" class="nav-button" onclick="showSection('phrases')">
+                <span class="text-2xl hidden md:inline">💬</span>
+                <span class="block text-sm md:text-lg font-semibold speak">My Phrases</span>
+                <span class="block text-xs md:text-sm text-gray-500">(วลีของฉัน)</span>
+            </button>
+            <button id="nav-quiz" class="nav-button" onclick="showSection('quiz')">
+                <span class="text-2xl hidden md:inline">❓</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Item Quiz</span>
+                <span class="block text-xs md:text-sm text-gray-500">(แบบทดสอบของใช้)</span>
+            </button>
+            <button id="nav-extension" class="nav-button" onclick="showSection('extension')">
+                <span class="text-2xl hidden md:inline">🚀</span>
+                <span class="block text-sm md:text-lg font-semibold speak">Extension</span>
+                <span class="block text-xs md:text-sm text-gray-500">(กิจกรรมเพิ่มเติม)</span>
+            </button>
+        </nav>
+
+        <main>
+            <!-- Warm-up Section -->
+            <section id="warmup-section" class="content-section active bg-white p-6 rounded-lg shadow-sm">
+                
+                <!-- Let's Talk -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4 speak">Let's Talk! (มาคุยกัน!)</h2>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <span class="text-lg font-medium text-gray-800 speak-sentence">Where are you now?</span>
+                            <button class="thai-toggle-btn" data-thai="ตอนนี้คุณอยู่ที่ไหน?">TH</button>
+                            <p class="thai-translation">ตอนนี้คุณอยู่ที่ไหน?</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <span class="text-lg font-medium text-gray-800 speak-sentence">What can you see in your room?</span>
+                            <button class="thai-toggle-btn" data-thai="คุณเห็นอะไรในห้องของคุณบ้าง?">TH</button>
+                            <p class="thai-translation">คุณเห็นอะไรในห้องของคุณบ้าง?</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            <span class="text-lg font-medium text-gray-800 speak-sentence">Is there a bed? ... Is there a TV?</span>
+                            <button class="thai-toggle-btn" data-thai="มีเตียงไหม? ... มีทีวีไหม?">TH</button>
+                            <p class="thai-translation">มีเตียงไหม? ... มีทีวีไหม?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Let's Watch -->
+                <div class="bg-amber-100 p-4 rounded-lg shadow-sm mt-8">
+                    <h2 class="text-2xl font-semibold text-amber-800 mb-2 speak-sentence">Let's Watch! (มาดูกัน!)</h2>
+                    <p class="text-amber-700 mb-4 speak-sentence">Watch this video, then answer the questions below.</p>
+                    
+                    <div class="aspect-video w-full max-w-lg mx-auto">
+                        <iframe class="w-full h-full rounded-lg shadow-md" src="https://www.youtube.com/embed/lx1e5xakqKM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- Comprehension Questions -->
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 speak-sentence">Check Your Understanding (ตรวจสอบความเข้าใจ)</h3>
+                    <div class="space-y-6" id="comprehension-questions">
+                        <!-- Questions will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- My Items Section -->
+            <section id="items-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2 speak">My Items & Words (ของใช้และคำศัพท์)</h2>
+                <button class="thai-toggle-btn speak-sentence" data-thai="คลิกที่ห้องเพื่อดูของใช้ จากนั้นจับคู่">Click a room to see its items, then play the matching game.</button>
+                <p class="thai-translation mb-6">คลิกที่ห้องเพื่อดูของใช้ จากนั้นจับคู่</p>
+
+                <!-- Room Selectors -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div id="select-kitchen" class="room-selector active p-4 bg-orange-100 rounded-lg text-center" onclick="showRoom('kitchen')">
+                        <span class="text-5xl">🍳</span>
+                        <h3 class="text-xl font-semibold text-orange-800 speak">Kitchen</h3>
+                    </div>
+                    <div id="select-livingroom" class="room-selector p-4 bg-blue-100 rounded-lg text-center" onclick="showRoom('livingroom')">
+                        <span class="text-5xl">🛋️</span>
+                        <h3 class="text-xl font-semibold text-blue-800 speak">Living Room</h3>
+                    </div>
+                    <div id="select-bedroom" class="room-selector p-4 bg-green-100 rounded-lg text-center" onclick="showRoom('bedroom')">
+                        <span class="text-5xl">🛏️</span>
+                        <h3 class="text-xl font-semibold text-green-800 speak">Bedroom</h3>
+                    </div>
+                    <div id="select-diningroom" class="room-selector p-4 bg-purple-100 rounded-lg text-center" onclick="showRoom('diningroom')">
+                        <span class="text-5xl">🍽️</span>
+                        <h3 class="text-xl font-semibold text-purple-800 speak">Dining Room</h3>
+                    </div>
+                    <div id="select-bathroom" class="room-selector p-4 bg-cyan-100 rounded-lg text-center" onclick="showRoom('bathroom')">
+                        <span class="text-5xl">🚻</span>
+                        <h3 class="text-xl font-semibold text-cyan-800 speak">Bathroom</h3>
+                    </div>
+                    <div id="select-garage" class="room-selector p-4 bg-gray-200 rounded-lg text-center" onclick="showRoom('garage')">
+                        <span class="text-5xl">🚗</span>
+                        <h3 class="text-xl font-semibold text-gray-800 speak">Garage</h3>
+                    </div>
+                    <div id="select-garden" class="room-selector p-4 bg-lime-100 rounded-lg text-center" onclick="showRoom('garden')">
+                        <span class="text-5xl">🌳</span>
+                        <h3 class="text-xl font-semibold text-lime-800 speak">Garden</h3>
+                    </div>
+                    <div id="select-balcony" class="room-selector p-4 bg-amber-100 rounded-lg text-center" onclick="showRoom('balcony')">
+                        <span class="text-5xl">🪴</span>
+                        <h3 class="text-xl font-semibold text-amber-800 speak">Balcony</h3>
+                    </div>
+                </div>
+
+                <!-- Kitchen Items -->
+                <div id="kitchen-items" class="room-items-container active">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Kitchen Items (ของใช้ในห้องครัว)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-kitchen">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="kitchen-col-1"></div>
+                            <div class="space-y-3" id="kitchen-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('kitchen')">Reset</button>
+                    </div>
+                </div>
+                
+                <!-- Living Room Items -->
+                <div id="livingroom-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Living Room Items (ของใช้ในห้องนั่งเล่น)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-livingroom">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="livingroom-col-1"></div>
+                            <div class="space-y-3" id="livingroom-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('livingroom')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Bedroom Items -->
+                <div id="bedroom-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Bedroom Items (ของใช้ในห้องนอน)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-bedroom">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="bedroom-col-1"></div>
+                            <div class="space-y-3" id="bedroom-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('bedroom')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Dining Room Items -->
+                <div id="diningroom-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Dining Room Items (ของใช้ในห้องทานอาหาร)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-diningroom">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="diningroom-col-1"></div>
+                            <div class="space-y-3" id="diningroom-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('diningroom')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Bathroom Items -->
+                <div id="bathroom-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Bathroom Items (ของใช้ในห้องน้ำ)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-bathroom">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="bathroom-col-1"></div>
+                            <div class="space-y-3" id="bathroom-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('bathroom')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Garage Items -->
+                <div id="garage-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Garage Items (ของในโรงรถ)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-garage">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="garage-col-1"></div>
+                            <div class="space-y-3" id="garage-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('garage')">Reset</button>
+                    </div>
+                </div>
+                
+                <!-- Garden Items -->
+                <div id="garden-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Garden Items (ของในสวน)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-garden">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="garden-col-1"></div>
+                            <div class="space-y-3" id="garden-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('garden')">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Balcony Items -->
+                <div id="balcony-items" class="room-items-container">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Balcony Items (ของที่ระเบียง)</h3>
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-balcony">
+                        <p class="text-center text-gray-500 mb-4 speak-sentence">Match the item to the word.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="balcony-col-1"></div>
+                            <div class="space-y-3" id="balcony-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4 speak-sentence" onclick="resetGame('balcony')">Reset</button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- My Phrases Section -->
+            <section id="phrases-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">My Phrases (วลีของฉัน)</h2>
+                
+                <!-- Phrase Builder: Asking -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Asking (การถาม)</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">1. Choose Question (เลือกคำถาม)</h4>
+                            <div class="flex flex-wrap gap-3" id="phrase-q-verbs">
+                                <button class="phrase-button q-verb-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="Where is">Where is... (อยู่ที่ไหน?)</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">2. Choose Item (เลือกของใช้)</h4>
+                            <div class="flex flex-wrap gap-3" id="phrase-q-nouns">
+                                <button class="phrase-button q-noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="the sofa?">the sofa? 🛋️</button>
+                                <button class="phrase-button q-noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="the bed?">the bed? 🛏️</button>
+                                <button class="phrase-button q-noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="the fridge?">the fridge? 🧊</button>
+                                <button class="phrase-button q-noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="the toilet?">the toilet? 🚽</button>
+                                <button class="phrase-button q-noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="the car?">the car? 🚗</button>
+                                <button class="phrase-button q-noun-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak" data-value="the dog?">the dog? 🐶</button>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">3. Your Question (คำถามของคุณ)</h4>
+                            <div id="phrase-q-result" class="w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center h-24 flex items-center justify-center">
+                                <p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-10 border-gray-300">
+
+                <!-- Phrase Builder: Telling -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Telling (การบอก)</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">1. Choose Item (เลือกของใช้)</h4>
+                            <div class="flex flex-wrap gap-3" id="phrase-t-subjects">
+                                <button class="phrase-button t-subject-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The sofa is">The sofa is... 🛋️</button>
+                                <button class="phrase-button t-subject-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The bed is">The bed is... 🛏️</button>
+                                <button class="phrase-button t-subject-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The fridge is">The fridge is... 🧊</button>
+                                <button class="phrase-button t-subject-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The toilet is">The toilet is... 🚽</button>
+                                <button class="phrase-button t-subject-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The car is">The car is... 🚗</button>
+                                <button class="phrase-button t-subject-btn text-lg font-medium bg-blue-100 text-blue-800 p-4 rounded-lg shadow-sm hover:bg-blue-200 speak-sentence" data-value="The dog is">The dog is... 🐶</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">2. Choose Place (เลือกสถานที่)</h4>
+                            <div class="flex flex-wrap gap-3" id="phrase-t-locations">
+                                <button class="phrase-button t-location-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the living room.">in the living room. 🛋️</button>
+                                <button class="phrase-button t-location-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the bedroom.">in the bedroom. 🛏️</button>
+                                <button class="phrase-button t-location-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the kitchen.">in the kitchen. 🍳</button>
+                                <button class="phrase-button t-location-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the bathroom.">in the bathroom. 🚻</button>
+                                <button class="phrase-button t-location-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the garage.">in the garage. 🚗</button>
+                                <button class="phrase-button t-location-btn text-lg font-medium bg-green-100 text-green-800 p-4 rounded-lg shadow-sm hover:bg-green-200 speak-sentence" data-value="in the garden.">in the garden. 🌳</button>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-lg text-gray-700 mb-3 speak-sentence">3. Your Sentence (ประโยคของคุณ)</h4>
+                            <div id="phrase-t-result" class="w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center h-24 flex items-center justify-center">
+                                <p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Item Quiz Section -->
+            <section id="quiz-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">Item Quiz (แบบทดสอบของใช้)</h2>
+                
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <div id="quiz-question-container">
+                        <h3 class="text-2xl font-semibold text-center text-gray-800 mb-6 speak" id="quiz-question">What's in the kitchen?</h3>
+                        <div class="grid grid-cols-3 gap-4" id="quiz-options">
+                            <!-- Options will be dynamically generated -->
+                        </div>
+                    </div>
+                    <div id="quiz-feedback" class="text-center hidden mt-6">
+                        <p class="text-3xl font-bold" id="quiz-feedback-text"></p>
+                        <button class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 speak-sentence" id="quiz-next-btn">Next Question</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Extension Activities Section -->
+            <section id="extension-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 speak">Extension Activities (กิจกรรมเพิ่มเติม)</h2>
+                
+                <!-- Activity 1: Scavenger Hunt -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Activity 1: Scavenger Hunt (เกมล่าสมบัติ)</h3>
+                    <p class="text-gray-600 mb-4 speak-sentence">Walk around your home. Check (✓) the items you can find. (เดินไปรอบๆ บ้านของคุณ ตรวจสอบ (✓) รายการที่คุณสามารถหาได้)</p>
+                    <div class="bg-gray-50 p-6 rounded-lg grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-1" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-1" class="ml-3 text-gray-700 speak">a bed 🛏️</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-2" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-2" class="ml-3 text-gray-700 speak">a sofa 🛋️</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-3" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-3" class="ml-3 text-gray-700 speak">a TV 📺</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-4" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-4" class="ml-3 text-gray-700 speak">a fridge 🧊</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-5" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-5" class="ml-3 text-gray-700 speak">a sink 💧</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-6" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-6" class="ml-3 text-gray-700 speak">a toilet 🚽</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-7" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-7" class="ml-3 text-gray-700 speak">a lamp 💡</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-8" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-8" class="ml-3 text-gray-700 speak">a plant 🪴</label>
+                        </div>
+                        <div class="scavenger-item flex items-center">
+                            <input type="checkbox" id="hunt-9" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="hunt-9" class="ml-3 text-gray-700 speak">a chair 🪑</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity 2: Odd One Out -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 speak-sentence">Activity 2: Odd One Out (หาคำที่ไม่เข้าพวก)</h3>
+                    <p class="text-gray-600 mb-4 speak-sentence">In each group, click the item that does NOT belong. (ในแต่ละกลุ่ม คลิกรายการที่ไม่เข้าพวก)</p>
+                    <div class="space-y-6" id="odd-one-out-container">
+                        <!-- Questions will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const allSections = document.querySelectorAll('.content-section');
+        const allNavButtons = document.querySelectorAll('.nav-button');
+        
+        // TTS setup
+        const synth = window.speechSynthesis;
+        let americanVoice = null;
+
+        function setVoice() {
+            if (synth.getVoices().length > 0) {
+                americanVoice = synth.getVoices().find(voice => voice.lang === 'en-US' && (voice.name.includes('Google') || voice.name.includes('Samantha') || voice.name.includes('Alex'))) || synth.getVoices().find(voice => voice.lang === 'en-US');
+            }
+        }
+
+        if (synth) {
+            synth.onvoiceschanged = setVoice;
+            setVoice();
+        }
+
+        function speakText(text) {
+            if (synth && text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (americanVoice) {
+                    utterance.voice = americanVoice;
+                } else {
+                    utterance.lang = 'en-US';
+                }
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                synth.speak(utterance);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initToggleButtons();
+            initTTSSpeakButtons();
+            initComprehensionQuestions();
+            initRoomExplorer();
+            initPhraseBuilders();
+            initQuiz();
+            initOddOneOut();
+            initScavengerHunt();
+            
+            allNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const sectionId = button.id.replace('nav-', '');
+                    showSection(sectionId);
+                });
+            });
+
+            showSection('warmup');
+        });
+
+        function showSection(sectionId) {
+            allSections.forEach(section => {
+                section.classList.toggle('active', section.id === `${sectionId}-section`);
+            });
+            allNavButtons.forEach(button => {
+                button.classList.toggle('active', button.id === `nav-${sectionId}`);
+            });
+        }
+        
+        function initToggleButtons() {
+            document.querySelectorAll('.thai-toggle-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const translationElement = button.nextElementSibling;
+                    if (translationElement && translationElement.classList.contains('thai-translation')) {
+                        translationElement.style.display = translationElement.style.display === 'block' ? 'none' : 'block';
+                    }
+                });
+            });
+        }
+
+        function initTTSSpeakButtons() {
+            document.body.addEventListener('click', (e) => {
+                const speakElement = e.target.closest('.speak, .speak-sentence, .scavenger-item label');
+                if (!speakElement) return;
+
+                // Special handling for comprehension quiz options: only speak, don't select.
+                // The selection logic is in initComprehensionQuestions
+                if (speakElement.parentElement.classList.contains('comprehension-option') && e.target.classList.contains('speak')) {
+                     e.stopPropagation(); // Stop it from triggering the selection click
+                } 
+                // Don't speak if a toggle button was clicked
+                else if (e.target.closest('.thai-toggle-btn') || e.target.closest('input[type="checkbox"]')) {
+                    return;
+                }
+                
+                // Get text, remove Thai, remove emoji from some buttons
+                let text = (speakElement.dataset.speakText || speakElement.innerText)
+                            .split('(')[0]
+                            .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+                            .trim();
+                speakText(text);
+                
+            });
+        }
+
+        // Section: Warm-up Comprehension
+        const comprehensionQuestions = [
+            {
+                question: "Which room has a toaster and a fridge?",
+                thai: "ห้องไหนมีเครื่องปิ้งขนมปังและตู้เย็น?",
+                options: ["Living Room", "Kitchen", "Bedroom"],
+                answer: "Kitchen"
+            },
+            {
+                question: "Which room has a couch and a TV?",
+                thai: "ห้องไหนมีโซฟาและทีวี?",
+                options: ["Garage", "Dining Room", "Living Room"],
+                answer: "Living Room"
+            },
+            {
+                question: "Which room has a wardrobe and a bed?",
+                thai: "ห้องไหนมีตู้เสื้อผ้าและเตียง?",
+                options: ["Bedroom", "Bathroom", "Garden"],
+                answer: "Bedroom"
+            },
+            {
+                question: "Which room has a toilet and a bathtub?",
+                thai: "ห้องไหนมีโถส้วมและอ่างอาบน้ำ?",
+                options: ["Kitchen", "Balcony", "Bathroom"],
+                answer: "Bathroom"
+            },
+            {
+                question: "Which room has a car?",
+                thai: "ห้องไหนมีรถ?",
+                options: ["Garage", "Garden", "Living Room"],
+                answer: "Garage"
+            }
+        ];
+
+        function initComprehensionQuestions() {
+            const container = document.getElementById('comprehension-questions');
+            container.innerHTML = '';
+            comprehensionQuestions.forEach((q, index) => {
+                const qBlock = document.createElement('div');
+                qBlock.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
+                
+                let optionsHTML = q.options.map(option => `
+                    <div class="comprehension-option p-3 rounded-lg border border-gray-300" data-answer="${q.answer}" data-selected="${option}">
+                        <span class="text-lg font-medium speak" data-speak-text="${option}">${option}</span>
+                    </div>
+                `).join('');
+
+                qBlock.innerHTML = `
+                    <div class="mb-3">
+                        <span class="text-lg font-medium text-gray-800 speak-sentence">${index + 1}. ${q.question}</span>
+                        <button class="thai-toggle-btn" data-thai="${q.thai}">TH</button>
+                        <p class="thai-translation">${q.thai}</p>
+                    </div>
+                    <div class="space-y-2" id="q-${index}-options">
+                        ${optionsHTML}
+                    </div>
+                    <p class="text-lg font-bold mt-3 hidden" id="q-${index}-feedback"></p>
+                `;
+                container.appendChild(qBlock);
+            });
+
+            container.addEventListener('click', (e) => {
+                const optionEl = e.target.closest('.comprehension-option');
+                if (!optionEl) return;
+                
+                // Do nothing if just the text span was clicked (handled by main TTS listener)
+                if (e.target.classList.contains('speak')) {
+                    return;
+                }
+
+                const selected = optionEl.dataset.selected;
+                const answer = optionEl.dataset.answer;
+                const parent = optionEl.parentElement;
+                const feedbackEl = parent.nextElementSibling;
+
+                parent.querySelectorAll('.comprehension-option').forEach(el => {
+                    el.style.backgroundColor = '';
+                    el.style.borderColor = '#d1d5db';
+                });
+
+                if (selected === answer) {
+                    optionEl.style.backgroundColor = '#dcfce7'; // green-100
+                    optionEl.style.borderColor = '#22c55e'; // green-500
+                    feedbackEl.innerText = 'Correct! 👍';
+                    feedbackEl.className = 'text-lg font-bold mt-3 text-green-600';
+                    speakText('Correct!');
+                } else {
+                    optionEl.style.backgroundColor = '#fee2e2'; // red-100
+                    optionEl.style.borderColor = '#ef4444'; // red-500
+                    feedbackEl.innerText = 'Try again. 👎';
+                    feedbackEl.className = 'text-lg font-bold mt-3 text-red-600';
+                    speakText('Try again.');
+                }
+                feedbackEl.classList.remove('hidden');
+            });
+
+            initToggleButtons(); // Re-init for new buttons
+        }
+
+
+        // Section: My Items & Words
+        const roomData = {
+            kitchen: [
+                { id: 'k1', emoji: '🧊', term: 'fridge' },
+                { id: 'k2', emoji: '🍳', term: 'oven' },
+                { id: 'k3', emoji: '💧', term: 'sink' },
+                { id: 'k4', emoji: '☕', term: 'coffee maker' },
+                { id: 'k5', emoji: '🍞', term: 'toaster' },
+                { id: 'k6', emoji: '🗄️', term: 'cabinet' }
+            ],
+            livingroom: [
+                { id: 'lr1', emoji: '🛋️', term: 'couch' },
+                { id: 'lr2', emoji: '📺', term: 'TV' },
+                { id: 'lr3', emoji: '💻', term: 'laptop' },
+                { id: 'lr4', emoji: '🪴', term: 'plant' },
+                { id: 'lr5', emoji: '💡', term: 'lamp' }
+            ],
+            bedroom: [
+                { id: 'br1', emoji: '🛏️', term: 'bed' },
+                { id: 'br2', emoji: '💡', term: 'lamp' },
+                { id: 'br3', emoji: '🚪', term: 'wardrobe' },
+                { id: 'br4', emoji: '⏰', term: 'alarm clock' },
+                { id: 'br5', emoji: '🖼️', term: 'picture' }
+            ],
+            diningroom: [
+                { id: 'dr1', emoji: '🍽️', term: 'dining table' },
+                { id: 'dr2', emoji: '🪑', term: 'chair' },
+                { id: 'dr3', emoji: '💡', term: 'light' },
+                { id: 'dr4', emoji: '🪴', term: 'plant' }
+            ],
+            bathroom: [
+                { id: 'bth1', emoji: '🚽', term: 'toilet' },
+                { id: 'bth2', emoji: '🚿', term: 'bathtub' },
+                { id: 'bth3', emoji: '💧', term: 'sink' },
+                { id: 'bth4', emoji: '🧼', term: 'soap' },
+                { id: 'bth5', emoji: '🪞', term: 'mirror' },
+                { id: 'bth6', emoji: '🛁', term: 'towel' }
+            ],
+            garage: [
+                { id: 'g1', emoji: '🚗', term: 'car' },
+                { id: 'g2', emoji: '🪜', term: 'ladder' },
+                { id: 'g3', emoji: '🧰', term: 'toolbox' },
+                { id: 'g4', emoji: '🔩', term: 'screwdriver' }
+            ],
+            garden: [
+                { id: 'gd1', emoji: '🌳', term: 'grass' },
+                { id: 'gd2', emoji: '🌸', term: 'flowers' },
+                { id: 'gd3', emoji: '🐶', term: 'dog' },
+                { id: 'gd4', emoji: '🐾', term: 'dog bowl' }
+            ],
+            balcony: [
+                { id: 'bc1', emoji: '🪴', term: 'plants' },
+                { id: 'bc2', emoji: '🚪', term: 'door' },
+                { id: 'bc3', emoji: '📚', term: 'shelf' }
+            ]
+        };
+
+        let selectedItem = null;
+
+        function shuffle(array) {
+            let newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        function createMatchingGame(room) {
+            const data = roomData[room];
+            if (!data) return; 
+
+            const col1 = document.getElementById(`${room}-col-1`);
+            const col2 = document.getElementById(`${room}-col-2`);
+            
+            col1.innerHTML = '';
+            col2.innerHTML = '';
+
+            const definitions = shuffle(data);
+            const terms = shuffle(data);
+
+            definitions.forEach(item => {
+                col1.innerHTML += `
+                    <div class="match-item p-4 rounded-lg bg-white shadow-sm text-center" data-id="${item.id}" data-type="definition" onclick="selectMatchItem(this, '${room}')">
+                        <span class="text-4xl">${item.emoji}</span>
+                    </div>`;
+            });
+            
+            terms.forEach(item => {
+                col2.innerHTML += `
+                    <div class="match-item p-4 rounded-lg bg-white shadow-sm text-center speak" data-speak-text="${item.term}" data-id="${item.id}" data-type="term" onclick="selectMatchItem(this, '${room}')">
+                        <span class="text-xl font-medium">${item.term}</span>
+                    </div>`;
+            });
+        }
+
+        function selectMatchItem(element, room) {
+            if (element.classList.contains('matched')) return;
+
+            const type = element.dataset.type;
+            const id = element.dataset.id;
+
+            if (selectedItem) {
+                // An item is already selected
+                if (selectedItem.type !== type && selectedItem.id === id) {
+                    // It's a match!
+                    element.classList.add('matched');
+                    selectedItem.element.classList.add('matched');
+                    selectedItem = null;
+                    checkGameWin(room);
+                } else if (selectedItem.type === type) {
+                    // Selected same type, just switch selection
+                    selectedItem.element.classList.remove('selected');
+                    element.classList.add('selected');
+                    selectedItem = { element, type, id };
+                } else {
+                    // Mismatch, reset
+                    selectedItem.element.classList.remove('selected');
+                    selectedItem = null;
+                }
+            } else {
+                // Nothing selected
+                element.classList.add('selected');
+                selectedItem = { element, type, id };
+            }
+        }
+
+        function checkGameWin(room) {
+            const gameContainer = document.getElementById(`match-game-${room}`);
+            const allItems = gameContainer.querySelectorAll('.match-item');
+            const allMatched = Array.from(allItems).every(item => item.classList.contains('matched'));
+            
+            if (allMatched) {
+                const p = gameContainer.querySelector('p');
+                p.innerText = 'Good job! 🎉';
+                speakText('Good job!');
+            }
+        }
+
+        function resetGame(room) {
+            selectedItem = null;
+            const p = document.getElementById(`match-game-${room}`).querySelector('p');
+            p.innerText = 'Match the item to the word.';
+            createMatchingGame(room);
+        }
+
+        function initRoomExplorer() {
+            Object.keys(roomData).forEach(room => {
+                createMatchingGame(room);
+            });
+            showRoom('kitchen'); // Show first room by default
+        }
+
+        function showRoom(room) {
+            document.querySelectorAll('.room-items-container').forEach(c => c.classList.remove('active'));
+            document.getElementById(`${room}-items`).classList.add('active');
+            
+            document.querySelectorAll('.room-selector').forEach(s => s.classList.remove('active'));
+            document.getElementById(`select-${room}`).classList.add('active');
+            
+            selectedItem = null; // Reset matching game selection
+        }
+
+        // Section: My Phrases
+        function initPhraseBuilders() {
+            // Asking
+            const qVerbBtn = document.querySelector('.q-verb-btn');
+            const qNounContainer = document.getElementById('phrase-q-nouns');
+            const qResultBox = document.getElementById('phrase-q-result');
+            let selectedQVerb = '';
+            let selectedQNoun = '';
+            
+            qVerbBtn.addEventListener('click', () => {
+                qVerbBtn.classList.toggle('selected');
+                selectedQVerb = qVerbBtn.classList.contains('selected') ? qVerbBtn.dataset.value : '';
+                updateQPhrase();
+            });
+
+            qNounContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.q-noun-btn');
+                if (!btn) return;
+                qNounContainer.querySelectorAll('.q-noun-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedQNoun = btn.dataset.value;
+                updateQPhrase();
+            });
+
+            function updateQPhrase() {
+                if (selectedQVerb && selectedQNoun) {
+                    const phrase = `${selectedQVerb} ${selectedQNoun}`;
+                    qResultBox.innerHTML = `<p class="text-3xl font-bold text-gray-900 speak-sentence">${phrase}</p>`;
+                    speakText(phrase);
+                } else if (selectedQVerb) {
+                    qResultBox.innerHTML = `<p class="text-2xl font-bold text-gray-700 speak-sentence">${selectedQVerb} ...?</p>`;
+                } else {
+                    qResultBox.innerHTML = `<p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>`;
+                }
+            }
+
+            // Telling
+            const tSubjectContainer = document.getElementById('phrase-t-subjects');
+            const tLocationContainer = document.getElementById('phrase-t-locations');
+            const tResultBox = document.getElementById('phrase-t-result');
+            let selectedTSubject = '';
+            let selectedTLocation = '';
+            
+            tSubjectContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.t-subject-btn');
+                if (!btn) return;
+                tSubjectContainer.querySelectorAll('.t-subject-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedTSubject = btn.dataset.value;
+                updateTPhrase();
+            });
+            
+            tLocationContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.t-location-btn');
+                if (!btn) return;
+                tLocationContainer.querySelectorAll('.t-location-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedTLocation = btn.dataset.value;
+                updateTPhrase();
+            });
+
+            function updateTPhrase() {
+                if (selectedTSubject && selectedTLocation) {
+                    const phrase = `${selectedTSubject} ${selectedTLocation}`;
+                    tResultBox.innerHTML = `<p class="text-3xl font-bold text-gray-900 speak-sentence">${phrase}</p>`;
+                    speakText(phrase);
+                } else if (selectedTSubject) {
+                    tResultBox.innerHTML = `<p class="text-2xl font-bold text-gray-700 speak-sentence">${selectedTSubject} ...</p>`;
+                } else {
+                    tResultBox.innerHTML = `<p class="text-2xl font-bold text-gray-500 speak-sentence">(Click buttons above)</p>`;
+                }
+            }
+        }
+
+        // Section: Item Quiz
+        const quizData = [
+            { question: "What's in the kitchen?", options: ['toaster', 'bed', 'sofa'], answer: 'toaster' },
+            { question: "What's in the bedroom?", options: ['toilet', 'wardrobe', 'fridge'], answer: 'wardrobe' },
+            { question: "What's in the living room?", options: ['couch', 'shower', 'stove'], answer: 'couch' },
+            { question: "What's in the bathroom?", options: ['lamp', 'closet', 'toilet'], answer: 'toilet' },
+            { question: "What's in the garage?", options: ['car', 'dog', 'flowers'], answer: 'car' },
+            { question: "What's in the garden?", options: ['screwdriver', 'grass', 'bathtub'], answer: 'grass' },
+            { question: "Where is the sink?", options: ['Bedroom', 'Kitchen', 'Living Room'], answer: 'Kitchen' },
+            { question: "Where is the TV?", options: ['Living Room', 'Bathroom', 'Kitchen'], answer: 'Living Room' },
+            { question: "Where is the bathtub?", options: ['Bedroom', 'Living Room', 'Bathroom'], answer: 'Bathroom' },
+            { question: "Where is the lamp?", options: ['Kitchen', 'Bedroom', 'Bathroom'], answer: 'Bedroom' },
+            { question: "Where is the dog?", options: ['Garage', 'Garden', 'Balcony'], answer: 'Garden' }
+        ];
+
+        const itemEmojis = {
+            'sofa': '🛋️', 'TV': '📺', 'coffee table': '☕', 'laptop': '💻', 'plant': '🪴',
+            'bed': '🛏️', 'lamp': '💡', 'closet': '🚪', 'wardrobe': '🚪', 'alarm clock': '⏰', 'picture': '🖼️',
+            'fridge': '🧊', 'stove': '🍳', 'sink': '💧', 'oven': '🍳', 'coffee maker': '☕', 'toaster': '🍞', 'cabinet': '🗄️',
+            'dining table': '🍽️', 'chair': '🪑', 'light': '💡',
+            'toilet': '🚽', 'shower': '🚿', 'bathtub': '🛁', 'soap': '🧼', 'mirror': '🪞', 'towel': '🛁',
+            'car': '🚗', 'ladder': '🪜', 'toolbox': '🧰', 'screwdriver': '🔩',
+            'grass': '🌳', 'flowers': '🌸', 'dog': '🐶', 'dog bowl': '🐾',
+            'plants': '🪴', 'door': '🚪', 'shelf': '📚',
+            'Living Room': '🛋️', 'Bedroom': '🛏️', 'Kitchen': '🍳', 'Bathroom': '🚻', 'Dining Room': '🍽️',
+            'Garage': '🚗', 'Garden': '🌳', 'Balcony': '🪴', 'couch': '🛋️'
+        };
+
+        let currentQuestionIndex = 0;
+
+        function initQuiz() {
+            currentQuestionIndex = 0;
+            shuffle(quizData); // Shuffle the quiz questions
+            loadQuizQuestion();
+            document.getElementById('quiz-next-btn').addEventListener('click', () => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= quizData.length) {
+                    currentQuestionIndex = 0; // Loop back
+                    shuffle(quizData);
+                }
+                loadQuizQuestion();
+            });
+        }
+
+        function loadQuizQuestion() {
+            const question = quizData[currentQuestionIndex];
+            document.getElementById('quiz-question').innerText = question.question;
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            const shuffledOptions = shuffle([...question.options]);
+
+            shuffledOptions.forEach(option => {
+                const emoji = itemEmojis[option] || '❓';
+                const optionEl = document.createElement('div');
+                optionEl.className = 'p-4 bg-white rounded-lg shadow-sm text-center cursor-pointer transition-transform hover:scale-105';
+                optionEl.innerHTML = `
+                    <span class="text-5xl">${emoji}</span>
+                    <p class="text-xl font-semibold mt-2 speak" data-speak-text="${option}">${option}</p>
+                `;
+                optionEl.addEventListener('click', () => checkQuizAnswer(option));
+                optionsContainer.appendChild(optionEl);
+            });
+
+            document.getElementById('quiz-question-container').style.display = 'block';
+            document.getElementById('quiz-feedback').style.display = 'none';
+        }
+
+        function checkQuizAnswer(selectedOption) {
+            const question = quizData[currentQuestionIndex];
+            const feedbackText = document.getElementById('quiz-feedback-text');
+            
+            if (selectedOption === question.answer) {
+                feedbackText.innerText = 'Correct! 👍';
+                feedbackText.className = 'text-3xl font-bold text-green-600';
+                speakText('Correct!');
+            } else {
+                feedbackText.innerText = 'Try again. 👎';
+                feedbackText.className = 'text-3xl font-bold text-red-600';
+                speakText('Try again.');
+            }
+            
+            document.getElementById('quiz-question-container').style.display = 'none';
+            document.getElementById('quiz-feedback').style.display = 'block';
+        }
+
+        // Section: Extension Activities
+        function initScavengerHunt() {
+            const checkboxes = document.querySelectorAll('.scavenger-item input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    if (cb.checked) {
+                        const label = cb.nextElementSibling;
+                        if (label) {
+                            speakText(`Found ${label.innerText.split(' ')[0]}`);
+                        }
+                    }
+                });
+            });
+        }
+
+        const oddOneOutQuestions = [
+            {
+                group: "Kitchen 🍳",
+                thai: "ห้องครัว",
+                options: ["sofa", "fridge", "oven"],
+                answer: "sofa"
+            },
+            {
+                group: "Bedroom 🛏️",
+                thai: "ห้องนอน",
+                options: ["bed", "wardrobe", "toilet"],
+                answer: "toilet"
+            },
+            {
+                group: "Bathroom 🚻",
+                thai: "ห้องน้ำ",
+                options: ["sink", "TV", "soap"],
+                answer: "TV"
+            },
+            {
+                group: "Garage 🚗",
+                thai: "โรงรถ",
+                options: ["car", "toolbox", "dog"],
+                answer: "dog"
+            }
+        ];
+
+        function initOddOneOut() {
+            const container = document.getElementById('odd-one-out-container');
+            container.innerHTML = '';
+            oddOneOutQuestions.forEach((q, index) => {
+                const qBlock = document.createElement('div');
+                qBlock.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
+                
+                let optionsHTML = q.options.map(option => `
+                    <div class="odd-one-out-option p-4 bg-white rounded-lg shadow-sm text-center" data-answer="${q.answer}" data-selected="${option}">
+                        <span class="text-4xl">${itemEmojis[option] || '❓'}</span>
+                        <p class="text-xl font-semibold mt-2 speak" data-speak-text="${option}">${option}</p>
+                    </div>
+                `).join('');
+
+                qBlock.innerHTML = `
+                    <div class="mb-3">
+                        <span class="text-xl font-medium text-gray-800 speak-sentence">Group ${index + 1}: ${q.group}</span>
+                        <button class="thai-toggle-btn" data-thai="${q.thai}">TH</button>
+                        <p class="thai-translation">${q.thai}</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4" id="ooo-q-${index}-options">
+                        ${optionsHTML}
+                    </div>
+                `;
+                container.appendChild(qBlock);
+
+                const optionsContainer = qBlock.querySelector(`#ooo-q-${index}-options`);
+                optionsContainer.addEventListener('click', (e) => {
+                    const optionEl = e.target.closest('.odd-one-out-option');
+                    if (!optionEl) return;
+
+                    const selected = optionEl.dataset.selected;
+                    const answer = optionEl.dataset.answer;
+
+                    optionsContainer.querySelectorAll('.odd-one-out-option').forEach(el => {
+                        el.classList.remove('selected-correct', 'selected-wrong');
+                    });
+
+                    if (selected === answer) {
+                        optionEl.classList.add('selected-correct');
+                        speakText('Correct!');
+                    } else {
+                        optionEl.classList.add('selected-wrong');
+                        speakText('Try again.');
+                    }
+                });
+            });
+            initToggleButtons(); // Re-init for new buttons
+        }
+
+    </script>
+</body>
+</html>
+
