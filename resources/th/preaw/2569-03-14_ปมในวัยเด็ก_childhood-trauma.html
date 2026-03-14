@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ปมในวัยเด็ก (Childhood Trauma)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #faf5ff; /* Light purple background */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .slide-down {
+            animation: slideDown 0.25s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar for embedded views */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d8b4fe; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c084fc; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased p-3 sm:p-6 md:p-8 min-h-screen pb-24">
+
+    <div class="max-w-4xl mx-auto space-y-6 sm:space-y-8" id="app">
+        
+        <!-- Header Section -->
+        <div id="header-container" class="bg-white rounded-3xl shadow-sm border border-fuchsia-100 p-6 text-center">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- Section 1: Review -->
+        <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-5 sm:p-8">
+            <div id="review-header"></div>
+            
+            <button onclick="rollRandomVocab()" class="w-full py-4 mt-6 bg-emerald-500 text-white text-xl font-bold rounded-2xl shadow hover:bg-emerald-600 transition-colors flex items-center justify-center gap-3 mb-6 touch-manipulation">
+                <span class="text-3xl">🎲</span> สุ่มคำศัพท์
+            </button>
+            
+            <div id="randomizer-result" class="min-h-[140px] flex items-center justify-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-2 sm:p-4 transition-all">
+                <p class="text-slate-400 font-medium text-lg text-center">คลิกปุ่มเพื่อสุ่มคำศัพท์ (Click button to randomize)</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Dialogue -->
+        <div class="bg-white rounded-3xl shadow-sm border border-blue-100 p-5 sm:p-8">
+            <div id="dialogue-header"></div>
+            <div id="dialogue-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 3: Target Vocab -->
+        <div class="bg-white rounded-3xl shadow-sm border border-purple-100 p-5 sm:p-8">
+            <div id="vocab-header"></div>
+            <div id="vocab-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 4: Main Activities -->
+        <div class="bg-white rounded-3xl shadow-sm border border-orange-100 p-5 sm:p-8">
+            <div id="main-activity-header"></div>
+            <div id="main-activity-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 5: Extension Activities -->
+        <div class="bg-white rounded-3xl shadow-sm border border-pink-100 p-5 sm:p-8">
+            <div id="extension-header"></div>
+            <div id="extension-content" class="mt-6 space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        // Data Structure
+        const lessonData = {
+            header: { emoji: '🧸💔', th: 'ปมในวัยเด็ก', ipa: 'bpom nai wai dèk', en: 'Childhood Trauma' },
+            
+            review: {
+                header: { emoji: '🔄', th: 'ทบทวนคำศัพท์', ipa: 'tóp-tuan kam-sàp', en: 'Vocabulary Review' },
+                instruction: { emoji: '🗣️', th: 'สุ่มคำศัพท์ด้านล่างและแต่งประโยคให้สมบูรณ์', ipa: 'sùm kam-sàp dâan lâang láe dtàeng bprà-yòhk hâi sŏm-buun', en: 'Randomize a vocabulary word below and make a complete sentence.' },
+                words: [
+                    { emoji: '🐔', th: 'ไก่', ipa: 'gài', en: 'chicken' },
+                    { emoji: '🐦🪶', th: 'จิก', ipa: 'jìk', en: 'to peck' },
+                    { emoji: '🧒', th: 'เด็ก', ipa: 'dèk', en: 'child' },
+                    { emoji: '⚰️', th: 'ตาย', ipa: 'dtaai', en: 'to die' },
+                    { emoji: '🔛', th: 'บน', ipa: 'bon', en: 'on' },
+                    { emoji: '👄', th: 'ปาก', ipa: 'bpàak', en: 'mouth' },
+                    { emoji: '🏺', th: 'โอ่ง', ipa: 'òng', en: 'water jar' },
+                    { emoji: '👻', th: 'ผี', ipa: 'pĕe', en: 'ghost' },
+                    { emoji: '🏦🤝📦', th: 'ฝาก', ipa: 'fàak', en: 'to deposit / to leave with' },
+                    { emoji: '👜', th: 'ถุง', ipa: 'tŭng', en: 'bag' },
+                    { emoji: '🍚', th: 'ข้าว', ipa: 'kâao', en: 'rice' },
+                    { emoji: '🧪🧫', th: 'สาร', ipa: 'săan', en: 'substance / milled rice' },
+                    { emoji: '🎁', th: 'ให้', ipa: 'hâi', en: 'to give' },
+                    { emoji: '🧍‍♀️', th: 'ฉัน', ipa: 'chăn', en: 'I / me' },
+                    { emoji: '🗣️✨', th: 'คล่อง', ipa: 'klông', en: 'fluently' },
+                    { emoji: '📝', th: 'แต่งประโยค', ipa: 'dtàeng-bprà-yòhk', en: 'make sentences (decorate / dress up)' },
+                    { emoji: '💬🗣️', th: 'บทสนทนา', ipa: 'bòt-sŏn-tá-naa', en: 'dialogue' },
+                    { emoji: '🥹🙏', th: 'ซึ้งใจ', ipa: 'sʉ́ng-jai', en: 'touched / deeply appreciative' },
+                    { emoji: '😌🏆', th: 'ภูมิใจ', ipa: 'phuum-jai', en: 'proud' },
+                    { emoji: '😊💪', th: 'ภูมิใจในตัวเอง', ipa: 'puum-jai-nai-dtua-ehng', en: 'proud of myself' },
+                    { emoji: '🩺📄', th: 'รายงานทางการแพทย์', ipa: 'raai-ngaan thaang gaan-pêet', en: 'medical report' },
+                    { emoji: '🎯🧹', th: 'เป็นคนเป๊ะ', ipa: 'bpen-kon-bpé', en: 'be a perfectionist' },
+                    { emoji: '🧊🥶', th: 'ค้าง', ipa: 'káang', en: 'freeze; frozen (system; electronic device)' },
+                    { emoji: '📈➕', th: 'เพิ่มขึ้น', ipa: 'pêrm-kêun', en: 'more; additional; increase' },
+                    { emoji: '🧠📋', th: 'พฤติกรรม', ipa: 'prʉ́t-dti-gam', en: 'behaviour' },
+                    { emoji: '🏙️🌇', th: 'ระเบียงดาดฟ้า', ipa: 'ra-biang-daat-fáa', en: 'rooftop terrace' },
+                    { emoji: '📦📈', th: 'สะสม', ipa: 'sà-sŏm', en: 'accumulated; collect' },
+                    { emoji: '🧠👨‍⚕️', th: 'จิตแพทย์', ipa: 'jìt-pàet', en: 'psychiatrist' },
+                    { emoji: '🔤', th: 'พยัญชนะต้น', ipa: 'pha-yan-cha-ná-dtôn', en: 'initial consonant' },
+                    { emoji: '🔤', th: 'ตัวสะกด', ipa: 'dtua-sà-gòt', en: 'final consonant' },
+                    { emoji: '🩹💚', th: 'เยียวยา', ipa: 'yiao-yaa', en: 'heal' },
+                    { emoji: '🧠💭', th: 'จิตใจ', ipa: 'jìt-jai', en: 'mind' },
+                    { emoji: '🩸📅', th: 'ขึ้นอยู่กับประจำเดือน', ipa: 'kêun-yòo-gàp-bpra-jam-deuan', en: 'depends on period / menstruation' },
+                    { emoji: '🤝❤️', th: 'งานอาสาสมัคร', ipa: 'ngaan-aa-săa-máak', en: 'volunteering job' },
+                    { emoji: '🧠🗣️', th: 'นักจิตบำบัด', ipa: 'nák-jìt-bam-bàt', en: 'psychotherapist' },
+                    { emoji: '💊🧠', th: 'ยาต้านเศร้า', ipa: 'yaa-dtâan-sâo', en: 'antidepressants' },
+                    { emoji: '💊⚠️', th: 'ผลข้างเคียง', ipa: 'pŏn-kâang-kìang', en: 'side effect' },
+                    { emoji: '🧠⚡️', th: 'โรคสมาธิสั้น', ipa: 'rôhk-sà-maa-tí-sân', en: 'ADHD' },
+                    { emoji: '⚖️📉', th: 'ไม่คงที่', ipa: 'mâi-kong-têe', en: 'not stable' }
+                ]
+            },
+
+            dialogue: {
+                header: { emoji: '💬', th: 'บทสนทนา: ความรู้สึกของเด็กในตัวเรา', ipa: 'bòt sŏn-tá-naa: kwaam ráng-sèuk kŏng dèk nai dtua rao', en: 'Dialogue: The feelings of our inner child' },
+                lines: [
+                    { emoji: '👧🏽', speaker: 'ลูก', th: 'แม่คะ ตอนที่แม่พาหนูไปอยู่เมืองนอก เด็กในตัวของหนูยังรู้สึกโกรธอยู่เลยค่ะ', ipa: 'mâe ká, dton tîi mâe paa nŭu bpai yòo meuang nôk, dèk nai dtua kŏng nŭu yang ráng-sèuk gròht yòo loei kâ', en: 'Mom, when you took me to live abroad, the child inside of me is still feeling angry.' },
+                    { emoji: '👩🏽', speaker: 'แม่', th: 'จริงเหรอลูก แม่ไม่เคยรู้เลย แม่คิดว่ามันจะดีกับอนาคตของลูกเสียอีก', ipa: 'jing rĕr lûuk, mâe mâi koey rúu loei, mâe kít wâa man jà dee gàp a-naa-kót kŏng lûuk sĭa èek', en: 'Really, dear? I never knew that. I thought it would be good for your future.' },
+                    { emoji: '👧🏽', speaker: 'ลูก', th: 'หนูเข้าใจค่ะ แต่การย้ายมาที่นี่ทำให้หนูรู้สึกแปลกแยก และมันทำให้เกิดวิกฤตกับตัวตนหนูค่ะ', ipa: 'nŭu kâo-jai kâ. dtàe gaan yáai maa tîi nêe tam hâi nŭu ráng-sèuk bplàek-yâek láe man tam hâi gèrt wí-grìt gàp dtua-dton nŭu kâ', en: 'I understand. But moving here made me feel disrooted (alienated), and it caused a crisis with my identity.' },
+                    { emoji: '👩🏽', speaker: 'แม่', th: 'แม่ขอโทษนะลูก ที่ทำให้ปมในวัยเด็กของลูกยังฝังใจอยู่', ipa: 'mâe kŏr tôht ná lûuk, tîi tam hâi bpom nai wai dèk kŏng lûuk yang făng jai yòo', en: 'I am sorry, dear, that I caused your childhood trauma to still be deeply embedded.' },
+                    { emoji: '👧🏽', speaker: 'ลูก', th: 'หนูแค่อยากให้แม่รู้ค่ะ เพราะสถานการณ์บางสถานการณ์มันมักจะกระตุ้นให้รู้สึกเจ็บปวดแบบนั้นอีก', ipa: 'nŭu kâe yàak hâi mâe rúu kâ, prór sà-tăa-ná-gaan baang sà-tăa-ná-gaan man mák jà grà-dtûn hâi ráng-sèuk jèp-bpùat bàep nán èek', en: 'I just wanted you to know, because some certain situations tend to trigger feeling that kind of pain again.' }
+                ]
+            },
+
+            targetVocab: {
+                header: { emoji: '🎯', th: 'คำศัพท์ใหม่', ipa: 'kam-sàp mài', en: 'New Vocabulary' },
+                words: [
+                    { emoji: '🧸💔', th: 'ปมในวัยเด็ก', ipa: 'bpom nai wai dèk', en: 'childhood trauma' },
+                    { emoji: '👧🏽✨', th: 'เด็กในตัวเรา', ipa: 'dèk nai dtua rao', en: 'inner child' },
+                    { emoji: '🎭❓', th: 'วิกฤตตัวตน', ipa: 'wí-grìt dtua-dton', en: 'identity crisis' },
+                    { emoji: '🌱🌪️', th: 'รู้สึกแปลกแยก', ipa: 'ráng-sèuk bplàek-yâek', en: 'to feel disrooted / alienated' },
+                    { emoji: '⚡️💢', th: 'กระตุ้น', ipa: 'grà-dtûn', en: 'to trigger (feelings/memories)' }
+                ]
+            },
+
+            mainActivities: {
+                header: { emoji: '🎭', th: 'กิจกรรมการพูด', ipa: 'gìt-jà-gam gaan pûut', en: 'Speaking Activities' },
+                tasks: [
+                    { emoji: '📱', th: 'บทบาทสมมติ: คุณกำลังคุยกับ "นักจิตบำบัด" อธิบายว่าการย้ายไปเมืองนอกทำให้เกิด "วิกฤตตัวตน" อย่างไร', ipa: 'bòt-bàat sŏm-mút: kun gam-lang kui gàp "nák-jìt-bam-bàt" a-tí-baai wâa gaan yáai bpai meuang nôk tam hâi gèrt "wí-grìt dtua-dton" yàang-rai', en: 'Role-play: You are talking to a "psychotherapist". Explain how moving abroad caused an "identity crisis".' },
+                    { emoji: '❓', th: 'คำถามอภิปราย: สถานการณ์แบบไหนที่มักจะ "กระตุ้น" ให้ "เด็กในตัวเรา" รู้สึกโกรธหรือเสียใจ?', ipa: 'kam-tăam a-pí-bpraai: sà-tăa-ná-gaan bàep năi tîi mák jà "grà-dtûn" hâi "dèk nai dtua rao" ráng-sèuk gròht rĕu sĭa-jai?', en: 'Discussion Question: What kind of situations usually "trigger" your "inner child" to feel angry or sad?' },
+                    { emoji: '🧩', th: 'เกมการพูด: สุ่มคำศัพท์เก่า 1 คำ และแต่งเรื่องสั้นที่เชื่อมโยงกับคำว่า "รู้สึกแปลกแยก"', ipa: 'gaym gaan pûut: sùm kam-sàp gào nèung kam láe dtàeng rêuang sân tîi chêam-yong gàp kam wâa "ráng-sèuk bplàek-yâek"', en: 'Speaking Game: Randomize 1 old vocabulary word and make a short story connecting it to the word "feel disrooted/alienated".' }
+                ]
+            },
+
+            extensionActivities: {
+                header: { emoji: '🌟', th: 'กิจกรรมเสริม', ipa: 'gìt-jà-gam sĕrm', en: 'Extension Activities' },
+                instruction: { emoji: '⏱️', th: 'หากมีเวลาเหลือ ให้ทำกิจกรรมเหล่านี้', ipa: 'hàak mee way-laa lĕua, hâi tam gìt-jà-gam lào née', en: 'If there is time left, do these activities.' },
+                tasks: [
+                    { emoji: '⚖️', th: 'โต้วาที: การเลี้ยงเด็กในต่างประเทศ มักจะสร้าง "ปมในวัยเด็ก" มากกว่าผลดี จริงหรือไม่?', ipa: 'dtôh-waa-tee: gaan léeang dèk nai dtàang-bprà-tâyt mák jà sâang "bpom nai wai dèk" mâak gwàa pŏn dee. jing rĕu mâi?', en: 'Debate: Raising a child abroad usually creates "childhood trauma" more than positive results. True or False?' },
+                    { emoji: '🎤', th: 'สัมภาษณ์: สัมภาษณ์ครู(สวมบทบาทเป็นแม่) ว่าทำไมถึงตัดสินใจพาคุณไปเมืองนอกในตอนนั้น', ipa: 'săm-pâat: săm-pâat kruu (sŭam bòt-bàat bpĕn mâe) wâa tam-mai tĕung dtàt-sĭn-jai paa kun bpai meuang nôk nai dton nán', en: 'Interview: Interview the teacher (playing the role of your mom) about why she made the decision to take you abroad back then.' },
+                    { emoji: '📊', th: 'นำเสนอ: พูดนำเสนอ 1 นาที เกี่ยวกับวิธี "เยียวยา" ภาวะสิ้นยินดีของตัวเอง', ipa: 'nam sà-nĕr: pûut nam sà-nĕr nèung naa-tee gìao gàp wí-tee "yiao-yaa" paa-wá sîn-yin-dee kŏng dtua-ehng', en: 'Presentation: Give a 1-minute presentation on how to "heal" your own anhedonia (inability to feel pleasure).' }
+                ]
+            }
+        };
+
+        // Function to create each interactive row/block
+        function createInteractiveBlock(item, isHeader = false) {
+            const speakerTag = item.speaker ? `<span class="font-bold text-fuchsia-700 mr-2 border-b-2 border-fuchsia-200 pb-1">${item.speaker}:</span>` : '';
+            const emojiTag = item.emoji ? `<span class="mr-3 text-2xl sm:text-3xl shrink-0 drop-shadow-sm">${item.emoji}</span>` : '';
+            
+            const uniqueId = Math.random().toString(36).substr(2, 9);
+            const ipaId = `ipa-${uniqueId}`;
+            const enId = `en-${uniqueId}`;
+
+            const safeThaiText = item.th.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            
+            const titleClass = isHeader ? "text-xl sm:text-2xl font-bold text-slate-800" : "text-lg text-slate-700 font-medium";
+            const containerClass = isHeader ? "bg-purple-50 border-purple-100" : "bg-white border-slate-100";
+
+            return `
+            <div class="${containerClass} rounded-2xl shadow-sm border p-4 sm:p-5 transition hover:shadow-md w-full">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="${titleClass} leading-relaxed flex-1 flex items-start">
+                        ${emojiTag}
+                        <div class="pt-0.5">${speakerTag}${item.th}</div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
+                        <button onclick="speakThai('${safeThaiText}')" class="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-pink-50 text-pink-600 rounded-full hover:bg-pink-100 transition shadow-sm touch-manipulation focus:outline-none focus:ring-2 focus:ring-pink-400" title="ฟังเสียง (Listen)">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z"/><path d="M15.932 7.757a.75.75 0 011.061 0 4.5 4.5 0 010 6.364.75.75 0 01-1.06-1.06 3 3 0 000-4.243.75.75 0 010-1.061z"/></svg>
+                        </button>
+                        <button onclick="toggleVisibility('${ipaId}')" class="px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm font-bold tracking-wide bg-indigo-50 text-indigo-700 rounded-xl hover:bg-indigo-100 transition shadow-sm touch-manipulation focus:outline-none focus:ring-2 focus:ring-indigo-400">IPA</button>
+                        <button onclick="toggleVisibility('${enId}')" class="px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm font-bold tracking-wide bg-teal-50 text-teal-700 rounded-xl hover:bg-teal-100 transition shadow-sm touch-manipulation focus:outline-none focus:ring-2 focus:ring-teal-400">EN</button>
+                    </div>
+                </div>
+                <div id="${ipaId}" class="hidden mt-4 px-4 py-3 bg-indigo-50 text-indigo-800 rounded-xl text-base font-medium tracking-wide border border-indigo-100 w-full slide-down"><span class="text-indigo-400 mr-2 font-bold text-sm">IPA</span> ${item.ipa}</div>
+                <div id="${enId}" class="hidden mt-3 px-4 py-3 bg-teal-50 text-teal-800 rounded-xl text-base border border-teal-100 w-full slide-down"><span class="text-teal-400 mr-2 font-bold text-sm">EN</span> ${item.en}</div>
+            </div>
+            `;
+        }
+
+        function toggleVisibility(elementId) {
+            const el = document.getElementById(elementId);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Web Speech API wrapper for iOS compatibility
+        function speakThai(text) {
+            if (!('speechSynthesis' in window)) {
+                alert("อุปกรณ์ของคุณไม่รองรับระบบเสียง (TTS is not supported).");
+                return;
+            }
+            
+            window.speechSynthesis.cancel(); // Stop any currently playing audio
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; // Optimal speed for B2 learning
+            utterance.pitch = 1.0;
+            
+            // iOS specific handling: ensure voices are loaded
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                const thaiVoice = voices.find(voice => voice.lang.includes('th'));
+                if (thaiVoice) utterance.voice = thaiVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Handle iOS voice loading quirk
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
+        function rollRandomVocab() {
+            const words = lessonData.review.words;
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const selectedWord = words[randomIndex];
+            
+            const container = document.getElementById('randomizer-result');
+            container.innerHTML = createInteractiveBlock(selectedWord);
+            
+            // Automatically play sound when selected
+            setTimeout(() => speakThai(selectedWord.th), 100);
+        }
+
+        function initializePage() {
+            // Header Content
+            document.getElementById('header-container').innerHTML = `
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800 flex items-center justify-center gap-3">
+                    <span class="text-4xl sm:text-5xl">${lessonData.header.emoji}</span>
+                    ${lessonData.header.th}
+                </h1>
+                <div class="mt-6 flex justify-center gap-2 sm:gap-3 flex-wrap">
+                    <button onclick="speakThai('${lessonData.header.th}')" class="px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm font-semibold hover:bg-pink-200 transition touch-manipulation shadow-sm">🔊 ฟังเสียง</button>
+                    <button onclick="toggleVisibility('header-ipa')" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold hover:bg-indigo-200 transition touch-manipulation shadow-sm">IPA</button>
+                    <button onclick="toggleVisibility('header-en')" class="px-4 py-2 bg-teal-100 text-teal-700 rounded-full text-sm font-semibold hover:bg-teal-200 transition touch-manipulation shadow-sm">EN</button>
+                </div>
+                <div id="header-ipa" class="hidden mt-4 text-indigo-700 font-medium text-lg slide-down">${lessonData.header.ipa}</div>
+                <div id="header-en" class="hidden mt-2 text-teal-700 text-lg slide-down">${lessonData.header.en}</div>
+            `;
+
+            // Sections Rendering
+            document.getElementById('review-header').innerHTML = createInteractiveBlock(lessonData.review.header, true);
+            document.getElementById('review-header').innerHTML += `<div class="mt-4">` + createInteractiveBlock(lessonData.review.instruction) + `</div>`;
+            
+            document.getElementById('dialogue-header').innerHTML = createInteractiveBlock(lessonData.dialogue.header, true);
+            document.getElementById('dialogue-content').innerHTML = lessonData.dialogue.lines.map(line => createInteractiveBlock(line)).join('');
+
+            document.getElementById('vocab-header').innerHTML = createInteractiveBlock(lessonData.targetVocab.header, true);
+            document.getElementById('vocab-content').innerHTML = lessonData.targetVocab.words.map(word => createInteractiveBlock(word)).join('');
+
+            document.getElementById('main-activity-header').innerHTML = createInteractiveBlock(lessonData.mainActivities.header, true);
+            document.getElementById('main-activity-content').innerHTML = lessonData.mainActivities.tasks.map(task => createInteractiveBlock(task)).join('');
+
+            document.getElementById('extension-header').innerHTML = createInteractiveBlock(lessonData.extensionActivities.header, true);
+            document.getElementById('extension-header').innerHTML += `<div class="mt-4">` + createInteractiveBlock(lessonData.extensionActivities.instruction) + `</div>`;
+            document.getElementById('extension-content').innerHTML = lessonData.extensionActivities.tasks.map(task => createInteractiveBlock(task)).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
