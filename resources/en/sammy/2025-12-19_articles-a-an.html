@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles (a/an)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+        .control-btn {
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .control-btn:hover { background-color: #f0f0f0; }
+        .speak-btn { color: #007bff; border-color: #007bff; }
+        .trans-btn { color: #28a745; border-color: #28a745; }
+        .thai-text {
+            display: none;
+            color: #666;
+            font-style: italic;
+            margin-left: 10px;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        /* Vocab Spinner */
+        #vocab-display {
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 20px;
+            background-color: #fff3e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #ffb74d;
+        }
+        .big-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .big-btn:hover { background-color: #2980b9; }
+
+        /* Story & Practice Styles */
+        .story-card {
+            border: 2px solid #90caf9;
+            border-radius: 10px;
+            padding: 15px;
+            background: #e3f2fd;
+            margin-bottom: 20px;
+        }
+        .story-prompt {
+            font-weight: bold;
+            color: #1565c0;
+            margin-bottom: 5px;
+        }
+        .sub-q {
+            margin-left: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #bbdefb;
+            padding-bottom: 10px;
+        }
+        .reveal-btn {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .answer-box {
+            display: none;
+            background: #e8f5e9;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border-left: 3px solid #4caf50;
+        }
+        .role-play-box {
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background: white; 
+            margin-bottom: 15px;
+        }
+
+        /* Grammar Box */
+        .grammar-box {
+            display: none; /* Hidden by default for the quiz approach */
+            background-color: #f3e5f5;
+            border-left: 5px solid #ab47bc;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .highlight-art {
+            color: #d81b60;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Quiz Choice */
+        .quiz-choice {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 15px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .quiz-choice:hover { background: #f5f5f5; }
+        .correct { background: #c8e6c9 !important; border-color: #4caf50 !important; color: #1b5e20; }
+        .wrong { background: #ffcdd2 !important; border-color: #f44336 !important; opacity: 0.6; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        Articles (a/an)
+        <button class="control-btn speak-btn" onclick="speak('Articles, a and an')">🔊</button>
+        <button class="control-btn trans-btn" onclick="toggleTrans('h1-trans')">🇹🇭</button>
+        <span id="h1-trans" class="thai-text">คำนำหน้านาม (a/an)</span>
+    </h1>
+
+    <!-- SECTION 1: VOCAB REVIEW -->
+    <div class="section">
+        <h2>
+            1. Vocab Review Spin 🌪️
+            <button class="control-btn speak-btn" onclick="speak('Vocab Review Spin')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-1-trans')">🇹🇭</button>
+            <span id="h2-1-trans" class="thai-text">วงล้อทบทวนคำศัพท์</span>
+        </h2>
+        <p style="text-align:center;">
+            Spin and say the word!
+            <button class="control-btn speak-btn" onclick="speak('Spin and say the word!')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-1-trans')">🇹🇭</button>
+            <span id="inst-1-trans" class="thai-text">หมุนและพูดคำศัพท์!</span>
+        </p>
+
+        <div id="vocab-display">
+            Click "Spin Vocab" to start!
+        </div>
+        <button class="big-btn" onclick="spinVocab()">Spin Vocab 🔄</button>
+    </div>
+
+    <!-- SECTION 2: STORYTELLING (RECOVERED) -->
+    <div class="section" style="border-color: #ef5350;">
+        <h2>
+            2. Storytelling: Mom's Surprise 💃
+            <button class="control-btn speak-btn" onclick="speak('Storytelling: Mom\'s Surprise')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-2-trans')">🇹🇭</button>
+            <span id="h2-2-trans" class="thai-text">การเล่าเรื่อง: เซอร์ไพรส์ของแม่</span>
+        </h2>
+        <p style="text-align:center;">
+            Use Present Simple (Habit) or Continuous (Now).
+            <button class="control-btn speak-btn" onclick="speak('Use Present Simple or Continuous.')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-2-trans')">🇹🇭</button>
+            <span id="inst-2-trans" class="thai-text">ใช้ Present Simple (นิสัย) หรือ Continuous (ตอนนี้)</span>
+        </p>
+
+        <!-- Story 2: About MOM -->
+        <div class="story-card" style="background: #ffebee; border-color: #ef5350;">
+            <div class="sub-q">
+                <p class="story-prompt">
+                    1. What does Mom usually do at 6 PM? (cook dinner)
+                    <button class="control-btn speak-btn" onclick="speak('What does Mom usually do at 6 PM?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('s2-q1')">🇹🇭</button>
+                    <span id="s2-q1" class="thai-text">1. ปกติแม่ทำอะไรตอน 6 โมงเย็น? (ทำกับข้าว)</span>
+                </p>
+                <button class="reveal-btn" onclick="toggleAnswer('s2-a1')">Check</button>
+                <div id="s2-a1" class="answer-box">She usually <b>cooks</b> dinner.</div>
+            </div>
+
+            <div class="sub-q">
+                <p class="story-prompt">
+                    2. Does she usually watch TV at this time? (No, she / wash dishes)
+                    <button class="control-btn speak-btn" onclick="speak('Does she usually watch TV at this time?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('s2-q2')">🇹🇭</button>
+                    <span id="s2-q2" class="thai-text">2. ปกติเธอดูทีวีตอนนี้ไหม? (เปล่า / ล้างจาน)</span>
+                </p>
+                <button class="reveal-btn" onclick="toggleAnswer('s2-a2')">Check</button>
+                <div id="s2-a2" class="answer-box">No, she usually <b>washes</b> dishes.</div>
+            </div>
+
+            <div class="sub-q">
+                <p class="story-prompt">
+                    3. But look at her NOW! Is she cooking? (No)
+                    <button class="control-btn speak-btn" onclick="speak('But look at her NOW! Is she cooking?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('s2-q3')">🇹🇭</button>
+                    <span id="s2-q3" class="thai-text">3. แต่ดูเธอตอนนี้สิ! เธอกำลังทำอาหารไหม? (เปล่า)</span>
+                </p>
+                <button class="reveal-btn" onclick="toggleAnswer('s2-a3')">Check</button>
+                <div id="s2-a3" class="answer-box">No, she <b>isn't cooking</b>.</div>
+            </div>
+
+            <div class="sub-q">
+                <p class="story-prompt">
+                    4. What is she doing? (dance / sing karaoke)
+                    <button class="control-btn speak-btn" onclick="speak('What is she doing?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('s2-q4')">🇹🇭</button>
+                    <span id="s2-q4" class="thai-text">4. เธอกำลังทำอะไร? (เต้น / ร้องคาราโอเกะ)</span>
+                </p>
+                <button class="reveal-btn" onclick="toggleAnswer('s2-a4')">Check</button>
+                <div id="s2-a4" class="answer-box">She <b>is dancing</b> and <b>singing</b> karaoke!</div>
+            </div>
+
+            <div class="sub-q" style="border-bottom:none;">
+                <p class="story-prompt">
+                    5. Is she happy right now? (Yes / have fun)
+                    <button class="control-btn speak-btn" onclick="speak('Is she happy right now?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('s2-q5')">🇹🇭</button>
+                    <span id="s2-q5" class="thai-text">5. ตอนนี้เธอมีความสุขไหม? (ใช่ / สนุกอยู่)</span>
+                </p>
+                <button class="reveal-btn" onclick="toggleAnswer('s2-a5')">Check</button>
+                <div id="s2-a5" class="answer-box">Yes, she <b>is having</b> fun!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: GRAMMAR QUIZ (MODIFIED) -->
+    <div class="section">
+        <h2>
+            3. Quiz: Discover the Rule 🕵️‍♀️
+            <button class="control-btn speak-btn" onclick="speak('Quiz: Discover the Rule')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-3-trans')">🇹🇭</button>
+            <span id="h2-3-trans" class="thai-text">แบบทดสอบ: ค้นหากฎ</span>
+        </h2>
+        <p style="text-align:center;">
+            Test your instinct! Which one is correct?
+            <button class="control-btn speak-btn" onclick="speak('Test your instinct! Which one is correct?')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-3-trans')">🇹🇭</button>
+            <span id="inst-3-trans" class="thai-text">ทดสอบสัญชาตญาณ! อันไหนถูก?</span>
+        </p>
+
+        <!-- Q1 -->
+        <div class="role-play-box">
+            <p>1. I have ______ <b>c</b>ar. (Start with 'C' sound)</p>
+            <span class="quiz-choice" onclick="checkQuiz(this, true)">a</span>
+            <span class="quiz-choice" onclick="checkQuiz(this, false)">an</span>
+            <button class="control-btn speak-btn" onclick="speak('I have a car.')">🔊</button>
+        </div>
+
+        <!-- Q2 -->
+        <div class="role-play-box">
+            <p>2. She is ______ <b>a</b>ctor. (Start with 'A' sound)</p>
+            <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+            <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+            <button class="control-btn speak-btn" onclick="speak('She is an actor.')">🔊</button>
+        </div>
+
+        <!-- Q3 -->
+        <div class="role-play-box">
+            <p>3. He eats ______ <b>o</b>melette. (Start with 'O' sound)</p>
+            <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+            <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+            <button class="control-btn speak-btn" onclick="speak('He eats an omelette.')">🔊</button>
+        </div>
+
+        <!-- Q4 (Tricky) -->
+        <div class="role-play-box" style="border-left: 5px solid #ffca28;">
+            <p>4. Wait! It takes ______ <b>h</b>our. (Start with 'O' sound!)</p>
+            <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+            <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+            <button class="control-btn speak-btn" onclick="speak('It takes an hour.')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('q4-hint')">🇹🇭</button>
+            <span id="q4-hint" class="thai-text">ระวัง! Hour ออกเสียง อ.อ่าง (O sound)</span>
+        </div>
+
+        <button class="big-btn" style="background-color: #9c27b0;" onclick="toggleAnswer('grammar-reveal')">✨ Reveal the Rule ✨</button>
+
+        <div id="grammar-reveal" class="grammar-box">
+            <h3 style="margin-top:0;">The Rule: The Sound 🎵</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <span class="highlight-art">a</span> + Consonant Sound (เสียงพยัญชนะ)
+                <br>
+                Example: <b>a</b> student, <b>a</b> movie.
+            </div>
+
+            <div>
+                <span class="highlight-art">an</span> + Vowel Sound (เสียงสระ: a, e, i, o, u)
+                <br>
+                Example: <b>an</b> actor, <b>an</b> owl.
+            </div>
+            
+            <p style="margin-top:15px; font-size:0.9em; color:#666;">
+                *Trick: "Hour" sounds like "Our", so use <b>an</b> hour.
+            </p>
+        </div>
+    </div>
+
+    <!-- SECTION 4: STORYTELLING WITH ARTICLES -->
+    <div class="section">
+        <h2>
+            4. Storytelling: A or An? 📖
+            <button class="control-btn speak-btn" onclick="speak('Storytelling: A or An?')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-4-trans')">🇹🇭</button>
+            <span id="h2-4-trans" class="thai-text">การเล่าเรื่อง: A หรือ An?</span>
+        </h2>
+        <p style="text-align:center;">
+            Complete the sentences.
+            <button class="control-btn speak-btn" onclick="speak('Complete the sentences.')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-4-trans')">🇹🇭</button>
+            <span id="inst-4-trans" class="thai-text">เติมประโยคให้สมบูรณ์</span>
+        </p>
+
+        <!-- Story A: The Job -->
+        <div class="story-card" style="background:#e1f5fe;">
+            <h3>
+                Story A: The Dream Job 👩‍🚀
+                <button class="control-btn speak-btn" onclick="speak('Story A: The Dream Job')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-a-title')">🇹🇭</button>
+                <span id="story-a-title" class="thai-text">อาชีพในฝัน</span>
+            </h3>
+
+            <div class="sub-q">
+                <p>1. My friend Tom wants to be ______ (actor).</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+                <button class="control-btn speak-btn" onclick="speak('My friend Tom wants to be an actor.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('qa-1')">🇹🇭</button>
+                <span id="qa-1" class="thai-text">เพื่อนของฉันทอมอยากเป็นนักแสดง</span>
+            </div>
+
+            <div class="sub-q">
+                <p>2. I want to be ______ (singer).</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">an</span>
+                <button class="control-btn speak-btn" onclick="speak('I want to be a singer.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('qa-2')">🇹🇭</button>
+                <span id="qa-2" class="thai-text">ฉันอยากเป็นนักร้อง</span>
+            </div>
+
+             <div class="sub-q">
+                <p>3. Tom is ______ (early bird).</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+                <button class="control-btn speak-btn" onclick="speak('Tom is an early bird.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('qa-3')">🇹🇭</button>
+                <span id="qa-3" class="thai-text">ทอมเป็นคนตื่นเช้า</span>
+            </div>
+        </div>
+
+        <!-- Story B: The Picnic -->
+        <div class="story-card" style="background:#fff3e0; border-color:#ffb74d;">
+            <h3>
+                Story B: The Picnic 🧺
+                <button class="control-btn speak-btn" onclick="speak('Story B: The Picnic')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-b-title')">🇹🇭</button>
+                <span id="story-b-title" class="thai-text">ปิกนิก</span>
+            </h3>
+
+            <div class="sub-q">
+                <p>1. I am making ______ (omelette).</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+                <button class="control-btn speak-btn" onclick="speak('I am making an omelette.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('qb-1')">🇹🇭</button>
+                <span id="qb-1" class="thai-text">ฉันกำลังทำออมเล็ต</span>
+            </div>
+
+            <div class="sub-q">
+                <p>2. Do you want ______ (sandwich)?</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">an</span>
+                <button class="control-btn speak-btn" onclick="speak('Do you want a sandwich?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('qb-2')">🇹🇭</button>
+                <span id="qb-2" class="thai-text">คุณอยากได้แซนด์วิชไหม?</span>
+            </div>
+            
+            <div class="sub-q">
+                <p>3. I see ______ (owl) in the tree!</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+                <button class="control-btn speak-btn" onclick="speak('I see an owl in the tree!')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('qb-3')">🇹🇭</button>
+                <span id="qb-3" class="thai-text">ฉันเห็นนกฮูกบนต้นไม้!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 5: EXTENSION -->
+    <div class="section" style="background-color: #fffde7;">
+        <h2>
+            5. Mystery Box Game 📦
+            <button class="control-btn speak-btn" onclick="speak('Mystery Box Game')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-5-trans')">🇹🇭</button>
+            <span id="h2-5-trans" class="thai-text">เกมกล่องปริศนา</span>
+        </h2>
+        <p style="text-align:center;">
+            Define the word using <b>"It is a..."</b> or <b>"It is an..."</b>
+            <button class="control-btn speak-btn" onclick="speak('Define the word using It is a... or It is an...')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-5-trans')">🇹🇭</button>
+            <span id="inst-5-trans" class="thai-text">นิยามคำศัพท์โดยใช้ It is a... หรือ It is an...</span>
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <div class="role-play-box">
+                <b>Word:</b> Apple 🍎
+                <button class="reveal-btn" onclick="toggleAnswer('mys-1')">Reveal Answer</button>
+                <div id="mys-1" class="answer-box">
+                    It is <b>an</b> apple.
+                    <button class="control-btn speak-btn" onclick="speak('It is an apple.')">🔊</button>
+                </div>
+            </div>
+
+            <div class="role-play-box">
+                <b>Word:</b> Lawn Mower 🚜
+                <button class="reveal-btn" onclick="toggleAnswer('mys-2')">Reveal Answer</button>
+                <div id="mys-2" class="answer-box">
+                    It is <b>a</b> lawn mower.
+                    <button class="control-btn speak-btn" onclick="speak('It is a lawn mower.')">🔊</button>
+                </div>
+            </div>
+
+            <div class="role-play-box">
+                <b>Word:</b> Umbrella ☔
+                <button class="reveal-btn" onclick="toggleAnswer('mys-3')">Reveal Answer</button>
+                <div id="mys-3" class="answer-box">
+                    It is <b>an</b> umbrella.
+                    <button class="control-btn speak-btn" onclick="speak('It is an umbrella.')">🔊</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: MORE FUN WITH ARTICLES -->
+    <div class="section" style="background-color: #e3f2fd; border-color: #90caf9;">
+        <h2>
+            6. More Fun with Articles 🤪
+            <button class="control-btn speak-btn" onclick="speak('More Fun with Articles')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-6-trans')">🇹🇭</button>
+            <span id="h2-6-trans" class="thai-text">สนุกกับคำนำหน้านาม</span>
+        </h2>
+
+        <!-- Role Play: The Alien Shopper -->
+        <div class="role-play-box" style="border-left: 5px solid #ab47bc;">
+            <h3>
+                A. Role Play: The Alien Shopper 👽
+                <button class="control-btn speak-btn" onclick="speak('Role Play: The Alien Shopper')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-alien-title')">🇹🇭</button>
+                <span id="rp-alien-title" class="thai-text">บทบาทสมมติ: มนุษย์ต่างดาวนักช้อป</span>
+            </h3>
+            <p style="text-align:center;">
+                The Alien makes mistakes. Correct him!
+                <button class="control-btn speak-btn" onclick="speak('The Alien makes mistakes. Correct him!')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('inst-alien')">🇹🇭</button>
+                <span id="inst-alien" class="thai-text">มนุษย์ต่างดาวพูดผิด ช่วยแก้หน่อย!</span>
+            </p>
+
+            <p>
+                <b>Alien:</b> "I want to buy <b>an</b>... car." 🚗
+                <button class="control-btn speak-btn" onclick="speak('I want to buy an car.')">🔊</button>
+            </p>
+            <p>
+                <b>Shopkeeper:</b> "You mean... <b>a</b> car?"
+                <button class="control-btn speak-btn" onclick="speak('You mean a car?')">🔊</button>
+            </p>
+            <hr style="margin: 10px 0;">
+            <p>
+                <b>Alien:</b> "Can I have <b>a</b>... orange?" 🍊
+                <button class="control-btn speak-btn" onclick="speak('Can I have a orange?')">🔊</button>
+            </p>
+            <p>
+                <b>Shopkeeper:</b> "You mean... <b>an</b> orange?"
+                <button class="control-btn speak-btn" onclick="speak('You mean an orange?')">🔊</button>
+            </p>
+            <button class="reveal-btn" onclick="toggleAnswer('rp-tips')">Show Tip</button>
+            <div id="rp-tips" class="answer-box">
+                Use <b>"a"</b> for consonant sounds (car). Use <b>"an"</b> for vowel sounds (orange).
+            </div>
+        </div>
+
+        <!-- Game: The Memory Picnic -->
+        <div class="role-play-box" style="border-left: 5px solid #ff7043;">
+            <h3>
+                B. Game: The Memory Picnic 🧺
+                <button class="control-btn speak-btn" onclick="speak('Game: The Memory Picnic')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('gm-picnic-title')">🇹🇭</button>
+                <span id="gm-picnic-title" class="thai-text">เกม: ปิกนิกความจำ</span>
+            </h3>
+            <p style="text-align:center;">
+                Add an item to the basket using "a" or "an".
+                <button class="control-btn speak-btn" onclick="speak('Add an item to the basket using a or an.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('inst-picnic')">🇹🇭</button>
+                <span id="inst-picnic" class="thai-text">เพิ่มของลงตะกร้าโดยใช้ a หรือ an</span>
+            </p>
+            
+            <p>
+                <b>Turn 1:</b> I'm going on a picnic and I'm bringing <b>a</b> sandwich.
+                <button class="control-btn speak-btn" onclick="speak('I am going on a picnic and I am bringing a sandwich.')">🔊</button>
+            </p>
+            <p>
+                <b>Turn 2:</b> I'm going on a picnic and I'm bringing <b>a</b> sandwich and <b>an</b> apple.
+                <button class="control-btn speak-btn" onclick="speak('I am going on a picnic and I am bringing a sandwich and an apple.')">🔊</button>
+            </p>
+            <p>
+                <b>Turn 3:</b> I'm bringing <b>a</b> sandwich, <b>an</b> apple, and... <b>an</b> elephant?!
+                <button class="control-btn speak-btn" onclick="speak('I am bringing a sandwich, an apple, and an elephant?!')">🔊</button>
+            </p>
+        </div>
+
+        <!-- Funny Debate: Unicorn vs Alien -->
+        <div class="role-play-box" style="border-left: 5px solid #26a69a;">
+            <h3>
+                C. Funny Debate: Unicorn 🦄 vs. Alien 👽
+                <button class="control-btn speak-btn" onclick="speak('Funny Debate: Unicorn versus Alien')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('debate-title')">🇹🇭</button>
+                <span id="debate-title" class="thai-text">โต้วาทีตลก: ยูนิคอร์น vs มนุษย์ต่างดาว</span>
+            </h3>
+            <p style="text-align:center;">
+                Topic: Which is the best pet?
+                <button class="control-btn speak-btn" onclick="speak('Topic: Which is the best pet?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('debate-topic')">🇹🇭</button>
+                <span id="debate-topic" class="thai-text">หัวข้อ: อะไรคือสัตว์เลี้ยงที่ดีที่สุด?</span>
+            </p>
+
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <h4>Team Unicorn</h4>
+                    <p>It is <b>a</b> beautiful animal.</p>
+                    <p>It has <b>a</b> horn.</p>
+                    <button class="control-btn speak-btn" onclick="speak('It is a beautiful animal. It has a horn.')">🔊</button>
+                </div>
+                <div style="flex:1; border-left:1px solid #ccc; padding-left:10px;">
+                    <h4>Team Alien</h4>
+                    <p>It is <b>an</b> intelligent friend.</p>
+                    <p>It has <b>an</b> eye (only one!).</p>
+                    <button class="control-btn speak-btn" onclick="speak('It is an intelligent friend. It has an eye.')">🔊</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funny Story Task: The Magician -->
+        <div class="role-play-box" style="border-left: 5px solid #ffca28;">
+            <h3>
+                D. Story Task: The Magician's Hat 🎩
+                <button class="control-btn speak-btn" onclick="speak('Story Task: The Magician\'s Hat')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('magic-title')">🇹🇭</button>
+                <span id="magic-title" class="thai-text">งานเล่าเรื่อง: หมวกนักมายากล</span>
+            </h3>
+            <p style="text-align:center;">
+                What does he pull out of the hat?
+                <button class="control-btn speak-btn" onclick="speak('What does he pull out of the hat?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('magic-inst')">🇹🇭</button>
+                <span id="magic-inst" class="thai-text">เขาดึงอะไรออกมาจากหมวก?</span>
+            </p>
+
+            <div class="sub-q">
+                <p>1. He pulls out ______ (rabbit). 🐰</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">an</span>
+                <button class="reveal-btn" onclick="toggleAnswer('mag-1')">Check</button>
+                <div id="mag-1" class="answer-box">He pulls out <b>a</b> rabbit.</div>
+            </div>
+
+            <div class="sub-q">
+                <p>2. He pulls out ______ (elephant). 🐘</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">an</span>
+                <button class="reveal-btn" onclick="toggleAnswer('mag-2')">Check</button>
+                <div id="mag-2" class="answer-box">He pulls out <b>an</b> elephant! (Wow!)</div>
+            </div>
+
+            <div class="sub-q" style="border-bottom:none;">
+                <p>3. He pulls out ______ (umbrella). ☔</p>
+                <span class="quiz-choice" onclick="checkQuiz(this, true)">a</span>
+                <span class="quiz-choice" onclick="checkQuiz(this, false)">an</span>
+                <button class="reveal-btn" onclick="toggleAnswer('mag-3')">Check</button>
+                <div id="mag-3" class="answer-box">He pulls out <b>an</b> umbrella.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECTION 7: FREE PRACTICE (NEW) -->
+    <div class="section" style="border: 2px dashed #4caf50; background-color: #f1f8e9;">
+        <h2>
+            7. Free Practice: Your Turn! 🎤
+            <button class="control-btn speak-btn" onclick="speak('Free Practice: Your Turn!')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-7-trans')">🇹🇭</button>
+            <span id="h2-7-trans" class="thai-text">ฝึกอิสระ: ตาคุณแล้ว!</span>
+        </h2>
+        <p style="text-align:center;">
+            Be creative! No wrong answers.
+            <button class="control-btn speak-btn" onclick="speak('Be creative! No wrong answers.')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-7-trans')">🇹🇭</button>
+            <span id="inst-7-trans" class="thai-text">ใช้ความคิดสร้างสรรค์! ไม่มีคำตอบที่ผิด</span>
+        </p>
+
+        <!-- Activity A: Speed Round -->
+        <div class="role-play-box">
+            <h3>
+                A. Speed Round ⏱️
+                <button class="control-btn speak-btn" onclick="speak('Speed Round')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('free-a-title')">🇹🇭</button>
+                <span id="free-a-title" class="thai-text">รอบความเร็ว</span>
+            </h3>
+            <p>
+                Look around your room. Name 5 things fast!
+                <br>
+                Use <b>"It's a..."</b> or <b>"It's an..."</b>.
+                <button class="control-btn speak-btn" onclick="speak('Look around your room. Name 5 things fast! Use It is a... or It is an...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('free-a-inst')">🇹🇭</button>
+                <span id="free-a-inst" class="thai-text">มองไปรอบๆ ห้อง พูดชื่อสิ่งของ 5 อย่างเร็วๆ! ใช้ "It's a..." หรือ "It's an..."</span>
+            </p>
+            <p style="color:#666; font-style:italic;">
+                (Example: It's a pen. It's an apple. It's a chair...)
+            </p>
+        </div>
+
+        <!-- Activity B: My Dream Room -->
+        <div class="role-play-box">
+            <h3>
+                B. My Dream Room 🏠
+                <button class="control-btn speak-btn" onclick="speak('My Dream Room')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('free-b-title')">🇹🇭</button>
+                <span id="free-b-title" class="thai-text">ห้องในฝันของฉัน</span>
+            </h3>
+            <p>
+                Imagine your dream room. What is inside?
+                <br>
+                Tell me 3 things using <b>"There is a..."</b> or <b>"There is an..."</b>.
+                <button class="control-btn speak-btn" onclick="speak('Imagine your dream room. What is inside? Tell me 3 things using There is a... or There is an...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('free-b-inst')">🇹🇭</button>
+                <span id="free-b-inst" class="thai-text">จินตนาการถึงห้องในฝัน มีอะไรอยู่ข้างใน? บอกมา 3 อย่างโดยใช้ "There is a..." หรือ "There is an..."</span>
+            </p>
+            <p style="color:#666; font-style:italic;">
+                (Example: There is a swimming pool. There is an elephant. There is a cinema.)
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- VOCAB DATA (UPDATED + New Words) ---
+    const vocabList = [
+        {en: "lately", th: "ช่วงนี้"},
+        {en: "It took place on earth.", th: "มันเกิดขึ้นบนโลก"},
+        {en: "It's catchy.", th: "มันติดหู"},
+        {en: "Scary", th: "น่ากลัว"},
+        {en: "What is it about?", th: "มันเกี่ยวกับอะไร"},
+        {en: "How was it?", th: "มันเป็นยังไง"},
+        {en: "I wrote English vocabulary.", th: "เขียนคำศัพท์ภาษาอังกฤษ (อดีต)"},
+        {en: "I'm not calling anyone.", th: "ไม่ได้กำลังโทรหาใคร"},
+        {en: "travel", th: "เที่ยว / เดินทาง"},
+        {en: "all the time", th: "ตลอดเวลา"},
+        {en: "Do you walk when working?", th: "คุณเดินตอนทำงานหรือเปล่า"},
+        {en: "topic", th: "หัวข้อ"},
+        {en: "Am I old enough?", th: "ฉันโตพอไหม"},
+        {en: "same as usual", th: "เหมือนเดิม"},
+        {en: "Keep it up!", th: "สู้ๆ"},
+        {en: "owl", th: "นกฮูก"},
+        {en: "stir-fried basil", th: "ผัดกะเพรา"},
+        {en: "make your bed", th: "เก็บที่นอน"},
+        {en: "wardrobe", th: "ตู้เสื้อผ้า"},
+        {en: "an early bird", th: "คนชอบตื่นเช้า"},
+        {en: "a night owl", th: "คนชอบนอนดึก"},
+        {en: "an actor", th: "นักแสดง"},
+        {en: "a singer", th: "นักร้อง"},
+        {en: "an omelette", th: "ออมเล็ต"},
+        {en: "wonton soup", th: "เกี๊ยวน้ำ"},
+        {en: "lawn mower", th: "เครื่องตัดหญ้า"},
+        {en: "fortune cookies", th: "คุกกี้เสี่ยงทาย"},
+        {en: "mashed potatoes", th: "มันฝรั่งบด"},
+        {en: "Did you order food?", th: "สั่งอาหารมาไหม"},
+        {en: "Are you laughing?", th: "หัวเราะอยู่ไหม"},
+        {en: "What did you hear?", th: "ได้ยินอะไร"},
+        {en: "leave the crust", th: "ทิ้งขอบไว้"},
+        {en: "at the cinema", th: "ที่โรงหนัง"},
+        {en: "shower head", th: "ฝักบัว"},
+        {en: "toothbrushes", th: "แปรงสีฟัน"},
+        {en: "How would you like to pay?", th: "จ่ายยังไง"}
+    ];
+
+    // --- FUNCTIONS ---
+
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9; 
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Browser TTS not supported.");
+        }
+    }
+
+    function toggleTrans(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === "inline" || el.style.display === "block") ? "none" : "inline";
+    }
+
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === "block") {
+            el.style.display = "none";
+        } else {
+            el.style.display = "block";
+            speak(el.innerText);
+        }
+    }
+
+    function spinVocab() {
+        const display = document.getElementById('vocab-display');
+        display.innerHTML = '<p>Spinning... 🎲</p>';
+        
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const item = vocabList[randomIndex];
+            const uniqueId = 'voc-' + Date.now();
+            
+            display.innerHTML = `
+                <div style="width:100%;">
+                    <p style="font-size:1.4rem; font-weight:bold; margin-bottom:10px;">${item.en}</p>
+                    <div style="margin-top:10px;">
+                        <button class="control-btn speak-btn" onclick="speak('${item.en.replace(/'/g, "\\'")}')">🔊 Listen</button>
+                        <button class="control-btn trans-btn" onclick="toggleTrans('${uniqueId}')">🇹🇭 TH</button>
+                    </div>
+                    <p id="${uniqueId}" class="thai-text" style="display:none; margin-top:15px; font-size:1.1rem; color:#d35400;">${item.th}</p>
+                </div>
+            `;
+        }, 500);
+    }
+
+    function checkQuiz(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const choices = parent.getElementsByClassName('quiz-choice');
+        for (let choice of choices) {
+            choice.classList.remove('correct', 'wrong');
+        }
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            speak("Correct!");
+        } else {
+            btn.classList.add('wrong');
+            speak("Try again.");
+        }
+    }
+</script>
+
+</body>
+</html>
