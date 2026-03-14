@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 9: Me, Him, Her, Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #eff6ff; /* Light Blue background */
+            color: #1e3a8a; /* Dark Blue text */
+        }
+        .content-section {
+            display: none; 
+        }
+        .content-section.active {
+            display: block; 
+        }
+        .nav-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-button.active {
+            border-bottom-color: #2563eb; /* Blue-600 */
+            color: #1d4ed8; /* Blue-700 */
+        }
+        .speak-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem; 
+            line-height: 1;
+            margin-left: 6px; 
+            color: #3b82f6; 
+            transition: all 0.2s ease;
+            padding: 2px;
+            flex-shrink: 0;
+        }
+        .speak-btn:hover {
+            color: #2563eb;
+            transform: scale(1.1);
+        }
+        .thai-toggle-btn {
+            background-color: #dbeafe; /* Light blue */
+            color: #1e40af; 
+            padding: 2px 8px;
+            border-radius: 9999px; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            margin-left: 8px; 
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .thai-toggle-btn:hover {
+            background-color: #bfdbfe; 
+        }
+        .thai-translation {
+            display: none;
+            font-size: 0.9em;
+            color: #64748b; 
+            margin-top: 4px;
+            padding-left: 8px;
+            border-left: 2px solid #93c5fd; 
+            width: 100%; 
+        }
+        
+        /* Review Card Styles */
+        .review-card {
+            transition: all 0.3s ease;
+        }
+        .answer-box {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .answer-box.visible {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Matching Game Styles */
+        .match-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #e2e8f0; 
+        }
+        .match-item:hover {
+            background-color: #e0f2fe; 
+        }
+        .match-item.selected {
+            background-color: #3b82f6; 
+            color: white;
+            border-color: #1d4ed8; 
+        }
+        .match-item.matched {
+            background-color: #86efac; /* Green */
+            color: #14532d; 
+            border-color: #22c55e; 
+            cursor: default;
+            opacity: 0.7;
+        }
+        
+        /* Quiz Option Styles */
+        .quiz-option {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #e2e8f0;
+        }
+        .quiz-option:hover {
+            background-color: #f1f5f9;
+        }
+        .quiz-option.correct {
+            background-color: #dcfce7; 
+            border-color: #22c55e; 
+        }
+        .quiz-option.wrong {
+            background-color: #fee2e2; 
+            border-color: #ef4444; 
+        }
+
+        /* Dialogue Styles */
+        .dialogue-bubble {
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            max-width: 90%;
+            position: relative;
+            animation: popIn 0.3s ease-out;
+        }
+        .dialogue-left {
+            background-color: #ffffff;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            border: 1px solid #e5e7eb;
+        }
+        .dialogue-right {
+            background-color: #dbeafe; 
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+            border: 1px solid #bfdbfe;
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Role Play Hidden Answer */
+        .role-play-answer {
+            display: none;
+        }
+        .role-play-card.revealed .role-play-answer {
+            display: block;
+        }
+        .role-play-card.revealed .role-play-prompt {
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-6 max-w-6xl">
+
+        <header class="text-center mb-6">
+            <div class="flex items-center justify-center mb-1">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Lesson 9: Me, Him, Her, Us</h1>
+                <button class="speak-btn" data-speak-text="Lesson 9: Me, Him, Her, Us">🔊</button>
+            </div>
+            <p class="text-lg text-gray-600">Object Pronouns</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:space-x-4 bg-white p-4 rounded-lg shadow-sm mb-6 sticky top-2 z-10">
+            <button id="nav-review" class="nav-button active" onclick="showSection('review')">
+                <span class="text-2xl hidden md:inline">⚡</span>
+                <span class="block text-sm md:text-lg font-semibold">Speed Review</span>
+                <span class="block text-xs md:text-sm text-gray-500">(ทบทวนเร็ว)</span>
+            </button>
+            <button id="nav-concept" class="nav-button" onclick="showSection('concept')">
+                <span class="text-2xl hidden md:inline">💡</span>
+                <span class="block text-sm md:text-lg font-semibold">Concept</span>
+                <span class="block text-xs md:text-sm text-gray-500">(แนวคิด)</span>
+            </button>
+            <button id="nav-rules" class="nav-button" onclick="showSection('rules')">
+                <span class="text-2xl hidden md:inline">📏</span>
+                <span class="block text-sm md:text-lg font-semibold">The Rules</span>
+                <span class="block text-xs md:text-sm text-gray-500">(กฎ)</span>
+            </button>
+            <button id="nav-practice" class="nav-button" onclick="showSection('practice')">
+                <span class="text-2xl hidden md:inline">🧩</span>
+                <span class="block text-sm md:text-lg font-semibold">Practice</span>
+                <span class="block text-xs md:text-sm text-gray-500">(ฝึกฝน)</span>
+            </button>
+            <button id="nav-extension" class="nav-button" onclick="showSection('extension')">
+                <span class="text-2xl hidden md:inline">🚀</span>
+                <span class="block text-sm md:text-lg font-semibold">Extension</span>
+                <span class="block text-xs md:text-sm text-gray-500">(กิจกรรม)</span>
+            </button>
+            <button id="nav-quiz" class="nav-button" onclick="showSection('quiz')">
+                <span class="text-2xl hidden md:inline">❓</span>
+                <span class="block text-sm md:text-lg font-semibold">Quiz</span>
+                <span class="block text-xs md:text-sm text-gray-500">(แบบทดสอบ)</span>
+            </button>
+        </nav>
+
+        <main>
+            <!-- Speed Review Section -->
+            <section id="review-section" class="content-section active bg-white p-6 rounded-lg shadow-sm">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-semibold text-gray-800">Speed Review!</h2>
+                    <p class="text-gray-600 mt-2">Challenge: Answer quickly with a <span class="font-bold text-blue-600">FULL SENTENCE</span>.</p>
+                    <p class="text-gray-500 text-sm">(ความท้าทาย: ตอบเร็วๆ ด้วย **ประโยคเต็ม** ห้ามตอบสั้นๆ)</p>
+                </div>
+
+                <div class="space-y-6 max-w-2xl mx-auto">
+                    <!-- Question 1 -->
+                    <div class="review-card bg-blue-50 p-5 rounded-xl border border-blue-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <span class="text-xl font-bold text-blue-800">Q1: Is there a TV in your room?</span>
+                                <button class="speak-btn" data-speak-text="Is there a TV in your room?">🔊</button>
+                            </div>
+                        </div>
+                        <div class="text-gray-500 italic mb-4 text-sm">Try to say: "Yes, there is..." or "No, there isn't..."</div>
+                        <button class="show-ans-btn bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition w-full">👁️ Show Full Sentence</button>
+                        <div class="answer-box mt-4 bg-white p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="flex items-center">
+                                <span class="text-lg font-bold text-green-700">"Yes, there is a TV in my room."</span>
+                                <button class="speak-btn" data-speak-text="Yes, there is a TV in my room.">🔊</button>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <span class="text-lg font-bold text-red-700">"No, there isn't a TV in my room."</span>
+                                <button class="speak-btn" data-speak-text="No, there isn't a TV in my room.">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="review-card bg-blue-50 p-5 rounded-xl border border-blue-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <span class="text-xl font-bold text-blue-800">Q2: What are you doing now?</span>
+                                <button class="speak-btn" data-speak-text="What are you doing now?">🔊</button>
+                            </div>
+                        </div>
+                        <div class="text-gray-500 italic mb-4 text-sm">Try to say: "I am..."</div>
+                        <button class="show-ans-btn bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition w-full">👁️ Show Full Sentence</button>
+                        <div class="answer-box mt-4 bg-white p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="flex items-center">
+                                <span class="text-lg font-bold text-green-700">"I am studying English."</span>
+                                <button class="speak-btn" data-speak-text="I am studying English.">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="review-card bg-blue-50 p-5 rounded-xl border border-blue-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <span class="text-xl font-bold text-blue-800">Q3: What are you going to do tomorrow?</span>
+                                <button class="speak-btn" data-speak-text="What are you going to do tomorrow?">🔊</button>
+                            </div>
+                        </div>
+                        <div class="text-gray-500 italic mb-4 text-sm">Try to say: "I am going to..."</div>
+                        <button class="show-ans-btn bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition w-full">👁️ Show Full Sentence</button>
+                        <div class="answer-box mt-4 bg-white p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="flex items-center">
+                                <span class="text-lg font-bold text-green-700">"I am going to eat pizza."</span>
+                                <button class="speak-btn" data-speak-text="I am going to eat pizza.">🔊</button>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-1">(Or whatever you will do!)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Concept Section -->
+            <section id="concept-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Why use pronouns? (ทำไมต้องใช้?)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                        <h3 class="font-bold text-red-700 mb-2">❌ Too many names (ชื่อเยอะเกินไป)</h3>
+                        <p class="mb-2">"I love <span class="font-bold">Tom</span>."</p>
+                        <p class="mb-2">"I call <span class="font-bold">Tom</span>."</p>
+                        <p class="mb-2">"I give money to <span class="font-bold">Tom</span>."</p>
+                        <div class="flex items-center mt-4">
+                            <button class="speak-btn !ml-0" data-speak-text="I love Tom. I call Tom. I give money to Tom.">🔊 Listen</button>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <h3 class="font-bold text-green-700 mb-2">✅ Better (ดีกว่า)</h3>
+                        <p class="mb-2">"I love <span class="font-bold">Tom</span>."</p>
+                        <p class="mb-2">"I call <span class="font-bold text-green-600 text-xl">him</span>."</p>
+                        <p class="mb-2">"I give money to <span class="font-bold text-green-600 text-xl">him</span>."</p>
+                        <div class="flex items-center mt-4">
+                            <button class="speak-btn !ml-0" data-speak-text="I love Tom. I call him. I give money to him.">🔊 Listen</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rules Section -->
+            <section id="rules-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">The Rules (กฎ)</h2>
+                <p class="text-gray-600 mb-4">Use these words <b>after</b> the verb (ใช้คำเหล่านี้ <b>หลัง</b> คำกริยา).</p>
+
+                <div class="grid grid-cols-2 gap-4 text-lg">
+                    <!-- I -> Me -->
+                    <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center border">
+                        <span class="font-bold text-gray-500">I (ฉัน - ประธาน)</span>
+                        <span class="text-2xl">➡️</span>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg flex justify-between items-center border border-blue-300">
+                        <span class="font-bold text-blue-700">me (ฉัน - กรรม)</span>
+                        <button class="speak-btn" data-speak-text="me">🔊</button>
+                    </div>
+
+                    <!-- He -> Him -->
+                    <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center border">
+                        <span class="font-bold text-gray-500">He (เขา)</span>
+                        <span class="text-2xl">➡️</span>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg flex justify-between items-center border border-blue-300">
+                        <span class="font-bold text-blue-700">him (เขา)</span>
+                        <button class="speak-btn" data-speak-text="him">🔊</button>
+                    </div>
+
+                    <!-- She -> Her -->
+                    <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center border">
+                        <span class="font-bold text-gray-500">She (เธอ)</span>
+                        <span class="text-2xl">➡️</span>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg flex justify-between items-center border border-blue-300">
+                        <span class="font-bold text-blue-700">her (เธอ)</span>
+                        <button class="speak-btn" data-speak-text="her">🔊</button>
+                    </div>
+
+                    <!-- It -> It -->
+                    <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center border">
+                        <span class="font-bold text-gray-500">It (มัน)</span>
+                        <span class="text-2xl">➡️</span>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg flex justify-between items-center border border-blue-300">
+                        <span class="font-bold text-blue-700">it (มัน)</span>
+                        <button class="speak-btn" data-speak-text="it">🔊</button>
+                    </div>
+
+                    <!-- They -> Them -->
+                    <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center border">
+                        <span class="font-bold text-gray-500">They (พวกเขา)</span>
+                        <span class="text-2xl">➡️</span>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg flex justify-between items-center border border-blue-300">
+                        <span class="font-bold text-blue-700">them (พวกเขา)</span>
+                        <button class="speak-btn" data-speak-text="them">🔊</button>
+                    </div>
+                     <!-- We -> Us -->
+                    <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center border">
+                        <span class="font-bold text-gray-500">We (พวกเรา)</span>
+                        <span class="text-2xl">➡️</span>
+                    </div>
+                    <div class="p-3 bg-blue-100 rounded-lg flex justify-between items-center border border-blue-300">
+                        <span class="font-bold text-blue-700">us (พวกเรา)</span>
+                        <button class="speak-btn" data-speak-text="us">🔊</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Practice Section -->
+            <section id="practice-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                
+                <!-- Part 1: Matching -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        1. Match Subject to Object
+                        <button class="thai-toggle-btn" data-thai="จับคู่ประธานกับกรรม">TH</button>
+                    </h3>
+                    <p class="thai-translation mb-4">จับคู่ประธานกับกรรม</p>
+                    
+                    <div class="p-4 bg-gray-50 rounded-lg" id="match-game-pronouns">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3" id="pronoun-col-1"></div>
+                            <div class="space-y-3" id="pronoun-col-2"></div>
+                        </div>
+                        <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full mt-4" onclick="resetGame()">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Part 2: Sentence Builder -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        2. Build Sentences
+                        <button class="thai-toggle-btn" data-thai="สร้างประโยค">TH</button>
+                    </h3>
+                    <p class="thai-translation mb-4">สร้างประโยค</p>
+
+                    <div class="bg-white border rounded-xl p-4 space-y-6">
+                        <!-- Actions -->
+                        <div>
+                            <p class="text-sm text-gray-500 mb-2 font-bold uppercase tracking-wide">Choose Action (เลือกการกระทำ)</p>
+                            <div class="flex flex-wrap gap-3" id="builder-verbs">
+                                <button class="phrase-button verb-btn p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-800" data-value="I call">I call 📞</button>
+                                <button class="phrase-button verb-btn p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-800" data-value="I help">I help 🤝</button>
+                                <button class="phrase-button verb-btn p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-800" data-value="I see">I see 👀</button>
+                                <button class="phrase-button verb-btn p-3 bg-blue-50 rounded-lg border border-blue-200 text-blue-800" data-value="I love">I love ❤️</button>
+                            </div>
+                        </div>
+
+                        <!-- Objects -->
+                        <div>
+                            <p class="text-sm text-gray-500 mb-2 font-bold uppercase tracking-wide">Choose Person (เลือกคน)</p>
+                            <div class="flex flex-wrap gap-3" id="builder-objects">
+                                <button class="phrase-button obj-btn p-3 bg-green-50 rounded-lg border border-green-200 text-green-800" data-value="him">him (Mom/Dad?)</button>
+                                <button class="phrase-button obj-btn p-3 bg-green-50 rounded-lg border border-green-200 text-green-800" data-value="her">her (Mom/Dad?)</button>
+                                <button class="phrase-button obj-btn p-3 bg-green-50 rounded-lg border border-green-200 text-green-800" data-value="them">them (friends)</button>
+                                <button class="phrase-button obj-btn p-3 bg-green-50 rounded-lg border border-green-200 text-green-800" data-value="it">it (the dog)</button>
+                                <button class="phrase-button obj-btn p-3 bg-green-50 rounded-lg border border-green-200 text-green-800" data-value="us">us (me & you)</button>
+                            </div>
+                        </div>
+
+                        <!-- Result -->
+                        <div class="p-4 bg-gray-100 rounded-lg text-center border-2 border-dashed border-gray-300">
+                            <div id="builder-result" class="text-2xl font-bold text-gray-400">Click buttons to make a sentence</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Extension Section (NEW) -->
+            <section id="extension-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Extension Activities (กิจกรรมเพิ่มเติม)</h2>
+                
+                <!-- 1. Interactive Dialogue -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-bold text-blue-800 mb-4 flex items-center">
+                        1. Dialogue: Sharing Snacks
+                        <button class="thai-toggle-btn" data-thai="บทสนทนา: แบ่งขนม">TH</button>
+                    </h3>
+                    <p class="thai-translation mb-4">บทสนทนา: แบ่งขนม</p>
+                    
+                    <div id="snack-dialogue" class="space-y-4">
+                        <!-- Chat bubbles injected by JS -->
+                    </div>
+                    <button class="mt-4 px-4 py-2 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 text-sm font-bold hidden" id="reset-snack-btn" onclick="startSnackDialogue()">Restart Dialogue</button>
+                </div>
+
+                <!-- 2. Role Play -->
+                <div class="mb-10 p-6 bg-yellow-50 rounded-xl border border-yellow-200">
+                    <h3 class="text-xl font-bold text-yellow-800 mb-4 flex items-center">
+                        2. Role Play: The Busy Teacher
+                        <button class="thai-toggle-btn" data-thai="บทบาทสมมติ: ครูจอมยุ่ง">TH</button>
+                    </h3>
+                    <p class="thai-translation mb-4">บทบาทสมมติ: ครูจอมยุ่ง</p>
+                    
+                    <p class="text-gray-700 mb-4"><strong>Situation:</strong> You are a teacher. The students are noisy! Click the sentence to tell them what to do.</p>
+                    
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-lg shadow-sm role-play-card" onclick="this.classList.add('revealed'); speakText('Please listen to me!')">
+                            <p class="text-sm text-gray-500 mb-1">Scenario 1: They are not listening.</p>
+                            <p class="text-lg font-bold text-gray-400 role-play-prompt">(Click to reveal answer)</p>
+                            <div class="role-play-answer">
+                                <div class="flex items-center mt-1">
+                                    <p class="text-lg font-bold text-yellow-900">"Please listen to <span class="text-blue-600">me</span>!"</p>
+                                    <button class="speak-btn" data-speak-text="Please listen to me!">🔊</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm role-play-card" onclick="this.classList.add('revealed'); speakText('Please look at it!')">
+                            <p class="text-sm text-gray-500 mb-1">Scenario 2: Point at the whiteboard.</p>
+                            <p class="text-lg font-bold text-gray-400 role-play-prompt">(Click to reveal answer)</p>
+                             <div class="role-play-answer">
+                                <div class="flex items-center mt-1">
+                                    <p class="text-lg font-bold text-yellow-900">"Please look at <span class="text-blue-600">it</span>!"</p>
+                                    <button class="speak-btn" data-speak-text="Please look at it!">🔊</button>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="bg-white p-4 rounded-lg shadow-sm role-play-card" onclick="this.classList.add('revealed'); speakText('Stop them!')">
+                            <p class="text-sm text-gray-500 mb-1">Scenario 3: Two students are fighting.</p>
+                             <p class="text-lg font-bold text-gray-400 role-play-prompt">(Click to reveal answer)</p>
+                            <div class="role-play-answer">
+                                <div class="flex items-center mt-1">
+                                    <p class="text-lg font-bold text-yellow-900">"Stop <span class="text-blue-600">them</span>!"</p>
+                                    <button class="speak-btn" data-speak-text="Stop them!">🔊</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Speaking Game -->
+                <div class="mb-10 p-6 bg-green-50 rounded-xl border border-green-200">
+                    <h3 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+                        3. Game: Pass the Ball!
+                        <button class="thai-toggle-btn" data-thai="เกม: ส่งลูกบอล">TH</button>
+                    </h3>
+                    <p class="thai-translation mb-4">เกม: ส่งลูกบอล</p>
+                    
+                    <div class="text-center">
+                        <div id="ball-target" class="text-6xl mb-4">❓</div>
+                        <p class="text-lg mb-4 font-bold" id="ball-text">Click Start!</p>
+                        <button class="px-6 py-3 bg-green-600 text-white rounded-lg font-bold shadow hover:bg-green-700 transition" onclick="playPassBall()" id="spin-btn">Spin!</button>
+                        <button class="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold shadow hover:bg-blue-700 transition hidden" onclick="revealBallAnswer()" id="reveal-btn">Reveal Answer</button>
+                        
+                        <div id="ball-answer" class="hidden mt-6 p-4 bg-white rounded-lg border-2 border-green-400">
+                            <p class="text-gray-500 text-sm uppercase">You say:</p>
+                            <p class="text-2xl font-bold text-green-800 mt-2" id="ball-sentence">...</p>
+                            <button id="ball-speak-btn" class="speak-btn !text-2xl !ml-2">🔊</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Gift Game (Restored) -->
+                <div class="bg-pink-50 p-6 rounded-xl border border-pink-200 text-center">
+                    <h3 class="text-xl font-bold text-pink-800 mb-4 flex items-center justify-center">
+                        4. Extra: Give the Gift! 🎁
+                         <button class="thai-toggle-btn" data-thai="พิเศษ: ให้ของขวัญ">TH</button>
+                    </h3>
+                    <p class="thai-translation mb-4">พิเศษ: ให้ของขวัญ</p>
+
+                    <p class="text-xl mb-4">Who is the gift for?</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="gift-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition" onclick="playGift('Dad', 'him')">
+                            <span class="text-4xl">👨</span>
+                            <p class="font-bold mt-2">Dad</p>
+                        </div>
+                        <div class="gift-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition" onclick="playGift('Mom', 'her')">
+                            <span class="text-4xl">👩</span>
+                            <p class="font-bold mt-2">Mom</p>
+                        </div>
+                        <div class="gift-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition" onclick="playGift('The Dog', 'it')">
+                            <span class="text-4xl">🐶</span>
+                            <p class="font-bold mt-2">The Dog</p>
+                        </div>
+                        <div class="gift-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition" onclick="playGift('My Friends', 'them')">
+                            <span class="text-4xl">👯</span>
+                            <p class="font-bold mt-2">My Friends</p>
+                        </div>
+                        <div class="gift-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition" onclick="playGift('You', 'you')">
+                            <span class="text-4xl">👉</span>
+                            <p class="font-bold mt-2">You</p>
+                        </div>
+                         <div class="gift-card bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition" onclick="playGift('Me & You', 'us')">
+                            <span class="text-4xl">🤝</span>
+                            <p class="font-bold mt-2">Me & You</p>
+                        </div>
+                    </div>
+
+                    <div id="gift-result" class="hidden mt-4 p-4 bg-white rounded-lg border-2 border-pink-400">
+                        <p class="text-gray-500 text-sm uppercase font-bold">Say this sentence:</p>
+                        <p class="text-2xl font-bold text-pink-800 mt-2" id="gift-sentence">...</p>
+                        <button id="gift-speak-btn" class="speak-btn !text-2xl !ml-2">🔊</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="quiz-section" class="content-section bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Quiz</h2>
+                <div class="space-y-6" id="quiz-container"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Navigation & Global ---
+        const allSections = document.querySelectorAll('.content-section');
+        const allNavButtons = document.querySelectorAll('.nav-button');
+        const synth = window.speechSynthesis;
+        let americanVoice = null;
+
+        function setVoice() {
+            if (synth.getVoices().length > 0) {
+                americanVoice = synth.getVoices().find(voice => voice.lang === 'en-US' && (voice.name.includes('Google') || voice.name.includes('Samantha')));
+            }
+        }
+        if (synth) { synth.onvoiceschanged = setVoice; setVoice(); }
+
+        function speakText(text) {
+            if (synth && text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (americanVoice) utterance.voice = americanVoice;
+                utterance.rate = 0.9;
+                synth.speak(utterance);
+            }
+        }
+
+        function showSection(sectionId) {
+            allSections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(`${sectionId}-section`).classList.add('active');
+            allNavButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${sectionId}`).classList.add('active');
+        }
+
+        // --- Global Event Listeners ---
+        document.body.addEventListener('click', (e) => {
+            // TTS
+            const speakBtn = e.target.closest('.speak-btn');
+            if (speakBtn) {
+                e.stopPropagation();
+                speakText(speakBtn.dataset.speakText);
+                return;
+            }
+
+            // Thai Toggle
+            const toggleBtn = e.target.closest('.thai-toggle-btn');
+            if (toggleBtn) {
+                e.stopPropagation();
+                let container = toggleBtn.parentElement;
+                let translation = container.querySelector('.thai-translation') || container.nextElementSibling;
+                
+                if (!translation || !translation.classList.contains('thai-translation')) {
+                     translation = toggleBtn.parentElement.parentElement.querySelector('.thai-translation');
+                }
+
+                if (translation && translation.classList.contains('thai-translation')) {
+                    translation.style.display = translation.style.display === 'block' ? 'none' : 'block';
+                }
+            }
+
+            // Speed Review Answer Reveal
+            const showAnsBtn = e.target.closest('.show-ans-btn');
+            if (showAnsBtn) {
+                const answerBox = showAnsBtn.nextElementSibling;
+                answerBox.classList.add('visible');
+                showAnsBtn.style.display = 'none';
+            }
+        });
+
+        // --- Review Matching Game ---
+        const pronouns = [
+            { id: 1, sub: 'I', obj: 'me' },
+            { id: 2, sub: 'He', obj: 'him' },
+            { id: 3, sub: 'She', obj: 'her' },
+            { id: 4, sub: 'It', obj: 'it' },
+            { id: 5, sub: 'They', obj: 'them' },
+            { id: 6, sub: 'We', obj: 'us' }
+        ];
+        
+        let selectedItem = null;
+
+        function shuffle(array) {
+            let newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        function createMatchingGame() {
+            const col1 = document.getElementById('pronoun-col-1');
+            const col2 = document.getElementById('pronoun-col-2');
+            col1.innerHTML = ''; col2.innerHTML = '';
+
+            const shuffledSub = shuffle(pronouns);
+            const shuffledObj = shuffle(pronouns);
+
+            shuffledSub.forEach(p => {
+                col1.innerHTML += `<div class="match-item p-3 bg-white rounded shadow text-center text-lg font-bold" data-type="sub" data-id="${p.id}" onclick="handleMatch(this)">${p.sub}</div>`;
+            });
+            shuffledObj.forEach(p => {
+                col2.innerHTML += `<div class="match-item p-3 bg-white rounded shadow text-center text-lg font-bold" data-type="obj" data-id="${p.id}" onclick="handleMatch(this)">${p.obj}</div>`;
+            });
+        }
+
+        function handleMatch(el) {
+            if (el.classList.contains('matched')) return;
+
+            if (!selectedItem) {
+                selectedItem = el;
+                el.classList.add('selected');
+                speakText(el.innerText);
+            } else {
+                if (selectedItem === el) return; 
+
+                const id1 = selectedItem.dataset.id;
+                const id2 = el.dataset.id;
+
+                if (id1 === id2) {
+                    el.classList.add('matched');
+                    selectedItem.classList.remove('selected');
+                    selectedItem.classList.add('matched');
+                    speakText("Correct! " + el.innerText);
+                    selectedItem = null;
+                } else {
+                    selectedItem.classList.remove('selected');
+                    el.classList.add('wrong'); 
+                    speakText("Try again");
+                    selectedItem = null;
+                }
+            }
+        }
+        
+        function resetGame() {
+            selectedItem = null;
+            createMatchingGame();
+        }
+
+        // --- Phrase Builder ---
+        let selectedVerb = '';
+        let selectedObj = '';
+
+        function initPhraseBuilder() {
+            const verbs = document.querySelectorAll('.verb-btn');
+            const objs = document.querySelectorAll('.obj-btn');
+            const result = document.getElementById('builder-result');
+
+            verbs.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    verbs.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedVerb = btn.dataset.value;
+                    checkPhrase();
+                });
+            });
+
+            objs.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    objs.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedObj = btn.dataset.value;
+                    checkPhrase();
+                });
+            });
+
+            function checkPhrase() {
+                if (selectedVerb && selectedObj) {
+                    const text = `${selectedVerb} ${selectedObj}.`;
+                    result.innerHTML = `<span class="text-gray-800">${text}</span> <button class="speak-btn" onclick="speakText('${text}')">🔊</button>`;
+                    speakText(text);
+                    result.classList.remove('text-gray-400');
+                }
+            }
+        }
+
+        // --- Extension: Snack Dialogue ---
+        const snackDialogueSteps = [
+            { speaker: "Friend A", text: "I have a lot of chips!", thai: "ฉันมีมันฝรั่งทอดเยอะเลย!", type: "info" },
+            { speaker: "You", text: "(Want some? Ask me!)", thai: "(อยากกินไหม? ถามฉันสิ!)", type: "prompt" },
+            { type: "choice", options: [
+                { text: "Give I some.", thai: "ให้ฉันบ้าง (ผิด)", correct: false },
+                { text: "Give me some, please.", thai: "ขอฉันบ้างได้ไหม (ถูก)", correct: true }
+            ]},
+            { speaker: "Friend A", text: "Sure! Look at Tom. He is hungry.", thai: "ได้สิ! ดูทอมสิ เขาหิว", type: "info" },
+            { speaker: "You", text: "(Give chips to Tom)", thai: "(ให้มันฝรั่งทอม)", type: "prompt" },
+            { type: "choice", options: [
+                { text: "Give him some too.", thai: "ให้เขาบ้าง (ถูก)", correct: true },
+                { text: "Give he some too.", thai: "ให้เขาบ้าง (ผิด)", correct: false }
+            ]},
+             { speaker: "Friend A", text: "Look at Sarah. She wants chips.", thai: "ดูซาร่าสิ เธออยากกินมันฝรั่ง", type: "info" },
+             { speaker: "You", text: "(Give chips to Sarah)", thai: "(ให้มันฝรั่งซาร่า)", type: "prompt" },
+             { type: "choice", options: [
+                { text: "Give her some.", thai: "ให้เธอบ้าง (ถูก)", correct: true },
+                { text: "Give she some.", thai: "ให้เธอบ้าง (ผิด)", correct: false }
+            ]},
+             { speaker: "Friend A", text: "The dog is hungry too!", thai: "หมาก็หิวเหมือนกัน!", type: "info" },
+             { speaker: "You", text: "(Give chips to the dog)", thai: "(ให้มันฝรั่งหมา)", type: "prompt" },
+             { type: "choice", options: [
+                { text: "Give it some.", thai: "ให้มันบ้าง (ถูก)", correct: true },
+                { text: "Give he some.", thai: "ให้มันบ้าง (ผิด)", correct: false }
+            ]},
+             { speaker: "Friend A", text: "Tom and Sarah are asking again.", thai: "ทอมกับซาร่าขออีกแล้ว", type: "info" },
+             { speaker: "You", text: "(Give to both)", thai: "(ให้ทั้งคู่)", type: "prompt" },
+             { type: "choice", options: [
+                { text: "Give them some.", thai: "ให้พวกเขาบ้าง (ถูก)", correct: true },
+                { text: "Give they some.", thai: "ให้พวกเขาบ้าง (ผิด)", correct: false }
+            ]},
+             { speaker: "Friend A", text: "We are all hungry!", thai: "พวกเราหิวกันหมดเลย!", type: "info" },
+             { speaker: "You", text: "(Give to all of us)", thai: "(ให้พวกเราทุกคน)", type: "prompt" },
+             { type: "choice", options: [
+                { text: "Give us some!", thai: "ให้พวกเราบ้าง! (ถูก)", correct: true },
+                { text: "Give we some!", thai: "ให้พวกเราบ้าง! (ผิด)", correct: false }
+            ]},
+            { speaker: "Friend A", text: "Good idea. We can share!", thai: "ความคิดดี เราแบ่งกันได้!", type: "info" }
+        ];
+        
+        let currentSnackIndex = 0;
+
+        function initSnackDialogue() { startSnackDialogue(); }
+
+        window.startSnackDialogue = function() {
+            currentSnackIndex = 0;
+            const container = document.getElementById('snack-dialogue');
+            container.innerHTML = '';
+            document.getElementById('reset-snack-btn').classList.add('hidden');
+            showNextSnackStep();
+        }
+
+        function showNextSnackStep() {
+            const container = document.getElementById('snack-dialogue');
+            if (currentSnackIndex >= snackDialogueSteps.length) {
+                document.getElementById('reset-snack-btn').classList.remove('hidden');
+                return;
+            }
+
+            const step = snackDialogueSteps[currentSnackIndex];
+            const bubble = document.createElement('div');
+            bubble.className = 'dialogue-bubble ' + (step.speaker === 'Friend A' ? 'dialogue-left' : 'dialogue-right');
+            
+            if (step.type === 'info' || step.type === 'prompt') {
+                bubble.innerHTML = `
+                    <p class="text-sm text-gray-500 font-bold mb-1">${step.speaker}</p>
+                    <div class="flex items-start">
+                        <p class="text-lg text-gray-800">${step.text}</p>
+                        <button class="speak-btn !text-lg" data-speak-text="${step.text}">🔊</button>
+                        <button class="thai-toggle-btn" data-thai="${step.thai}">TH</button>
+                    </div>
+                    <p class="thai-translation mt-1">${step.thai}</p>
+                `;
+                container.appendChild(bubble);
+                bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                speakText(step.text);
+                currentSnackIndex++;
+                setTimeout(showNextSnackStep, step.type === 'prompt' ? 100 : 2500); // Fast for prompt
+            } else if (step.type === 'choice') {
+                const choiceContainer = document.createElement('div');
+                choiceContainer.className = 'space-y-2 w-full max-w-md mx-auto';
+                
+                step.options.forEach(opt => {
+                     const btn = document.createElement('button');
+                     btn.className = `w-full p-3 rounded-lg border-2 border-blue-200 text-left hover:bg-blue-50 transition dialogue-option`;
+                     btn.innerHTML = `<span class="font-bold">${opt.text}</span> <span class="text-sm text-gray-500 ml-2">${opt.thai}</span>`;
+                     btn.onclick = () => handleSnackChoice(btn, opt.correct, choiceContainer);
+                     choiceContainer.appendChild(btn);
+                });
+                container.appendChild(choiceContainer);
+                choiceContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+
+        function handleSnackChoice(btn, isCorrect, container) {
+            const allBtns = container.querySelectorAll('.dialogue-option');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                btn.classList.add('bg-green-100', 'border-green-500');
+                speakText("Correct! " + btn.querySelector('span').innerText);
+                setTimeout(() => {
+                    container.remove();
+                     const bubble = document.createElement('div');
+                     bubble.className = 'dialogue-bubble dialogue-right';
+                     bubble.innerHTML = `
+                        <p class="text-sm text-gray-500 font-bold mb-1">You</p>
+                        <p class="text-lg text-gray-800">${btn.querySelector('span').innerText}</p>
+                    `;
+                    document.getElementById('snack-dialogue').appendChild(bubble);
+                    currentSnackIndex++;
+                    showNextSnackStep();
+                }, 1500);
+            } else {
+                btn.classList.add('bg-red-100', 'border-red-500');
+                speakText("Try again.");
+                setTimeout(() => {
+                     allBtns.forEach(b => b.disabled = false);
+                     btn.classList.remove('bg-red-100', 'border-red-500');
+                }, 1000);
+            }
+        }
+
+        // --- Extension: Pass the Ball ---
+        let passBallFinal = null;
+
+        function playPassBall() {
+            const targets = [
+                { name: "Mom", pronoun: "her", icon: "👩" },
+                { name: "Dad", pronoun: "him", icon: "👨" },
+                { name: "The Dog", pronoun: "it", icon: "🐶" },
+                { name: "My Friends", pronoun: "them", icon: "👯" },
+                { name: "You & Me", pronoun: "us", icon: "🤝" }
+            ];
+            
+            const targetEl = document.getElementById('ball-target');
+            const textEl = document.getElementById('ball-text');
+            const resultDiv = document.getElementById('ball-answer');
+            const sentenceP = document.getElementById('ball-sentence');
+            const speakBtn = document.getElementById('ball-speak-btn');
+            const spinBtn = document.getElementById('spin-btn');
+            const revealBtn = document.getElementById('reveal-btn');
+
+            resultDiv.classList.add('hidden'); // Hide answer initially
+            spinBtn.classList.add('hidden');
+            
+            // Simple animation
+            let count = 0;
+            const interval = setInterval(() => {
+                const random = targets[Math.floor(Math.random() * targets.length)];
+                targetEl.innerText = random.icon;
+                textEl.innerText = random.name;
+                count++;
+                if (count > 10) {
+                    clearInterval(interval);
+                    passBallFinal = targets[Math.floor(Math.random() * targets.length)];
+                    targetEl.innerText = passBallFinal.icon;
+                    textEl.innerText = passBallFinal.name;
+                    
+                    // Show Reveal button
+                    revealBtn.classList.remove('hidden');
+                }
+            }, 100);
+        }
+
+        function revealBallAnswer() {
+            const resultDiv = document.getElementById('ball-answer');
+            const sentenceP = document.getElementById('ball-sentence');
+            const speakBtn = document.getElementById('ball-speak-btn');
+            const spinBtn = document.getElementById('spin-btn');
+            const revealBtn = document.getElementById('reveal-btn');
+
+            if (!passBallFinal) return;
+
+            resultDiv.classList.remove('hidden');
+            const sentence = `Pass the ball to ${passBallFinal.pronoun}.`;
+            sentenceP.innerText = sentence;
+            speakBtn.onclick = () => speakText(sentence);
+            speakText(sentence);
+
+            revealBtn.classList.add('hidden');
+            spinBtn.classList.remove('hidden');
+        }
+
+
+        // --- Activity: Gift Game ---
+        function playGift(person, pronoun) {
+            const resultDiv = document.getElementById('gift-result');
+            const sentenceP = document.getElementById('gift-sentence');
+            const speakBtn = document.getElementById('gift-speak-btn');
+
+            resultDiv.classList.remove('hidden');
+            const sentence = `I give the gift to ${pronoun}.`;
+            sentenceP.innerText = sentence;
+            
+            speakBtn.onclick = () => speakText(sentence);
+            speakText(sentence);
+        }
+
+        // --- Quiz ---
+        const quizQuestions = [
+            { q: "I like Tom. I like ___.", opts: ["he", "him"], a: "him" },
+            { q: "Where is Mom? I can't see ___.", opts: ["she", "her"], a: "her" },
+            { q: "We are hungry. Help ___!", opts: ["us", "we"], a: "us" },
+            { q: "They are nice. I like ___.", opts: ["they", "them"], a: "them" },
+            { q: "I am talking. Listen to ___!", opts: ["me", "I"], a: "me" }
+        ];
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            
+            quizQuestions.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 rounded-lg shadow mb-4';
+                
+                let buttonsHtml = item.opts.map(opt => 
+                    `<button class="quiz-option w-full text-left p-3 rounded border mb-2 text-lg" onclick="checkQuiz(this, '${opt}', '${item.a}')">${opt}</button>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="flex items-center mb-3">
+                        <span class="text-xl font-bold mr-2">${idx+1}. ${item.q}</span>
+                        <button class="speak-btn" data-speak-text="${item.q.replace('___', 'blank')}">🔊</button>
+                    </div>
+                    <div>${buttonsHtml}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.checkQuiz = function(btn, selected, correct) {
+            const parent = btn.parentElement;
+            Array.from(parent.children).forEach(child => {
+                child.classList.remove('correct', 'wrong');
+                child.disabled = true;
+            });
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                speakText(selected);
+            } else {
+                btn.classList.add('wrong');
+                Array.from(parent.children).forEach(child => {
+                    if (child.innerText === correct) child.classList.add('correct');
+                });
+                speakText("Try again");
+            }
+        }
+
+        // Init
+        showSection('review');
+        createMatchingGame();
+        initPhraseBuilder();
+        initSnackDialogue();
+        initQuiz();
+
+    </script>
+</body>
+</html>
