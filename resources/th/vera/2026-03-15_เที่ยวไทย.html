@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทเรียนภาษาไทย: เตรียมตัวเที่ยวไทย</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Fonts: Sarabun (Main) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fafaf9; /* Warm off-white */
+            touch-action: manipulation;
+        }
+        .thai-text {
+            line-height: 1.8;
+            letter-spacing: 0.2px;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle:active {
+            transform: scale(0.95);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- VOCABULARY DATA (Complete List from Prompt) ---
+        const reviewVocabList = [
+            { em: "🌙🌃", t: "กลางคืน", i: "glaang kʉʉn", e: "At night" },
+            { em: "🌤️", t: "กลางวัน", i: "glaang wan", e: "During the day" },
+            { em: "🎯🎲", t: "กิจกรรม", i: "gìt jà gam", e: "Activities" },
+            { em: "❓😮", t: "เกิดอะไรขึ้น", i: "gə̀ət à rai kʉ̂n", e: "What happened?" },
+            { em: "🔎🗣️", t: "เกี่ยวกับ", i: "gìao gàp", e: "About / on the topic of" },
+            { em: "😖", t: "ขม", i: "kǒm", e: "Bitter" },
+            { em: "🧬🦎", t: "งอกอวัยวะใหม่ได้", i: "ngɔ̂ɔk à wai yá wá mài dâi", e: "Can grow(back) organs again(new)" },
+            { em: "💵", t: "เงินสด", i: "ngən sòt", e: "Cash (fresh money)" },
+            { em: "💳", t: "จ่ายยังไง", i: "jàai yang ngai", e: "How do you want to pay?" },
+            { em: "🍵", t: "ชา", i: "chaa", e: "Tea" },
+            { em: "💪🏘️", t: "ชุมชนที่แข็งแรง", i: "chum chon tîi kɛ̌ng rɛeng", e: "Strong communities" },
+            { em: "🥢🧂", t: "ซีอิ๊ว", i: "sii íu", e: "Soy sauce" },
+            { em: "💍👰🤵", t: "แต่งงาน", i: "dtɛ̀ng ngaan", e: "Get married" },
+            { em: "🌊", t: "ทะเล", i: "tá lee", e: "Sea" },
+            { em: "⏳", t: "ที่แล้ว", i: "tîi lɛ́ɛo", e: "Last .. / ...ago" },
+            { em: "🕧", t: "เที่ยงครึ่ง", i: "tîang krʉ̂ng", e: "Half past noon" },
+            { em: "💳", t: "บัตร", i: "bàt", e: "Card" },
+            { em: "🕐", t: "บ่ายหนึ่งโมง", i: "bàai nʉ̀ng moong", e: "13:00" },
+            { em: "👥🗓️", t: "ประชุม", i: "bprà chum", e: "Have a meeting" },
+            { em: "🔒", t: "ปิด", i: "bpìt", e: "Close" },
+            { em: "👯‍♂️👯‍♀️", t: "ฝาแฝด", i: "fǎa fɛ̀ɛt", e: "Twins" },
+            { em: "✝️", t: "พระเยซู", i: "prá yee suu", e: "Jesus" },
+            { em: "💯", t: "พัน", i: "pan", e: "Thousand" },
+            { em: "🐠🐟🏛️", t: "พิพิธภัณฑ์สัตว์น้ำ", i: "pí pít tá pan sàt náam", e: "Aquarium (museum water animal)" },
+            { em: "🏔️", t: "ภูเขา", i: "puu kǎo", e: "Mountain" },
+            { em: "🔁", t: "ไม่เหมือน", i: "mâi mʉ̌an", e: "Not the same" },
+            { em: "💊", t: "ยา", i: "yaa", e: "Medicine" },
+            { em: "🛒🏪", t: "ร้านชำ", i: "ráan cham", e: "Grocery store" },
+            { em: "🗿", t: "รูปปั้น", i: "rûup bpân", e: "Statue" },
+            { em: "⬇️", t: "ลึกกว่า", i: "lʉ́k gwàa", e: "Deeper" },
+            { em: "🛒", t: "ลูกค้า", i: "lûuk káa", e: "Customer" },
+            { em: "▶️", t: "เริ่ม", i: "rə̂əm", e: "Start" },
+            { em: "🗓️", t: "วันอังคาร", i: "wan ang kaan", e: "Tuesday" },
+            { em: "👥🏙️", t: "สังคม", i: "sǎng kom", e: "Society" },
+            { em: "👀", t: "หน้าตา", i: "nâa dtaa", e: "Appearance (face eyes)" },
+            { em: "🍚🍲", t: "หม้อหุงข้าว", i: "mɔ̂ɔ hǔng kâao", e: "Rice cooker" },
+            { em: "🥩🐷", t: "แหนม", i: "nɛ̌ɛm", e: "Fermented pork" },
+            { em: "🛒", t: "อย่างละหนึ่ง", i: "yàang lá nʉ̀ng", e: "one each (one per item)" },
+            { em: "🧩", t: "อย่างอื่น", i: "yàang ʉ̀ʉn", e: "Other things" },
+            { em: "✨🆕", t: "อะไรใหม่ๆ", i: "à rai mài mài", e: "New things" },
+            { em: "🥗", t: "อาหารเฮลตี้หายาก", i: "aa hǎan heen dtîi hǎa yâak", e: "It's hard to find healthy food." },
+            { em: "🔁", t: "เหมือนเดิม", i: "mʉ̌an dəəm", e: "Same as usual" },
+            { em: "🍋😖", t: "เปรี้ยวเกินไป", i: "bprîao gəən bpai", e: "Too sour" },
+            { em: "🧅", t: "หัวหอม", i: "hǔa hɔ̌ɔm", e: "onions" },
+            { em: "🔄", t: "สลับกัน", i: "sà láp gan", e: "Swap with one another" },
+            { em: "💔", t: "เลิก", i: "lə̂ək", e: "Break up" },
+            { em: "🤷‍♂️", t: "ไม่รู้ทำยังไง", i: "mâi rúu tam yang ngai", e: "Don't know how to make it" },
+            { em: "👕👖", t: "เสื้อผ้า", i: "sʉ̂a pâa", e: "Clothes" },
+            { em: "🧰🧴", t: "ของใช้", i: "kɔ̌ɔng chái", e: "Things I can use" },
+            { em: "💰", t: "ประหยัด", i: "bprà yàt", e: "Frugal / Thrifty" },
+            { em: "🛍️", t: "เป็นไงจ๊ะแม่ค้า", i: "bpen ngai já mɛ̂ɛ káa", e: "How are you, seller?" },
+            { em: "🥚🍳", t: "ไข่ต้มจ้ะ", i: "kài dtôm jâ", e: "Boiled eggs" },
+            { em: "🛍️", t: "ขายยังไงจ๊ะแม่ค้า", i: "kǎai yang ngai já mɛ̂ɛ káa", e: "How do you sell it, seller?" },
+            { em: "🛒🥚💰", t: "ฟองละห้าบาทจ้า", i: "fɔɔng lá hâa bàat jâa", e: "5 baht each (classifier for eggs)" },
+            { em: "🛍️💸", t: "แม่ค้า ทำไมขายแพงอย่างนั้นน่ะ", i: "mɛ̂ɛ káa tam mai kǎai pɛɛng yàang nán nà", e: "Seller, why are you selling it so expensively like that?" },
+            { em: "💸", t: "ค่าของแพงจ้า", i: "kâa kɔ̌ɔng pɛɛng jâa", e: "The cost/value of the stuff is expensive." },
+            { em: "💰🛒", t: "ตอนนี้ฟองนึงแปดบาทนะจ๊า", i: "dtɔɔn níi fɔɔng nʉng bpɛ̀ɛt bàat ná jáa", e: "Now, it's sold at 8 baht each." },
+            { em: "💸", t: "ฉันขายห้าบาทขาดทุน", i: "chǎn kǎai hâa bàat kàat tun", e: "Selling at 5 baht is a loss. (lacking fund/capital)" },
+            { em: "💸📉", t: "เจ๊งกะบ๊ง", i: "jéng gà bóng", e: "Failed (business) / Go bankrupt" },
+            { em: "🗓️", t: "ทุกวันนี้", i: "túk wan níi", e: "These days" },
+            { em: "👨‍👩‍👧‍👦", t: "ญาติ", i: "yâat", e: "relatives" },
+            { em: "⏳", t: "รอ", i: "rɔɔ", e: "Wait" },
+            { em: "📅", t: "วันพุธ", i: "wan pút", e: "Wednesday" },
+            { em: "📅⏳", t: "วันสุดท้าย", i: "wan sùt táai", e: "Last day" },
+            { em: "🧊", t: "ตู้เย็น", i: "dtûu yen", e: "Fridge" },
+            { em: "🎬📺", t: "ดูเกือบจบแล้ว", i: "duu gʉ̀ap jòp lɛ́ɛo", e: "Watch almost finish(to the end)" },
+            { em: "🫱", t: "เหลือ", i: "lʉ̌a", e: "Remaining / left" },
+            { em: "⏰", t: "บ่อย", i: "bɔ̀ɔi", e: "Often" },
+            { em: "📄", t: "กระดาษ", i: "grà dàat", e: "paper" },
+            { em: "🏢💼", t: "ธุรกิจ", i: "tú rá gìt", e: "Business" },
+            { em: "🧵", t: "ผ้าไหม", i: "pâa mǎi", e: "Silk" },
+            { em: "🆘", t: "ช่วย", i: "chûai", e: "Help" },
+            { em: "🧂", t: "ผง", i: "pǒng", e: "powder" },
+            { em: "👕", t: "เสื้อยืด", i: "sʉ̂a yʉ̂ʉt", e: "T-shirt (stretch)" },
+            { em: "📺", t: "ช่อง", i: "chɔ̂ɔng", e: "Channel" },
+            { em: "🥩", t: "เนื้อสัตว์", i: "nʉ́a sàt", e: "Meat" },
+            { em: "😋🍽️", t: "อร่อยกว่า", i: "à rɔ̂ɔi gwàa", e: "more delicious" },
+            { em: "😕🍽️", t: "ไม่อร่อยเท่า", i: "mâi à rɔ̂ɔi tâo", e: "not as delicious as" },
+            { em: "🥩", t: "เนื้อ", i: "nʉ́a", e: "beef" },
+            { em: "📅", t: "วันที่", i: "wan tîi", e: "Date" },
+            { em: "😋🍽️", t: "รสชาติ", i: "rót châat", e: "Tastes" },
+            { em: "😱👻", t: "น่ากลัว", i: "nâa glua", e: "Scary" },
+            { em: "🚔⚖️", t: "อาชญากรรม", i: "àat chá yaa gam", e: "crime" },
+            { em: "🙈", t: "ปิดตา", i: "bpìt dtaa", e: "Cover my eyes" },
+            { em: "⚔️💥", t: "ความรุนแรง", i: "kwaam run rɛɛng", e: "violence" },
+            { em: "📺🍿", t: "ดูยาว", i: "duu yaao", e: "Binge watch" },
+            { em: "🕵️‍♂️🔎", t: "ไขคดี", i: "kǎi ká dii", e: "solve the crime" },
+            { em: "🩸", t: "เลือด", i: "lʉ̂at", e: "blood" },
+            { em: "💀🪦", t: "คนตาย", i: "kon dtaai", e: "dead people" },
+            { em: "🎯", t: "ความตั้งใจ", i: "kwaam dtâng jai", e: "intention" },
+            { em: "👥💼", t: "เพื่อนร่วมงาน", i: "pʉ̂an rûam ngaan", e: "colleagues" },
+            { em: "🛍️🏬", t: "ห้าง", i: "hâang", e: "Mall" },
+            { em: "🔎", t: "หา", i: "hǎa", e: "search / look for" },
+            { em: "🚬", t: "สูบบุหรี่", i: "sùup bù rìi", e: "To smoke (cigarette)" },
+            { em: "❓", t: "ถาม", i: "tǎam", e: "ask questions" },
+            { em: "🎁🧳", t: "ของฝาก", i: "kɔ̌ɔng fàak", e: "Souvenirs" },
+            { em: "✅", t: "พอ", i: "pɔɔ", e: "enough" },
+            { em: "💱", t: "ทอน", i: "tɔɔn", e: "the change (money)" },
+            { em: "👥", t: "คน", i: "kon", e: "people" },
+            { em: "🛍️➕", t: "ถุงเพิ่ม", i: "tǔng pə̂əm", e: "extra bag" },
+            { em: "👁️😣", t: "คันตา", i: "kan-dtaa", e: "itchy eyes" },
+            { em: "🧼🧖", t: "ล้างหน้า", i: "láang-nâa", e: "wash face" },
+            { em: "⚠️🧩", t: "ปัญหา", i: "bpan-hǎa", e: "problems" },
+            { em: "🧘‍♂️", t: "อดทน", i: "òt-ton", e: "patient (adj)" },
+            { em: "🧺🫧", t: "เครื่องซักผ้า", i: "krʉ̂ʉang-sák-pâa", e: "Washing machine (scrub)" },
+            { em: "🏷️💸", t: "ส่วนลด", i: "sùan lót", e: "discounts (n) (parts)" },
+            { em: "💸🛍️", t: "ไม่แพงเท่าเดิม", i: "mâi pɛɛng tâo dəəm", e: "not as expensive as before (equal)" },
+            { em: "💧🔧", t: "น้ำรั่ว", i: "nám rûua", e: "To leak / leaking" },
+            { em: "🌟", t: "ดัง", i: "dang", e: "famous" },
+            { em: "⏳🕰️", t: "เมื่อก่อน", i: "mʉ̂ʉa-gɔ̀ɔn", e: "back then" },
+            { em: "💸", t: "ถูก", i: "tùuk", e: "Cheap / correct" },
+            { em: "📺✅", t: "ดูจบ", i: "duu jòp", e: "Finish watching" },
+            { em: "🙏✨", t: "พร", i: "pɔɔn", e: "blessing" },
+            { em: "🏹", t: "ศร", i: "sɔ̌ɔn", e: "arrow" },
+            { em: "🎆🎇", t: "พลุ", i: "plú", e: "Fireworks" },
+            { em: "👑", t: "พระราชา", i: "prá-raa-chaa", e: "King" },
+            { em: "🧠", t: "นิสัย", i: "ní-sǎi", e: "Personalities" },
+            { em: "🔁", t: "คล้าย", i: "kláai", e: "similar" },
+            { em: "♈♉♊", t: "ราศี", i: "raa sǐi", e: "Zodiac" },
+            { em: "🕰️", t: "เก่า", i: "gào", e: "old" },
+            { em: "⭐️", t: "สำคัญ", i: "săm-kan", e: "important" },
+            { em: "💪🔥", t: "เข้มข้น", i: "kêhm-kôn", e: "strong / intense" },
+            { em: "💔🔺", t: "รักสามเศร้า", i: "rák săam sâo", e: "Love triangle" },
+            { em: "👫", t: "ทั้งคู่", i: "táng kôo", e: "Both" },
+            { em: "🏛️", t: "รัฐบาล", i: "rát-tà-baan", e: "government" },
+            { em: "🗳️🏛️", t: "พรรค", i: "pák", e: "(political) parties" },
+            { em: "🔄", t: "เปลี่ยน", i: "bplìian", e: "change" },
+            { em: "🌿", t: "ธรรมชาติ", i: "tam-má-châat", e: "natural" },
+            { em: "📏", t: "ยาว", i: "yaao", e: "long" },
+            { em: "✅", t: "แท้", i: "táae", e: "authentic, real, related by blood" },
+            { em: "😂🤣", t: "ตลก", i: "dtà-lòk", e: "funny" },
+            { em: "🤝💛", t: "จริงใจ", i: "jing-jai", e: "sincere" },
+            { em: "🏞️", t: "ข้างนอก", i: "kâang nâawk", e: "outdoor / outside" },
+            { em: "👑", t: "พระพันปี", i: "prá-pan-bpii", e: "Queen Mother" },
+            { em: "😐", t: "เฉยๆ", i: "chəəy-chəəy", e: "so so" },
+            { em: "🎉🥳", t: "ฉลอง", i: "chà-lǎawng", e: "celebrate" },
+            { em: "🎨🛠️", t: "ตกแต่ง", i: "dtòk-dtàeng", e: "decorate" },
+            { em: "🕚🌙", t: "ห้าทุ่ม", i: "hâa-tûm", e: "23:00" },
+            { em: "🥓🐖", t: "หมูสามชั้น", i: "mǔu-sǎam-chán", e: "pork belly (layers/floors/levels)" },
+            { em: "🦁🦒", t: "สวนสัตว์", i: "sǔan-sàt", e: "zoo (park, animals)" },
+            { em: "😬", t: "น่าอึดอัด", i: "nâa-ʉ̀t-ʔàt", e: "awkward (thought towards sth - I find it awkward)" },
+            { em: "🤷‍♂️😅", t: "ไม่รู้จะทำตัวยังไง", i: "mâi rúu jà tham dtua yang-ngai", e: "don't know how to act" },
+            { em: "🍊🍑", t: "ลูกพลับ", i: "lûuk pláp", e: "persimmon (kaki)" },
+            { em: "🌙", t: "เที่ยงคืน", i: "thîang khʉ̄ʉn", e: "midnight" },
+            { em: "🧼🧴", t: "ต้องล้างหน้าทุกวัน", i: "dtɔ̂ng láang nâa thúk wan", e: "Have to wash face every day" },
+            { em: "🍺🥴", t: "ดื่มหมดแก้วไม่ได้", i: "dʉ̀ʉm mòt gɛ̂ɛw mâi dâi", e: "cannot bottom up" },
+            { em: "💔", t: "แฟนเก่า", i: "fɛɛn gào", e: "ex" },
+            { em: "🤷", t: "แล้วแต่", i: "lɛ́ɛw dtɛ̀ɛ", e: "it depends" },
+            { em: "🛠️", t: "แก้ไข", i: "gɛ̂ɛ khǎi", e: "solve" },
+            { em: "🧽🧼", t: "ทำความสะอาด", i: "tham4-kwaam1-sà1-àat2", e: "To clean" },
+            { em: "🛂📝", t: "ทำพาสปอร์ตใหม่", i: "tham-hâat-phâat-mài", e: "renew passport" },
+            { em: "⏳", t: "หมดอายุ", i: "mòt-aa-yú", e: "expire" },
+            { em: "📝💼", t: "สมัคร", i: "sà-màk", e: "apply for" },
+            { em: "✨", t: "พิเศษ", i: "phí-sèt", e: "special" },
+            { em: "📥🤲", t: "ได้รับ", i: "dâai-ráp", e: "receive" },
+            { em: "👶⬇️", t: "อายุน้อยกว่า", i: "aa-yúu-náawy-gwàa", e: "age below (less than)" },
+            { em: "🤞🙏", t: "ลุ้น", i: "lún", e: "to root for; keep one's fingers crossed" },
+            { em: "💑", t: "คู่จริง", i: "kôo-jing", e: "real couple" },
+            { em: "📍", t: "ใน", i: "nai", e: "in" },
+            { em: "🌍", t: "โลก", i: "lôhk", e: "world" },
+            { em: "💼⏳", t: "ติดงาน", i: "dìt-ngaan", e: "get caught up with work" },
+            { em: "😐", t: "เรื่อยๆ", i: "rʉ̂ay-rʉ̂ay", e: "so so" },
+            { em: "🚪🏃", t: "ออก", i: "òk", e: "leave; resign; out" },
+            { em: "😌🧘", t: "ใจเย็น", i: "jai-jen", e: "calm (down)" },
+            { em: "😬🤔", t: "ลังเล", i: "lang-leə", e: "hesitant" },
+            { em: "😔💔", t: "ไม่อยากให้เขาเสียใจ", i: "mâi-yàak-hâi-kǎo-sǐa-jai", e: "Don't want them to be sad" },
+            { em: "⏳", t: "ก่อน", i: "gòn", e: "before" },
+            { em: "⏳➡️", t: "หลัง", i: "lăng", e: "after" },
+            { em: "🧑‍💻⬇️", t: "ทำงานน้อยลง", i: "tam-ŋaan-nói-long", e: "work less than before" },
+            { em: "🗑️🚮", t: "ขยะ", i: "khà-yà", e: "trash; rubbish" },
+            { em: "🗑️🚮", t: "ทิ้งขยะให้ลงถัง", i: "tíng-khà-yà-hâi-long-thăng", e: "throw trash in the bin" },
+            { em: "🎤📝", t: "สัมภาษณ์", i: "sǎm-phâat", e: "interview" },
+            { em: "🌟👥", t: "คนดัง", i: "kon dang", e: "famous people" },
+            { em: "🎬", t: "หนัง", i: "năng", e: "movie" },
+            { em: "🔗🧷", t: "ติด", i: "tìt", e: "addicted to; stuck" },
+            { em: "🤝💪", t: "ให้กำลังใจ", i: "hâi-gam-lang-jai", e: "give support" }
+        ];
+
+        // --- SCENARIO DATA ---
+        
+        // Scenario 1: Shopping
+        const shoppingDialogue = [
+            { r: "แม่ค้า", t: "รับอะไรดีจ๊ะ", i: "ráp à-rai dii já", e: "What would you like to get?", em: "👩‍💼" },
+            { r: "ลูกค้า", t: "เอาของฝากอันนี้ครับ ขายยังไงครับ", i: "ao kɔ̌ɔng fàak an níi kráp, kǎai yang ngai kráp", e: "I'll take this souvenir. How much is it?", em: "🙋‍♂️" },
+            { r: "แม่ค้า", t: "อันนี้พันบาทจ้า รับถุงเพิ่มไหมจ๊ะ", i: "an níi pan bàat jâa, ráp tǔng pə̂əm mǎi já", e: "This one is a thousand baht. Do you want an extra bag?", em: "🛍️" },
+            { r: "ลูกค้า", t: "แพงจังเลย มีส่วนลดไหมครับ", i: "pɛɛng jang ləəi, mii sùan lót mǎi kráp", e: "So expensive! Is there a discount?", em: "💸" },
+            { r: "แม่ค้า", t: "ลดไม่ได้แล้วจ้า ฉันขายขาดทุนแล้ว", i: "lót mâi dâi lɛ́ɛo jâa, chǎn kǎai kàat tun lɛ́ɛo", e: "Can't discount anymore. I'm selling at a loss.", em: "📉" },
+            { r: "ลูกค้า", t: "โอเคครับ จ่ายด้วยบัตรได้ไหมครับ", i: "oo-kee kráp, jàai dûai bàt dâi mǎi kráp", e: "Okay. Can I pay with a card?", em: "💳" },
+            { r: "แม่ค้า", t: "รับแต่เงินสดจ้า", i: "ráp dtɛ̀ɛ ngən sòt jâa", e: "Cash only.", em: "💵" },
+            { r: "ลูกค้า", t: "นี่ครับ ไม่ต้องทอนนะครับ", i: "nîi kráp, mâi dtɔ̂ng tɔɔn ná kráp", e: "Here you go. Keep the change.", em: "🪙" }
+        ];
+
+        // Scenario 2: Restaurant
+        const restaurantDialogue = [
+            { r: "พนักงาน", t: "อาหารรสชาติเป็นยังไงบ้างคะ", i: "aa-hǎan rót châat bpen yang ngai bâang ká", e: "How is the taste of the food?", em: "👩‍🍳" },
+            { r: "ลูกค้า", t: "อร่อยกว่าที่คิดครับ แต่แหนมเปรี้ยวเกินไป", i: "à-rɔ̀ɔi gwàa tîi kít kráp, dtɛ̀ɛ nɛ̌ɛm bprîao gəən bpai", e: "More delicious than I thought, but the fermented pork is too sour.", em: "😋" },
+            { r: "พนักงาน", t: "ขอโทษค่ะ รับอย่างอื่นเพิ่มไหมคะ", i: "kɔ̌ɔ tôot kâ, ráp yàang ʉ̀ʉn pə̂əm mǎi ká", e: "Sorry about that. Would you like to order anything else?", em: "🙏" },
+            { r: "ลูกค้า", t: "ขอหมูสามชั้นครับ อาหารเฮลตี้หายากนะครับ", i: "kɔ̌ɔ mǔu sǎam chán kráp, aa-hǎan heen-dtîi hǎa yâak ná kráp", e: "I'll have pork belly. Healthy food is hard to find, huh?", em: "🥓" }
+        ];
+
+        // Scenario 3: Hotel Problem
+        const hotelDialogue = [
+            { r: "ลูกค้า", t: "เกิดอะไรขึ้นครับ มีน้ำรั่วในห้อง", i: "gə̀ət à-rai kʉ̂n kráp, mii nám rûua nai hɔ̂ng", e: "What happened? There's a water leak in the room.", em: "💧" },
+            { r: "พนักงาน", t: "ใจเย็นๆนะคะ มีปัญหาตรงตู้เย็นหรือเปล่าคะ", i: "jai yen yen ná ká, mii bpan-hǎa dtrong dtûu yen rʉ̌ʉ bplào ká", e: "Calm down. Is there a problem at the fridge?", em: "🧊" },
+            { r: "ลูกค้า", t: "ไม่รู้ทำยังไงครับ ช่วยแก้ไขให้หน่อย", i: "mâi rúu tam yang ngai kráp, chûai gɛ̂ɛ kǎi hâi nɔ̀ɔi", e: "I don't know what to do. Please help fix it.", em: "🛠️" },
+            { r: "พนักงาน", t: "ได้ค่ะ เดี๋ยวให้คนไปทำความสะอาดและแก้ไขให้ค่ะ", i: "dâi kâ, dǐao hâi kon bpai tam kwaam sà-àat lɛ́ gɛ̂ɛ kǎi hâi kâ", e: "Okay, I will have someone go clean and fix it for you.", em: "🧽" }
+        ];
+
+        // --- COMPONENTS ---
+
+        // Interactive Text Component (Core of the lesson)
+        const InteractiveText = ({ text, ipa, en, emoji, speaker, isHeader, isInstruction, className }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const speak = () => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const containerClass = isHeader 
+                ? "bg-transparent mb-4 w-full" 
+                : isInstruction 
+                    ? "bg-amber-50 p-4 rounded-xl mb-4 w-full border border-amber-200 shadow-sm"
+                    : "bg-white p-5 rounded-2xl shadow-sm mb-4 border-l-4 border-teal-500 w-full hover:shadow-md transition-shadow";
+
+            const textClass = isHeader
+                ? "text-2xl md:text-3xl text-slate-800 font-bold thai-text"
+                : isInstruction
+                    ? "text-lg md:text-xl text-slate-700 thai-text font-medium"
+                    : "text-xl md:text-2xl text-slate-800 font-medium thai-text";
+
+            return (
+                <div className={`${containerClass} ${className || ''}`}>
+                    {speaker && <div className="text-sm text-teal-600 mb-2 font-bold tracking-wide">{speaker}</div>}
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 cursor-pointer group" onClick={speak}>
+                            <p className={textClass}>
+                                {text} {emoji} <span className="text-slate-300 group-hover:text-teal-500 text-xl inline-block align-middle transition-colors ml-1">🔊</span>
+                            </p>
+                        </div>
+                        <div className="flex gap-2 flex-col sm:flex-row shrink-0 mt-1">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setShowIPA(!showIPA); }}
+                                className={`px-3 py-1.5 text-xs rounded-lg font-bold btn-toggle border ${showIPA ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                            >
+                                IPA
+                            </button>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setShowEN(!showEN); }}
+                                className={`px-3 py-1.5 text-xs rounded-lg font-bold btn-toggle border ${showEN ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                            >
+                                EN
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {(showIPA || showEN) && (
+                        <div className="mt-4 space-y-2 p-3 bg-slate-50 rounded-xl animate-fade-in border border-slate-100">
+                            {showIPA && <p className="text-indigo-600 font-mono text-base md:text-lg border-b border-slate-200 pb-2">{ipa}</p>}
+                            {showEN && <p className="text-slate-600 text-base md:text-lg">{en}</p>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Section 1: Review Game Component
+        const ReviewGame = () => {
+            const [currentCard, setCurrentCard] = useState(null);
+            
+            const pickCard = () => {
+                const random = reviewVocabList[Math.floor(Math.random() * reviewVocabList.length)];
+                setCurrentCard(random);
+            };
+
+            useEffect(() => { pickCard(); }, []);
+
+            if (!currentCard) return <div>Loading...</div>;
+
+            return (
+                <div className="flex flex-col items-center bg-gradient-to-br from-teal-50 to-emerald-50 p-6 rounded-[2rem] shadow-inner border border-teal-100">
+                    <InteractiveText 
+                        text="ทบทวนคำศัพท์" 
+                        ipa="tóp-tuan kam-sàp" 
+                        en="Review Vocabulary" 
+                        emoji="🎯"
+                        isHeader={true}
+                    />
+                    
+                    <div className="w-full max-w-sm bg-white rounded-[2rem] shadow-xl p-8 min-h-[300px] flex flex-col items-center justify-center relative mb-8 text-center border-4 border-white">
+                        <div className="text-7xl mb-6 drop-shadow-md">{currentCard.em}</div>
+                        <InteractiveText 
+                            text={currentCard.t} 
+                            ipa={currentCard.i} 
+                            en={currentCard.e} 
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-4 w-full max-w-sm">
+                        <InteractiveText 
+                            text="แต่งประโยคจากคำนี้" 
+                            ipa="dtɛ̀ng bprà-yòok jàak kam níi" 
+                            en="Make a sentence from this word"
+                            isInstruction={true}
+                            className="text-center"
+                        />
+                        <button 
+                            onClick={pickCard}
+                            className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 text-xl w-full"
+                        >
+                            <span>สุ่มคำต่อไป 🎲</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [section, setSection] = useState('review');
+
+            return (
+                <div className="min-h-screen pb-24">
+                    {/* Navigation Bar */}
+                    <nav className="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 px-4 py-3 shadow-sm">
+                        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <h1 className="text-2xl font-bold text-teal-700 flex items-center gap-2 font-['Sarabun'] tracking-wide">
+                                ✈️ เที่ยวไทย
+                            </h1>
+                            <div className="flex gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1 sm:pb-0">
+                                {[
+                                    {id: 'review', icon: '🎯', label: 'ทบทวน'},
+                                    {id: 'shopping', icon: '🛍️', label: 'ซื้อของ'},
+                                    {id: 'restaurant', icon: '🍽️', label: 'ร้านอาหาร'},
+                                    {id: 'hotel', icon: '🏨', label: 'โรงแรม'},
+                                    {id: 'activity', icon: '🗣️', label: 'กิจกรรม'}
+                                ].map(tab => (
+                                    <button 
+                                        key={tab.id}
+                                        onClick={() => setSection(tab.id)} 
+                                        className={`px-4 py-2 rounded-full text-base font-bold whitespace-nowrap transition-all font-['Sarabun']
+                                            ${section === tab.id ? 'bg-teal-600 text-white shadow-md transform scale-105' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                    >
+                                        {tab.icon} {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </nav>
+
+                    <main className="max-w-3xl mx-auto p-5 space-y-8 mt-4">
+                        
+                        {/* 1. REVIEW SECTION */}
+                        {section === 'review' && (
+                            <section className="animate-fade-in">
+                                <ReviewGame />
+                            </section>
+                        )}
+
+                        {/* 2. SCENARIO 1: SHOPPING */}
+                        {section === 'shopping' && (
+                            <section className="animate-fade-in space-y-6">
+                                <InteractiveText text="สถานการณ์: ซื้อของฝากที่ห้าง" ipa="sà-tǎan-ná-gaan: sʉ́ʉ kɔ̌ɔng fàak tîi hâang" en="Scenario: Buying souvenirs at the mall" isHeader={true} emoji="🛍️" />
+                                
+                                <InteractiveText 
+                                    text="อ่านบทสนทนาและสวมบทบาท" 
+                                    ipa="àan bòt sǒn-tá-naa lɛ́ sǔam bòt-bàat" 
+                                    en="Read the dialogue and role-play"
+                                    isInstruction={true}
+                                />
+
+                                <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-3">
+                                    {shoppingDialogue.map((line, index) => (
+                                        <InteractiveText key={index} speaker={line.r} text={line.t} ipa={line.i} en={line.e} emoji={line.em} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* 3. SCENARIO 2: RESTAURANT */}
+                        {section === 'restaurant' && (
+                            <section className="animate-fade-in space-y-6">
+                                <InteractiveText text="สถานการณ์: สั่งอาหาร" ipa="sà-tǎan-ná-gaan: sàang aa-hǎan" en="Scenario: Ordering food" isHeader={true} emoji="🍽️" />
+                                
+                                <InteractiveText 
+                                    text="ฝึกถาม-ตอบ เรื่องรสชาติอาหาร" 
+                                    ipa="fʉ̀k tǎam-dtɔ̀ɔp rʉ̂ang rót-châat aa-hǎan" 
+                                    en="Practice Q&A about food taste"
+                                    isInstruction={true}
+                                />
+
+                                <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-3">
+                                    {restaurantDialogue.map((line, index) => (
+                                        <InteractiveText key={index} speaker={line.r} text={line.t} ipa={line.i} en={line.e} emoji={line.em} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* 4. SCENARIO 3: HOTEL PROBLEM */}
+                        {section === 'hotel' && (
+                            <section className="animate-fade-in space-y-6">
+                                <InteractiveText text="สถานการณ์: ปัญหาในโรงแรม" ipa="sà-tǎan-ná-gaan: bpan-hǎa nai roong-rɛɛm" en="Scenario: Hotel problems" isHeader={true} emoji="🏨" />
+                                
+                                <InteractiveText 
+                                    text="ฝึกอธิบายปัญหาและขอความช่วยเหลือ" 
+                                    ipa="fʉ̀k à-tí-baai bpan-hǎa lɛ́ kɔ̌ɔ kwaam chûai-lʉ̌a" 
+                                    en="Practice explaining problems and asking for help"
+                                    isInstruction={true}
+                                />
+
+                                <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-3">
+                                    {hotelDialogue.map((line, index) => (
+                                        <InteractiveText key={index} speaker={line.r} text={line.t} ipa={line.i} en={line.e} emoji={line.em} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* 5. ACTIVITIES SECTION */}
+                        {section === 'activity' && (
+                            <section className="animate-fade-in space-y-8">
+                                <InteractiveText text="กิจกรรมสนทนา" ipa="gìt-jà-gam sǒn-tá-naa" en="Speaking Activities" isHeader={true} emoji="🗣️" />
+
+                                {/* Debate: Cash vs Card */}
+                                <div className="bg-white p-6 rounded-3xl shadow-md border border-indigo-100">
+                                    <InteractiveText text="ชวนคุย: จ่ายยังไงดี?" ipa="chuan kui: jàai yang ngai dii?" en="Discussion: How to pay?" isHeader={true} emoji="💳" />
+                                    <InteractiveText text="ที่ประเทศไทย คุณชอบจ่ายด้วย เงินสด หรือ บัตร เพราะอะไร?" ipa="tîi bprà-têet tai, kun chɔ̂ɔp jàai dûai ngən sòt rʉ̌ʉ bàt? pərɔ́ à-rai?" en="In Thailand, do you prefer to pay with cash or card? Why?" isInstruction={true} />
+                                    
+                                    <div className="flex gap-4 mt-4">
+                                        <div className="flex-1 bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                                            <div className="text-4xl mb-2">💵</div>
+                                            <InteractiveText text="เงินสด" ipa="ngən sòt" en="Cash" className="!p-0 !mb-0 !border-0 bg-transparent shadow-none" />
+                                        </div>
+                                        <div className="flex-1 bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                                            <div className="text-4xl mb-2">💳</div>
+                                            <InteractiveText text="บัตร" ipa="bàt" en="Card" className="!p-0 !mb-0 !border-0 bg-transparent shadow-none" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Problem Solving: What would you do? */}
+                                <div className="bg-white p-6 rounded-3xl shadow-md border border-rose-100">
+                                    <InteractiveText text="แก้ปัญหา: จะทำยังไง?" ipa="gɛ̂ɛ bpan-hǎa: jà tam yang ngai?" en="Problem Solving: What will you do?" isHeader={true} emoji="⚠️" />
+                                    
+                                    <div className="space-y-4">
+                                        <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                            <InteractiveText text="1. แม่ค้าขายของแพงมาก คุณจะพูดว่าอะไร?" ipa="mɛ̂ɛ káa kǎai kɔ̌ɔng pɛɛng mâak, kun jà pûut wâa à-rai?" en="1. The seller is selling things very expensively. What will you say?" emoji="💸" />
+                                        </div>
+                                        <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                            <InteractiveText text="2. คุณทำพาสปอร์ตหายที่ห้าง เกิดอะไรขึ้น ต่อไป?" ipa="kun tam pâat-spɔ̀ɔt hǎai tîi hâang, gə̀ət à-rai kʉ̂n dtɔ̀ɔ bpai?" en="2. You lost your passport at the mall. What happens next?" emoji="🛂" />
+                                        </div>
+                                        <div className="bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                            <InteractiveText text="3. อาหาร เปรี้ยวเกินไป และ ขม คุณจะบอกพนักงานว่าอะไร?" ipa="aa-hǎan bprîao gəən bpai lɛ́ kǒm, kun jà bɔ̀ɔk pá-nák-ngaan wâa à-rai?" en="3. The food is too sour and bitter. What will you tell the staff?" emoji="😖" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                    </main>
+
+                    {/* Floating Help Note */}
+                    <div className="fixed bottom-6 right-6 bg-slate-800/90 text-white backdrop-blur shadow-2xl p-4 px-6 rounded-full z-50 text-base flex items-center gap-3 font-['Sarabun'] animate-bounce">
+                        <span>กดข้อความเพื่อฟังเสียง</span>
+                        <span className="text-2xl">🔊</span>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
