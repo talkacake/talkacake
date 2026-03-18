@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เรื่องของบ้าน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .ipa-text, .en-text { display: none; }
+        .active-toggle { display: block; }
+        /* Highlight words for teaching purposes */
+        .vocab { color: #2563eb; font-weight: 700; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- ส่วนหัว -->
+    <header class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-6 py-10 rounded-b-[40px] shadow-xl mb-8">
+        <div class="max-w-2xl mx-auto">
+            <h1 class="text-4xl font-black mb-2 tracking-tight text-center">เรื่องของบ้าน 🏠✨</h1>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto px-4">
+        
+        <!-- แถบเมนูหลัก -->
+        <nav class="flex bg-white/80 backdrop-blur-xl p-1.5 rounded-[20px] shadow-sm border border-white mb-8 sticky top-4 z-20 overflow-x-auto no-scrollbar">
+            <button onclick="showTab('review')" id="btn-review" class="tab-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-bold transition-all bg-blue-600 text-white shadow-lg shadow-blue-200">
+                🔄 ทบทวน
+            </button>
+            <button onclick="showTab('lesson')" id="btn-lesson" class="tab-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-bold transition-all text-gray-500 hover:bg-gray-100">
+                💬 บทสนทนา
+            </button>
+            <button onclick="showTab('tasks')" id="btn-tasks" class="tab-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-bold transition-all text-gray-500 hover:bg-gray-100">
+                🛠️ กิจกรรม
+            </button>
+            <button onclick="showTab('extra')" id="btn-extra" class="tab-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl text-sm font-bold transition-all text-gray-500 hover:bg-gray-100">
+                ➕ เพิ่มเติม
+            </button>
+        </nav>
+
+        <!-- ส่วนที่ 1: การทบทวน -->
+        <section id="review" class="tab-content active space-y-6">
+            <div class="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-white flex flex-col items-center text-center">
+                <h2 class="text-2xl font-black text-gray-800 mb-2">สุ่มคำศัพท์แต่งประโยค 👔</h2>
+                <p class="text-gray-500 text-sm mb-8">เลือกคำศัพท์เก่าแล้วลองแต่งประโยคเกี่ยวกับบ้านครับ</p>
+                
+                <div id="review-card" class="w-full min-h-[200px] flex flex-col items-center justify-center bg-slate-50 rounded-[28px] border-2 border-dashed border-slate-200 p-6 mb-8">
+                    <div class="text-slate-400 text-center" id="review-placeholder">
+                        <p class="text-lg font-medium">กดปุ่มสีฟ้าเพื่อเริ่มทบทวน</p>
+                    </div>
+                    <div id="review-result" class="hidden w-full">
+                        <!-- คำศัพท์จะถูกใส่ตรงนี้ด้วย JS -->
+                    </div>
+                </div>
+                
+                <button onclick="randomReviewWord()" class="w-full py-5 bg-blue-600 text-white rounded-[24px] font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all">
+                    สุ่มคำศัพท์
+                </button>
+            </div>
+        </section>
+
+        <!-- ส่วนที่ 2: บทเรียนและบทสนทนา -->
+        <section id="lesson" class="tab-content space-y-8">
+            <div id="dialogue-container" class="space-y-6">
+                <!-- เนื้อหาจะถูกสร้างผ่าน JS -->
+            </div>
+        </section>
+
+        <!-- ส่วนที่ 3: กิจกรรม -->
+        <section id="tasks" class="tab-content space-y-8">
+            <div id="tasks-container" class="space-y-8">
+                <!-- เนื้อหาจะถูกสร้างผ่าน JS -->
+            </div>
+        </section>
+
+        <!-- ส่วนที่ 4: เพิ่มเติม -->
+        <section id="extra" class="tab-content space-y-6">
+            <div class="bg-slate-900 text-white p-8 rounded-[40px] shadow-2xl">
+                <div id="extra-title-container" class="mb-6"></div>
+                <div id="extra-items-container" class="space-y-6">
+                    <!-- เนื้อหาจะถูกสร้างผ่าน JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- แถบสถานะด้านล่าง -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t p-4 z-50">
+        <div class="max-w-2xl mx-auto flex items-center justify-between text-[10px] font-black uppercase text-gray-400">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                หน้าหลัก
+            </div>
+            <div class="flex gap-4">
+                <span>🔊 มีระบบเสียง</span>
+                <span>📱 รองรับ iOS</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ข้อมูลคำศัพท์เก่าสำหรับการทบทวน
+        const prevVocab = [
+            { emoji: "👔🏢", th: "เพื่อนร่วมงาน", ipa: "pʉ̂ʉan rûam ngaan", en: "colleague" },
+            { emoji: "🧗‍♂️💪", th: "พยายาม", ipa: "pa-yaa-yaam", en: "attempt" },
+            { emoji: "🔍📝", th: "รายละเอียด", ipa: "raai lá-ìiat", en: "detail" },
+            { emoji: "🗣️💡", th: "อธิบาย", ipa: "à-tí-baai", en: "explain / describe" },
+            { emoji: "👁️🧠", th: "มุมมอง", ipa: "mum mɔɔng", en: "perspectives" },
+            { emoji: "🏋️‍♂️🏟️", th: "ฟิตเนส", ipa: "fit-nét", en: "gym" },
+            { emoji: "🗣️⚡", th: "คล่อง", ipa: "klɔ̂ng", en: "fluent" }
+        ];
+
+        // ข้อมูลบทสนทนา (ปรับปรุงให้เป็นการสนทนาแบบ 1 ต่อ 1 กับผู้ให้บริการ)
+        const targetDialogues = [
+            {
+                title: { th: "1. ติดต่อนายหน้าบ้าน 🏡", ipa: "nèung. dtìt-dtòr naai-nâa bâan", en: "1. Contacting an Estate Agent" },
+                lines: [
+                    { th: "ลูกค้า: ผมอยากย้ายบ้านไปชานเมืองครับ เลยมาติดต่อนายหน้าบ้านและที่ดิน", ipa: "lôok-káa: pǒm yàak yáai bâan bpai chaan meuang kráp. loey maa dtìt-dtòr naai-nâa bâan láe têe-din", en: "Client: I want to move house to the suburb. So I came to contact an estate agent." },
+                    { th: "นายหน้า: จะเช่าหรืออยากเป็นเจ้าของคะ? สนใจบ้านเดี่ยว บังกะโล เรือนไทย หรือวิลล่าคะ?", ipa: "naai-nâa: jà châo rěu yàak bpen jâo-kǒrng ká? sǒn-jai bâan-dìaw, bang-gà-loh, reuan-tai rěu win-lâa ká?", en: "Agent: Will you rent or do you want to own it? Are you interested in a detached house, bungalow, traditional Thai house, or villa?" },
+                    { th: "ลูกค้า: แค่เช่าครับ ตอนแรกดูคอนโด ห้องสตูดิโอในตึก และอาคารที่พัก แต่ค่าเช่าแพง", ipa: "lôok-káa: kɛ̂ɛ châo kráp. dton rɛ̂ɛk duu korn-doh, hông sà-dtoo-dì-oh nai dtèuk, láe aa-kaan têe pák, dtɛ̀ɛ kâa châo pɛɛng", en: "Client: Just rent. At first, I looked at condos, studio flats in a building, and blocks of flats, but the rent was expensive." },
+                    { th: "นายหน้า: งั้นเดี๋ยวหาเจ้าของบ้านที่ปล่อยเช่าราคาถูกให้นะคะ คุณจะเป็นผู้เช่าที่มีเพื่อนบ้านดีๆ อาจได้เป็นบ้านพักตากอากาศด้วย เดี๋ยวส่งที่อยู่ให้ค่ะ", ipa: "naai-nâa: ngán dǐaw hǎa jâo-kǒrng bâan têe bplòi châo raa-kaa tòok hâi ná ká. kun jà bpen pôo châo têe mee pêuan bâan dee dee. àat dâai bpen bâan pák dtàak aa-gàat dûay. dǐaw sòng têe-yòo hâi kâ", en: "Agent: Then I'll find a landlord who rents it out cheaply for you. You'll be a tenant with good neighbours. It might even be a holiday let. I'll send the address to you." }
+                ]
+            },
+            {
+                title: { th: "2. สั่งงานแม่บ้าน: ห้องนอน 🛏️", ipa: "sǒrng. sàng ngaan mɛ̂ɛ-bâan: hông-norn", en: "2. Instructing the Maid: Bedroom" },
+                lines: [
+                    { th: "นายจ้าง: แม่บ้านครับ ตู้เสื้อผ้ากับตู้ลิ้นชักมาส่งแล้ว ช่วยเอาไม้แขวนเสื้อไปเก็บในลิ้นชักด้วย", ipa: "naai-jâang: mɛ̂ɛ-bâan kráp, dtôo-sêua-pâa gàp dtôo-lín-chák maa sòng lɛ́ɛo. chûay ao máai-kwɛ̌ɛn-sêua bpai gèp nai lín-chák dûay", en: "Boss: Maid, the wardrobe and chest of drawers have been delivered. Please put the coat hangers away in the drawer." },
+                    { th: "แม่บ้าน: ได้ค่ะ จะให้ดิฉันจัดห้องและจัดเตียงเลยไหมคะ? จะได้เอาฟูก/ที่นอนวาง แล้วเปลี่ยนผ้าปูที่นอน ผ้านวม กับหมอนให้", ipa: "mɛ̂ɛ-bâan: dâai kâ. jà hâi dì-chǎn jàt hông láe jàt dtiang loey mǎi ká? jà dâai ao fûuk/têe-norn waang, lɛ́ɛo bplìan pâa-bpoo-têe-norn, pâa-nuam, gàp mǒrn hâi", en: "Maid: Okay. Should I tidy up and make the bed now? Then I'll put the mattress down, and change the sheets, duvet, and pillows for you." },
+                    { th: "นายจ้าง: ดีเลยครับ แล้วช่วยเอาโคมไฟข้างเตียงกับนาฬิกาปลุกไปวางบนโต๊ะข้างเตียงตรงหัวเตียงนะ", ipa: "naai-jâang: dee loey kráp. lɛ́ɛo chûay ao kohm-fai-kâang-dtiang gàp naa-lí-gaa-bplùk bpai waang bon dtó-kâang-dtiang dtrong hǔa-dtiang ná", en: "Boss: Great. And please put the bedside lamp and alarm clock on the bedside table at the headboard." },
+                    { th: "แม่บ้าน: เรียบร้อยค่ะ ดิฉันเปิดเครื่องปรับอากาศและวางรีโมทไว้บนชั้นวางทีวีข้างโต๊ะวางของแต่งบ้านนะคะ อ้อ เก็บไดร์เป่าผมให้แล้วด้วย ทีวีเครื่องนี้ใหญ่จัง ทำให้กำแพงกับพื้นดูเล็กลงเลยค่ะ", ipa: "mɛ̂ɛ-bâan: rîap-rói kâ. dì-chǎn bpèrt krêuang-bpràp-aa-gàat láe waang ree-môht wái bon chán-waang-tee-wee kâang dtó-waang-kǒrng-dtɛ̀ng-bâan ná ká. ôr, gèp dai-bpào-pǒm hâi lɛ́ɛo dûay. tee-wee krêuang née yài jang. tam hâi gam-pɛɛng gàp péun duu lék long loey kâ", en: "Maid: All done. I turned on the air conditioning and placed the remote on the TV stand next to the console table. Oh, I put the hairdryer away too. This TV is huge. It makes the wall and floor look smaller." },
+                    { th: "นายจ้าง: ขอบคุณครับ เดี๋ยวผมจะพักผ่อนและดูทีวีบนเตียงสักหน่อย", ipa: "naai-jâang: kòrp-kun kráp. dǐaw pǒm jà pák-pòrn láe duu tee-wee bon dtiang sàk nòi", en: "Boss: Thank you. I will relax and watch TV on the bed for a bit." }
+                ]
+            },
+            {
+                title: { th: "3. สั่งงานแม่บ้าน: ห้องรับแขก 🛋️", ipa: "sǎam. sàng ngaan mɛ̂ɛ-bâan: hông-ráp-kɛ̀ɛk", en: "3. Instructing the Maid: Living Room" },
+                lines: [
+                    { th: "นายจ้าง: ช่วยตกแต่งห้องรับแขกหน่อยครับ เริ่มจากปูพรมบนพื้นไม้กับพื้นกระเบื้องเลย", ipa: "naai-jâang: chûay dtòk-dtɛ̀ng hông-ráp-kɛ̀ɛk nòi kráp. rêrm jàak bpuu prom bon péun-máai gàp péun-grà-bêuang loey", en: "Boss: Please decorate the living room. Start by laying rugs on the wooden floor and tiled floor." },
+                    { th: "แม่บ้าน: ค่ะ จะให้วางชุดรับแขกที่มีโซฟา โซฟาเบด โซฟาเดี่ยว และที่วางเท้า ล้อมโต๊ะกาแฟไว้ไหมคะ?", ipa: "mɛ̂ɛ-bâan: kâ. jà hâi waang chút-ráp-kɛ̀ɛk têe mee soh-faa, soh-faa-bàyt, soh-faa-dìaw, láe têe-waang-táao, lórm dtó-gaa-fɛɛ wái mǎi ká?", en: "Maid: Okay. Should I place the suite that has the sofa, sofa bed, armchair, and footstool around the coffee table?" },
+                    { th: "นายจ้าง: ใช่ครับ แล้วเอาหมอนอิงกับของตกแต่งมาจัดด้วย ภาพติดผนังก็แขวนใกล้ไฟผนังนะ", ipa: "naai-jâang: châi kráp. lɛ́ɛo ao mǒrn-ing gàp kǒrng-dtòk-dtɛ̀ng maa jàt dûay. pâap-dtìt-pà-nǎng gôr kwɛ̌ɛn glâi fai-pà-nǎng ná", en: "Boss: Yes. And arrange the cushions and ornaments too. Hang the picture near the wall light." },
+                    { th: "แม่บ้าน: โคมไฟตั้งโต๊ะวางบนตู้เก็บของ ส่วนตู้โชว์กับชั้นวางหนังสือไว้มุมห้องนะคะ ตรงหน้าต่างจะติดผ้าม่านหรือมู่ลี่ปรับแสงดีคะ?", ipa: "mɛ̂ɛ-bâan: kohm-fai-dtâng-dtó waang bon dtôo-gèp-kǒrng. sùan dtôo-choh gàp chán-waang-nǎng-sěu wái mum hông ná ká. dtrong nâa-dtàang jà dtìt pâa-mâan rěu môo-lêe-bpràp-sǎeng dee ká?", en: "Maid: Place the table lamp on the cabinet. The display cabinet and bookcase will be in the corner of the room. At the window, should we install curtains or Venetian blinds?" },
+                    { th: "นายจ้าง: ติดผ้าม่านครับ แล้วเอาตู้เก็บรองเท้าไปไว้หน้าห้อง เปิดพัดลมตั้งพื้น พัดลมไอเย็น หรือพัดลมติดเพดานด้วยนะ เปิดวิทยุกับเครื่องเล่นดีวีดี/บลูเรย์ทิ้งไว้ด้วย", ipa: "naai-jâang: dtìt pâa-mâan kráp. lɛ́ɛo ao dtôo-gèp-rorng-táao bpai wái nâa hông. bpèrt pát-lom-dtâng-péun, pát-lom-ai-yen, rěu pát-lom-dtìt-pay-daan dûay ná. bpèrt wít-tá-yú gàp krêuang-lên-dee-wee-dee/bloo-ray tíng wái dûay", en: "Boss: Install curtains. And put the shoe cupboard in front of the room. Turn on the standing fan, evaporative cooler, or ceiling fan too. Leave the radio and DVD/Blu-ray player on." }
+                ]
+            },
+            {
+                title: { th: "4. สั่งงานแม่บ้าน: ห้องครัว 🍽️", ipa: "sèe. sàng ngaan mɛ̂ɛ-bâan: hông-krua", en: "4. Instructing the Maid: Kitchen" },
+                lines: [
+                    { th: "นายจ้าง: ในครัวมีเครื่องใช้ไฟฟ้าครบไหมครับ? พวกตู้เย็น-ตู้แช่แข็ง ไมโครเวฟ เครื่องปิ้งขนมปัง เตาแก๊ส เตาไฟฟ้า และหัวเตา", ipa: "naai-jâang: nai krua mee krêuang-chái-fai-fáa króp mǎi kráp? pûak dtôo-yen-dtôo-chɛ̂ɛ-kɛ̌ng, mai-kroh-wáyp, krêuang-bpîng-kà-nǒm-bpang, dtao-gɛ́ɛt, dtao-fai-fáa, láe hǔa-dtao", en: "Boss: Are there all household appliances in the kitchen? The fridge-freezer, microwave, toaster, gas cooker, electric cooker, and hob." },
+                    { th: "แม่บ้าน: ครบค่ะ วันนี้คุณจะรับซุปไหมคะ? ดิฉันเตรียมกระทะจีน ตะกร้อมือ กับช้อนไม้ไว้แล้ว", ipa: "mɛ̂ɛ-bâan: króp kâ. wan née kun jà ráp súp mǎi ká? dì-chǎn dtriam grà-tá-jeen, dtà-grôr-meu, gàp chón-máai wái lɛ́ɛo", en: "Maid: Yes, all there. Will you have soup today? I have prepared the wok, whisk, and wooden spoon." },
+                    { th: "นายจ้าง: รับครับ ช่วยจัดโต๊ะด้วย เอาจาน จานข้าว ถ้วยน้ำซุป ช้อน ช้อนชา ช้อนส้อม และส้อมกับมีดไปวางนะ เตรียมถ้วยกาแฟ แก้วน้ำ แก้วน้ำทรงสูง และแก้วไวน์ พร้อมผ้าเช็ดปากด้วย", ipa: "naai-jâang: ráp kráp. chûay jàt dtó dûay. ao jaan, jaan-kâao, tûay-náam-súp, chón, chón-chaa, chón-sôm, láe sôm-gàp-mêet bpai waang ná. dtriam tûay-gaa-fɛɛ, gɛ̂ɛw-náam, gɛ̂ɛw-náam-song-sǔung, láe gɛ̂ɛw-wai, prórm pâa-chét-bpàak dûay", en: "Boss: Yes. Please set the table too. Place the plate, dinner plate, soup bowl, spoon, teaspoon, spoon and fork, and knife and fork. Prepare the coffee cup, glass, tumbler, and wine glass, along with a napkin." },
+                    { th: "แม่บ้าน: ได้ค่ะ ทานเสร็จแล้ว ถ้าคุณล้างมือที่อ่างล้างจานเสร็จ ดิฉันจะใช้น้ำยาล้างจาน ฟองน้ำ และใยขัดมาทำความสะอาดเองค่ะ", ipa: "mɛ̂ɛ-bâan: dâai kâ. taan sèt lɛ́ɛo, tâa kun láang meu têe àang-láang-jaan sèt, dì-chǎn jà chái náam-yaa-láang-jaan, forng-náam, láe yai-kàt maa tam-kwaam-sà-àat eng kâ", en: "Maid: Okay. When you finish eating, if you finish washing your hands at the sink, I will use washing-up liquid, sponge, and scourer to clean up." },
+                    { th: "นายจ้าง: ขอบคุณครับ ทำเสร็จแล้วก็เอาถุงขยะใส่ถังขยะและถังขยะตะแกรงเหล็ก แล้วเอาขยะไปทิ้งด้วยนะ", ipa: "naai-jâang: kòrp-kun kráp. tam sèt lɛ́ɛo gôr ao tǔng-kà-yà sài tǎng-kà-yà láe tǎng-kà-yà-dtà-grɛɛng-lèk, lɛ́ɛo ao kà-yà bpai tíng dûay ná", en: "Boss: Thank you. When done, put a bin bag in the dustbin and wastepaper basket, and take out the rubbish too." }
+                ]
+            },
+            {
+                title: { th: "5. สั่งงานแม่บ้าน: ห้องน้ำ 🛁", ipa: "hâa. sàng ngaan mɛ̂ɛ-bâan: hông-náam", en: "5. Instructing the Maid: Bathroom" },
+                lines: [
+                    { th: "นายจ้าง: แม่บ้านครับ ผมจะไปเข้าห้องน้ำ ช่วยเตรียมแช่น้ำ/อาบน้ำในอ่างอาบน้ำ และเปิดฝักบัวในห้องอาบน้ำให้ที เปิดเครื่องทำน้ำร้อนด้วยนะ", ipa: "naai-jâang: mɛ̂ɛ-bâan kráp. pǒm jà bpai kâo hông-náam. chûay dtriam chɛ̂ɛ-náam/àap-náam nai àang-àap-náam, láe bpèrt fùk-bua nai hông-àap-náam hâi tee. bpèrt krêuang-tam-náam-rórn dûay ná", en: "Boss: Maid. I'm going to go to the toilet. Please prepare to have a bath/shower in the bath, and turn on the shower in the shower cubicle. Turn on the boiler too." },
+                    { th: "แม่บ้าน: รูดม่านห้องน้ำให้แล้วค่ะ ระวังของใช้ในห้องน้ำเปียกตอนแปรงฟันที่อ่างล้างหน้านะคะ สบู่กับใยขัดตัววางไว้ให้แล้วค่ะ", ipa: "mɛ̂ɛ-bâan: rôot mâan-hông-náam hâi lɛ́ɛo kâ. ra-wang kǒrng-chái-nai-hông-náam bpìak dton bpraeng-fan têe àang-láang-nâa ná ká. sà-bòo gàp yai-kàt-dtua waang wái hâi lɛ́ɛo kâ", en: "Maid: I drew the shower curtain. Be careful not to wet the toiletries when you brush one's teeth at the sink. The soap and shower puff are placed there for you." },
+                    { th: "นายจ้าง: ผ้าเช็ดตัวกับผ้าเช็ดหน้าอยู่บนราวแขวนผ้าใช่ไหม? อ้อ กระดาษทิชชู่ตรงชักโครกหมดแล้ว", ipa: "naai-jâang: pâa-chét-dtua gàp pâa-chét-nâa yùu bon raao-kwɛ̌ɛn-pâa châi mǎi? ôr, grà-dàat-tít-chôo dtrong chák-krôhk mòt lɛ́ɛo", en: "Boss: Are the bath towel and face cloth on the towel rail? Oh, the toilet roll at the toilet is empty." },
+                    { th: "แม่บ้าน: เดี๋ยวเติมให้ค่ะ อาบเสร็จแล้ว ดิฉันจะใส่ถุงมือยาง เอาถัง แปรงล้างห้องน้ำ น้ำยาทำความสะอาดฆ่าเชื้อ และน้ำยาซักผ้าขาวเข้าไปล้างห้องน้ำค่ะ", ipa: "mɛ̂ɛ-bâan: dǐaw dterm hâi kâ. àap sèt lɛ́ɛo, dì-chǎn jà sài tǔng-meu-yaang, ao tǎng, bpraeng-láang-hông-náam, náam-yaa-tam-kwaam-sà-àat-kâa-chêua, láe náam-yaa-sák-pâa-kǎao kâo bpai láang hông-náam kâ", en: "Maid: I'll refill it. After you shower, I will put on rubber gloves, take the bucket, toilet brush, disinfectant, and bleach to wash the bathroom." }
+                ]
+            },
+            {
+                title: { th: "6. สั่งงานแม่บ้าน: ซักรีดและถูพื้น 🧺", ipa: "hòk. sàng ngaan mɛ̂ɛ-bâan: sák-rîit láe tǔu péun", en: "6. Instructing the Maid: Laundry and Mopping" },
+                lines: [
+                    { th: "นายจ้าง: ไปทำความสะอาดห้องซักรีดและซักผ้าด้วยนะครับ เอาเสื้อในตะกร้าผ้าใส่เครื่องซักผ้า แล้วเติมผงซักฟอก", ipa: "naai-jâang: bpai tam-kwaam-sà-àat hông-sák-rîit láe sák pâa dûay ná kráp. ao sêua nai dtà-grâa-pâa sài krêuang-sák-pâa, lɛ́ɛo dterm pǒng-sák-fôrk", en: "Boss: Go clean the utility room and do the laundry too. Put the clothes in the laundry basket into the washing machine, then add washing powder." },
+                    { th: "แม่บ้าน: ซักเสร็จแล้วจะให้อบในเครื่องอบผ้า หรือตากบนราวตากผ้าและเชือกตากผ้า แล้วใช้ไม้หนีบผ้าหนีบไว้คะ?", ipa: "mɛ̂ɛ-bâan: sák sèt lɛ́ɛo jà hâi òp nai krêuang-òp-pâa, rěu dtàak bon raao-dtàak-pâa láe chêua-dtàak-pâa, lɛ́ɛo chái máai-nèep-pâa nèep wái ká?", en: "Maid: When washing is done, should I dry it in the tumble drier, or hang it on the clothes horse and washing line, and use clothes pegs to peg it?" },
+                    { th: "นายจ้าง: ตากดีกว่าครับ แห้งแล้วเอาเตารีดรีดบนโต๊ะรีดผ้าเลย", ipa: "naai-jâang: dtàak dee gwàa kráp. hɛ̂ɛng lɛ́ɛo ao dtao-rîit rîit bon dtó-rîit-pâa loey", en: "Boss: Hanging is better. When dry, take the iron and iron on the ironing board right away." },
+                    { th: "แม่บ้าน: ได้ค่ะ ระหว่างรอผ้าแห้ง ดิฉันจะกวาดพื้นใส่ที่โกยผง แล้วดูดฝุ่นด้วยเครื่องดูดฝุ่นนะคะ", ipa: "mɛ̂ɛ-bâan: dâai kâ. rá-wàang ror pâa hɛ̂ɛng, dì-chǎn jà gwàat péun sài têe-gohy-pǒng, lɛ́ɛo dòot fùn dûay krêuang-dòot-fùn ná ká", en: "Maid: Okay. While waiting for the clothes to dry, I will sweep the floor into the dustpan, then hoover using the vacuum cleaner." },
+                    { th: "นายจ้าง: ดีครับ ถ้ามีรอยเปื้อนก็เอาผ้าชุบน้ำ ใช้ไม้ถูพื้นและแปรงถูพื้นขัดให้สะอาดด้วย", ipa: "naai-jâang: dee kráp. tâa mee roi bpêuan gôr ao pâa chúp náam, chái máai-tǔu-péun láe bpraeng-tǔu-péun kàt hâi sà-àat dûay", en: "Boss: Good. If there are stains, dampen a cloth and use the mop and brush to scrub it clean." }
+                ]
+            },
+            {
+                title: { th: "7. สั่งงานช่างซ่อมบ้าน 🚪", ipa: "jèt. sàng ngaan châang sôrm bâan", en: "7. Instructing the House Repairman" },
+                lines: [
+                    { th: "นายจ้าง: ช่างครับ ผมอยากให้ซ่อมหลังคา รางน้ำฝน และท่อน้ำฝนตรงโรงจอดรถกับถนนส่วนบุคคลครับ", ipa: "naai-jâang: châang kráp. pǒm yàak hâi sôrm lǎng-kaa, raang-náam-fǒn, láe tôr-náam-fǒn dtrong rohng-jòrt-rót gàp tà-nǒn-sùan-bùk-kon kráp", en: "Boss: Mechanic. I want you to fix the roof, gutter, and drainpipe at the garage and driveway." },
+                    { th: "ช่าง: ได้ครับ ขอผมเข้าไปดูข้างในหน่อย พอถึงประตูหน้าหรือทางเข้าประตู ผมต้องกดกริ่งประตูหรืออินเตอร์คอมให้คนข้างในกดเปิดประตูให้เข้าไหมครับ?", ipa: "châang: dâai kráp. kǒr pǒm kâo bpai duu kâang nai nòi. por těung bprà-dtoo nâa rěu taang kâo bprà-dtoo, pǒm dtông gòt grìng-bprà-dtoo rěu in-dter-korm hâi kon kâang-nai gòt bpèrt bprà-dtoo hâi kâo mǎi kráp?", en: "Repairman: Okay. Let me go look inside. When arriving at the front door or doorway, do I need to ring the doorbell or intercom to buzz somebody in?" },
+                    { th: "นายจ้าง: ไม่ต้องครับ เอากุญแจหรือกุญแจรีโมทไปไขลูกบิดประตูได้เลย แต่อย่าลืมเช็ดเท้าบนพรมเช็ดเท้านะ", ipa: "naai-jâang: mâi dtông kráp. ao gun-jɛɛ rěu gun-jɛɛ-ree-môht bpai kǎi lôok-bìt-bprà-dtoo dâai loey. dtɛ̀ yàa leum chét táao bon prom-chét-táao ná", en: "Boss: No need. Take the key or key fob to unlock the door handle right away. But don't forget to wipe one's feet on the doormat." },
+                    { th: "ช่าง: เดินไปตามทางเดิน เอาเสื้อไปแขวนที่ตะขอแขวนเสื้อ แล้วเปลี่ยนเป็นรองเท้าแตะใช่ไหมครับ?", ipa: "châang: dern bpai dtaam taang-dern, ao sêua bpai kwɛ̌ɛn têe dtà-kǒr-kwɛ̌ɛn-sêua, lɛ́ɛo bplìan bpen rorng-táao-dtɛ̀ châi mǎi kráp?", en: "Repairman: Walk along the corridor, go hang the jacket at the coat hook, and change into plastic slippers, right?" },
+                    { th: "นายจ้าง: ถูกต้องครับ ขึ้นบันไดก็จับราวบันไดผ่านเชิงบันไดและช่องบันได หรือจะใช้ลิฟต์ก็ได้ ซ่อมเสร็จอย่าลืมล็อคประตูหลังและเช็ดช่องแสงด้านบนด้วย", ipa: "naai-jâang: tòok dtông kráp. kêun ban-dai gôr jàp raao-ban-dai pàan cherng-ban-dai láe chông-ban-dai. rěu jà chái líp gôr dâai. sôrm sèt yàa leum lórk bprà-dtoo-lǎng láe chét chông-sǎeng dâan bon dûay", en: "Boss: Correct. When going up the staircase, hold the banister past the landing and stairwell. Or you can use the lift. When done fixing, don't forget to lock the back door and wipe the skylight above too." }
+                ]
+            },
+            {
+                title: { th: "8. สั่งงานช่างไฟ ⚡", ipa: "bpɛ̀ɛt. sàng ngaan châang-fai", en: "8. Instructing the Electrician" },
+                lines: [
+                    { th: "นายจ้าง: ระบบไฟฟ้ามีปัญหาครับ ปลั๊ก ปลั๊กไฟ ปลั๊กพ่วง และอะแดปเตอร์ใช้ไม่ได้ หลอดไฟก็ดับ", ipa: "naai-jâang: rá-bòp fai-fáa mee bpan-hǎa kráp. bplák, bplák-fai, bplák-pûang, láe à-dɛ̀p-dtêr chái mâi dâai. lòrt-fai gôr dàp", en: "Boss: The electricity system has a problem. The plug, socket, extension cable, and adaptor aren't working. The light bulb is out too." },
+                    { th: "ช่างไฟ: เดี๋ยวผมไปเช็คที่กล่องตัดไฟและมิเตอร์ให้ครับ แล้วจะเช็คแบตเตอรี่ของสัญญาณกันขโมย สัญญาณเตือนไฟไหม้ และเทอร์โมสตัทด้วย", ipa: "châang-fai: dǐaw pǒm bpai chék têe glòng-dtàt-fai láe mí-dtêr hâi kráp. lɛ́ɛo jà chék bɛ̀t-dter-rêe kǒrng sǎn-yaan-gan-kà-mohy, sǎn-yaan-dteuan-fai-mâi, láe ter-moh-sà-dtàt dûay", en: "Electrician: I'll go check the fusebox and meter. And I'll check the battery of the security alarm, smoke alarm, and thermostat too." },
+                    { th: "นายจ้าง: ขอบคุณครับ ซ่อมเสร็จช่วยไปซ่อมมุ้งลวด เสาอากาศ และจานดาวเทียมที่ระเบียงตรงพื้นระเบียงไม้ด้วยนะ", ipa: "naai-jâang: kòrp-kun kráp. sôrm sèt chûay bpai sôrm múng-lûat, sǎo-aa-gàat, láe jaan-daao-tiam têe rá-biang dtrong péun-rá-biang-máai dûay ná", en: "Boss: Thank you. After fixing, please go fix the mosquito screen, aerial, and satellite dish at the balcony with the wooden decking too." }
+                ]
+            },
+            {
+                title: { th: "9. สั่งงานคนสวน 🌳", ipa: "gâao. sàng ngaan kon-sǔan", en: "9. Instructing the Gardener" },
+                lines: [
+                    { th: "คนสวน: วันนี้ให้ผมปลูกต้นไม้ในบ้านกับต้นไม้ด้วยไหม? ผมเห็นดิน กระถาง ชั้นวางกระถาง และกระบะต้นไม้ริมหน้าต่างเตรียมไว้แล้ว", ipa: "kon-sǔan: wan-née hâi pǒm bplòok dtôn-máai-nai-bâan gàp dtôn-máai dûay mǎi? pǒm hěn din, grà-tàang, chán-waang-grà-tàang, láe grà-bà-dtôn-máai-rim-nâa-dtàang dtriam wái lɛ́ɛo", en: "Gardener: Do you want me to grow house plants and plants today too? I saw soil, a flowerpot, a flowerpot stand, and a windowbox prepared already." },
+                    { th: "นายจ้าง: ใช่ครับ ในกรีนเฮาส์มีนกในกรงนก ช่วยดูแลดอกไม้กับไม้พุ่มตรงนั้นด้วย ใส่ถุงมือทำสวน เอาช้อนปลูกไปถอนหญ้าและวัชพืช ระวังอย่าใช้ยาฆ่าหญ้าเยอะ แล้วรดน้ำต้นไม้ด้วยบัวรดน้ำนะ", ipa: "naai-jâang: châi kráp. nai green-háo mee nók nai grong-nók. chûay duu-lɛɛ dòrk-máai gàp máai-pûm dtrong nán dûay. sài tǔng-meu-tam-sǔan, ao chón-bplòok bpai tǒrn-yâa láe wát-chá-pêut. ra-wang yàa chái yaa-kâa-yâa yə́. lɛ́ɛo rót-náam-dtôn-máai dûay bua-rót-náam ná", en: "Boss: Yes. In the greenhouse there is a bird in the birdcage. Please take care of the flowers and shrubs there too. Put on gardening gloves, take the trowel to weed and remove weeds. Be careful not to use too much weedkiller. Then water the plants with the watering can." }
+                ]
+            },
+            {
+                title: { th: "10. สั่งงานช่างประปา 💧", ipa: "sìp. sàng ngaan châang bprà-bpaa", en: "10. Instructing the Plumber" },
+                lines: [
+                    { th: "นายจ้าง: ช่างประปาครับ ท่อน้ำในห้องน้ำรั่ว แล้วก็เครื่องทำน้ำร้อนไม่ทำงานครับ", ipa: "naai-jâang: châang bprà-bpaa kráp, tôr-náam nai hông-náam rûa, lɛ́ɛo gôr krêuang-tam-náam-rórn mâi tam-ngaan kráp", en: "Boss: Plumber, the water pipe in the bathroom is leaking, and the boiler isn't working." },
+                    { th: "ช่างประปา: เดี๋ยวผมเช็คท่อน้ำและวาล์วน้ำให้ครับ อาการนี้อาจจะต้องเปลี่ยนข้อต่อใหม่", ipa: "châang bprà-bpaa: dǐaw pǒm chék tôr-náam láe waao-náam hâi kráp. aa-gaan née àat jà dtông bplìan kôr-dtòr mài", en: "Plumber: I'll check the water pipe and valve for you. This symptom might require changing to a new joint." },
+                    { th: "นายจ้าง: ขอบคุณครับ ซ่อมเสร็จแล้วช่วยไปดูอ่างล้างจานในครัวด้วยนะครับ น้ำมันไหลช้ามาก", ipa: "naai-jâang: kòrp-kun kráp. sôrm sèt lɛ́ɛo chûay bpai duu àang-láang-jaan nai krua dûay ná kráp. náam man lǎi cháa mâak", en: "Boss: Thank you. When you finish fixing it, please go look at the sink in the kitchen too. The water flows very slowly." }
+                ]
+            },
+            {
+                title: { th: "11. คุยกับ รปภ. 👮‍♂️", ipa: "sìp-èt. kui gàp ror-bpor-por", en: "11. Talking to the Security Guard" },
+                lines: [
+                    { th: "ลูกบ้าน: รปภ. ครับ เดี๋ยววันนี้จะมีช่างซ่อมบ้านเข้ามาตอนบ่ายโมงตรงนะครับ", ipa: "lôok-bâan: ror-bpor-por kráp, dǐaw wan-née jà mee châang sôrm bâan kâo maa dton bàai mohng dtrong ná kráp", en: "Resident: Security guard, there will be a house repairman coming today exactly at 1 PM." },
+                    { th: "รปภ.: รับทราบครับ ให้ช่างแลกบัตรแล้วจอดรถที่โรงจอดรถสำหรับผู้มาติดต่อได้เลยครับ", ipa: "ror-bpor-por: ráp sâap kráp. hâi châang lɛ̂ɛk bàt lɛ́ɛo jòrt rót têe rohng-jòrt-rót sǎm-ràp pôo maa dtìt-dtòr dâai loey kráp", en: "Security Guard: Acknowledged. Have the repairman exchange his ID card and park at the visitor's garage." },
+                    { th: "ลูกบ้าน: ดีครับ ถ้าช่างมาถึงแล้ว รบกวนโทรแจ้งผ่านอินเตอร์คอมด้วยนะครับ", ipa: "lôok-bâan: dee kráp. tâa châang maa těung lɛ́ɛo, róp-guan toh jɛ̂ɛng pàan in-dter-korm dûay ná kráp", en: "Resident: Good. If the repairman arrives, please call to inform me via the intercom." }
+                ]
+            }
+        ];
+
+        // ข้อมูลกิจกรรม (Tasks) ที่ผสมคำศัพท์เก่าและใหม่เข้าด้วยกัน
+        const tasksData = [
+            {
+                number: 1, color: 'orange',
+                title: { th: "บทบาทสมมติ: ปัญหาระดับชาติ 🔨💦", ipa: "bòt-bàat sǒm-mút: bpan-hǎa rá-dàp châat", en: "Role-play: National Crisis" },
+                desc: { th: "สมมติว่าคุณเพิ่งย้ายเข้า \"เรือนไทย\" หรือ \"วิลล่า\" แล้วพบว่า \"ก๊อกน้ำ\" เสีย \"หลังคา\" รั่ว และ \"สัญญาณกันขโมย\" ดังไม่หยุด ลองโทรหา \"เจ้าของบ้าน\" เพื่อขอความช่วยเหลือ โดยพยายามอธิบายรายละเอียดให้ชัดเจนที่สุด", ipa: "sǒm-mút wâa kun pêung yáai kâo reuan-tai rěu win-lâa, lɛ́ɛo póp wâa górk-náam sǐa, lǎng-kaa rûa, láe sǎn-yaan gan-kà-mohy dang mâi yùt. long toh hǎa jâo-kǒrng-bâan pêua kǒr kwaam chûay-hěua doi pa-yaa-yaam à-tí-baai raai-lá-ìiat hâi chát-jehn têe-sùt", en: "Imagine you just moved into a \"traditional Thai house\" or \"villa\" and found the \"tap\" is broken, the \"roof\" is leaking, and the \"security alarm\" won't stop ringing. Try calling the \"landlord\" for help by attempting to explain the details as clearly as possible." }
+            },
+            {
+                number: 2, color: 'indigo',
+                title: { th: "เกม: มัณฑนากรจำเป็น 🎨🛋️", ipa: "gehm: man-tá-naa-gorn jam-bpen", en: "Game: Accidental Decorator" },
+                desc: { th: "เลือกห้องหนึ่งห้องใน \"คอนโด\" หรือ \"บังกะโล\" แล้วอธิบายการวาง \"ชุดรับแขก\" \"มู่ลี่ปรับแสง\" และ \"พรม\" ให้เพื่อนร่วมงานฟัง เพื่อให้เขาเข้าใจมุมมองการตกแต่งของคุณ และให้เขาวาดตาม", ipa: "lêuak hông nèung hông nai korn-doh rěu bang-gà-loh, lɛ́ɛo à-tí-baai gaan waang chút-ráp-kɛ̀ɛk, môo-lêe-bpràp-sǎeng, láe prom hâi pêuan-rûam-ngaan fang, pêua hâi kǎo kâo-jai mum-morng gaan dtòk-dtɛ̀ng kǒrng kun láe hâi kǎo wâat dtaam", en: "Choose a room in a \"condo\" or \"bungalow\" and describe the placement of the \"suite\", \"Venetian blind\", and \"rug\" for a colleague to hear, so they understand your decorating perspectives and have them draw it." }
+            }
+        ];
+
+        // ข้อมูลส่วนเพิ่มเติม (Extension) ที่ผสมคำศัพท์เก่าและใหม่เข้าด้วยกัน
+        const extraData = {
+            mainTitle: { th: "กิจกรรมขยายผล", ipa: "gìt-jà-gam kà-yǎai pǒn", en: "Extension Activities" },
+            items: [
+                {
+                    title: { th: "บ้านในอนาคต 🚀", ipa: "bâan nai à-naa-kót", en: "Future Home" },
+                    desc: { th: "ในอีก 50 ปี \"พัดลมติดเพดาน\" และ \"เครื่องทำน้ำร้อน\" จะเปลี่ยนไปอย่างไร? จะมี \"ฟิตเนส\" ในบ้านที่ทำให้เราออกกำลังกายได้คล่องขึ้นไหม?", ipa: "nai èek hâa-sìp bpee, pát-lom-dtìt-pay-daan láe krêuang-tam-náam-rórn jà bplìan bpai yàang-rai? jà mee fit-nét nai bâan têe tam hâi rao òrk-gam-lang-gaai dâai klôrng kêun mǎi?", en: "In the next 50 years, how will \"ceiling fans\" and \"boilers\" change? Will there be a \"gym\" in the house that makes us exercise more fluently?" }
+                },
+                {
+                    title: { th: "สัมภาษณ์ฮวงจุ้ย 🏮", ipa: "sǎm-pâat huang-jûi", en: "Feng Shui Interview" },
+                    desc: { th: "คุยเรื่องการติด \"จานดาวเทียม\" หรือการวาง \"อ่างอาบน้ำ\" ตามความเชื่อ โดยอธิบายให้เห็นรายละเอียดว่าทำไมถึงสำคัญ", ipa: "kui rêuang gaan dtìt jaan-daao-tiam rěu gaan waang àang-àap-náam dtaam kwaam chêua. doi à-tí-baai hâi hěn raai-lá-ìiat wâa tam-mai těung sǎm-kan", en: "Discuss the installation of a \"satellite dish\" or the placement of a \"bath\" according to beliefs. Explain to show the details of why it is important." }
+                }
+            ]
+        };
+
+        // ฟังก์ชันแสดงแถบเมนู
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
+                btn.classList.add('text-gray-500');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('text-gray-500');
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
+        }
+
+        // ฟังก์ชันอ่านออกเสียง
+        function speak(text) {
+            // ลบชื่อผู้พูดออกก่อนให้อ่าน เพื่อให้เสียงเป็นธรรมชาติขึ้น
+            const textToSpeak = text.replace(/^(ลูกค้า:|นายหน้า:|นายจ้าง:|แม่บ้าน:|ช่าง:|ช่างไฟ:|คนสวน:|ช่างประปา:|รปภ.:|ลูกบ้าน:)\s*/, '');
+            const ut = new SpeechSynthesisUtterance(textToSpeak);
+            ut.lang = 'th-TH';
+            window.speechSynthesis.speak(ut);
+        }
+
+        // ฟังก์ชันสลับการแสดงผล IPA/EN
+        function toggleInfo(id, type) {
+            const el = document.getElementById(`${type}-${id}`);
+            if (el.style.display === 'block') {
+                el.style.display = 'none';
+                event.target.classList.remove('bg-slate-800', 'text-white');
+            } else {
+                el.style.display = 'block';
+                event.target.classList.add('bg-slate-800', 'text-white');
+            }
+        }
+
+        // แม่แบบ (Template) สำหรับสร้างกล่องข้อความที่มีปุ่ม TTS, IPA, EN แบบยืดหยุ่น
+        function createThaiItem(th, ipa, en, id, customTextClass = 'text-lg font-bold text-slate-800', boxClass = 'p-4 bg-slate-50 rounded-2xl border border-slate-100', isDark = false) {
+            const btnClass = isDark ? 'border-slate-600 text-slate-300 hover:bg-slate-700' : 'border-slate-200 text-slate-500 hover:bg-slate-100';
+            const ipaBg = isDark ? 'bg-slate-900 border-slate-700 text-indigo-400' : 'bg-white border-indigo-50 text-indigo-600';
+            const enBg = isDark ? 'bg-slate-900 border-slate-700 border-l-emerald-500 text-emerald-400' : 'bg-white border-emerald-50 border-l-emerald-400 text-emerald-700';
+            const safeTh = th.replace(/'/g, "\\'");
+
+            return `
+            <div class="flex flex-col ${boxClass}">
+                <div class="flex items-start gap-3">
+                    <button onclick="speak('${safeTh}')" class="p-2 bg-blue-500 text-white rounded-full shadow-md active:scale-90 transition-all flex-shrink-0 mt-1">
+                        ▶️
+                    </button>
+                    <div class="flex-1">
+                        <p class="${customTextClass} leading-snug">${th}</p>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="toggleInfo('${id}', 'ipa')" class="px-3 py-1 text-[10px] font-black rounded-lg border transition-all uppercase ${btnClass}">IPA</button>
+                            <button onclick="toggleInfo('${id}', 'en')" class="px-3 py-1 text-[10px] font-black rounded-lg border transition-all uppercase ${btnClass}">EN</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="ipa-${id}" class="ipa-text mt-3 text-sm font-mono italic p-3 rounded-xl border ${ipaBg}">[${ipa}]</div>
+                <div id="en-${id}" class="en-text mt-2 text-sm font-medium p-3 rounded-xl border border-l-4 ${enBg}">${en}</div>
+            </div>`;
+        }
+
+        // Render ส่วนบทสนทนา
+        function renderLesson() {
+            const container = document.getElementById('dialogue-container');
+            let html = '';
+            let globalId = 0;
+
+            targetDialogues.forEach((section) => {
+                html += `<div class="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100">`;
+                
+                // Title
+                globalId++;
+                html += createThaiItem(section.title.th, section.title.ipa, section.title.en, 'dial-title-'+globalId, 'text-xl font-black text-indigo-600', 'bg-transparent border-none p-0 mb-6');
+
+                html += `<div class="space-y-4">`;
+                section.lines.forEach((line) => {
+                    globalId++;
+                    html += createThaiItem(line.th, line.ipa, line.en, 'dial-line-'+globalId, 'text-lg font-medium text-slate-800', 'bg-slate-50 border-slate-100 p-4 rounded-2xl border');
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // Render ส่วนกิจกรรม
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            let html = '';
+            let globalId = 0;
+
+            tasksData.forEach((task) => {
+                html += `<div class="bg-white p-8 rounded-[32px] shadow-lg border border-gray-100">`;
+                html += `<div class="inline-flex items-center justify-center w-12 h-12 bg-${task.color}-100 text-${task.color}-600 rounded-2xl mb-6 font-black text-xl">${task.number}</div>`;
+                
+                // Task Title
+                globalId++;
+                html += createThaiItem(task.title.th, task.title.ipa, task.title.en, 'task-title-'+globalId, 'text-xl font-black text-gray-800', 'bg-transparent border-none p-0 mb-4');
+
+                // Task Desc
+                globalId++;
+                html += createThaiItem(task.desc.th, task.desc.ipa, task.desc.en, 'task-desc-'+globalId, 'text-gray-600 leading-relaxed text-base', 'bg-slate-50 border-slate-100 p-5 rounded-2xl border');
+
+                html += `</div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // Render ส่วนเพิ่มเติม
+        function renderExtras() {
+            const titleContainer = document.getElementById('extra-title-container');
+            titleContainer.innerHTML = createThaiItem(extraData.mainTitle.th, extraData.mainTitle.ipa, extraData.mainTitle.en, 'extra-main-title', 'text-2xl font-black italic text-blue-400', 'bg-transparent border-none p-0', true);
+
+            const itemsContainer = document.getElementById('extra-items-container');
+            let html = '';
+            let globalId = 0;
+
+            extraData.items.forEach((item) => {
+                html += `<div class="p-6 bg-slate-800 rounded-[28px] border border-slate-700 flex flex-col space-y-4">`;
+                
+                // Extra Item Title
+                globalId++;
+                html += createThaiItem(item.title.th, item.title.ipa, item.title.en, 'extra-title-'+globalId, 'font-black text-white text-xl', 'bg-transparent border-none p-0', true);
+
+                // Extra Item Desc
+                globalId++;
+                html += createThaiItem(item.desc.th, item.desc.ipa, item.desc.en, 'extra-desc-'+globalId, 'text-sm text-slate-300 leading-relaxed', 'bg-slate-900 border-slate-700 p-4 rounded-2xl border', true);
+
+                html += `</div>`;
+            });
+            itemsContainer.innerHTML = html;
+        }
+
+        // ฟังก์ชันสุ่มคำศัพท์ทบทวน
+        function randomReviewWord() {
+            const word = prevVocab[Math.floor(Math.random() * prevVocab.length)];
+            const res = document.getElementById('review-result');
+            const placeholder = document.getElementById('review-placeholder');
+            
+            placeholder.classList.add('hidden');
+            res.classList.remove('hidden');
+            res.innerHTML = `
+                <div class="text-5xl text-center mb-4">${word.emoji}</div>
+                ${createThaiItem(word.th, word.ipa, word.en, 'review-id', 'text-2xl font-black text-slate-800 text-center', 'bg-transparent border-none p-0')}
+            `;
+        }
+
+        // เริ่มต้นทำงานเมื่อโหลดหน้า
+        window.onload = () => {
+            renderLesson();
+            renderTasks();
+            renderExtras();
+        };
+    </script>
+</body>
+</html>
