@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>การช้อปปิ้ง</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body { font-family: 'Sarabun', sans-serif; -webkit-tap-highlight-color: transparent; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+        .bg-pattern { background-image: radial-gradient(#bfdbfe 1.5px, transparent 1.5px); background-size: 24px 24px; }
+        .toggle-btn { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .ipa-btn-active { background-color: #9333ea; color: white; border: 1px solid #9333ea; }
+        .ipa-btn-inactive { background-color: white; color: #9333ea; border: 1px solid #d8b4fe; }
+        .en-btn-active { background-color: #2563eb; color: white; border: 1px solid #2563eb; }
+        .en-btn-inactive { background-color: white; color: #2563eb; border: 1px solid #bfdbfe; }
+    </style>
+</head>
+<body class="bg-blue-50 bg-pattern text-gray-800 antialiased min-h-screen pb-20">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- SVG Icons ---
+        const Icons = {
+            Volume2: ({size=18}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>,
+            ShoppingBag: ({size=20}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>,
+            Refresh: ({size=20}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        };
+
+        // --- Interactive Text Component (Core Feature) ---
+        const IntText = ({ th, ipa, en, size="text-base", bold=false, color="text-gray-800", block=true }) => {
+            const [showIpa, setShowIpa] = useState(false);
+            const [showEn, setShowEn] = useState(false);
+
+            const speak = (e) => {
+                e.stopPropagation();
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    // Strip emojis
+                    const cleanText = th.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+                    const u = new SpeechSynthesisUtterance(cleanText);
+                    u.lang = 'th-TH';
+                    u.rate = 0.85; 
+                    window.speechSynthesis.speak(u);
+                }
+            };
+
+            const Wrapper = block ? "div" : "span";
+
+            return (
+                <Wrapper className={`flex flex-col gap-1 w-full my-2 ${!block ? 'inline-flex w-auto my-0 align-middle' : ''}`}>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className={`${size} ${color} ${bold ? 'font-bold' : ''} leading-snug`}>{th}</span>
+                        
+                        <div className="flex items-center gap-1.5 shrink-0">
+                            <button onClick={speak} className="p-1.5 rounded-full hover:bg-black/5 text-blue-600 active:scale-95 shadow-sm bg-white border border-blue-100" title="ฟังเสียง">
+                                <Icons.Volume2 />
+                            </button>
+                            
+                            {ipa && (
+                                <button onClick={(e) => {e.stopPropagation(); setShowIpa(!showIpa)}} className={`toggle-btn ${showIpa ? 'ipa-btn-active' : 'ipa-btn-inactive'}`}>
+                                    IPA
+                                </button>
+                            )}
+                            
+                            {en && (
+                                <button onClick={(e) => {e.stopPropagation(); setShowEn(!showEn)}} className={`toggle-btn ${showEn ? 'en-btn-active' : 'en-btn-inactive'}`}>
+                                    EN
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {(showIpa || showEn) && (
+                        <div className="flex flex-col gap-1.5 mt-1">
+                            {showIpa && ipa && <div className="text-purple-700 text-[15px] bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100 italic animate-fade w-fit">{ipa}</div>}
+                            {showEn && en && <div className="text-blue-700 text-[15px] bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 animate-fade w-fit">{en}</div>}
+                        </div>
+                    )}
+                </Wrapper>
+            );
+        };
+
+        // --- MASSIVE VOCABULARY DATA (From User) ---
+        const oldVocab = [
+            { t: 'เห็ด', p: 'hèt', e: 'mushrooms', em: '🍄' }, { t: 'ชวน', p: 'chuan', e: 'Invite', em: '📩🤝' },
+            { t: 'แหวน', p: 'wɛ̌ɛn', e: 'Ring', em: '💍' }, { t: 'อนาคต', p: 'a naa khót', e: 'Future', em: '🔮⏳' },
+            { t: 'น่าสนใจ', p: 'nâa sǒn jai', e: 'Interesting', em: '🤔✨' }, { t: 'การ', p: 'gaan', e: 'Prefix (verbs to nouns)', em: '🧩' },
+            { t: 'การกินดี', p: 'gaan gin dii', e: 'Good eating', em: '🍽️👍' }, { t: 'หุบเขาลึก', p: 'hùp khǎw lʉ́k', e: 'Deep valley / canyon', em: '🏞️⛰️' },
+            { t: 'ผา', p: 'phǎa', e: 'cliff', em: '🪨⛰️' }, { t: 'ขอจองค่ะ', p: 'khɔ̌ɔ jong khâ', e: 'Can I book?', em: '📅🛎️' },
+            { t: 'ขอจองได้ไหม', p: 'khɔ̌ɔ jong dâay mǎy', e: 'Would it be possible to make a reservation?', em: '📅🍽️' },
+            { t: 'ราคา', p: 'raa-kaa', e: 'Price', em: '💰' }, { t: 'ละ', p: 'lá', e: 'per / each', em: '➗' },
+            { t: 'ถูก', p: 'tùuk', e: 'cheap', em: '💸' }, { t: 'กลางคืน', p: 'klaaŋkhʉʉn', e: 'Nighttime', em: '🌙🌃' },
+            { t: 'ถั่ว', p: 'thùa', e: 'peas / nuts', em: '🫛🥜' }, { t: 'ติดกระเป๋า', p: 'dtìt grà bpǎw', e: 'attach to a bag', em: '👜📎' },
+            { t: 'แว่นกันแดด', p: 'wɛ̂n gan dɛ̀ɛt', e: 'sunglasses', em: '🕶️' }, { t: 'แว่นสายตา', p: 'wɛ̂n sǎay dtaa', e: 'eyeglasses (sight)', em: '👓' },
+            { t: 'กระจก', p: 'grà jòk', e: 'mirror', em: '🪞' }, { t: 'น้ำผึ้ง', p: 'nám pʉ̂ng', e: 'Honey', em: '🍯' },
+            { t: 'หอย', p: 'hɔ̌ɔy', e: 'Clams', em: '🦪' }, { t: 'ราด', p: 'râat', e: 'Put it on top', em: '🍲' },
+            { t: 'อย่างละหนึ่ง', p: 'yàaŋ lá nʉ̀ŋ', e: '1 each', em: '1️⃣' }, { t: 'ชิ้น', p: 'chín', e: 'piece', em: '🧩' },
+            { t: 'พอแล้ว', p: 'phɔɔ lɛ́ɛw', e: 'Enough already', em: '🛑🙅‍♂️' }, { t: 'แค่นี้', p: 'khɛ̂ɛ níi', e: 'That\'s it. / That\'s all.', em: '✅' },
+            { t: 'เครื่องปรุง', p: 'khrʉ̂aŋpruŋ', e: 'Seasonings', em: '🧂🌶️' }, { t: 'บด', p: 'bòt', e: 'Mashed', em: '🥔' },
+            { t: 'พร้อมกัน', p: 'phrɔ́ɔmkan', e: 'At the same time', em: '⏱️🤝' }, { t: 'ยาแก้แพ้', p: 'yaa kɛ̂ɛ phɛ́ɛ', e: 'allergy pills', em: '💊🤧' },
+            { t: 'นมถั่วเหลือง', p: 'nom thùa lʉ̌ang', e: 'soy milk', em: '🥛🫘' }, { t: 'น้ำเต้าหู้', p: 'náam dtâw hûu', e: 'Tofu milk', em: '🥛🫘' },
+            { t: 'นมข้น', p: 'nomkhôn', e: 'Condense milk', em: '🥛' }, { t: 'อาศัยอยู่ที่ไหน', p: 'aasǎy yùu thîi nǎy', e: 'Where do you live?', em: '🏠📍' },
+            { t: 'เบอร์อะไร', p: 'bəə àray', e: 'What\'s your number?', em: '📞' }, { t: 'เครื่องประดับ', p: 'sʉ́ʉ khrʉ̂ang bpra-dàp', e: 'Accessories', em: '💍👜' },
+            { t: 'เดือน', p: 'dʉan', e: 'months', em: '🗓️' }, { t: 'สำหรับ', p: 'sǎm-ràp', e: 'for', em: '🔗' },
+            { t: 'สายตาเอียง', p: 'sǎay dtaa iang', e: 'Astigmatism', em: '👁️🤓' }, { t: 'กรอบ', p: 'grɔ̀ɔp', e: 'Frame', em: '🖼️' },
+            { t: 'ตุ้มหู', p: 'dtûm hǔu', e: 'earring', em: '💎👂' }, { t: 'ทำมาจากอะไร', p: 'tham maacàak àray', e: 'What is it made of?', em: '🧪🧵' },
+            { t: 'หมวกสาน', p: 'mùak sǎan', e: 'staw hats', em: '👒🧺' }, { t: 'ลูกค้า', p: 'lûukkháa', e: 'Customers', em: '🧑‍🤝‍🧑' },
+            { t: 'ขโมย', p: 'khamooy', e: 'Steal', em: '🦹‍♂️💰' }, { t: 'ไม่ให้', p: 'mây hây', e: 'Not allows', em: '🚫🙅‍♂️' },
+            { t: 'เพิ่ม', p: 'phə̂əm', e: 'more / additional', em: '➕' }, { t: 'กุ้งเผา', p: 'kûng phǎw', e: 'roasted prawns', em: '🍤🔥' },
+            { t: 'กระเทียม', p: 'kràthiam', e: 'garlic', em: '🧄' }, { t: 'ปูอบวุ้นเส้น', p: 'puu òp wúnsên', e: 'Baked crabs with glass noodles', em: '🦀🍜' },
+            { t: 'หนัก', p: 'nàk', e: 'Heavy', em: '🏋️‍♂️' }, { t: 'หอยนางรม', p: 'hɔ̌ɔy naang rom', e: 'Oyster', em: '🦪' },
+            { t: 'หอยแมลงภู่', p: 'hɔ̌ɔy malɛɛng phûu', e: 'Mussels', em: '🦪' }, { t: 'หอยทอด', p: 'hɔ̌ɔy thɔ̂ɔt', e: 'Oyster omelette', em: '🦪🍳' },
+            { t: 'ของเหลือ', p: 'khɔ̌ɔnglʉ̌a', e: 'leftovers', em: '🍱🥡' }, { t: 'ไฟไหม้', p: 'faymây', e: 'Fire (burning)', em: '🔥' },
+            { t: 'เคยเป็นเมืองขึ้นของอังกฤษ', p: 'khəəy bpen mʉang khʉ̂n khɔ̌ɔng ang grìt', e: 'Used to be a British colony', em: '🏴🇬🇧📜' },
+            { t: 'อะไรก็ได้', p: 'àray gɔ̂ɔ dâay', e: 'Whatever', em: '🤷' }, { t: '(แล้ว)เจอกัน', p: '(lɛ́ɛw) jəə gan', e: 'See you!', em: '👋🙂' },
+            { t: 'ลองกันอีกครั้ง', p: 'lɔɔng gan ìik khráng', e: 'Let\'s try again.', em: '🔁🙏' }, { t: '...กัน', p: 'gan', e: 'Let\'s ...', em: '🤝' },
+            { t: 'อีก(หนึ่ง)ครั้ง', p: 'ìik (nʉ̀ng) khráng', e: 'One more time / again', em: '🔁' }, { t: 'เหรอ', p: 'rə̌ə', e: 'Really?', em: '🤨' },
+            { t: 'ไฟแรง', p: 'fay rɛɛŋ', e: 'Strong fire', em: '🔥💪' }, { t: 'กระเจี๊ยบ', p: 'grà jíap', e: 'Okra', em: '🥬' },
+            { t: 'จืด', p: 'jʉ̀ʉt', e: 'Bland', em: '😐🍲' }, { t: 'มะกรูด', p: 'má grùut', e: 'Kaffir limes', em: '🍋' },
+            { t: 'ใบมะกรูด', p: 'bai má grùut', e: 'Kaffir limes leaves', em: '🍃🟢' }, { t: 'บวบ', p: 'bùab', e: 'Sponge gourd', em: '🥒' },
+            { t: 'ก๋วยเตี๋ยวน้ำ', p: 'gǔay dtǐaw náam', e: 'Noodle soup', em: '🍜' }, { t: 'ลืม', p: 'lʉʉm', e: 'Forget', em: '🧠❓' },
+            { t: 'มื้อ', p: 'mʉ́ʉ', e: 'Meals', em: '🍽️' }, { t: 'นึ่ง', p: 'nʉ̂ng', e: 'Steam', em: '♨️' },
+            { t: 'ทั้งตัว', p: 'tháng dtua', e: 'The whole body', em: '🧍‍♂️🧍‍♀️' }, { t: 'ถ้วย', p: 'thûay', e: 'small bowl', em: '🥣' },
+            { t: 'เดี๋ยวห่อให้', p: 'dǐaw hɔ̀ɔ hây', e: 'I\'ll wrap it for you.', em: '📦🛍️' }, { t: 'อย่า', p: 'yàa', e: 'Don\'t ...', em: '🚫' },
+            { t: 'ไส้กรอก', p: 'sâi-grɔ̂ɔk', e: 'sausage', em: '🌭' }, { t: 'ครัว', p: 'krua', e: 'kitchen', em: '🍳🏠' },
+            { t: 'ใบ', p: 'bai', e: 'leaves', em: '🍃' }, { t: 'ขนม', p: 'khà-nǒm', e: 'desserts/snacks', em: '🍰🍪' },
+            { t: 'ผ้า', p: 'phâa', e: 'cloth/fabric', em: '🧵👕' }, { t: 'ผ้าฝ้าย', p: 'pâa-fâai', e: 'cotton', em: '🧵👕' },
+            { t: 'แตงโม', p: 'dtaeng-moh', e: 'watermelon', em: '🍉' }, { t: 'บอก', p: 'bòk', e: 'to tell', em: '🗣️' },
+            { t: 'ครั้งหน้า', p: 'kráng-nâa', e: 'next time', em: '⏭️' }, { t: 'ไม่กล้าขี่', p: 'mâi glâa kìi', e: 'don\'t dare to ride', em: '🚲😰' },
+            { t: 'ทั้งสอง', p: 'táng-sǎawng', e: 'both', em: '👥' }, { t: 'พอ', p: 'pɔɔ', e: 'enough', em: '✅' },
+            { t: 'ปอก', p: 'bpòk', e: 'to peel', em: '🔪🍊' }, { t: 'ตัวเงินตัวทอง', p: 'dtua-ngen-dtua-tong', e: 'monitor lizard', em: '🦎' },
+            { t: 'ระหว่าง', p: 'rá-wàang', e: 'between; during', em: '↔️' }, { t: 'เลือก', p: 'lʉ̂ak', e: 'Choose', em: '✅🫵' },
+            { t: 'เกลียด', p: 'glìat', e: 'hate', em: '😡💔' }, { t: 'มะระ', p: 'má-rá', e: 'bitter melon', em: '🥒' },
+            { t: 'ย่อย', p: 'yɔ̂y', e: 'digest', em: '🍽️' }, { t: 'กะปิ', p: 'gà-bpì', e: 'shrimp paste', em: '🦐' },
+            { t: 'ครก', p: 'krók', e: 'mortar', em: '🥣🔨' }, { t: 'สาก', p: 'sàak', e: 'pestle', em: '🥣🔨' },
+            { t: 'หิน', p: 'hǐn', e: 'stone', em: '🪨' }, { t: 'ไม้', p: 'mái', e: 'wood', em: '🪵🌳' },
+            { t: 'วง', p: 'wong', e: 'circle/ring classifier', em: '⭕️' }, { t: 'น่ากิน', p: 'nâa-gin', e: 'looks delicious', em: '😋🍽️' },
+            { t: '...จัง', p: '...jang', e: 'very; so', em: '✨' }, { t: 'จ้ะ', p: 'jâ', e: 'polite ending', em: '🙂' },
+            { t: 'สุภาพ', p: 'sù-pâap', e: 'polite', em: '🙏' }, { t: 'สั้น', p: 'sân', e: 'short', em: '📏' },
+            { t: 'คืนสุดท้าย', p: 'keun-sùt-táai', e: 'the last night', em: '🌙🌃' }, { t: 'แรงเกินไป', p: 'rɛɛng gəən bpai', e: 'Too strong', em: '💪' },
+            { t: 'เดี๋ยว', p: 'dǐaw', e: 'In a bit', em: '⏳' }, { t: 'กินให้อร่อย', p: 'gin hâi a-ròi', e: 'Enjoy your meal', em: '🍽️😋' },
+            { t: 'อวกาศ', p: 'à-wá-gàat', e: 'space', em: '🚀🌌' }, { t: 'หน้า', p: 'nâa', e: 'face/page', em: '📄😊' },
+            { t: 'ไหม้', p: 'mâi', e: 'burnt', em: '❤️‍🔥' }, { t: 'ลูกค้ายังกินข้าวอยู่', p: 'lûuk-káa yang gin kâao yùu', e: 'The customer is still eating.', em: '🍽️' },
+            { t: 'พระเจ้า', p: 'pra-jâo', e: 'God', em: '🌬️' }, { t: 'พระอาทิตย์', p: 'phrá aa-thít', e: 'the Sun', em: '🌞' },
+            { t: 'พระจันทร์', p: 'phrá jan', e: 'the moon', em: '🌝' }, { t: 'ดาวอังคาร', p: 'daao ang-khaan', e: 'Mars', em: '🇲🇭' },
+            { t: 'ดาวพุธ', p: 'daao phút', e: 'Mercury', em: '🧜' }, { t: 'ดาวพฤหัส(บดี)', p: 'daao prá-hàt', e: 'Jupiter', em: '☄️' },
+            { t: 'ดาวศุกร์', p: 'daao sùk', e: 'Venus', em: '🔵' }, { t: 'ดาวเสาร์', p: 'daao sǎo', e: 'Saturn', em: '🪐' },
+            { t: 'มีแต่', p: 'mii dtàe', e: 'Have only', em: '✅🔞' }, { t: 'เสิร์ฟแต่', p: 'sə̀əp dtɛ̀ɛ', e: 'serve only', em: '🍦🔞' },
+            { t: 'แกงเขียวหวาน', p: 'gɛɛng kǐao wǎan', e: 'green curry', em: '🟩🥘' }, { t: 'กิ้งก่า', p: 'gîng gàa', e: 'lizard', em: '🦎' },
+            { t: 'แสน', p: 'sǎen', e: '100,000', em: '💯0️⃣0️⃣0️⃣' }, { t: 'น้ำแข็งไส', p: 'náam-kɛ̌ng-sǎi', e: 'shaved ice', em: '🍧' },
+            { t: 'สัตว์เลี้ยง', p: 'sàt-líang', e: 'pet', em: '🐶🐱🐹' }, { t: 'เลี้ยง', p: 'líang', e: 'To raise/treat', em: '🧑‍🍼' },
+            { t: 'นก', p: 'nôk', e: 'bird', em: '🦅' }, { t: 'ส่งประวัติ', p: 'sòng bprà-wàt', e: 'Submit profile', em: '📄📧📤' },
+            { t: 'อัดเสียง', p: 'àt-sĭang', e: 'record audio', em: '🎙️🎧📱' }, { t: 'ปริญญาโท', p: 'bpriin-yaa toh', e: 'Master\'s degree', em: '🎓📚📜' },
+            { t: 'ทุกวันนี้', p: 'túk wan níi', e: 'nowadays', em: '📅🕒📍' }, { t: 'ทำให้คนโง่', p: 'tam hâi kon ngô', e: 'make someone stupid', em: '🧠📉❓' },
+            { t: 'คนมีอำนาจ', p: 'khon mii am-nâat', e: 'powerful people', em: '👑🛡️⚡' }, { t: 'ควบคุม', p: 'kûup-kum', e: 'to control', em: '🎮🕹️⛓️' },
+            { t: 'ผิวสี', p: 'phǐu-sǐi', e: 'colored skin', em: '🏿🏾🏽' }, { t: 'ตอบ', p: 'dtɔ̀ɔp', e: 'to answer', em: '🗣️💬✅' },
+            { t: 'ฝึก', p: 'fʉ̀k', e: 'to train/practice', em: '🏃‍♂️🏋️‍♀️🔥' }, { t: 'ใส่บาตร', p: 'sài bâat', e: 'make offering to monk', em: '🙏🥣🍚' },
+            { t: 'สั่น', p: 'sàn', e: 'shiver/vibrate', em: '📳🥶⚠️' }, { t: 'เป็นไข้', p: 'bpen kâi', e: 'have a fever', em: '🤒🌡️💊' },
+            { t: 'หวังว่า', p: 'wǎng wâa', e: 'hope that', em: '🙏✨🌈' }, { t: 'ผู้ต้องหา', p: 'pôo dtông hăa', e: 'suspect', em: '🚔⚖️👤' },
+            { t: 'กระโดด', p: 'kra-dòot', e: 'jump', em: '🦘💨🆙' }, { t: 'รั้ว', p: 'rúa', e: 'fence', em: '🚧🪜📏' },
+            { t: 'นอก', p: 'nɔ̂ɔk', e: 'outside', em: '🏠🌳🚪' }, { t: 'รัฐ', p: 'rát', e: 'state/government', em: '🏛️🏢🇹🇭' },
+            { t: 'เอกชน', p: 'èek-gà-chon', e: 'private', em: '💼🏢🏢' }, { t: 'แป้ง', p: 'bpâeng', e: 'flour', em: '🌾🥣' },
+            { t: 'ติดลบ', p: 'dtìt-lóbp', e: 'negative; in debt', em: '📉💸' }, { t: 'อีกมหาวิทยาลัย', p: 'ìik má-hǎa-wít-tá-yaa-lai', e: 'another university', em: '🏫' },
+            { t: 'ไม่อยากให้คนคิดว่า เป็นคนไทย', p: 'mâi-yàak hâi kon kít-wâa bpen kon-thai', e: 'Don\'t want people to think they are Thai.', em: '🤐🇹🇭' },
+            { t: 'ตอนไม่มีคนอื่น', p: 'dtọn mâi mii kon ʉ̀ʉn', e: 'When nobody else is around.', em: '🤫👤' }, { t: 'แข็ง', p: 'kǎeng', e: 'hard; strong', em: '🪨💪' },
+            { t: 'ไม่รู้ ทำขนมจีนยังไง', p: 'mâi rúu tam khà-nǒm-jiin yang-ngai', e: 'Don\'t know how to make khanom chin.', em: '🍜❓' },
+            { t: 'หมดอายุ', p: 'mot-aa-yú', e: 'expired', em: '⏳📅' }, { t: 'เน่า', p: 'nâo', e: 'rotten', em: '🤢🦠' },
+            { t: 'โลก', p: 'lôhk', e: 'world', em: '🌍' }, { t: 'ล้าน', p: 'láan', e: 'million', em: '💰' },
+            { t: 'สัมภาษณ์', p: 'sǎm-pâat', e: 'interview', em: '🗣️📋' }, { t: 'ต่างดาว', p: 'dtàang daao', e: 'alien', em: '👽🪐' },
+            { t: 'พันธุ์', p: 'pan', e: 'breed', em: '🦮🐕‍🦺🐩' }, { t: 'ตั้งชื่อ', p: 'dtâng chêuu', e: 'to name', em: '🤲📇' },
+            { t: 'เหม็น', p: 'měn', e: 'smelly', em: '🤢💩' }, { t: 'ดื้อ', p: 'dʉ̂e', e: 'stubborn', em: '😤🙅' },
+            { t: 'กระต่าย', p: 'grà-dtàai', e: 'rabbit', em: '🐇' }, { t: 'เถียง', p: 'thǐang', e: 'argue', em: '🗣️💥' },
+            { t: 'ควร', p: 'khuan', e: 'should', em: '✅' }, { t: 'ใบไม้', p: 'bai máay', e: 'Leaves', em: '🍃' },
+            { t: 'ต้นไม้', p: 'dtôn-máai', e: 'tree', em: '🌳' }, { t: 'ต้องการ', p: 'dtâwng-gaan', e: 'to want', em: '🙏🫴' },
+            { t: 'ต้นไม้ต้องการใบไม้เพื่อให้อยู่ได้', p: 'dtôn-máai dtâwng-gaan bai-máai pʉ̂a hâi yòo-dâi', e: 'Trees need leaves to survive.', em: '🌳🍃' },
+            { t: 'เลือก', p: 'lʉ̂ak', e: 'Choose', em: '✅🫵' }, { t: 'เห็นด้วย', p: 'hĕn dûai', e: 'agree', em: '👍' },
+            { t: 'สาน', p: 'sǎan', e: 'weave', em: '🧶🪡' }, { t: 'ฟาง', p: 'faang', e: 'straw', em: '🌾' },
+            { t: 'จู่ๆ', p: 'jùu-jùu', e: 'suddenly', em: '⚡️😲' }, { t: 'จับ', p: 'jàp', e: 'to catch', em: '🤝👮' },
+            { t: 'ประตู', p: 'bprà-tuu', e: 'door', em: '🚪' }, { t: 'ซ่อม', p: 'sôm', e: 'to repair', em: '🔧🛠️' },
+            { t: 'เข้า', p: 'kâo', e: 'to enter', em: '🚪' }, { t: 'นอกบ้าน', p: 'nɔ̂ɔk bâan', e: 'outdoors', em: '🌳🏡' },
+            { t: 'แขก', p: 'kàek', e: 'guest', em: '👤🤝' }, { t: 'ขับรถพาแขกไปโรงแรม', p: 'khàp-rót paa khàaek bpai roong-raem', e: 'Drive the guest to the hotel.', em: '🚗🏨' },
+            { t: 'แต่ละ', p: 'dtàae-lá', e: 'each', em: '🔁' }, { t: 'เรื่องความรัก', p: 'rʉ̂ʉang kwaam rák', e: 'love story', em: '💖📖' },
+            { t: 'ตัวเอก', p: 'dtua-èek', e: 'protagonist', em: '🦸📖' }, { t: 'ให้ยืม', p: 'hâi yeum', e: 'to lend', em: '💸🤝' },
+            { t: 'ยืม', p: 'yeum', e: 'to borrow', em: '🤝💸' }, { t: 'โบราณ', p: 'bō-raan', e: 'ancient', em: '🏺🕰️' },
+            { t: 'ดั้งเดิม', p: 'dâng-doēm', e: 'original', em: '🏺🕰️' }, { t: 'ห่วง', p: 'hùang', e: 'to worry', em: '😟😰' },
+            { t: 'กังวล', p: 'gang-won', e: 'to worry', em: '😟😰' }, { t: 'เลิศ', p: 'lêrt', e: 'excellent', em: '✨🌟👌' },
+            { t: 'ยานอวกาศ', p: 'yaan-à-wá-gàat', e: 'spaceship', em: '🚀🛸' }, { t: 'บูด', p: 'bòot', e: 'spoiled, rancid', em: '🤢🥛' },
+            { t: 'หนัง', p: 'năng', e: 'film; skin', em: '🎬🐾' }, { t: 'ผง', p: 'pǒng', e: 'powder', em: '🧂' },
+            { t: 'เอาแหนมไว้ข้างนอก', p: 'ao nǎem wái kâang nɔ̂ɔk', e: 'Leave the fermented pork sausage outside.', em: '🥩🏠' },
+            { t: 'มด', p: 'mót', e: 'ant', em: '🐜' }, { t: 'หายใจ', p: 'hăai jai', e: 'breathe', em: '🫁💨' },
+            { t: 'หัวผักกาด', p: 'hŭa phàk kàat', e: 'radish', em: '🥬🥕' }
+        ];
+
+        // --- NEW TARGET VOCAB (Shopping) ---
+        const newVocab = [
+            { t: 'ลดราคา', p: 'lót raa-kaa', e: 'discount / reduce price', em: '🏷️🔻' },
+            { t: 'จ่ายด้วยบัตรเครดิต', p: 'jàay dǔay bàt khree-dìt', e: 'pay with credit card', em: '💳' },
+            { t: 'เงินสด', p: 'ngən-sòt', e: 'cash', em: '💵' },
+            { t: 'ลองใส่', p: 'lɔɔng sài', e: 'try on (clothes)', em: '👕👚' },
+            { t: 'ไซส์', p: 'sáy', e: 'size', em: '📏' },
+            { t: 'คับเกินไป', p: 'kháp gəən bpai', e: 'too tight', em: '🤏' },
+            { t: 'หลวมเกินไป', p: 'lǔam gəən bpai', e: 'too loose', em: '👐' },
+            { t: 'ใบเสร็จ', p: 'bai-sèt', e: 'receipt', em: '🧾' },
+            { t: 'ถุงผ้า', p: 'tǔng phâa', e: 'cloth bag', em: '🛍️' }
+        ];
+
+        // --- 1. Vocab Review Component ---
+        const VocabReview = () => {
+            const [randomWord, setRandomWord] = useState(null);
+
+            const pickWord = () => {
+                const w = oldVocab[Math.floor(Math.random() * oldVocab.length)];
+                setRandomWord(w);
+            };
+
+            return (
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-blue-200 animate-fade">
+                    <div className="text-center">
+                        <IntText th="ทบทวนคำศัพท์เก่า" ipa="thóp-thuan kham-sàp gào" en="Review Old Vocabulary" size="text-2xl" bold={true} color="text-blue-700" />
+                    </div>
+                    
+                    <div className="my-6">
+                        <IntText th="แต่งประโยคจากคำนี้:" ipa="dtɛ̀ɛng bprà-yòok jàak kham níi:" en="Make a sentence from this word:" size="text-lg" />
+                    </div>
+                    
+                    <div className="min-h-[160px] flex items-center justify-center bg-blue-50 rounded-2xl my-6 border-2 border-dashed border-blue-300 p-4">
+                        {randomWord ? (
+                            <div className="text-center">
+                                <div className="text-7xl mb-4">{randomWord.em}</div>
+                                <IntText th={randomWord.t} ipa={randomWord.p} en={randomWord.e} size="text-4xl" bold={true} color="text-blue-900" />
+                            </div>
+                        ) : (
+                            <IntText th="❓ กดปุ่มด้านล่างเพื่อเริ่ม" ipa="gòt bpùm dâan lâang phʉ̂a rə̂əm" en="Click the button below to start" color="text-gray-400" size="text-xl" />
+                        )}
+                    </div>
+                    
+                    <div className="flex justify-center">
+                        <button onClick={pickWord} className="bg-blue-600 hover:bg-blue-700 text-white py-4 px-8 rounded-full flex items-center gap-3 shadow-lg active:scale-95 transition-transform">
+                            <Icons.Refresh size={24}/>
+                            <span className="font-bold text-lg font-sans">สุ่มคำศัพท์ (Random)</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 2. Shopping Dialogue Component ---
+        const ShoppingDialogue = () => {
+            return (
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-indigo-200 animate-fade space-y-8">
+                    
+                    <div className="text-center border-b border-gray-100 pb-6">
+                        <div className="text-5xl mb-4">🛍️💳</div>
+                        <IntText th="บทสนทนา: ซื้อเสื้อผ้า" ipa="bòt sǒn-thá-naa: sʉ́ʉ sʉ̂a-phâa" en="Dialogue: Buying Clothes" size="text-2xl" bold={true} color="text-indigo-700" />
+                    </div>
+
+                    <div className="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                        <div className="mb-4">
+                            <IntText th="🎯 คำศัพท์ใหม่:" ipa="kham-sàp mài:" en="New Vocabulary:" bold={true} color="text-indigo-800" size="text-lg" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {newVocab.map((v, i) => (
+                                <div key={i} className="bg-white p-3 rounded-xl border border-indigo-50 shadow-sm">
+                                    <IntText th={`${v.em} ${v.t}`} ipa={v.p} en={v.e} bold={true} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="mb-2 text-center">
+                            <IntText th="ฝึกอ่านบทสนทนา" ipa="fʉ̀k àan bòt-sǒn-thá-naa" en="Practice reading dialogue" bold={true} color="text-indigo-700" size="text-xl" />
+                        </div>
+                        
+                        <div className="bg-blue-50 p-5 rounded-2xl border-l-4 border-blue-400">
+                            <IntText th="🧑 ลูกค้า:" ipa="lûuk-kháa:" en="Customer:" bold={true} color="text-blue-700" />
+                            <IntText th="ขอโทษค่ะ มีเสื้อตัวนี้ ไซส์ ใหญ่ไหมคะ? ตัวนี้ คับเกินไป" ipa="khɔ̌ɔ-thôot khâ, mii sʉ̂a dtua níi sáy yài mǎy khá? dtua níi kháp gəən bpai." en="Excuse me, do you have this shirt in a large size? This one is too tight." size="text-lg" />
+                        </div>
+                        
+                        <div className="bg-green-50 p-5 rounded-2xl border-l-4 border-green-400">
+                            <IntText th="👩‍💼 พนักงาน:" ipa="phá-nák-ngaan:" en="Seller:" bold={true} color="text-green-700"/>
+                            <IntText th="มีค่ะ ลองใส่ ตัวนี้ดูนะคะ หลวมเกินไป ไหมคะ?" ipa="mii khâ. lɔɔng sài dtua níi duu ná khá. lǔam gəən bpai mǎy khá?" en="Yes we do. Try putting this one on. Is it too loose?" size="text-lg" />
+                        </div>
+                        
+                        <div className="bg-blue-50 p-5 rounded-2xl border-l-4 border-blue-400">
+                            <IntText th="🧑 ลูกค้า:" ipa="lûuk-kháa:" en="Customer:" bold={true} color="text-blue-700"/>
+                            <IntText th="พอดีเลยค่ะ ราคา เท่าไหร่คะ? ลดราคา ได้ไหม?" ipa="phɔɔ-dii ləəy khâ. raa-kaa thâo-rài khá? lót raa-kaa dâay mǎy?" en="It fits perfectly. What is the price? Can you give a discount?" size="text-lg" />
+                        </div>
+                        
+                        <div className="bg-green-50 p-5 rounded-2xl border-l-4 border-green-400">
+                            <IntText th="👩‍💼 พนักงาน:" ipa="phá-nák-ngaan:" en="Seller:" bold={true} color="text-green-700"/>
+                            <IntText th="500 บาทค่ะ ถ้าไม่รับ ถุงผ้า ลดราคา 10 บาทค่ะ" ipa="hâa rɔ́ɔy bàat khâ. thâa mâi ráp tǔng phâa, lót raa-kaa sìp bàat khâ." en="500 baht. If you don't take a cloth bag, there is a 10 baht discount." size="text-lg" />
+                        </div>
+                        
+                        <div className="bg-blue-50 p-5 rounded-2xl border-l-4 border-blue-400">
+                            <IntText th="🧑 ลูกค้า:" ipa="lûuk-kháa:" en="Customer:" bold={true} color="text-blue-700"/>
+                            <IntText th="เอาค่ะ จ่ายด้วยบัตรเครดิต ได้ไหมคะ? หรือรับแค่ เงินสด?" ipa="ao khâ. jàay dǔay bàt khree-dìt dâay mǎy khá? rʉ̌ʉ ráp khɛ̂ɛ ngən-sòt?" en="I'll take it. Can I pay with credit card? Or do you only accept cash?" size="text-lg" />
+                        </div>
+                        
+                        <div className="bg-green-50 p-5 rounded-2xl border-l-4 border-green-400">
+                            <IntText th="👩‍💼 พนักงาน:" ipa="phá-nák-ngaan:" en="Seller:" bold={true} color="text-green-700"/>
+                            <IntText th="จ่ายด้วยบัตรเครดิต ได้ค่ะ นี่ ใบเสร็จ ค่ะ" ipa="jàay dǔay bàt khree-dìt dâay khâ. nîi bai-sèt khâ." en="You can pay with credit card. Here is the receipt." size="text-lg" />
+                        </div>
+                    </div>
+
+                    <div className="bg-orange-50 p-6 rounded-2xl border border-orange-200 mt-8">
+                        <div className="mb-4 text-center">
+                            <IntText th="❓ คำถามทดสอบความเข้าใจ" ipa="kham-thǎam thót-sɔ̀ɔp khwaam khâo-jai" en="Comprehension Questions" bold={true} color="text-orange-700" size="text-xl" />
+                        </div>
+                        <ul className="space-y-4">
+                            <li className="flex gap-3 bg-white p-4 rounded-xl shadow-sm border border-orange-100">
+                                <span className="font-bold text-orange-500 text-lg">1.</span>
+                                <div className="flex-1"><IntText th="ทำไมลูกค้าถึงขอ ไซส์ ใหญ่?" ipa="tham-mai lûuk-kháa thʉ̌ng khɔ̌ɔ sáy yài?" en="Why did the customer ask for a large size?" /></div>
+                            </li>
+                            <li className="flex gap-3 bg-white p-4 rounded-xl shadow-sm border border-orange-100">
+                                <span className="font-bold text-orange-500 text-lg">2.</span>
+                                <div className="flex-1"><IntText th="ทำไมลูกค้าได้ ลดราคา 10 บาท?" ipa="tham-mai lûuk-kháa dâay lót raa-kaa sìp bàat?" en="Why did the customer get a 10 baht discount?" /></div>
+                            </li>
+                            <li className="flex gap-3 bg-white p-4 rounded-xl shadow-sm border border-orange-100">
+                                <span className="font-bold text-orange-500 text-lg">3.</span>
+                                <div className="flex-1"><IntText th="ลูกค้าจ่ายเงินด้วย เงินสด หรือ บัตรเครดิต?" ipa="lûuk-kháa jàay ngən dûay ngən-sòt rʉ̌ʉ bàt khree-dìt?" en="Did the customer pay with cash or credit card?" /></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 3. Speaking Activities ---
+        const SpeakingActivities = () => {
+            return (
+                <div className="space-y-6 animate-fade">
+                    
+                    {/* Activity 1 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-pink-200">
+                        <div className="text-6xl text-center mb-4">👕🛍️</div>
+                        <div className="text-center mb-6">
+                            <IntText th="บทบาทสมมติในชีวิตจริง: ซื้อเสื้อผ้าและเครื่องประดับ" ipa="bòt-bàat sǒm-mút nai chii-wít jing: sʉ́ʉ sʉ̂a-phâa lɛ́ sʉ́ʉ khrʉ̂ang bpra-dàp" en="Real-life Role-play: Buying clothes and accessories" size="text-xl" bold={true} color="text-pink-700" />
+                        </div>
+                        <div className="bg-pink-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="คุณอยู่ในร้านเสื้อผ้า เลือกซื้อเสื้อผ้าและเครื่องประดับ ลองใส่ ขอเปลี่ยนไซส์ และขอลดราคา" ipa="khun yùu nai ráan sʉ̂a-phâa. lʉ̂ak sʉ́ʉ sʉ̂a-phâa lɛ́ sʉ́ʉ khrʉ̂ang bpra-dàp, lɔɔng sài, khɔ̌ɔ bplìan sáy lɛ́ khɔ̌ɔ lót raa-kaa." en="You are in a clothing store. Choose clothes and accessories, try them on, ask to change size, and ask for a discount." />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600" />
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="ลองใส่ 👕" ipa="lɔɔng sài" en="try on" inline={true}/>
+                            <IntText th="ไซส์ 📏" ipa="sáy" en="size" inline={true}/>
+                            <IntText th="คับเกินไป 🤏" ipa="kháp gəən bpai" en="too tight" inline={true}/>
+                            <IntText th="ลดราคา 🏷️" ipa="lót raa-kaa" en="discount" inline={true}/>
+                            <IntText th="เครื่องประดับ 💍" ipa="sʉ́ʉ khrʉ̂ang bpra-dàp" en="accessories" inline={true}/>
+                        </div>
+                    </div>
+
+                    {/* Activity 2 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-emerald-200">
+                        <div className="text-6xl text-center mb-4">🎤🛒</div>
+                        <div className="text-center mb-6">
+                            <IntText th="สัมภาษณ์ในชีวิตจริง: สัมภาษณ์เจ้าของร้าน" ipa="sǎm-pâat nai chii-wít jing: sǎm-pâat jâo-khɔ̌ɔng ráan" en="Real-life Interview: Interviewing a shop owner" size="text-xl" bold={true} color="text-emerald-700" />
+                        </div>
+                        <div className="bg-emerald-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="คุณเป็นนักข่าว สัมภาษณ์เจ้าของร้านว่า ทุกวันนี้ลูกค้าชอบจ่ายเงินสดหรือบัตรเครดิต? และพวกเขาใช้ถุงผ้าไหม?" ipa="khun bpen nák-khàao. sǎm-pâat jâo-khɔ̌ɔng ráan wâa túk wan níi lûuk-kháa chɔ̂ɔp jàay ngən-sòt rʉ̌ʉ bàt khree-dìt? lɛ́ phûak-khǎo chái tǔng phâa mǎy?" en="You are a reporter. Interview a shop owner about whether customers nowadays prefer paying with cash or credit card? And do they use cloth bags?" />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600"/>
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="สัมภาษณ์ 🗣️" ipa="sǎm-pâat" en="interview" inline={true}/>
+                            <IntText th="ลูกค้า 🧑‍🤝‍🧑" ipa="lûukkháa" en="Customers" inline={true}/>
+                            <IntText th="ทุกวันนี้ 📅" ipa="túk wan níi" en="nowadays" inline={true}/>
+                            <IntText th="เงินสด 💵" ipa="ngən-sòt" en="cash" inline={true}/>
+                            <IntText th="จ่ายด้วยบัตรเครดิต 💳" ipa="jàay dǔay bàt khree-dìt" en="pay with credit card" inline={true}/>
+                        </div>
+                    </div>
+
+                    {/* Activity 3 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-amber-200">
+                        <div className="text-6xl text-center mb-4">🗣️💥</div>
+                        <div className="text-center mb-6">
+                            <IntText th="โต้วาทีในชีวิตจริง: เงินสด VS บัตรเครดิต" ipa="dtôo-waa-thii nai chii-wít jing: ngən-sòt VS bàt khree-dìt" en="Real-life Debate: Cash VS Credit Card" size="text-xl" bold={true} color="text-amber-700" />
+                        </div>
+                        <div className="bg-amber-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="เถียงกันว่า การจ่ายด้วยเงินสด หรือ บัตรเครดิต แบบไหนดีกว่ากัน? เพราะอะไร?" ipa="thǐang gan wâa gaan jàay dûay ngən-sòt rʉ̌ʉ bàt khree-dìt, bɛ̀ɛp nǎy dii gwàa gan? phró àray?" en="Debate whether paying with cash or credit card is better? Why?" />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600"/>
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="เถียง 🗣️💥" ipa="thǐang" en="argue" inline={true}/>
+                            <IntText th="เงินสด 💵" ipa="ngən-sòt" en="cash" inline={true}/>
+                            <IntText th="จ่ายด้วยบัตรเครดิต 💳" ipa="jàay dǔay bàt khree-dìt" en="pay with credit card" inline={true}/>
+                            <IntText th="ติดกระเป๋า 👜" ipa="dtìt grà bpǎw" en="attach to a bag" inline={true}/>
+                            <IntText th="สะดวก" ipa="sà-dùak" en="convenient" inline={true}/>
+                        </div>
+                    </div>
+
+                    {/* Activity 4 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-teal-200">
+                        <div className="text-6xl text-center mb-4">🤦‍♂️🛍️</div>
+                        <div className="text-center mb-6">
+                            <IntText th="เล่าเรื่องในชีวิตจริง: วันช้อปปิ้งที่แย่มาก" ipa="lâo rʉ̂ang nai chii-wít jing: wan chóp-bpîng thîi yɛ̂ɛ mâak" en="Real-life Story-telling: A terrible shopping day" size="text-xl" bold={true} color="text-teal-700" />
+                        </div>
+                        <div className="bg-teal-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="เล่าเรื่องไปซื้อเสื้อผ้า แต่เกิดปัญหา เช่น เสื้อหลวมเกินไป ร้านไม่รับบัตรเครดิต หรือ ลืมเงินสด" ipa="lâo rʉ̂ang bpai sʉ́ʉ sʉ̂a-phâa dtɛ̀ɛ gə̀ət bpan-hǎa chên sʉ̂a lǔam gəən bpai, ráan mâi ráp bàt khree-dìt, rʉ̌ʉ lʉʉm ngən-sòt" en="Tell a story about going to buy clothes but having problems like the clothes were too loose, the store didn't accept credit cards, or you forgot cash." />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600"/>
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="หลวมเกินไป 👐" ipa="lǔam gəən bpai" en="too loose" inline={true}/>
+                            <IntText th="ลืม 🧠❓" ipa="lʉʉm" en="Forget" inline={true}/>
+                            <IntText th="เงินสด 💵" ipa="ngən-sòt" en="cash" inline={true}/>
+                            <IntText th="ห่วง 😟" ipa="hùang" en="to worry" inline={true}/>
+                        </div>
+                    </div>
+
+                </div>
+            );
+        };
+
+        // --- 4. Extensions ---
+        const Extensions = () => {
+            return (
+                <div className="space-y-6 animate-fade">
+                    
+                    {/* Ext 1 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-purple-200">
+                        <div className="text-6xl text-center mb-4">🤔🛍️</div>
+                        <div className="text-center mb-6">
+                            <IntText th="เกมใบ้คำ: ฉันซื้ออะไร?" ipa="geem bâi kham: chǎn sʉ́ʉ àray?" en="Speaking Game: What am I buying?" size="text-xl" bold={true} color="text-purple-700" />
+                        </div>
+                        <div className="bg-purple-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="บอกลักษณะของสิ่งที่คุณกำลังซื้อโดยไม่พูดชื่อของมัน เพื่อให้ครูทาย" ipa="bòk lák-sà-nà khɔ̌ɔng sǐng thîi khun gam-lang sʉ́ʉ dooy mâi phûut chêuu khɔ̌ɔng man phʉ̂a hâi khruu thaay" en="Describe the characteristics of what you are buying without saying its name, so the teacher can guess." />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600"/>
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="เครื่องประดับ 💍" ipa="sʉ́ʉ khrʉ̂ang bpra-dàp" en="Accessories" inline={true}/>
+                            <IntText th="แว่นกันแดด 🕶️" ipa="wɛ̂n gan dɛ̀ɛt" en="sunglasses" inline={true}/>
+                            <IntText th="กระจก 🪞" ipa="grà jòk" en="mirror" inline={true}/>
+                            <IntText th="ทำมาจากอะไร 🧪🧵" ipa="tham maacàak àray" en="What is it made of?" inline={true}/>
+                        </div>
+                    </div>
+
+                    {/* Ext 2 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-orange-200">
+                        <div className="text-6xl text-center mb-4">🛍️🌍</div>
+                        <div className="text-center mb-6">
+                            <IntText th="คำถามอภิปรายในชีวิตจริง: การใช้ถุงผ้า" ipa="kham-thǎam a-pí-bpraay nai chii-wít jing: gaan chái tǔng phâa" en="Real-life Discussion: Using cloth bags" size="text-xl" bold={true} color="text-orange-700" />
+                        </div>
+                        <div className="bg-orange-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="คุณคิดว่าทำไมร้านค้าถึง ลดราคา ให้ลูกค้าที่ใช้ ถุงผ้า? และมันดีต่อ โลก อย่างไร?" ipa="khun khít wâa tham-mai ráan-kháa thʉ̌ng lót raa-kaa hâi lûuk-kháa thîi chái tǔng phâa? lɛ́ man dii dtɔ̀ɔ lôhk yàang-rai?" en="Why do you think stores give a discount to customers who use cloth bags? And how is it good for the world?" />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600"/>
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="ลดราคา 🏷️" ipa="lót raa-kaa" en="discount" inline={true}/>
+                            <IntText th="ถุงผ้า 🛍️" ipa="tǔng phâa" en="cloth bag" inline={true}/>
+                            <IntText th="โลก 🌍" ipa="lôhk" en="world" inline={true}/>
+                            <IntText th="อนาคต 🔮" ipa="a naa khót" en="Future" inline={true}/>
+                        </div>
+                    </div>
+
+                    {/* Ext 3 */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-cyan-200">
+                        <div className="text-6xl text-center mb-4">💍✨</div>
+                        <div className="text-center mb-6">
+                            <IntText th="นำเสนอในชีวิตจริง: ของที่ฉันชอบ" ipa="nam-sà-nə̌ə nai chii-wít jing: khɔ̌ɔng thîi chǎn chɔ̂ɔp" en="Real-life Presentation: My favorite item" size="text-xl" bold={true} color="text-cyan-700" />
+                        </div>
+                        <div className="bg-cyan-50 p-4 rounded-xl mb-6 text-gray-700">
+                            <IntText th="โชว์และพูดเกี่ยวกับเครื่องประดับหรือเสื้อผ้าที่คุณชอบที่สุด ทำไมถึงซื้อ? ราคาเท่าไหร่? และทำมาจากอะไร?" ipa="choo lɛ́ phûut gìao-gàp sʉ́ʉ khrʉ̂ang bpra-dàp rʉ̌ʉ sʉ̂a-phâa thîi khun chɔ̂ɔp thîi sùt. tham-mai thʉ̌ng sʉ́ʉ? raa-kaa thâo-rài? lɛ́ tham maacàak àray?" en="Show and tell about your favorite accessory or clothing. Why did you buy it? How much was the price? And what is it made of?" />
+                        </div>
+                        <div className="mb-2">
+                            <IntText th="ลองใช้คำศัพท์:" ipa="lɔɔng chái kham-sàp:" en="Try using vocab:" bold={true} color="text-gray-600"/>
+                        </div>
+                        <div className="flex flex-wrap gap-2 bg-slate-50 p-4 border border-slate-100 rounded-xl">
+                            <IntText th="ราคา 💰" ipa="raa-kaa" en="Price" inline={true}/>
+                            <IntText th="ทำมาจากอะไร 🧪🧵" ipa="tham maacàak àray" en="What is it made of?" inline={true}/>
+                            <IntText th="ตุ้มหู 💎👂" ipa="dtûm hǔu" en="earring" inline={true}/>
+                            <IntText th="แหวน 💍" ipa="wɛ̌ɛn" en="Ring" inline={true}/>
+                        </div>
+                    </div>
+
+                </div>
+            );
+        };
+
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+            const [currentTab, setCurrentTab] = useState('review');
+
+            const TabBtn = ({ id, th, ipa, en, em }) => (
+                <button 
+                    onClick={() => setCurrentTab(id)}
+                    className={`flex-1 p-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${currentTab === id ? 'bg-blue-100 border-blue-400 shadow-md transform scale-105 z-10' : 'bg-white border-blue-100 opacity-80 hover:opacity-100 hover:bg-gray-50'}`}
+                >
+                    <span className="text-3xl">{em}</span>
+                    <IntText th={th} ipa={ipa} en={en} size="text-sm" bold={true} color={currentTab === id ? 'text-blue-800' : 'text-gray-600'} block={false}/>
+                </button>
+            );
+
+            return (
+                <div className="max-w-3xl mx-auto p-4 space-y-8">
+                    {/* Header */}
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-blue-200 flex flex-col sm:flex-row items-center gap-4 justify-center mb-8">
+                        <div className="bg-blue-100 p-4 rounded-full text-blue-600">
+                            <Icons.ShoppingBag size={32} />
+                        </div>
+                        <div className="text-center sm:text-left">
+                            <IntText th="การช้อปปิ้ง" ipa="gaan chóp-bpîng" en="Shopping" size="text-3xl" bold={true} color="text-blue-900" />
+                        </div>
+                    </div>
+
+                    {/* Navigation Tabs */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <TabBtn id="review" th="ทบทวน" ipa="thóp-thuan" en="Review" em="🎲" />
+                        <TabBtn id="dialogue" th="บทสนทนา" ipa="bòt sǒn-thá-naa" en="Dialogue" em="🗣️" />
+                        <TabBtn id="core" th="กิจกรรม" ipa="gìt-jà-gam" en="Activities" em="🎯" />
+                        <TabBtn id="ext" th="เพิ่มเติม" ipa="phə̂əm-dtəəm" en="Extensions" em="✨" />
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="mt-8">
+                        {currentTab === 'review' && <VocabReview />}
+                        {currentTab === 'dialogue' && <ShoppingDialogue />}
+                        {currentTab === 'core' && <SpeakingActivities />}
+                        {currentTab === 'ext' && <Extensions />}
+                    </div>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
