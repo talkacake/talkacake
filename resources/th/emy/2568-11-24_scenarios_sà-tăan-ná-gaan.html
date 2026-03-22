@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฝึกพูดภาษาไทย</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f9ff;
+        }
+        h1, h2, h3 {
+            font-family: 'Kanit', sans-serif;
+        }
+        .thai-text {
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+        .ipa-text {
+            font-family: 'Courier New', Courier, monospace;
+            color: #db2777;
+        }
+        /* Added !important to ensure this overrides Tailwind's display classes */
+        .hidden-content {
+            display: none !important;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+            border-width: 1px;
+        }
+        .btn-toggle:hover {
+            transform: translateY(-1px);
+        }
+        .btn-toggle.active {
+            background-color: #eff6ff;
+            font-weight: bold;
+            border-color: #4f46e5;
+            color: #4f46e5;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+        .speaker-icon {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .speaker-icon:active {
+            transform: scale(0.9);
+        }
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-4xl mx-auto flex items-center gap-4">
+            <i class="fa-solid fa-graduation-cap text-xl"></i>
+            <div id="nav-title-container" class="flex-grow">
+                <!-- Interactive Nav Title injected here -->
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-4 space-y-8">
+
+        <!-- Scenario 1: Shopping -->
+        <div id="scenario-1" class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="bg-orange-50 p-4 border-b border-orange-200 flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div class="bg-orange-500 text-white p-2 rounded-full w-12 h-12 flex items-center justify-center shadow-sm flex-shrink-0">
+                    <i class="fa-solid fa-glasses"></i>
+                </div>
+                <div class="flex-grow w-full">
+                    <div id="sc1-header"></div>
+                    <div id="sc1-desc" class="mt-2"></div>
+                </div>
+            </div>
+            <div class="p-6 space-y-6" id="dialogue-container-1">
+                <!-- JS will inject dialogue here -->
+            </div>
+        </div>
+
+        <!-- Scenario 2: Restaurant -->
+        <div id="scenario-2" class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="bg-emerald-50 p-4 border-b border-emerald-200 flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div class="bg-emerald-500 text-white p-2 rounded-full w-12 h-12 flex items-center justify-center shadow-sm flex-shrink-0">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div class="flex-grow w-full">
+                    <div id="sc2-header"></div>
+                    <div id="sc2-desc" class="mt-2"></div>
+                </div>
+            </div>
+            <div class="p-6 space-y-6" id="dialogue-container-2">
+                <!-- JS will inject dialogue here -->
+            </div>
+        </div>
+
+        <!-- Scenario 3: Small Talk -->
+        <div id="scenario-3" class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="bg-sky-50 p-4 border-b border-sky-200 flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div class="bg-sky-500 text-white p-2 rounded-full w-12 h-12 flex items-center justify-center shadow-sm flex-shrink-0">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                </div>
+                <div class="flex-grow w-full">
+                    <div id="sc3-header"></div>
+                    <div id="sc3-desc" class="mt-2"></div>
+                </div>
+            </div>
+            <div class="p-6 space-y-6" id="dialogue-container-3">
+                <!-- JS will inject dialogue here -->
+            </div>
+        </div>
+
+        <!-- Vocab Review Section -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="bg-slate-100 p-4 border-b border-slate-200 flex items-center gap-3">
+                <i class="fa-solid fa-list text-slate-500 text-xl"></i>
+                <div id="vocab-header" class="flex-grow"></div>
+            </div>
+            <div class="p-6 vocab-grid" id="vocab-container">
+                <!-- JS will inject vocab here -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Data Source ---
+
+        // Header Data
+        const headerData = {
+            navTitle: { thai: "สถานการณ์", ipa: "sà-tǎa-ná-gaan", en: "Scenarios" },
+            sc1Title: { thai: "สถานการณ์ที่ 1: ซื้อเครื่องประดับ", ipa: "sà-tǎa-ná-gaan tîi nʉ̀ng: sʉ́ʉ khrʉ̂ang bpra-dàp", en: "Scenario 1: Buying Jewelry/Accessories" },
+            sc1Desc:  { thai: "เลือกซื้อแว่นกันแดดและแหวน", ipa: "lʉ̂ak sʉ́ʉ wɛ̂n gan dɛ̀ɛt lɛ́ wɛ̌ɛn", en: "Selecting sunglasses and rings" },
+            sc2Title: { thai: "สถานการณ์ที่ 2: สั่งอาหารเย็น", ipa: "sà-tǎa-ná-gaan tîi sɔ̌ɔng: sàng aa-hǎan yen", en: "Scenario 2: Ordering Dinner" },
+            sc2Desc:  { thai: "จองโต๊ะและสั่งเมนูพิเศษ", ipa: "jɔɔng dtó lɛ́ sàng mee-nuu pí-sèet", en: "Booking a table and ordering special menu items" },
+            sc3Title: { thai: "สถานการณ์ที่ 3: วางแผนเที่ยว", ipa: "sà-tǎa-ná-gaan tîi sǎam: waang pɛ̌ɛn tîiao", en: "Scenario 3: Planning a Trip" },
+            sc3Desc:  { thai: "ชวนเพื่อนไปเที่ยวธรรมชาติ", ipa: "chuan phʉ̂an bpai tîiao tham-má-châat", en: "Inviting a friend to a nature trip" },
+            vocabTitle: { thai: "รายการคำศัพท์", ipa: "raai-gaan kham-sàp", en: "Vocabulary List" }
+        };
+        
+        // Scenario 1: Shopping
+        const scenario1_shopping = [
+            {
+                role: "คนขาย",
+                thai: "สวัสดีครับ สนใจ แว่นกันแดด หรือ แว่นสายตา ครับ?",
+                ipa: "sà-wàt-dii kráp · sǒn-jai wɛ̂n gan dɛ̀ɛt rʉ̌ʉ wɛ̂n sǎay dtaa kráp?",
+                en: "Hello. Are you interested in sunglasses or eyeglasses? 🕶️👓"
+            },
+            {
+                role: "คนซื้อ",
+                thai: "ขอดู แว่นกันแดด ครับ เดือน เมษายน แดดแรงมาก",
+                ipa: "khɔ̌ɔ duu wɛ̂n gan dɛ̀ɛt kráp · dʉan mee-sǎa-yon dɛ̀ɛt rɛɛng mâak",
+                en: "I'd like to see sunglasses. In April, the sun is very strong. ☀️🔥"
+            },
+            {
+                role: "คนซื้อ",
+                thai: "แล้วก็... มี กระจก ไหมครับ? ผมอยากลองใส่ดู",
+                ipa: "lɛ́ɛw gɔ̂ɔ... mii grà jòk mǎi kráp? · phǒm yàak lɔɔng sài duu",
+                en: "Also... do you have a mirror? I want to try them on. 🪞"
+            },
+            {
+                role: "คนขาย",
+                thai: "เชิญทางนี้ครับ นอกจากนี้เรายังมี แหวน ราคา ถูก ด้วยนะครับ",
+                ipa: "chəən taang níi kráp · nɔ̂ɔk jàak níi rao yang mii wɛ̌ɛn raa-kaa tùuk dûai ná kráp",
+                en: "This way please. Besides this, we also have cheap rings. 💍🏷️"
+            },
+            {
+                role: "คนซื้อ",
+                thai: "น่าสนใจ ครับ ซื้อเก็บไว้สำหรับ อนาคต ก็ดีครับ",
+                ipa: "nâa sǒn jai kráp · sʉ́ʉ gèp wái sǎm-ràp a naa khót gɔ̂ɔ dii kráp",
+                en: "Interesting. Buying it to keep for the future is good too. ⏳"
+            },
+             {
+                role: "คนซื้อ",
+                thai: "เอา แว่นกันแดด 1 ชิ้น พอแล้ว ครับ ใส่ถุงให้หน่อยครับ",
+                ipa: "ao wɛ̂n gan dɛ̀ɛt nʉ̀ng chín phɔɔ lɛ́ɛw kráp · sài tǔng hâi nɔ̀y kráp",
+                en: "I'll take 1 piece of sunglasses, that's enough. Please put it in a bag. 🛍️"
+            }
+        ];
+
+        // Scenario 2: Ordering Food
+        const scenario2_restaurant = [
+            {
+                role: "ลูกค้า",
+                thai: "สวัสดีครับ ขอจองได้ไหม ครับ? สำหรับเดือน พฤศจิกายน",
+                ipa: "sà-wàt-dii kráp · khɔ̌ɔ jong dâay mǎy kráp? · sǎm-ràp dʉan phrʉ́t-sà-jì-gaa-yon",
+                en: "Hello, can I make a reservation? For November. 🗓️"
+            },
+            {
+                role: "พนักงาน",
+                thai: "ได้ครับ วันนี้รับอะไรดีครับ?",
+                ipa: "dâai kráp · wan níi ráp a-rai dii kráp?",
+                en: "Yes. What would you like today? 🍽️"
+            },
+            {
+                role: "ลูกค้า",
+                thai: "เอา หอย กับ เห็ด ย่างครับ ขอ น้ำผึ้ง ราด ด้วยนะครับ",
+                ipa: "ao hɔ̌ɔy gàp hèt yâang kráp · khɔ̌ɔ nám pʉ̂ng râat dûai ná kráp",
+                en: "I'll take grilled clams and mushrooms. Please put honey on top too. 🐚🍄🍯"
+            },
+            {
+                role: "ลูกค้า",
+                thai: "แล้วก็ขอ ถั่ว อย่างละหนึ่ง จานครับ",
+                ipa: "lɛ́ɛw gɔ̂ɔ khɔ̌ɔ thùa yàaŋ lá nʉ̀ŋ jaan kráp",
+                en: "And I'd like one plate of nuts each. 🥜"
+            },
+            {
+                role: "พนักงาน",
+                thai: "ได้ครับ ต้องการ เครื่องปรุง เพิ่มไหมครับ?",
+                ipa: "dâai kráp · dtɔ̂ng gaan khrʉ̂aŋpruŋ phə̂əm mǎi kráp?",
+                en: "Certainly. Do you need extra seasonings? 🧂"
+            },
+            {
+                role: "ลูกค้า",
+                thai: "ไม่ครับ แค่นี้ ก็ พอแล้ว ครับ",
+                ipa: "mâi kráp · khɛ̂ɛ níi gɔ̂ɔ phɔɔ lɛ́ɛw kráp",
+                en: "No. Just this is enough. ✋"
+            }
+        ];
+
+        // Scenario 3: Small Talk
+        const scenario3_smalltalk = [
+            {
+                role: "เพื่อน",
+                thai: "เดือน มกราคม ว่างไหม? อยาก ชวน ไปเที่ยว",
+                ipa: "dʉan mók-gà-raa-khom wâang mǎi? · yàak chuan bpai tîiao",
+                en: "Are you free in January? I want to invite you on a trip. 🏔️"
+            },
+            {
+                role: "เพื่อน 2",
+                thai: "ไปที่ไหนหรอ?",
+                ipa: "bpai tîi nǎi rɔ̌ɔ?",
+                en: "Where are we going? ❓"
+            },
+            {
+                role: "เพื่อน",
+                thai: "ไป หุบเขาลึก ที่มี ผา สวยๆ น่าจะ น่าสนใจ นะ",
+                ipa: "bpai hùp khǎw lʉ́k tîi mii phǎa sǔai sǔai · nâa jà nâa sǒn jai ná",
+                en: "To a deep valley that has beautiful cliffs. It should be interesting. 🏞️"
+            },
+            {
+                role: "เพื่อน 2",
+                thai: "โอเค! แต่ต้องมี การกินดี นะ ผมชอบกิน",
+                ipa: "oo-kee! · dtɛ̀ɛ dtɔ̂ng mii gaan gin dii ná · phǒm chɔ̂ɔp gin",
+                en: "Okay! But there must be 'good eating'. I love to eat. 😋"
+            },
+            {
+                role: "เพื่อน",
+                thai: "แน่นอน! ตอน กลางคืน เราจะทำอาหารกินกัน",
+                ipa: "nɛ̂ɛ-nɔɔn! · dtɔɔn klaaŋkhʉʉn rao jà tam aa-hǎan gin gan",
+                en: "Of course! At nighttime we will cook and eat together. 🌙🔥"
+            },
+            {
+                role: "เพื่อน 2",
+                thai: "งั้นผมจะเอาขนม ติดกระเป๋า ไปด้วย",
+                ipa: "ngán phǒm jà ao kà-nǒm dtìt grà bpǎw bpai dûai",
+                en: "Then I will attach (carry) snacks in my bag too. 🎒"
+            }
+        ];
+
+        const vocab_list = [
+            { thai: "เห็ด", ipa: "hèt", en: "Mushrooms 🍄" },
+            { thai: "ชวน", ipa: "chuan", en: "Invite 💌" },
+            { thai: "แหวน", ipa: "wɛ̌ɛn", en: "Ring 💍" },
+            { thai: "อนาคต", ipa: "a naa khót", en: "Future 🔮" },
+            { thai: "น่าสนใจ", ipa: "nâa sǒn jai", en: "Interesting 🤔" },
+            { thai: "การ...", ipa: "gaan...", en: "Prefix (Verb -> Noun) 📦" },
+            { thai: "การกินดี", ipa: "gaan gin dii", en: "Good eating 🍲" },
+            { thai: "หุบเขาลึก", ipa: "hùp khǎw lʉ́k", en: "Deep valley / Canyon 🏞️" },
+            { thai: "ผา", ipa: "phǎa", en: "Cliff ⛰️" },
+            { thai: "ขอจองค่ะ/ครับ", ipa: "khɔ̌ɔ jong khâ/kráp", en: "Can I book? 📅" },
+            { thai: "ราคา", ipa: "raa-kaa", en: "Price 🏷️" },
+            { thai: "ละ", ipa: "lá", en: "Per / Each 1️⃣" },
+            { thai: "ถูก", ipa: "tùuk", en: "Cheap 💸" },
+            { thai: "กลางคืน", ipa: "klaaŋkhʉʉn", en: "Nighttime 🌑" },
+            { thai: "ถั่ว", ipa: "thùa", en: "Peas / Nuts 🥜" },
+            { thai: "ติดกระเป๋า", ipa: "dtìt grà bpǎw", en: "To carry in/attach to bag 🎒" },
+            { thai: "แว่นกันแดด", ipa: "wɛ̂n gan dɛ̀ɛt", en: "Sunglasses 🕶️" },
+            { thai: "แว่นสายตา", ipa: "wɛ̂n sǎay dtaa", en: "Eyeglasses (sight) 👓" },
+            { thai: "กระจก", ipa: "grà jòk", en: "Mirror 🪞" },
+            { thai: "น้ำผึ้ง", ipa: "nám pʉ̂ng", en: "Honey 🍯" },
+            { thai: "หอย", ipa: "hɔ̌ɔy", en: "Clams 🐚" },
+            { thai: "ราด", ipa: "râat", en: "To put on top / Pour over 🍛" },
+            { thai: "อย่างละหนึ่ง", ipa: "yàaŋ lá nʉ̀ŋ", en: "One each ☝️" },
+            { thai: "ชิ้น", ipa: "chín", en: "Piece (classifier) 🍰" },
+            { thai: "พอแล้ว", ipa: "phɔɔ lɛ́ɛw", en: "Enough already 🛑" },
+            { thai: "แค่นี้", ipa: "khɛ̂ɛ níi", en: "Just this / That's all 👇" },
+            { thai: "เครื่องปรุง", ipa: "khrʉ̂aŋpruŋ", en: "Seasonings 🧂" }
+        ];
+
+        // --- Functions ---
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Modified function to support styling for headers and text size options
+        function createInteractiveElement(item, uniqueId, isHeader = false, isNav = false) {
+            const wrapper = document.createElement('div');
+            // If nav, we want inline behavior to fit in the navbar
+            wrapper.className = isNav ? "flex items-center gap-2" : "flex flex-col";
+
+            // Row 1: Speaker + Thai Text + Controls
+            const topRow = document.createElement('div');
+            topRow.className = "flex flex-wrap items-center gap-2";
+            if (!isNav && !isHeader) topRow.classList.add("mb-2"); // Spacing for regular dialogue
+            
+            // Speaker Icon
+            const speakerBtn = document.createElement('button');
+            speakerBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+            speakerBtn.className = isNav 
+                ? "speaker-icon bg-indigo-700 hover:bg-indigo-500 text-white w-8 h-8 rounded-full flex items-center justify-center"
+                : "speaker-icon bg-gray-100 hover:bg-indigo-500 hover:text-white text-gray-500 w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center";
+            speakerBtn.onclick = (e) => {
+                e.stopPropagation();
+                speak(item.thai);
+            };
+
+            // Thai Text
+            const thaiText = document.createElement(isHeader || isNav ? 'h3' : 'p');
+            thaiText.textContent = item.thai;
+            if (isNav) {
+                thaiText.className = "thai-text text-xl font-bold text-white";
+            } else if (isHeader) {
+                thaiText.className = "thai-text text-xl font-bold text-gray-800";
+            } else {
+                thaiText.className = "thai-text font-medium text-lg flex-grow";
+            }
+
+            // Controls
+            const controls = document.createElement('div');
+            controls.className = "flex gap-1 ml-2";
+
+            const btnIpa = document.createElement('button');
+            btnIpa.textContent = "IPA";
+            btnIpa.className = `btn-toggle px-2 py-0.5 rounded text-xs border border-transparent shadow-sm ${isNav ? "bg-indigo-500 text-white hover:bg-indigo-400" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`;
+            btnIpa.onclick = () => toggleContent(btnIpa, `ipa-${uniqueId}`);
+
+            const btnEn = document.createElement('button');
+            btnEn.textContent = "EN";
+            btnEn.className = `btn-toggle px-2 py-0.5 rounded text-xs border border-transparent shadow-sm ${isNav ? "bg-indigo-500 text-white hover:bg-indigo-400" : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"}`;
+            btnEn.onclick = () => toggleContent(btnEn, `en-${uniqueId}`);
+
+            controls.appendChild(btnIpa);
+            controls.appendChild(btnEn);
+
+            topRow.appendChild(speakerBtn);
+            topRow.appendChild(thaiText);
+            topRow.appendChild(controls);
+
+            // Hidden Content Rows
+            const contentContainer = document.createElement('div');
+            contentContainer.className = isNav ? "absolute top-16 left-0 right-0 bg-indigo-800 p-2 shadow-lg z-50 rounded-b-lg hidden-content-wrapper" : "ml-10";
+
+            // IPA Box
+            const ipaDiv = document.createElement('div');
+            ipaDiv.id = `ipa-${uniqueId}`;
+            ipaDiv.className = "hidden-content ipa-text text-sm mb-1 bg-pink-50 p-2 rounded-md inline-block border border-pink-100";
+            ipaDiv.textContent = item.ipa;
+
+            // EN Box
+            const enDiv = document.createElement('div');
+            enDiv.id = `en-${uniqueId}`;
+            enDiv.className = "hidden-content text-gray-700 text-sm italic bg-gray-50 p-2 rounded-md block border border-gray-200";
+            enDiv.textContent = item.en;
+
+            contentContainer.appendChild(ipaDiv);
+            contentContainer.appendChild(enDiv);
+            
+            // Special handling for Nav to avoid breaking layout
+            if(isNav) {
+                // For navbar we just append the hidden divs to the topRow but they are hidden anyway.
+                // Actually, positioning absolute for Nav toggles is better if we want to see them.
+                // Let's simplify: for Nav, just show them below the title in the flow if possible, or simple block
+                wrapper.appendChild(topRow);
+                const navHiddenContainer = document.createElement('div');
+                navHiddenContainer.className = "ml-10"; // Indent under text
+                navHiddenContainer.appendChild(ipaDiv);
+                navHiddenContainer.appendChild(enDiv);
+                wrapper.appendChild(navHiddenContainer);
+            } else {
+                wrapper.appendChild(topRow);
+                wrapper.appendChild(contentContainer);
+            }
+
+            return wrapper;
+        }
+
+        // Main Card Creator (incorporating role logic)
+        function createInteractiveCard(item, index, sectionId) {
+            const container = document.createElement('div');
+            container.className = "flex flex-col border-b border-gray-100 pb-4 last:border-0";
+            
+            const userRoles = ["คนซื้อ", "ลูกค้า", "เพื่อน 2"];
+            const isUser = userRoles.includes(item.role);
+
+            // Role Tag
+            if (item.role) {
+                const roleTag = document.createElement('span');
+                roleTag.className = `text-xs font-bold uppercase tracking-wide mb-1 ${isUser ? "text-indigo-600" : "text-orange-600"}`;
+                roleTag.textContent = item.role;
+                container.appendChild(roleTag);
+            }
+
+            // Reuse the generic element creator for the content
+            // We pass false for header to get standard text styling
+            const content = createInteractiveElement(item, `${sectionId}-${index}`, false, false);
+            container.appendChild(content);
+
+            return container;
+        }
+
+        function toggleContent(btn, elementId) {
+            const el = document.getElementById(elementId);
+            btn.classList.toggle('active');
+            if (el.classList.contains('hidden-content')) {
+                el.classList.remove('hidden-content');
+            } else {
+                el.classList.add('hidden-content');
+            }
+        }
+
+        // --- Initialization ---
+
+        function injectHeader(elementId, data, isHeader = false, isNav = false) {
+            const el = document.getElementById(elementId);
+            if(el) {
+                el.appendChild(createInteractiveElement(data, elementId, isHeader, isNav));
+            }
+        }
+
+        function renderScenario(data, containerId, sectionPrefix) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            data.forEach((item, index) => {
+                container.appendChild(createInteractiveCard(item, index, sectionPrefix));
+            });
+        }
+
+        function renderVocab() {
+            const container = document.getElementById('vocab-container');
+            container.innerHTML = '';
+            vocab_list.forEach((item, index) => {
+                // Reuse Card creator but vocab has no role, so it just renders content
+                container.appendChild(createInteractiveCard(item, index, 'vocab'));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render Headers
+            injectHeader('nav-title-container', headerData.navTitle, true, true);
+            injectHeader('sc1-header', headerData.sc1Title, true);
+            injectHeader('sc1-desc', headerData.sc1Desc); // Description uses normal text style but is static data
+            injectHeader('sc2-header', headerData.sc2Title, true);
+            injectHeader('sc2-desc', headerData.sc2Desc);
+            injectHeader('sc3-header', headerData.sc3Title, true);
+            injectHeader('sc3-desc', headerData.sc3Desc);
+            injectHeader('vocab-header', headerData.vocabTitle, true);
+
+            // Render Lists
+            renderScenario(scenario1_shopping, 'dialogue-container-1', 'sc1');
+            renderScenario(scenario2_restaurant, 'dialogue-container-2', 'sc2');
+            renderScenario(scenario3_smalltalk, 'dialogue-container-3', 'sc3');
+            renderVocab();
+        });
+
+    </script>
+</body>
+</html>
