@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Speaking Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f9ff;
+        }
+        h1, h2, h3 {
+            font-family: 'Kanit', sans-serif;
+        }
+        .thai-text {
+            font-size: 1.25rem;
+            color: #1e3a8a;
+            line-height: 1.6;
+        }
+        .ipa-text {
+            font-family: 'Courier New', Courier, monospace;
+            color: #db2777;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active {
+            background-color: #e0e7ff;
+            font-weight: bold;
+            border-color: #4f46e5;
+        }
+        .speaker-icon {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .speaker-icon:active {
+            transform: scale(0.9);
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar -->
+    <nav class="bg-teal-600 text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fa-solid fa-book-open mr-2"></i> Thai Conversation Practice</h1>
+            <div class="text-sm opacity-80">Interactive Lesson</div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-4 space-y-8">
+
+        <!-- Introduction -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-teal-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome! ยินดีต้อนรับครับ/ค่ะ</h2>
+            <p class="text-gray-600">Today we will practice vocabulary through three real-life scenarios. Use the buttons below the Thai text to reveal pronunciation (IPA) and meaning (EN).</p>
+        </div>
+
+        <!-- Scenario 1: Shopping -->
+        <div id="scenario-1" class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-orange-100 p-4 border-b border-orange-200 flex items-center gap-3">
+                <div class="bg-orange-500 text-white p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                    <i class="fa-solid fa-shop"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Scenario 1: At the Night Market (ตลาดนัดกลางคืน)</h2>
+                    <p class="text-sm text-gray-600">Buying snacks and souvenirs</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-6" id="dialogue-container-1">
+                <!-- JS will inject dialogue here -->
+            </div>
+        </div>
+
+        <!-- Scenario 2: Restaurant -->
+        <div id="scenario-2" class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-emerald-100 p-4 border-b border-emerald-200 flex items-center gap-3">
+                <div class="bg-emerald-500 text-white p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Scenario 2: Ordering Food (ร้านอาหาร)</h2>
+                    <p class="text-sm text-gray-600">Table for 4 and special requests</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-6" id="dialogue-container-2">
+                <!-- JS will inject dialogue here -->
+            </div>
+        </div>
+
+        <!-- Scenario 3: Small Talk -->
+        <div id="scenario-3" class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-blue-100 p-4 border-b border-blue-200 flex items-center gap-3">
+                <div class="bg-blue-500 text-white p-2 rounded-full w-10 h-10 flex items-center justify-center">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Scenario 3: Catching up (คุยกับเพื่อน)</h2>
+                    <p class="text-sm text-gray-600">Travel plans, movies, and daily life</p>
+                </div>
+            </div>
+            <div class="p-6 space-y-6" id="dialogue-container-3">
+                <!-- JS will inject dialogue here -->
+            </div>
+        </div>
+
+        <!-- Vocab Review Section -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-slate-100 p-4 border-b border-slate-200">
+                <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-list mr-2"></i> Vocabulary Review</h2>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="vocab-container">
+                <!-- JS will inject vocab here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Global Toggle -->
+    <div class="fixed bottom-4 right-4 flex gap-2">
+        <button onclick="toggleAll('ipa')" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold transition">
+            Toggle All IPA
+        </button>
+        <button onclick="toggleAll('en')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold transition">
+            Toggle All EN
+        </button>
+    </div>
+
+    <script>
+        // --- Data Source ---
+        
+        const scenario1_shopping = [
+            {
+                role: "Seller",
+                thai: "เชิญครับ! ร้านนี้มีของน่ารักเยอะแยะ ตุ๊กตาตัวเล็กๆ ก็มีครับ",
+                ipa: "chəən kráp! ráan níi mii kɔ̌ɔng nâa rák yə́-yɛ́ · dtúk-gà-dtaa dtua lék lék gɔ̂ɔ mii kráp",
+                en: "Welcome! This shop has lots of cute stuff. We have small dolls too. 🧸"
+            },
+            {
+                role: "You",
+                thai: "ตุ๊กตาจิ้งจอกตัวนั้นราคาเท่าไรครับ? ผมอยากได้สีเขียวอ่อน",
+                ipa: "dtúk-gà-dtaa jîng-jàawk dtua nán raa-kaa tâo-rài kráp? · pǒm yàak dâai sǐi kǐao ɔ̀ɔn",
+                en: "How much is that fox doll? I want the light green one. 🦊🟢"
+            },
+            {
+                role: "Seller",
+                thai: "ตัวละสี่หมื่นบาทครับ เพราะมันดังมาก เป็นของลิมิเต็ด",
+                ipa: "dtua lá sìi mʉ̀ʉn bàat kráp · prɔ́ man dang mâak · bpen kɔ̌ɔng li-mi-dtèt",
+                en: "It's 40,000 baht each. Because it's very famous, it's a limited edition. 💰"
+            },
+            {
+                role: "You",
+                thai: "โห! แพงจัง มีแบบถูกกว่านี้ไหมครับ? หรือมีหมูหยองแท่งกรอบไหม?",
+                ipa: "hǒo! pɛɛng jang · mii bàaep tùuk gwàa níi mǎi kráp? · rʉ̌ʉ mii mǔu yɔ̌ɔng tɛ̂ɛng grɔ̀ɔp mǎi?",
+                en: "Whoa! So expensive. Do you have a cheaper type? Or do you have crispy pork floss sticks? 🐷"
+            },
+            {
+                role: "Seller",
+                thai: "มีครับ ข้าวตังหน้าหมูหยองก็มี อยู่ในถุงตรงนั้นครับ 3 ถุง 100",
+                ipa: "mii kráp · kâao dtang nâa mǔu yɔ̌ɔng gɔ̂ɔ mii · yùu nai tǔng dtrong nán kráp · sǎam tǔng nʉ̀ng rɔ́ɔi",
+                en: "Yes. We also have rice crackers with pork floss. They are in the bags over there. 3 bags for 100. 🛍️"
+            },
+            {
+                role: "You",
+                thai: "โอเคครับ ซื้อ 3 ถุง จ่ายบัตรเครดิตได้ไหม หรือต้องใช้เงินสด?",
+                ipa: "oo-kee kráp · sʉ́ʉ sǎam tǔng · jàai bàt kre-dìt dâai mǎi · rʉ̌ʉ dtɔ̂ng chái ngən sòt?",
+                en: "Okay, I'll buy 3 bags. Can I pay by card or do I need to use cash? 💳💵"
+            }
+        ];
+
+        const scenario2_restaurant = [
+            {
+                role: "Host",
+                thai: "สวัสดีค่ะ มากี่คนคะ?",
+                ipa: "sà-wàt-dii kâ · maa gìi kon ká?",
+                en: "Hello. How many people are coming? 🍽️"
+            },
+            {
+                role: "You",
+                thai: "มา 4 คนครับ ขอโต๊ะริมหน้าต่างนะครับ",
+                ipa: "maa sìi kon kráp · kɔ̌ɔ dtó rim nâa-dtàang ná kráp",
+                en: "4 people. I'd like a table by the window please. 🪟"
+            },
+            {
+                role: "Waiter",
+                thai: "รับอะไรดีคะ? วันนี้เรามีขาไก่งวงย่าง กับเป็ดอบน้ำผึ้งค่ะ",
+                ipa: "ráp à-rai dii ká? · wan-níi rao mii kǎa gài nguang yâang · gàp bpèt òp nám pʉ̂ng kâ",
+                en: "What would you like? Today we have roast turkey leg and honey baked duck. 🦃🦆🍯"
+            },
+            {
+                role: "You",
+                thai: "เอาเป็ดครับ แล้วก็น้ำสลัดมะนาว แยกน้ำสลัดนะครับ",
+                ipa: "ao bpèt kráp · lɛ́ɛo gɔ̂ɔ náam sà làt má naao · yɛ̂ɛk náam sà làt ná kráp",
+                en: "I'll take the duck. And lime salad dressing. Please separate the dressing. 🥗🍋"
+            },
+            {
+                role: "You",
+                thai: "ของหวานขอเป็นเค้กกล้วยหอม กับไอศกรีมรสผลไม้รวมครับ",
+                ipa: "kɔ̌ɔng wǎan kɔ̌ɔ bpen kâyk glûuay hǎawm · gàp ai-sà-griim rót pǒn-lá-mái ruam kráp",
+                en: "For dessert, I'd like banana cake and mixed fruit flavor ice cream. 🍌🍰🍦"
+            },
+            {
+                role: "Waiter",
+                thai: "ได้ค่ะ... จ่ายรวมหรือจ่ายแยกคะ?",
+                ipa: "dâai kâ... · jàai ruam rʉ̌ʉ jàai yâek ká?",
+                en: "Certainly. Will you pay together or split the bill (pay separately)? 🧾"
+            }
+        ];
+
+        const scenario3_smalltalk = [
+            {
+                role: "Friend",
+                thai: "นายจะมาไทยเมื่อไร? อยากไปเที่ยวที่ไหนบ้าง?",
+                ipa: "naai jà maa tai mʉ̂a rài? · yàak bpai tîiao tîi nǎi bâang?",
+                en: "When are you coming to Thailand? Where do you want to visit? ✈️"
+            },
+            {
+                role: "You",
+                thai: "อีกสองวันครับ อยากไปวัด แล้วก็อยากขี่มอเตอร์ไซค์ไปดูสะพานพระราม 8",
+                ipa: "ìik sɔ̌ɔng wan kráp · yàak bpai wát · lɛ́ɛo gɔ̂ɔ yàak kìi mɔɔ dtəə sai bpai duu sà-paan prá-raam bpàat",
+                en: "In two days. I want to go to the temple, and ride a motorbike to see Rama 8 Bridge. 🛵🌉"
+            },
+            {
+                role: "Friend",
+                thai: "ระวังนะ รถเยอะมาก ทางเหมือนเขาวงกตเลย เดี๋ยวหลง",
+                ipa: "rá-wang ná · rót yə́ mâak · taang mʉ̌an kǎo wong-gòt ləəi · dǐao lǒng",
+                en: "Be careful, there are lots of cars. The roads are like a maze. You might get lost. 🗺️"
+            },
+            {
+                role: "You",
+                thai: "ไม่เป็นไรครับ ผมมีโน๊ตบุ๊คกับมือถือ บอกทางได้",
+                ipa: "mâi bpen rai kráp · pǒm mii nóot búk gàp mʉʉ-tʉ̌ʉ · bòk taang dâai",
+                en: "It's okay. I have a notebook and mobile phone to give directions. 💻📱"
+            },
+            {
+                role: "Friend",
+                thai: "แล้วเมื่อคืนดูหนังผีหรือเปล่า? น่ากลัวไหม?",
+                ipa: "lɛ́ɛo mʉ̂a kʉʉn duu nǎng pǐi rʉ̌ʉ bplàao? · nâa glua mǎi?",
+                en: "And did you watch the horror movie last night? Was it scary? 👻"
+            },
+            {
+                role: "You",
+                thai: "ดูครับ! มีนักฆ่าที่เป็นผี แปลกมาก แต่สนุกดี",
+                ipa: "duu kráp! · mii nák-kâa tîi bpen pǐi · plàaek mâak · dtɛ̀ɛ sà-nùk dii",
+                en: "Yes! There was an assassin who was a ghost. Very strange, but fun. 🔪🧛"
+            }
+        ];
+
+        const vocab_list = [
+            { thai: "หมูหยองแท่งกรอบ", ipa: "mǔu yɔ̌ɔng tɛ̂ɛng grɔ̀ɔp", en: "Crispy pork floss sticks" },
+            { thai: "ของที่ชอบกิน", ipa: "kɔ̌ɔng tîi chɔ̂ɔp gin", en: "Things I like to eat" },
+            { thai: "น้ำผึ้ง", ipa: "nám pʉ̂ng", en: "Honey" },
+            { thai: "พัดลม", ipa: "pát lom", en: "Fan (electric)" },
+            { thai: "กางเกงยีนส์", ipa: "gaang geeng yiin", en: "Jeans" },
+            { thai: "รองเท้าผ้าใบ", ipa: "rɔɔng táao pâa bai", en: "Sneakers" },
+            { thai: "ตู้เย็น", ipa: "dtûu yen", en: "Fridge" },
+            { thai: "เทศกาล", ipa: "têet sà gaan", en: "Festival" },
+            { thai: "ประติมากรรม", ipa: "bprà dtì maa gam", en: "Sculpture" },
+            { thai: "ดินสอสี", ipa: "din sɔ̌ɔ sǐi", en: "Colored pencils" },
+            { thai: "กบเหลาดินสอ", ipa: "gòp lǎo din sɔ̌ɔ", en: "Pencil sharpener" },
+            { thai: "นิยาย", ipa: "ní yaai", en: "Novel / Fiction" },
+            { thai: "สมุนไพร", ipa: "sà-mun-pai", en: "Herbs" },
+            { thai: "ตะไคร้", ipa: "dtà-krái", en: "Lemongrass" },
+            { thai: "กลิ่นหอม", ipa: "glìn hǎawm", en: "Fragrant smell" },
+            { thai: "ลูกพี่ลูกน้อง", ipa: "lûuk-pîi-lûuk-nóong", en: "Cousin" },
+            { thai: "ยาแก้ปวด", ipa: "yaa gâae bpùuat", en: "Painkiller" },
+            { thai: "หมอฟัน", ipa: "mǎaw fan", en: "Dentist" }
+        ];
+
+        // --- Functions ---
+
+        function speak(text) {
+            window.speechSynthesis.cancel(); // Stop previous audio
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9; // Slightly slower for learners
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function createInteractiveCard(item, index, sectionId) {
+            const container = document.createElement('div');
+            container.className = "border-l-4 border-gray-200 pl-4 py-2 hover:bg-gray-50 transition rounded-r-lg";
+            if (item.role) {
+                container.classList.add(item.role === "You" ? "border-blue-400" : "border-orange-400");
+            }
+
+            // Header (Role)
+            if (item.role) {
+                const roleTag = document.createElement('span');
+                roleTag.className = `text-xs font-bold uppercase tracking-wide mb-1 block ${item.role === "You" ? "text-blue-600" : "text-orange-600"}`;
+                roleTag.textContent = item.role;
+                container.appendChild(roleTag);
+            }
+
+            // Thai Text Row
+            const thaiRow = document.createElement('div');
+            thaiRow.className = "flex items-start gap-3 mb-3";
+            
+            const speakerBtn = document.createElement('button');
+            speakerBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+            speakerBtn.className = "speaker-icon bg-gray-200 hover:bg-teal-500 hover:text-white text-gray-600 w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center mt-1";
+            speakerBtn.onclick = () => speak(item.thai);
+
+            const thaiText = document.createElement('p');
+            thaiText.className = "thai-text font-medium flex-grow";
+            thaiText.textContent = item.thai;
+
+            thaiRow.appendChild(speakerBtn);
+            thaiRow.appendChild(thaiText);
+
+            // Controls Row
+            const controlsRow = document.createElement('div');
+            controlsRow.className = "flex gap-2 mb-2";
+
+            const btnIpa = document.createElement('button');
+            btnIpa.textContent = "IPA";
+            btnIpa.className = `btn-toggle px-3 py-1 rounded text-xs border border-gray-300 text-gray-600 hover:bg-gray-100`;
+            btnIpa.onclick = (e) => toggleContent(e.target, `ipa-${sectionId}-${index}`);
+
+            const btnEn = document.createElement('button');
+            btnEn.textContent = "EN";
+            btnEn.className = `btn-toggle px-3 py-1 rounded text-xs border border-gray-300 text-gray-600 hover:bg-gray-100`;
+            btnEn.onclick = (e) => toggleContent(e.target, `en-${sectionId}-${index}`);
+
+            controlsRow.appendChild(btnIpa);
+            controlsRow.appendChild(btnEn);
+
+            // Hidden Content
+            const ipaDiv = document.createElement('div');
+            ipaDiv.id = `ipa-${sectionId}-${index}`;
+            ipaDiv.className = "hidden-content ipa-text text-sm mb-1 pl-11";
+            ipaDiv.textContent = item.ipa;
+
+            const enDiv = document.createElement('div');
+            enDiv.id = `en-${sectionId}-${index}`;
+            enDiv.className = "hidden-content text-gray-600 text-sm italic pl-11";
+            enDiv.textContent = item.en;
+
+            // Append all
+            container.appendChild(thaiRow);
+            container.appendChild(controlsRow);
+            container.appendChild(ipaDiv);
+            container.appendChild(enDiv);
+
+            return container;
+        }
+
+        function toggleContent(btn, elementId) {
+            const el = document.getElementById(elementId);
+            btn.classList.toggle('active');
+            if (el.classList.contains('hidden-content')) {
+                el.classList.remove('hidden-content');
+            } else {
+                el.classList.add('hidden-content');
+            }
+        }
+
+        function toggleAll(type) {
+            const allButtons = document.querySelectorAll('.btn-toggle');
+            allButtons.forEach(btn => {
+                if (btn.textContent === type.toUpperCase()) {
+                    // Check if not already active
+                    if (!btn.classList.contains('active')) {
+                        btn.click();
+                    } else {
+                        btn.click(); // Click again to close if desired, or logic to force open
+                    }
+                }
+            });
+        }
+
+        // --- Initialization ---
+
+        function renderScenario(data, containerId, sectionPrefix) {
+            const container = document.getElementById(containerId);
+            data.forEach((item, index) => {
+                container.appendChild(createInteractiveCard(item, index, sectionPrefix));
+            });
+        }
+
+        function renderVocab() {
+            const container = document.getElementById('vocab-container');
+            vocab_list.forEach((item, index) => {
+                container.appendChild(createInteractiveCard(item, index, 'vocab'));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderScenario(scenario1_shopping, 'dialogue-container-1', 'sc1');
+            renderScenario(scenario2_restaurant, 'dialogue-container-2', 'sc2');
+            renderScenario(scenario3_smalltalk, 'dialogue-container-3', 'sc3');
+            renderVocab();
+        });
+
+    </script>
+</body>
+</html>
