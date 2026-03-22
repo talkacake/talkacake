@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funny Thai Roleplay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fff1f2; /* Light pink background */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .thai-text {
+            line-height: 1.6;
+            color: #881337; /* Rose-900 */
+        }
+        .ipa-text {
+            font-family: monospace; 
+            color: #d946ef; /* Fuchsia */
+        }
+        .en-text {
+            color: #059669; /* Emerald */
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #fecdd3; /* Rose-200 */
+        }
+        button:focus {
+            outline: none;
+        }
+        /* Animation for active drill items */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Sticky Header -->
+    <header id="main-header" class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-md p-3 text-center rounded-b-xl border-b border-pink-200">
+        <!-- JS will inject H1 here -->
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-8">
+
+        <!-- Instructions -->
+        <div id="instruction-area" class="mb-4"></div>
+
+        <!-- Scenario 1: Smoothie Shop -->
+        <section id="scenario-1">
+            <div id="header-1" class="mb-2"></div>
+            <div class="bg-rose-50 p-4 rounded-xl border border-rose-100 shadow-sm">
+                <div id="context-1" class="mb-4 pb-2 border-b border-rose-200 border-dashed"></div>
+                <div id="dialogue-1" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- Scenario 2: Blind Thief -->
+        <section id="scenario-2">
+            <div id="header-2" class="mb-2"></div>
+            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 shadow-sm">
+                <div id="context-2" class="mb-4 pb-2 border-b border-indigo-200 border-dashed"></div>
+                <div id="dialogue-2" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- Scenario 3: BBQ Fire -->
+        <section id="scenario-3">
+            <div id="header-3" class="mb-2"></div>
+            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 shadow-sm">
+                <div id="context-3" class="mb-4 pb-2 border-b border-orange-200 border-dashed"></div>
+                <div id="dialogue-3" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- Interactive Teacher Tips -->
+        <section class="mt-8">
+            <details class="bg-yellow-50 rounded-xl border border-yellow-200 p-4" open>
+                <summary id="tips-summary" class="cursor-pointer list-none mb-4 outline-none">
+                    <!-- JS Injected Header -->
+                </summary>
+                
+                <div class="space-y-6">
+                    
+                    <!-- 1. Emotion Cards -->
+                    <div class="bg-white rounded-lg p-3 shadow-sm border border-yellow-100">
+                        <div id="header-emotions" class="mb-3"></div>
+                        <!-- Container for cards -->
+                        <div class="grid grid-cols-2 gap-3" id="emotion-cards-container">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                    <!-- 2. Substitution Drill -->
+                    <div class="bg-white rounded-lg p-3 shadow-sm border border-yellow-100">
+                        <div id="header-drill" class="mb-3"></div>
+                        <div id="context-drill" class="mb-3"></div>
+                        
+                        <div id="drill-display" class="mb-4 min-h-[80px]">
+                            <!-- Placeholder text will be injected by JS -->
+                        </div>
+                        <div class="flex gap-2 justify-center" id="drill-buttons">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+
+                    <!-- 3. Whatever Game -->
+                    <div class="bg-white rounded-lg p-3 shadow-sm border border-yellow-100">
+                        <div id="header-game" class="mb-3"></div>
+                        
+                        <div class="space-y-4">
+                            <!-- Ask Question Section -->
+                            <div class="space-y-2">
+                                <div id="game-ask-item"></div>
+                                <button onclick="playRandomQuestion()" class="w-full bg-blue-500 text-white py-2 rounded-lg font-bold hover:bg-blue-600 transition shadow-sm active:scale-95 text-sm">
+                                    🎲 Randomize (สุ่มคำถาม)
+                                </button>
+                            </div>
+
+                            <!-- Question Result -->
+                            <div id="question-display" class="hidden fade-in"></div>
+                            
+                            <div class="flex justify-center text-gray-300">
+                                <span class="text-xl">⬇️</span>
+                            </div>
+
+                            <!-- Answer Item -->
+                            <div id="game-answer-item"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+    <script>
+        // --- UI Text Data ---
+        const uiText = {
+            mainTitle: { th: "ทบทวนบทบาทสมมติสุดฮา", ipa: "thóp-thuan bòt-bàat sǒm-mót sùt haa", en: "Funny Roleplay Review" },
+            instruction: { th: "แตะลำโพงเพื่อฟังเสียง แตะปุ่มเพื่อดูคำแปล", ipa: "dtɛ́ lam-phoong phûea fang sǐang, dtɛ́ pùm phûea duu kham-bplɛɛ", en: "Tap speaker for audio. Tap buttons for hints." },
+            
+            header1: { th: "1. ร้านน้ำปั่นเพื่อสุขภาพ", ipa: "ráan náam-bpàn phûea sùk-khà-phâap", en: "1. The 'Healthy' Smoothie Shop" },
+            context1: { th: "บริบท: สั่งเมนูแปลกๆ คนขายงง", ipa: "bɔɔ-rí-bòt: sàng mee-nuu bplɛ̀ɛk-bplɛ̀ɛk khon-khǎai ngong", en: "Context: Ordering weird menu items. Seller is confused." },
+
+            header2: { th: "2. ขโมยตาบอด", ipa: "khà-mooi dtaa-bɔ̀ɔt", en: "2. The Blind Thief" },
+            context2: { th: "บริบท: ลืมแว่นและหยิบของผิด", ipa: "bɔɔ-rí-bòt: luuem wɛ̂n láe yìp khɔ̌ɔng phìt", en: "Context: Forgot glasses and picked up the wrong item." },
+
+            header3: { th: "3. ไฟไหม้ร้านหมูกระทะ", ipa: "fai-mâi ráan mǔu-grà-thá", en: "3. Fire at the BBQ Restaurant" },
+            context3: { th: "บริบท: ไฟแรงเกินไป กุ้งไหม้", ipa: "bɔɔ-rí-bòt: fai rɛɛng gəən bpai gûng mâi", en: "Context: Fire is too strong. Shrimp is burning." },
+        };
+
+        // --- Teacher Tips Data ---
+        const tipsText = {
+            mainHeader: { th: "เคล็ดลับครูแบบโต้ตอบ", ipa: "khlét-láp khruu bàep dtôo-dtɔ̀ɔp", en: "Interactive Teacher Tips" },
+            emotionHeader: { th: "1. การ์ดอารมณ์ (การแสดง)", ipa: "gaan-sà-dɛɛng aa-rom", en: "Emotion Cards (Acting)" },
+            drillHeader: { th: "2. แบบฝึกหัดแทนที่คำ", ipa: "bàep-fùek-hàt thɛɛn-thîi kham", en: "Substitution Drill" },
+            drillContext: { th: "ประโยค: 'นั่นไม่ใช่แหวน นั่นคือ...'", ipa: "bprà-yòok: nân mâi châi wɛ̌ɛn nân khʉʉ...", en: "Sentence: 'That isn't a ring. That is...'" },
+            drillPrompt: { th: "แตะคำศัพท์ด้านล่างเพื่อแต่งประโยค", ipa: "dtɛ́ kham-sàp dâan-lâang phûea dtàeng bprà-yòok", en: "Tap a word below to build the sentence." },
+            gameHeader: { th: "3. เกม 'อะไรก็ได้'", ipa: "geem à-rai gɔ̂ɔ dâay", en: "The 'Whatever' Game" },
+            gameBtnAsk: { th: "ถามคำถามสุดเพี้ยน", ipa: "thǎam kham-thǎam sùt phían", en: "Ask Ridiculous Question" },
+            gameAnswer: { th: "อะไรก็ได้!", ipa: "à-rai gɔ̂ɔ dâay", en: "Whatever!" }
+        };
+
+        const emotionData = [
+            { th: "ขยะแขยง", ipa: "khà-yà khà-yěeng", en: "Disgust (Scenario 1)", icon: "🤢" },
+            { th: "ตื่นตระหนก", ipa: "dtùuen-dtrà-nòk", en: "Panic (Scenario 3)", icon: "😱" }
+        ];
+
+        const drillOptions = [
+            { label: "Mushroom", th: "เห็ด", ipa: "hèt", icon: "🍄" },
+            { label: "Clams", th: "หอย", ipa: "hɔ̌ɔy", icon: "🐚" },
+            { label: "Garlic", th: "กระเทียม", ipa: "grà-thiam", icon: "🧄" }
+        ];
+
+        const gameQuestions = [
+            { th: "คุณกินแว่นตาไหม", ipa: "khun gin wɛ̂n-dtaa mǎi", en: "Do you eat glasses?", icon: "👓" },
+            { th: "พระจันทร์ทำจากชีสไหม", ipa: "phrá-jan tham jàak chíis mǎi", en: "Is the moon made of cheese?", icon: "🧀" },
+            { th: "หมาขับรถได้ไหม", ipa: "mǎa khàp rót dâay mǎi", en: "Can dogs drive?", icon: "🐶" },
+            { th: "คุณนอนในห้องน้ำไหม", ipa: "khun nɔɔn nai hɔ̂ng-náam mǎi", en: "Do you sleep in the toilet?", icon: "🚽" },
+            { th: "คุณชอบดื่มน้ำส้วมไหม", ipa: "khun chɔ̂ɔp dʉ̀ʉm náam-sûam mǎi", en: "Do you like drinking toilet water?", icon: "🤢" }
+        ];
+
+        // --- Dialogue Data ---
+        const scenario1 = [
+            { speaker: "Seller", icon: "🥤", th: "เชิญเลือกเลยครับ", ipa: "chəən lʉ̂ak ləəy kráp", en: "Please choose (whatever you want)." },
+            { speaker: "You", icon: "🤢", th: "ผมเกลียดของหวาน", ipa: "phǒm glìat khɔ̌ɔng-wǎan", en: "I hate sweet things." },
+            { speaker: "You", icon: "🥒", th: "ขอน้ำมะระปั่น ราดนมข้นครับ", ipa: "khɔ̌ɔ náam má-rá bpàn râat nom-khôn kráp", en: "I want bitter melon smoothie, put condensed milk on top." },
+            { speaker: "Seller", icon: "🤨", th: "หือ? จะย่อยเหรอครับ", ipa: "hʉ̌ʉ? jà yɔ̂y rə̌ə kráp", en: "Huh? Will you (be able to) digest that really?" },
+            { speaker: "You", icon: "🥜", th: "ไม่เป็นไร เอาถั่วกับกะปิด้วย", ipa: "mâi bpen rai ao thùa gàp gà-bpì dûay", en: "It's fine. Take nuts and shrimp paste too." },
+            { speaker: "Seller", icon: "😩", th: "อะไรก็ได้ครับ", ipa: "à-ray gɔ̂ɔ dâay kráp", en: "Whatever." }
+        ];
+
+        const scenario2 = [
+            { speaker: "You", icon: "💍", th: "แหวนวงนี้สวยมาก", ipa: "wɛ̌ɛn wong níi sǔay mâak", en: "This ring is very beautiful." },
+            { speaker: "Friend", icon: "🍄", th: "นั่นไม่ใช่แหวน นั่นคือเห็ด", ipa: "nân mâi châi wɛ̌ɛn nân khʉʉ hèt", en: "That is not a ring. That is a mushroom." },
+            { speaker: "You", icon: "👓", th: "อุ๊ย ผมลืมแว่นสายตา", ipa: "úi phǒm lʉʉm wɛ̂n sǎay dtaa", en: "Oops, I forgot my eyeglasses." },
+            { speaker: "You", icon: "😵‍💫", th: "ผมสายตาเอียง", ipa: "phǒm sǎay dtaa iang", en: "I have astigmatism." },
+            { speaker: "Shop", icon: "👮", th: "อย่าขโมยเห็ดของฉันนะ!", ipa: "yàa khamooy hèt khɔ̌ɔng chǎn ná!", en: "Don't steal my mushrooms!" },
+            { speaker: "You", icon: "🙏", th: "ขอโทษครับ ผมคิดว่าเป็นเครื่องประดับ", ipa: "khɔ̌ɔ thôot kráp phǒm khít wâa bpen khrʉ̂ang bpra-dàp", en: "Sorry, I thought it was accessories." }
+        ];
+
+        const scenario3 = [
+            { speaker: "You", icon: "🔥", th: "โอ้โห ไฟแรงมาก", ipa: "ôo-hǒo fay rɛɛng mâak", en: "Wow, the fire is (very) strong." },
+            { speaker: "Staff", icon: "🚒", th: "ระวังไฟไหม้นะคะ", ipa: "rá-wang fay-mây ná khá", en: "Be careful of fire (burning)." },
+            { speaker: "You", icon: "🦐", th: "ไฟไหม้กุ้งเผาของผม!", ipa: "fay-mây kûng phǎw khɔ̌ɔng phǒm!", en: "Fire is burning my roasted prawns!" },
+            { speaker: "Staff", icon: "🏃‍♀️", th: "ทิ้งเถอะค่ะ วิ่งหนีเร็ว", ipa: "tíng thə̀ khà wîng nǐi reo", en: "Throw it away. Run away fast!" },
+            { speaker: "You", icon: "🥡", th: "ไม่ได้! เสียดายของเหลือ", ipa: "mâi dâay! sǐa-daai khɔ̌ɔŋlʉ̌a", en: "I can't! I regret (wasting) the leftovers." },
+            { speaker: "You", icon: "🛍️", th: "เดี๋ยวห่อให้หน่อยครับ", ipa: "dǐaw hɔ̀ɔ hây nɔ̀y kráp", en: "Wrap it for me in a bit." },
+            { speaker: "Staff", icon: "🔮", th: "ห่วงอนาคตก่อนเถอะค่ะ!", ipa: "hùang a naa khót gɔ̀ɔn thə̀ khà!", en: "Worry about your future first!" }
+        ];
+
+        // --- Functions ---
+
+        function playAudio(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH'; 
+            utterance.rate = 0.8; 
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) window.speechSynthesis.speak(utterance);
+            else setTimeout(() => window.speechSynthesis.speak(utterance), 50);
+        }
+
+        // --- Interactive Tips Functions ---
+        
+        function renderEmotions() {
+            const container = document.getElementById('emotion-cards-container');
+            container.innerHTML = '';
+            emotionData.forEach(item => {
+                container.appendChild(createToggleItem(item, 'card'));
+            });
+        }
+
+        function renderDrillButtons() {
+            const container = document.getElementById('drill-buttons');
+            // Set Placeholder text
+            document.getElementById('drill-display').innerHTML = `<div class="bg-gray-100 rounded-lg p-4 text-center text-gray-400 italic text-sm flex items-center justify-center h-full">${tipsText.drillPrompt.th}</div>`;
+            
+            drillOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "flex-1 bg-white border border-gray-200 p-2 rounded text-sm hover:bg-blue-50 transition active:scale-95 shadow-sm";
+                btn.innerHTML = `<span class="block text-xl mb-1">${opt.icon}</span><span class="font-bold text-gray-700">${opt.th}</span>`;
+                btn.onclick = () => updateDrill(opt);
+                container.appendChild(btn);
+            });
+        }
+
+        function updateDrill(option) {
+            const display = document.getElementById('drill-display');
+            // Construct the full sentence item
+            const item = {
+                th: `นั่นไม่ใช่แหวน นั่นคือ ${option.th}`,
+                ipa: `nân mâi châi wɛ̌ɛn nân khʉʉ ${option.ipa}`,
+                en: `That isn't a ring. That is ${option.label}.`,
+                icon: option.icon
+            };
+            
+            display.innerHTML = ''; // Clear placeholder
+            const element = createToggleItem(item, 'dialogue'); // Use dialogue style for result
+            element.classList.add('fade-in');
+            display.appendChild(element);
+            
+            playAudio(item.th);
+        }
+
+        function playRandomQuestion() {
+            const q = gameQuestions[Math.floor(Math.random() * gameQuestions.length)];
+            const display = document.getElementById('question-display');
+            display.innerHTML = '';
+            display.classList.remove('hidden');
+            
+            const element = createToggleItem(q, 'dialogue');
+            element.classList.add('fade-in');
+            display.appendChild(element);
+            
+            playAudio(q.th);
+        }
+
+        // --- Core Rendering ---
+
+        function createToggleItem(item, type = 'dialogue') {
+            const container = document.createElement('div');
+            
+            // Base Class styling
+            if (type === 'h1') {
+                container.className = "flex flex-col items-center justify-center";
+            } else if (type === 'h2') {
+                container.className = "flex flex-col items-start";
+            } else if (type === 'tips-header') { 
+                 container.className = "flex flex-col items-center justify-between w-full";
+            } else if (type === 'tips-sub') { 
+                container.className = "flex flex-col items-start w-full border-b border-yellow-100 pb-2";
+            } else if (type === 'context') {
+                container.className = "flex flex-col items-start";
+            } else if (type === 'instruction') {
+                container.className = "flex flex-col items-center justify-center text-center";
+            } else if (type === 'card') {
+                container.className = "card p-3 flex flex-col items-center text-center relative bg-white";
+            } else { // dialogue
+                container.className = "bg-white p-4 rounded-lg shadow-sm border-l-4 border-pink-400";
+            }
+
+            // Header (Speaker Name for dialogue)
+            if (type === 'dialogue' && item.speaker) {
+                const speaker = document.createElement('div');
+                speaker.className = "text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1";
+                speaker.innerHTML = `<span>${item.icon}</span> ${item.speaker}`;
+                container.appendChild(speaker);
+            }
+
+            const thaiLine = document.createElement('div');
+            thaiLine.className = "flex items-center gap-2 w-full";
+            
+            if (['h1', 'instruction', 'tips-header', 'card'].includes(type)) thaiLine.classList.add('justify-center');
+            else thaiLine.classList.add('justify-start');
+
+            const textSpan = document.createElement('span');
+            textSpan.className = "thai-text font-bold";
+            
+            if (type === 'h1') textSpan.className += " text-2xl text-pink-900";
+            else if (type === 'h2') textSpan.className += " text-xl text-gray-800";
+            else if (type === 'tips-header') textSpan.className += " text-lg text-yellow-800 flex-1";
+            else if (type === 'tips-sub') textSpan.className += " text-sm text-yellow-700 uppercase";
+            else if (type === 'context') textSpan.className += " text-sm text-gray-600 font-semibold";
+            else if (type === 'instruction') textSpan.className += " text-xs text-gray-500 font-normal";
+            else if (type === 'card') textSpan.className += " text-lg text-gray-800";
+            else textSpan.className += " text-lg";
+
+            // Add Icon to text if card
+            if (type === 'card' && item.icon) {
+                 textSpan.innerHTML = `<span class="block text-3xl mb-2">${item.icon}</span>` + item.th;
+            } else {
+                textSpan.innerText = item.th;
+            }
+            
+            const audioBtn = document.createElement('button');
+            const btnColorClass = (type === 'context' || type === 'instruction' || type.includes('tips')) 
+                ? "text-gray-400 hover:text-pink-600" 
+                : "bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-full";
+            
+            audioBtn.className = `${btnColorClass} p-2 transition-colors ml-1 flex-shrink-0`;
+            const iconSize = (type === 'instruction' || type === 'context' || type.includes('tips')) ? 16 : 20;
+            
+            audioBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+            `;
+            audioBtn.onclick = (e) => {
+                e.stopPropagation(); // Prevent closing details
+                playAudio(item.th);
+            };
+
+            thaiLine.appendChild(textSpan);
+            thaiLine.appendChild(audioBtn);
+            container.appendChild(thaiLine);
+
+            const controls = document.createElement('div');
+            if (['h1', 'instruction', 'tips-header', 'card'].includes(type)) {
+                controls.className = "flex gap-2 mt-2 w-full max-w-[200px] justify-center";
+            } else {
+                controls.className = "flex gap-2 mt-2 w-full max-w-[250px] justify-start";
+            }
+
+            const isSmall = ['h1', 'h2', 'context', 'instruction', 'tips-header', 'tips-sub'].includes(type);
+            const btnPy = isSmall ? "py-0.5" : "py-1";
+            const btnText = isSmall ? "text-xs" : "text-sm";
+            
+            const ipaBtn = document.createElement('button');
+            ipaBtn.className = `flex-1 bg-fuchsia-100 text-fuchsia-700 ${btnPy} px-3 rounded ${btnText} font-semibold hover:bg-fuchsia-200 transition-colors`;
+            ipaBtn.innerText = "IPA";
+            
+            const enBtn = document.createElement('button');
+            enBtn.className = `flex-1 bg-emerald-100 text-emerald-700 ${btnPy} px-3 rounded ${btnText} font-semibold hover:bg-emerald-200 transition-colors`;
+            enBtn.innerText = "EN";
+
+            controls.appendChild(ipaBtn);
+            controls.appendChild(enBtn);
+            container.appendChild(controls);
+
+            const ipaContent = document.createElement('div');
+            ipaContent.className = `hidden mt-1 text-center ipa-text bg-fuchsia-50 p-1 rounded w-full ${isSmall ? 'text-xs' : ''}`;
+            ipaContent.innerText = `/${item.ipa}/`;
+
+            const enContent = document.createElement('div');
+            enContent.className = `hidden mt-1 text-center en-text bg-emerald-50 p-1 rounded w-full ${isSmall ? 'text-xs' : 'text-sm'}`;
+            enContent.innerText = item.en;
+
+            ipaBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                ipaContent.classList.toggle('hidden');
+                ipaBtn.classList.toggle('ring-2');
+                ipaBtn.classList.toggle('ring-fuchsia-400');
+            };
+            enBtn.onclick = (e) => {
+                e.stopPropagation(); 
+                enContent.classList.toggle('hidden');
+                enBtn.classList.toggle('ring-2');
+                enBtn.classList.toggle('ring-emerald-400');
+            };
+
+            container.appendChild(ipaContent);
+            container.appendChild(enContent);
+
+            return container;
+        }
+
+        // --- Render ---
+
+        function render() {
+            document.getElementById('main-header').appendChild(createToggleItem(uiText.mainTitle, 'h1'));
+            document.getElementById('instruction-area').appendChild(createToggleItem(uiText.instruction, 'instruction'));
+
+            document.getElementById('header-1').appendChild(createToggleItem(uiText.header1, 'h2'));
+            document.getElementById('context-1').appendChild(createToggleItem(uiText.context1, 'context'));
+            scenario1.forEach(item => document.getElementById('dialogue-1').appendChild(createToggleItem(item)));
+
+            document.getElementById('header-2').appendChild(createToggleItem(uiText.header2, 'h2'));
+            document.getElementById('context-2').appendChild(createToggleItem(uiText.context2, 'context'));
+            scenario2.forEach(item => document.getElementById('dialogue-2').appendChild(createToggleItem(item)));
+
+            document.getElementById('header-3').appendChild(createToggleItem(uiText.header3, 'h2'));
+            document.getElementById('context-3').appendChild(createToggleItem(uiText.context3, 'context'));
+            scenario3.forEach(item => document.getElementById('dialogue-3').appendChild(createToggleItem(item)));
+            
+            // --- Render Interactive Tips ---
+            
+            // Tips Main Header (In Summary)
+            document.getElementById('tips-summary').appendChild(createToggleItem(tipsText.mainHeader, 'tips-header'));
+            
+            // 1. Emotion Cards
+            document.getElementById('header-emotions').appendChild(createToggleItem(tipsText.emotionHeader, 'tips-sub'));
+            renderEmotions();
+
+            // 2. Substitution Drill
+            document.getElementById('header-drill').appendChild(createToggleItem(tipsText.drillHeader, 'tips-sub'));
+            document.getElementById('context-drill').appendChild(createToggleItem(tipsText.drillContext, 'context'));
+            renderDrillButtons();
+
+            // 3. Game
+            document.getElementById('header-game').appendChild(createToggleItem(tipsText.gameHeader, 'tips-sub'));
+            document.getElementById('game-ask-item').appendChild(createToggleItem(tipsText.gameBtnAsk, 'dialogue'));
+            document.getElementById('game-answer-item').appendChild(createToggleItem(tipsText.gameAnswer, 'dialogue'));
+        }
+
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>
