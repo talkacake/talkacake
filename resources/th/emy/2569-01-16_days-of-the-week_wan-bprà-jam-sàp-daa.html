@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Days & Funny Roleplay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .thai-text {
+            line-height: 1.6;
+            color: #1e293b;
+        }
+        .ipa-text {
+            font-family: monospace; 
+            color: #d946ef;
+        }
+        .en-text {
+            color: #059669;
+        }
+        /* Thai Day Colors */
+        .day-sunday { border-left: 6px solid #ef4444; } /* Red */
+        .day-monday { border-left: 6px solid #eab308; } /* Yellow */
+        .day-tuesday { border-left: 6px solid #ec4899; } /* Pink */
+        .day-wednesday { border-left: 6px solid #22c55e; } /* Green */
+        .day-thursday { border-left: 6px solid #f97316; } /* Orange */
+        .day-friday { border-left: 6px solid #3b82f6; } /* Blue */
+        .day-saturday { border-left: 6px solid #a855f7; } /* Purple */
+        
+        button:focus { outline: none; }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-md p-4 text-center border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-blue-900 flex justify-center items-center gap-2">
+            <span>📅</span>
+            <button onclick="playAudio('วันประจำสัปดาห์ และ บทบาทสมมติ')" class="hover:text-blue-600">วันและบทบาทสมมติ</button>
+        </h1>
+        <p class="text-xs text-gray-500 font-mono mt-1">/wan láe bòt-bàat sǒm-mót/</p>
+        <p class="text-sm text-gray-600">Days & Funny Roleplay</p>
+    </header>
+
+    <main class="max-w-xl mx-auto p-4 space-y-8">
+
+        <!-- Section 1: Vocab Roulette (Review) -->
+        <section class="bg-indigo-50 rounded-xl p-4 border border-indigo-100 shadow-sm">
+            <h2 class="text-xl font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                <span>🎲</span> 
+                <button onclick="playAudio('ทบทวนคำศัพท์')">ทบทวนคำศัพท์</button>
+                <span class="text-sm font-normal text-indigo-400">(Vocab Review)</span>
+            </h2>
+            <p class="text-sm text-indigo-700 mb-4">Click to pick a random word. Make a sentence!</p>
+            
+            <div id="roulette-display" class="bg-white rounded-lg p-6 text-center min-h-[120px] flex flex-col justify-center items-center shadow-inner mb-4">
+                <span class="text-gray-400 italic">Press the button below to start...</span>
+            </div>
+
+            <button onclick="randomVocab()" class="w-full bg-indigo-500 text-white font-bold py-3 rounded-lg shadow-md hover:bg-indigo-600 transition active:scale-95 flex items-center justify-center gap-2">
+                <span>🔄</span> สุ่มคำศัพท์ (Random)
+            </button>
+        </section>
+
+        <!-- Section 2: Days & Planets -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>🪐</span> ดวงดาวและวัน (Stars & Days)
+            </h2>
+            <div id="days-container" class="space-y-4">
+                <!-- Content injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section 3: Funny Role-Play Scenarios -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>🎭</span> 
+                <button onclick="playAudio('บทบาทสมมติ ตลกๆ')">บทบาทสมมติ ตลกๆ</button>
+            </h2>
+
+            <!-- Roleplay 1 -->
+            <div class="mb-6">
+                <div class="bg-pink-50 p-3 rounded-t-xl border-b border-pink-100">
+                    <h3 class="font-bold text-pink-800">Scenario 1: The Strict Color Restaurant</h3>
+                    <p class="text-xs text-pink-600">Teacher is a waiter who only serves food that matches the day's color.</p>
+                </div>
+                <div id="rp1-container" class="bg-white border border-pink-100 rounded-b-xl p-3 space-y-3"></div>
+            </div>
+
+            <!-- Roleplay 2 -->
+            <div>
+                <div class="bg-green-50 p-3 rounded-t-xl border-b border-green-100">
+                    <h3 class="font-bold text-green-800">Scenario 2: The Lucky Pet Shop</h3>
+                    <p class="text-xs text-green-600">Student wants a pet. Teacher suggests weird animals based on the day.</p>
+                </div>
+                <div id="rp2-container" class="bg-white border border-green-100 rounded-b-xl p-3 space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- Section 4: Cultural Beliefs -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>🙏</span> 
+                <button onclick="playAudio('ความเชื่อ')">ความเชื่อ</button>
+                <span class="text-sm font-normal text-gray-500">(Beliefs)</span>
+            </h2>
+            <div id="beliefs-container" class="grid grid-cols-1 gap-3">
+                <!-- JS Injected -->
+            </div>
+        </section>
+
+        <!-- Section 5: Reading Diary -->
+        <section class="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+            <h2 class="text-xl font-bold text-yellow-900 mb-4 flex items-center gap-2">
+                <span>📔</span> 
+                <button onclick="playAudio('ไดอารี่')">ไดอารี่</button>
+            </h2>
+            <p class="text-sm text-yellow-800 mb-4">Read sentence by sentence:</p>
+            <div id="diary-container" class="space-y-3">
+                <!-- JS Injected -->
+            </div>
+        </section>
+
+        <!-- Section 6: Reflection -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <button onclick="playAudio('สะท้อนบทเรียน')">สะท้อนบทเรียน (Reflection)</button>
+            </h2>
+            <div id="reflection-container" class="space-y-3">
+                <!-- JS Injected -->
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Data ---
+
+        const reviewVocab = [
+            { th: "เห็ด", ipa: "hèt", en: "mushrooms" },
+            { th: "ชวน", ipa: "chuan", en: "Invite" },
+            { th: "แหวน", ipa: "wɛ̌ɛn", en: "Ring" },
+            { th: "อนาคต", ipa: "a naa khót", en: "Future" },
+            { th: "น่าสนใจ", ipa: "nâa sǒn jai", en: "Interesting" },
+            { th: "การกินดี", ipa: "gaan gin dii", en: "Good eating" },
+            { th: "หุบเขาลึก", ipa: "hùp khǎw lʉ́k", en: "Deep valley / canyon" },
+            { th: "ผา", ipa: "phǎa", en: "cliff" },
+            { th: "ขอจองได้ไหม", ipa: "khɔ̌ɔ jong dâay mǎy", en: "Would it be possible to make a reservation?" },
+            { th: "ราคาถูก", ipa: "raa-kaa tùuk", en: "Cheap price" },
+            { th: "กลางคืน", ipa: "klaaŋkhʉʉn", en: "Nighttime" },
+            { th: "ถั่ว", ipa: "thùa", en: "peas / nuts" },
+            { th: "แว่นกันแดด", ipa: "wɛ̂n gan dɛ̀ɛt", en: "sunglasses" },
+            { th: "กระจก", ipa: "grà jòk", en: "mirror" },
+            { th: "น้ำผึ้ง", ipa: "nám pʉ̂ng", en: "Honey" },
+            { th: "หอย", ipa: "hɔ̌ɔy", en: "Clams" },
+            { th: "เครื่องปรุง", ipa: "khrʉ̂aŋpruŋ", en: "Seasonings" },
+            { th: "บด", ipa: "bòt", en: "Mashed" },
+            { th: "พร้อมกัน", ipa: "phrɔ́ɔmkan", en: "At the same time" },
+            { th: "ยาแก้แพ้", ipa: "yaa kɛ̂ɛ phɛ́ɛ", en: "allergy pills" },
+            { th: "นมถั่วเหลือง", ipa: "nom thùa lʉ̌ang", en: "soy milk" },
+            { th: "น้ำเต้าหู้", ipa: "náam dtâw hûu", en: "Tofu milk" },
+            { th: "อาศัยอยู่ที่ไหน", ipa: "aasǎy yùu thîi nǎy", en: "Where do you live?" },
+            { th: "เครื่องประดับ", ipa: "khrʉ̂ang bpra-dàp", en: "Accessories" },
+            { th: "สายตาเอียง", ipa: "sǎay dtaa iang", en: "Astigmatism" },
+            { th: "ตุ้มหู", ipa: "dtûm hǔu", en: "earring" },
+            { th: "ทำมาจากอะไร", ipa: "tham maacàak àray", en: "What is it made of?" },
+            { th: "ลูกค้า", ipa: "lûukkháa", en: "Customers" },
+            { th: "ขโมย", ipa: "khamooy", en: "Steal" },
+            { th: "กุ้งเผา", ipa: "kûng phǎw", en: "roasted prawns" },
+            { th: "กระเทียม", ipa: "kràthiam", en: "garlic" },
+            { th: "ปูอบวุ้นเส้น", ipa: "puu òp wúnsên", en: "Baked crabs with glass noodles" },
+            { th: "หนัก", ipa: "nàk", en: "Heavy" },
+            { th: "หอยนางรม", ipa: "hɔ̌ɔy naang rom", en: "Oyster" },
+            { th: "ของเหลือ", ipa: "khɔ̌ɔŋlʉ̌a", en: "leftovers" },
+            { th: "ไฟไหม้", ipa: "faymây", en: "Fire (burning)" },
+            { th: "อะไรก็ได้", ipa: "àray gɔ̂ɔ dâay", en: "Whatever" },
+            { th: "ไฟแรง", ipa: "fay rɛɛŋ", en: "Strong fire" },
+            { th: "มะระ", ipa: "má-rá", en: "Bitter melon" },
+            { th: "จืด", ipa: "jʉ̀ʉt", en: "Bland" },
+            { th: "ลืม", ipa: "lʉʉm", en: "Forget" },
+            { th: "ไส้กรอก", ipa: "sâi-grɔ̂ɔk", en: "sausage" },
+            { th: "แตงโม", ipa: "dtaeng-moh", en: "watermelon" },
+            { th: "ตัวเงินตัวทอง", ipa: "dtua-ngen-dtua-tong", en: "monitor lizard" },
+            { th: "เกลียด", ipa: "glìat", en: "hate" },
+            { th: "กะปิ", ipa: "gà-bpì", en: "shrimp paste" },
+            { th: "ครก", ipa: "krók", en: "mortar" },
+            { th: "สาก", ipa: "sàak", en: "pestle" }
+        ];
+
+        const daysData = [
+            { 
+                day: "วันอาทิตย์", dayIpa: "wan aa-thít", color: "สีแดง", colorIpa: "sǐi dɛɛng", colorEn: "Red",
+                planet: "พระอาทิตย์", planetIpa: "phrá aa-thít", planetEn: "Sun", cssClass: "day-sunday" 
+            },
+            { 
+                day: "วันจันทร์", dayIpa: "wan jan", color: "สีเหลือง", colorIpa: "sǐi lʉ̌ang", colorEn: "Yellow",
+                planet: "พระจันทร์", planetIpa: "phrá jan", planetEn: "Moon", cssClass: "day-monday" 
+            },
+            { 
+                day: "วันอังคาร", dayIpa: "wan ang-khaan", color: "สีชมพู", colorIpa: "sǐi chom-phuu", colorEn: "Pink",
+                planet: "ดาวอังคาร", planetIpa: "daao ang-khaan", planetEn: "Mars", cssClass: "day-tuesday" 
+            },
+            { 
+                day: "วันพุธ", dayIpa: "wan phút", color: "สีเขียว", colorIpa: "sǐi khǐao", colorEn: "Green",
+                planet: "ดาวพุธ", planetIpa: "daao phút", planetEn: "Mercury", cssClass: "day-wednesday" 
+            },
+            { 
+                day: "วันพฤหัสบดี", dayIpa: "wan pharʉ́-hàt-sà-bɔɔ-dii", color: "สีส้ม", colorIpa: "sǐi sôm", colorEn: "Orange",
+                planet: "ดาวพฤหัส", planetIpa: "daao pharʉ́-hàt", planetEn: "Jupiter", cssClass: "day-thursday" 
+            },
+            { 
+                day: "วันศุกร์", dayIpa: "wan sùk", color: "สีฟ้า", colorIpa: "sǐi fáa", colorEn: "Sky Blue",
+                planet: "ดาวศุกร์", planetIpa: "daao sùk", planetEn: "Venus", cssClass: "day-friday" 
+            },
+            { 
+                day: "วันเสาร์", dayIpa: "wan sǎo", color: "สีม่วง", colorIpa: "sǐi mûang", colorEn: "Purple",
+                planet: "ดาวเสาร์", planetIpa: "daao sǎo", planetEn: "Saturn", cssClass: "day-saturday" 
+            }
+        ];
+
+        const rp1Data = [
+            { speaker: "You (Customer)", th: "ขอจองโต๊ะวันอังคารครับ", ipa: "khɔ̌ɔ jong dtó wan ang-khaan kráp", en: "Can I book a table for Tuesday?" },
+            { speaker: "Waiter", th: "วันอังคารสีชมพู มีแต่แตงโมครับ", ipa: "wan ang-khaan sǐi chom-phuu mii dtàe dtaeng-moh kráp", en: "Tuesday is Pink. We only have watermelon." },
+            { speaker: "You", th: "ผมเกลียดแตงโม มีไส้กรอกไหม", ipa: "phǒm glìat dtaeng-moh mii sâi-grɔ̂ɔk mǎi", en: "I hate watermelon. Do you have sausage?" },
+            { speaker: "Waiter", th: "ไส้กรอกสีแดง ต้องมาวันอาทิตย์!", ipa: "sâi-grɔ̂ɔk sǐi dɛɛng dtông maa wan aa-thít!", en: "Sausage is red. Must come on Sunday!" },
+            { speaker: "You", th: "โอ๊ย! งั้นเอามะระก็ได้", ipa: "ói! ngán ao má-rá gɔ̂ɔ dâay", en: "Ouch! Then I'll take bitter melon (Whatever)." },
+            { speaker: "Waiter", th: "มะระสีเขียว เชิญวันพุธครับ!", ipa: "má-rá sǐi khǐao chəən wan phút kráp!", en: "Bitter melon is green. Please come Wednesday!" }
+        ];
+
+        const rp2Data = [
+            { speaker: "You (Buyer)", th: "อยากซื้อสัตว์เลี้ยงครับ", ipa: "yàak súue sàt-líang kráp", en: "I want to buy a pet." },
+            { speaker: "Shop", th: "วันนี้วันเสาร์ สีม่วงค่ะ", ipa: "wan-níi wan sǎo sǐi mûang khà", en: "Today is Saturday. Purple." },
+            { speaker: "You", th: "แล้วไงครับ?", ipa: "lɛ́ɛw ngai kráp?", en: "So what?" },
+            { speaker: "Shop", th: "ต้องเลี้ยงตัวเงินตัวทองค่ะ", ipa: "dtông líang dtua-ngen-dtua-tong khà", en: "Must raise a monitor lizard." },
+            { speaker: "You", th: "มันกัดไหมครับ?", ipa: "man gàt mǎi kráp?", en: "Does it bite?" },
+            { speaker: "Shop", th: "ไม่กัดค่ะ แต่มันชอบขโมยยาแก้แพ้", ipa: "mâi gàt khà dtàe man chɔ̂ɔp khà-mooi yaa kɛ̂ɛ phɛ́ɛ", en: "No bite. But it likes to steal allergy pills." }
+        ];
+
+        const beliefsData = [
+            { th: "วันเสาร์ อังคาร ไม่ซื้อของใหม่", ipa: "wan sǎo, ang-khaan mâi súue khɔ̌ɔng mài", en: "Sat/Tue: Don't buy new things." },
+            { th: "ไม่ตัดผมวันพุธ", ipa: "mâi dtàt phǒm wan phút", en: "Don't cut hair on Wednesday." },
+            { th: "วันอาทิตย์ วันครอบครัว", ipa: "wan aa-thít wan khrɔ̂ɔp-khrua", en: "Sunday is Family Day." },
+            { th: "วันพฤหัส วันครู", ipa: "wan pharʉ́-hàt wan khruu", en: "Thursday is Teacher's Day." },
+            { th: "วันเสาร์ที่ 2 ของปี เป็นวันเด็ก", ipa: "wan sǎo thîi sɔ̌ɔng khɔ̌ɔng bpii bpen wan dèk", en: "2nd Saturday of the year is Children's Day." },
+            { th: "ขึ้นบ้านใหม่วันเสาร์", ipa: "khûn bâan mài wan sǎo", en: "Move into new house on Saturday." },
+            { th: "แต่งงานวันพุธ", ipa: "dtàeng-ngaan wan phút", en: "Wedding on Wednesday." },
+            { th: "วันศุกร์ที่ 13 เป็นวันโชคไม่ดี", ipa: "wan sùk thîi sìp-sǎam bpen wan chôok mâi dii", en: "Friday the 13th is unlucky." }
+        ];
+
+        const diaryText = [
+            { th: "เมื่อวานซืนไปโรงพยาบาลกับพ่อ", ipa: "mûuea-waan-suuen bpai roong-phá-yaa-baan gàp phɔ̂ɔ", en: "The day before yesterday, I went to the hospital with Dad." },
+            { th: "เมื่อวานไปโรงเรียนมา สอนตอนบ่าย 3 ครึ่งถึง 5 โมงครึ่ง", ipa: "mûuea-waan bpai roong-riian maa, sɔ̌ɔn dtɔɔn bàai sǎam khrûeng thǔeng hâa moong khrûeng", en: "Yesterday I went to school. Taught from 3:30 PM to 5:30 PM." },
+            { th: "วันนี้ก็ต้องไปอีกตอน 4 ถึง 6 โมง", ipa: "wan-níi gɔ̂ɔ dtông bpai ìik dtɔɔn sìi thǔeng hòk moong", en: "Today I have to go again from 4 to 6 o'clock." },
+            { th: "ดีที่พรุ่งนี้ได้หยุดอ่านหนังสือทั้งวัน", ipa: "dii thîi phrûng-níi dâay yùt àan nǎng-sǔue tháng wan", en: "It's good that tomorrow I'm off to read books all day." },
+            { th: "มะรืนนี้ต้องไปโรงเรียนอีกแล้ว", ipa: "má-ruuen-níi dtông bpai roong-riian ìik lɛ́ɛw", en: "The day after tomorrow, I have to go to school again." },
+            { th: "เพราะสอน 3 โมงครึ่งถึง 4 โมงครึ่ง", ipa: "phrɔ́ sɔ̌ɔn sǎam moong khrûeng thǔeng sìi moong khrûeng", en: "Because I teach 3:30 to 4:30." },
+            { th: "ที่เค้กไม่ชอบไปโรงเรียน ไม่ใช่ว่าไม่ชอบการเรียน", ipa: "thîi 'Cake' mâi chɔ̂ɔp bpai roong-riian, mâi châi wâa mâi chɔ̂ɔp gaan-riian", en: "The reason Cake doesn't like going to school isn't that she dislikes learning." },
+            { th: "แต่ไม่ชอบรถติด ทำให้เกิดความเหนื่อยหน่าย", ipa: "dtàe mâi chɔ̂ɔp rót dtìt, tham hâi gə̀ət khwaam nùeai-nàai", en: "But she dislikes traffic jams. It causes exhaustion/boredom." },
+            { th: "อาทิตย์หน้าเค้กอาจจะขอลา เพราะใกล้สอบแล้ว", ipa: "aa-thít nâa 'Cake' àat-jà khɔ̌ɔ laa, phrɔ́ glâi sɔ̀ɔp lɛ́ɛw", en: "Next week Cake might ask for leave, because exams are close." },
+            { th: "พ่อพูดประจำว่า “อ่านหนังสือสิ เดี๋ยวก็สอบได้คะแนนไม่ดีหรอก”", ipa: "phɔ̂ɔ phûut bprà-jam wâa 'àan nǎng-sǔue sì, dǐaw gɔ̂ɔ sɔ̀ɔp dâay khá-nɛɛn mâi dii rɔ̀ɔk'", en: "Dad always says: 'Read your books! Or else you won't get good grades.'" }
+        ];
+
+        const reflectionData = [
+            { th: "เรียนอะไรใหม่บ้างวันนี้", ipa: "rian à-rai mài bâang wan-níi", en: "What new things did you learn today?" },
+            { th: "จำอะไรได้บ้าง", ipa: "jam à-rai dâay bâang", en: "What can you remember?" },
+            { th: "อยากโฟกัสอะไรเป็นพิเศษในบทเรียนต่อๆ ไปไหม", ipa: "yàak foo-gát à-rai bpen phí-sèet...", en: "Do you want to focus on anything special next time?" },
+            { th: "มีคำถามไหม", ipa: "mii kham-thǎam mǎi", en: "Do you have questions?" }
+        ];
+
+        // --- Core Functions ---
+
+        function playAudio(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.8;
+            
+             // iOS/Safari quirk
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) window.speechSynthesis.speak(utterance);
+            else setTimeout(() => window.speechSynthesis.speak(utterance), 50);
+        }
+
+        // --- Vocab Roulette Function ---
+        function randomVocab() {
+            const display = document.getElementById('roulette-display');
+            const randomItem = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            
+            // Generate the card html
+            const cardHtml = `
+                <div class="fade-in w-full">
+                    <div class="text-3xl font-bold text-indigo-900 mb-2 cursor-pointer hover:text-indigo-600" onclick="playAudio('${randomItem.th}')">
+                        ${randomItem.th} 🔊
+                    </div>
+                    
+                    <div class="flex gap-2 justify-center mb-2">
+                        <button onclick="document.getElementById('roulette-ipa').classList.toggle('hidden')" class="bg-fuchsia-100 text-fuchsia-700 px-3 py-1 rounded text-xs">IPA</button>
+                        <button onclick="document.getElementById('roulette-en').classList.toggle('hidden')" class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded text-xs">Meaning</button>
+                    </div>
+
+                    <div id="roulette-ipa" class="hidden text-sm font-mono text-fuchsia-600 mb-1">/${randomItem.ipa}/</div>
+                    <div id="roulette-en" class="hidden text-sm font-bold text-emerald-600">${randomItem.en}</div>
+                    
+                    <div class="mt-4 text-xs text-gray-400 border-t pt-2">Task: Make a sentence with this word!</div>
+                </div>
+            `;
+            
+            display.innerHTML = cardHtml;
+            playAudio(randomItem.th);
+        }
+
+        function createToggleItem(item, style = 'simple') {
+            const container = document.createElement('div');
+            
+            // Layout Styles
+            if (style === 'dayCard') {
+                container.className = `bg-white p-4 rounded-lg shadow-sm flex flex-col gap-2 ${item.cssClass}`;
+            } else if (style === 'diary') {
+                container.className = "bg-white p-3 rounded-lg shadow-sm border border-yellow-100";
+            } else {
+                container.className = "bg-white p-4 rounded-lg shadow-sm border border-gray-100";
+            }
+
+            // Main Content Area
+            const contentDiv = document.createElement('div');
+            contentDiv.className = "flex items-start justify-between w-full gap-2";
+
+            // Text Wrapper
+            const textWrapper = document.createElement('div');
+            textWrapper.className = "flex-1";
+
+            // Main Thai Text
+            const thaiText = document.createElement('div');
+            thaiText.className = "thai-text text-lg font-bold cursor-pointer hover:text-blue-700 transition";
+            
+            if (style === 'dayCard') {
+                thaiText.onclick = () => playAudio(item.day);
+                thaiText.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span>${item.day}</span>
+                        <span class="text-sm font-normal bg-gray-100 px-2 py-1 rounded">🪐 ${item.planet}</span>
+                    </div>
+                    <div class="text-sm font-normal text-gray-500 mt-1">Color: ${item.color}</div>
+                `;
+            } else if (style === 'roleplay') {
+                thaiText.onclick = () => playAudio(item.th);
+                thaiText.innerHTML = `<span class="text-sm text-gray-400 font-normal block mb-1">${item.speaker}</span>${item.th}`;
+            } else {
+                thaiText.onclick = () => playAudio(item.th);
+                thaiText.innerText = item.th;
+            }
+            
+            textWrapper.appendChild(thaiText);
+
+            // Audio Button (Small icon)
+            const audioBtn = document.createElement('button');
+            audioBtn.className = "text-gray-400 hover:text-blue-600 p-1";
+            audioBtn.innerHTML = "🔊";
+            audioBtn.onclick = (e) => { 
+                e.stopPropagation(); 
+                playAudio(style === 'dayCard' ? item.day : item.th); 
+            };
+            
+            contentDiv.appendChild(textWrapper);
+            contentDiv.appendChild(audioBtn);
+            container.appendChild(contentDiv);
+
+            // Controls
+            const controls = document.createElement('div');
+            controls.className = "flex gap-2 mt-3";
+            
+            const ipaBtn = document.createElement('button');
+            ipaBtn.className = "flex-1 bg-fuchsia-50 text-fuchsia-700 py-1 rounded text-xs font-semibold hover:bg-fuchsia-100 transition";
+            ipaBtn.innerText = "IPA";
+            
+            const enBtn = document.createElement('button');
+            enBtn.className = "flex-1 bg-emerald-50 text-emerald-700 py-1 rounded text-xs font-semibold hover:bg-emerald-100 transition";
+            enBtn.innerText = "EN";
+
+            controls.appendChild(ipaBtn);
+            controls.appendChild(enBtn);
+            container.appendChild(controls);
+
+            // Hidden Data
+            const ipaContent = document.createElement('div');
+            ipaContent.className = "hidden mt-2 text-sm ipa-text bg-gray-50 p-2 rounded";
+            if (style === 'dayCard') {
+                ipaContent.innerHTML = `${item.dayIpa} <br> <span class="text-xs text-gray-500">Planet: ${item.planetIpa} | Color: ${item.colorIpa}</span>`;
+            } else {
+                ipaContent.innerText = `/${item.ipa}/`;
+            }
+
+            const enContent = document.createElement('div');
+            enContent.className = "hidden mt-2 text-sm en-text bg-gray-50 p-2 rounded";
+            if (style === 'dayCard') {
+                 enContent.innerHTML = `Day: ${item.day.replace('วัน','')} | Planet: ${item.planetEn} | Color: ${item.colorEn}`;
+            } else {
+                enContent.innerText = item.en;
+            }
+
+            // Toggle Logic
+            ipaBtn.onclick = () => ipaContent.classList.toggle('hidden');
+            enBtn.onclick = () => enContent.classList.toggle('hidden');
+
+            container.appendChild(ipaContent);
+            container.appendChild(enContent);
+
+            return container;
+        }
+
+        // --- Render ---
+        function render() {
+            // Days
+            const daysContainer = document.getElementById('days-container');
+            daysData.forEach(item => daysContainer.appendChild(createToggleItem(item, 'dayCard')));
+
+            // Roleplays
+            const rp1Container = document.getElementById('rp1-container');
+            rp1Data.forEach(item => rp1Container.appendChild(createToggleItem(item, 'roleplay')));
+            
+            const rp2Container = document.getElementById('rp2-container');
+            rp2Data.forEach(item => rp2Container.appendChild(createToggleItem(item, 'roleplay')));
+
+            // Beliefs
+            const beliefsContainer = document.getElementById('beliefs-container');
+            beliefsData.forEach(item => beliefsContainer.appendChild(createToggleItem(item, 'simple')));
+
+            // Diary
+            const diaryContainer = document.getElementById('diary-container');
+            diaryText.forEach(item => diaryContainer.appendChild(createToggleItem(item, 'diary')));
+
+            // Reflection
+            const reflectionContainer = document.getElementById('reflection-container');
+            reflectionData.forEach(item => reflectionContainer.appendChild(createToggleItem(item, 'simple')));
+        }
+
+        document.addEventListener('DOMContentLoaded', render);
+
+    </script>
+</body>
+</html>
