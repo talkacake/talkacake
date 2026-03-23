@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตี๋ใหญ่ - Thai Speaking Practice</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Thai - Sarabun Only -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        h1, h2, h3, h4, .btn-text, button, p, div {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .show-content {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .thai-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+        /* Button Styles for Text Units */
+        .ctrl-btn {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-ipa { background-color: #fef9c3; color: #854d0e; border-color: #fde047; } /* yellow-100 */
+        .btn-ipa:hover { background-color: #fde047; }
+        .btn-en { background-color: #dbeafe; color: #1e40af; border-color: #93c5fd; } /* blue-100 */
+        .btn-en:hover { background-color: #bfdbfe; }
+        
+        .tts-btn {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #ccfbf1; /* teal-100 */
+            color: #0f766e; /* teal-700 */
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tts-btn:hover { background-color: #99f6e4; transform: scale(1.05); }
+
+        /* iOS specific adjustments */
+        button { touch-action: manipulation; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar -->
+    <nav class="bg-teal-600 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <!-- ID target for Nav Title -->
+            <div id="nav-title-container" class="flex-1"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto p-4 space-y-8">
+
+        <!-- Section 1: Video -->
+        <section class="bg-white rounded-2xl shadow-md p-6 border-l-8 border-red-500">
+            <div id="sec1-title-container" class="mb-4 text-2xl font-bold text-gray-800"></div>
+            <div class="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-inner flex justify-center items-center relative" style="padding-top: 56.25%;">
+                <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/c7FJ5jHGXiw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="mt-4 text-sm text-gray-500 text-center flex justify-center items-center flex-col">
+                <i class="fas fa-info-circle mb-1"></i>
+                <div id="sec1-desc-container"></div>
+            </div>
+        </section>
+
+        <!-- Section 2: Target Vocab -->
+        <section class="bg-white rounded-2xl shadow-md p-6 border-l-8 border-blue-500">
+            <div id="sec2-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            <div id="vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Javascript will populate this -->
+            </div>
+        </section>
+
+        <!-- Section 3: Script -->
+        <section class="bg-white rounded-2xl shadow-md p-6 border-l-8 border-green-500">
+            <div id="sec3-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            <div id="script-container" class="space-y-4">
+                <!-- Javascript will populate this -->
+            </div>
+        </section>
+
+        <!-- Section 4: Activities -->
+        <section class="bg-white rounded-2xl shadow-md p-6 border-l-8 border-purple-500">
+            <div id="sec4-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <div class="space-y-6">
+                <div id="activity-1"></div>
+                <div class="border-t border-gray-200 my-4"></div>
+                <div id="activity-2"></div>
+            </div>
+        </section>
+
+        <!-- Section 5: Extension Activities -->
+        <section class="bg-white rounded-2xl shadow-md p-6 border-l-8 border-orange-500">
+            <div id="sec5-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <div class="space-y-6">
+                <!-- Game -->
+                <div id="ext-game"></div>
+                
+                <div class="border-t border-gray-200 my-4"></div>
+                
+                <!-- Story Telling -->
+                <div id="ext-story"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-400 py-6 text-sm">
+        <div id="footer-container" class="flex justify-center"></div>
+    </footer>
+
+    <!-- Templates & Logic -->
+    <script>
+        // --- DATA: UI STRINGS ---
+        const uiData = {
+            "nav-title": { th: "ตี๋ใหญ่", ipa: "dtĕe yài", en: "Tee Yai (Topic)" },
+            "sec1-title": { th: "1. ดูวิดีโอ 📺", ipa: "duu wí-dee-oh", en: "Watch video" },
+            "sec1-desc": { th: "ดูคลิปแล้วสังเกตว่าตี๋ใหญ่ทำอะไร", ipa: "duu klíp láew săng-gàet wâa dtĕe-yài tam à-rai", en: "Watch the clip and notice what Tee Yai does." },
+            "sec2-title": { th: "2. คำศัพท์น่ารู้ (9 คำ) 🔑", ipa: "kam-sàp nâa rúu", en: "Interesting vocabulary" },
+            "sec3-title": { th: "3. บทสนทนา 💬", ipa: "bòt sŏn-tá-naa", en: "Conversation" },
+            "sec4-title": { th: "4. กิจกรรมท้ายบท 🎭", ipa: "gìt-jà-gam táai bòt", en: "End of lesson activities" },
+            "sec5-title": { th: "5. กิจกรรมเสริม 🚀", ipa: "gìt-jà-gam sĕrm", en: "Extension Activities" },
+            "footer-text": { th: "สร้างเพื่อการเรียนการสอนภาษาไทย", ipa: "sâang pêua gaan riian gaan sŏn paa-săa tai", en: "Created for teaching and learning Thai" },
+            
+            // Activity Specific Titles/Inst
+            "act1-title": { th: "บทบาทสมมติ (Role Play)", ipa: "bòt-bàat sŏm-mút", en: "Role Play" },
+            "act1-inst": { th: "จงแสดงบทบาทสมมติต่อไปนี้", ipa: "jong sa-daeng bòt-bàat sŏm-mút dtàaw bpai née", en: "Perform the following role play" },
+            "act2-title": { th: "อภิปราย (Debate)", ipa: "à-pí-bpraai", en: "Debate" },
+            "act2-inst": { th: "คุณคิดเห็นอย่างไรกับประโยคนี้", ipa: "kun kít hĕn yàang-rai gàp bprà-yòhk née", en: "What is your opinion on this sentence?" },
+            "vocab-hint": { th: "ศัพท์แนะนำ", ipa: "sàp náe-nam", en: "Useful Vocab" },
+
+            // Extension Titles
+            "ext-game-title": { th: "เกม: นักขายของขลัง", ipa: "game: nák kăai kăawng-kăng", en: "Game: The Magic Salesman" },
+            "ext-game-inst": { th: "เลือกของ 1 อย่าง แล้วพยายามขายครู โดยบอกว่ามันวิเศษอย่างไร", ipa: "lêuuak kăawng nèung yàang, láew pá-yaa-yaam kăai kruu...", en: "Pick 1 object and try to sell it to the teacher by explaining its magical powers." },
+            "ext-story-title": { th: "แต่งเรื่อง: จอมโจรคนใหม่", ipa: "dtàeng rêuuang: jawm-john kon mài", en: "Storytelling: The New Bandit" },
+            "ext-story-inst": { th: "สร้างตัวละครจอมโจรของคุณเอง", ipa: "sâang dtua-la-kawn jawm-john kăawng kun eng", en: "Create your own bandit character." }
+        };
+
+        // --- DATA: Target Vocab ---
+        const targetVocab = [
+            { th: "งมงาย", ipa: "ngom-ngaai", en: "Gullible / Superstitious", emoji: "😵‍💫" },
+            { th: "หายตัว", ipa: "hăai dtua", en: "To disappear / Invisible", emoji: "👻" },
+            { th: "ลือ", ipa: "leu", en: "To rumor", emoji: "🗣️" },
+            { th: "ของดี", ipa: "kăawng dee", en: "Amulet / Talisman", emoji: "🧿" },
+            { th: "เป็นบุญตา", ipa: "bpen bun dtaa", en: "A sight to behold", emoji: "🤩" },
+            { th: "ได้ใจ", ipa: "dâai jai", en: "To get cocky", emoji: "😤" },
+            { th: "เจอมากับตัว", ipa: "jer maa gàp dtua", en: "Experienced firsthand", emoji: "👁️" },
+            { th: "นักโทษ", ipa: "nák tôht", en: "Prisoner", emoji: "⛓️" },
+            { th: "หลบ", ipa: "lòp", en: "To dodge / Hide", emoji: "🙈" }
+        ];
+
+        // --- DATA: Activity Specific Vocab (Appended to sections) ---
+        const act1Vocab = [
+            { th: "ศรัทธา", ipa: "sàt-taa", en: "Faith / Belief" },
+            { th: "หลอกลวง", ipa: "làawk-luuang", en: "To scam / Deceive" },
+            { th: "ยิงไม่เข้า", ipa: "ying mâi kâo", en: "Bulletproof / Invincible" },
+            { th: "ราคา", ipa: "raa-kaa", en: "Price" },
+            { th: "บูชา", ipa: "buu-chaa", en: "To worship" }
+        ];
+
+        const act2Vocab = [
+            { th: "แอบ", ipa: "àep", en: "To sneak / Hide" },
+            { th: "ความลับ", ipa: "kwaam láp", en: "Secret" },
+            { th: "ผิดกฎหมาย", ipa: "pìt gòt-măai", en: "Illegal" },
+            { th: "ช่วยคน", ipa: "chûuay kon", en: "Help people" },
+            { th: "จับไม่ได้", ipa: "jàp mâi dâai", en: "Cannot be caught" }
+        ];
+
+        const gameVocab = [
+            { th: "สรรพคุณ", ipa: "sàp-pá-kun", en: "Properties / Benefits" },
+            { th: "หายาก", ipa: "hăa yâak", en: "Rare" },
+            { th: "รับประกัน", ipa: "ráp bprà-gan", en: "Guarantee" },
+            { th: "ลดราคา", ipa: "lót raa-kaa", en: "Discount" },
+            { th: "สนใจไหม", ipa: "sŏn-jai măi", en: "Interested?" }
+        ];
+
+        const storyVocab = [
+            { th: "ปล้น", ipa: "bplôn", en: "To rob" },
+            { th: "หนี", ipa: "nĕe", en: "To escape" },
+            { th: "ตำรวจ", ipa: "dtam-rùuat", en: "Police" },
+            { th: "ชาวบ้าน", ipa: "chaao bâan", en: "Villagers" },
+            { th: "ฮีโร่", ipa: "hee-rôh", en: "Hero" }
+        ];
+
+        // --- DATA: Script ---
+        const scriptData = [
+            { role: "ตำรวจ", th: "ไอเหี้ยตี๋", ipa: "âi hîia dtĕe", en: "Hey bastard Tee" },
+            { role: "ตำรวจ", th: "แม่งจริงเหรอวะ", ipa: "mâeng jing rĕr wá", en: "Is it f*cking true?" },
+            { role: "ตำรวจ", th: "ตอนที่เขาลือกันว่า", ipa: "dtawn têe kăo leu gan wâa", en: "When they rumored that..." },
+            { role: "ตำรวจ", th: "ของดีหลวงพ่อสดเนี่ย", ipa: "kăawng dee lŭuang-pâaw sòt nîia", en: "Luang Phor Sod's amulet..." },
+            { role: "ตำรวจ", th: "แม่งทำให้มึงหายตัวได้", ipa: "mâeng tam hâi meung hăai dtua dâai", en: "It f*cking makes you invisible." },
+            { role: "สมชัย", th: "เฮ้ย แต่กูเจอมากับตัวนะ", ipa: "héuy · dtàe goo jer maa gàp dtua ná", en: "Hey, but I experienced it firsthand!" },
+            { role: "สมชัย", th: "มันหายจริงๆ เว้ย", ipa: "man hăai jing jing wóei", en: "He really disappeared!" },
+            { role: "ตำรวจ", th: "โฮ่ พี่แม่งงมงายชิบหายเลยพี่สมชัย", ipa: "hôh · pêe mâeng ngom-ngaai chíp-hăai loie pêe sŏm-chai", en: "Oh, you are so damn superstitious, brother Somchai." },
+            { role: "ตำรวจ", th: "ก็เป็นแบบนี้ไง", ipa: "gôr bpen bàep née ngai", en: "This is exactly why..." },
+            { role: "ตำรวจ", th: "พวกเหี้ยเนี่ยเลยได้ใจ", ipa: "pûuak hîia nîia loie dâai jai", en: "...these bastards get so cocky." },
+            { role: "ตำรวจ", th: "ผมก็อยากรู้เหมือนกัน", ipa: "pŏm gôr yàak rúu mĕuuan gan", en: "I also want to know..." },
+            { role: "ตำรวจ", th: "ว่ามันจะหายไปได้ยังไงวะ", ipa: "wâa man jà hăai bpai dâai yang-ngai wá", en: "...how the hell can he disappear?" },
+            { role: "ตำรวจ", th: "อีแบบเนี้ยะ มันจะหนีไปได้ยังไงวะพี่", ipa: "ee bàep nía · man jà nĕe bpai dâai yang-ngai wá pêe", en: "Like this... how can he escape, bro?" },
+            { role: "ตำรวจ", th: "ฮะ มึงจะหาย มึงจะเหี้ยอะไรไอตี๋", ipa: "há · meung jà hăai · meung jà hîia à-rai âi dtĕe", en: "Huh? You gonna disappear? What the hell are you doing, Tee?" },
+            { role: "ตำรวจ", th: "เอาดิ มึงทำให้พี่กูดูนะ", ipa: "ao dì · meung tam hâi pêe goo duu ná", en: "Do it. Show my brother here." },
+            { role: "ตำรวจ", th: "กูขอดูเป็นบุญตาบ้างดิวะ", ipa: "goo kăw duu bpen bun dtaa bâang dì wá", en: "Let me see it as a blessing for my eyes." },
+            { role: "ตี๋ใหญ่", th: "นะปิดตา โมมิเห็น...", ipa: "ná bpìt dtaa · moh mí hĕn...", en: "(Mantra) Na-blind-eyes Mo-not-see..." },
+            { role: "ตี๋ใหญ่", th: "พุทธซ่อนไว้ ธารหลับอยู่", ipa: "pút sâawn wái · taa làp yùu", en: "(Mantra) Phut-hidden Tha-sleeping..." },
+            { role: "ตี๋ใหญ่", th: "ยะหายตัวไป นะโมพุทธายะ", ipa: "yá hăai dtua bpai · ná moh pút taa yá", en: "(Mantra) Ya-disappear Na-Mo-Phut-Tha-Ya..." },
+            { role: "ตำรวจ", th: "เฮ้ย!", ipa: "héuy", en: "Hey!" },
+            { role: "สมชัย", th: "อะไรของมึงวะ", ipa: "à-rai kăawng meung wá", en: "What are you doing? (Referring to police dropping keys)" },
+            { role: "ตำรวจ", th: "กุญแจอยู่ไหนวะ", ipa: "gun-jae yùu năi wá", en: "Where's the key?" },
+            { role: "สมชัย", th: "อ่าว ไม่มีเหรอ", ipa: "àao · mâi mee rĕr", en: "Oh? You don't have it?" },
+            { role: "ตำรวจ", th: "ไอตี๋!", ipa: "âi dtĕe", en: "Tee!" },
+            { role: "สมชัย", th: "เฮ้ย หลบๆๆๆๆๆๆๆ", ipa: "héuy · lòp lòp lòp", en: "Hey! Dodge! Move out of the way!" },
+            { role: "สมชัย", th: "เห็นนักโทษสองคนมาทางนี้เปล่า", ipa: "hĕn nák tôht săawng kon maa taang née bplào", en: "Did you see two prisoners come this way?" },
+            { role: "สมชัย", th: "หายไปไหนของมันวะเนี่ย", ipa: "hăai bpai năi kăawng man wá nîia", en: "Where the hell did they disappear to?" }
+        ];
+
+        // --- FUNCTIONS ---
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Browser does not support TTS");
+            }
+        }
+
+        function toggleVisibility(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (el.classList.contains('hidden-content')) {
+                el.classList.remove('hidden-content');
+                el.classList.add('show-content');
+            } else {
+                el.classList.add('hidden-content');
+                el.classList.remove('show-content');
+            }
+        }
+
+        function renderInteractive(id, thai, ipa, en, options = {}) {
+            const type = options.type || 'inline';
+            const textSize = options.textSize || '';
+            const emoji = options.emoji || '';
+
+            // Layout: BLOCK Style
+            if (type === 'block') {
+                return `
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:shadow-md transition">
+                    <div class="flex items-start space-x-3">
+                        ${emoji ? `<span class="text-2xl pt-1">${emoji}</span>` : ''}
+                        <div class="flex-1">
+                            <p class="thai-text font-semibold text-gray-800 mb-2">${thai}</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="speak('${thai.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-teal-500 text-white rounded-lg text-sm hover:bg-teal-600 flex items-center">
+                                    <i class="fas fa-volume-up mr-1"></i> ฟัง
+                                </button>
+                                <button onclick="toggleVisibility('ipa-${id}')" class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-bold border border-yellow-200 hover:bg-yellow-200">
+                                    IPA
+                                </button>
+                                <button onclick="toggleVisibility('en-${id}')" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm font-bold border border-blue-200 hover:bg-blue-200">
+                                    EN
+                                </button>
+                            </div>
+                            <div id="ipa-${id}" class="hidden-content mt-3 text-sm text-gray-500 font-mono bg-yellow-50 p-2 rounded">${ipa}</div>
+                            <div id="en-${id}" class="hidden-content mt-2 text-sm text-blue-700 font-medium bg-blue-50 p-2 rounded">${en}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // Layout: COMPACT BLOCK (For useful vocab list)
+            if (type === 'compact') {
+                return `
+                <div class="bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
+                    <div class="flex flex-col">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-gray-700">${thai}</span>
+                            <button onclick="speak('${thai}')" class="text-teal-600 hover:text-teal-800"><i class="fas fa-volume-up"></i></button>
+                        </div>
+                        <div class="flex space-x-1">
+                            <button onclick="toggleVisibility('ipa-${id}')" class="text-[10px] px-1 bg-yellow-100 rounded text-yellow-800">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}')" class="text-[10px] px-1 bg-blue-100 rounded text-blue-800">EN</button>
+                        </div>
+                        <div id="ipa-${id}" class="hidden-content text-xs text-gray-500 mt-1">${ipa}</div>
+                        <div id="en-${id}" class="hidden-content text-xs text-blue-600 mt-1">${en}</div>
+                    </div>
+                </div>`;
+            }
+
+            // Layout: INLINE / HEADER Style
+            return `
+                <div class="inline-block w-full">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="${textSize}">${thai}</span>
+                        <div class="inline-flex items-center space-x-1 ml-1">
+                            <button onclick="speak('${thai.replace(/'/g, "\\'")}')" class="tts-btn" title="Listen">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <button onclick="toggleVisibility('ipa-${id}')" class="ctrl-btn btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}')" class="ctrl-btn btn-en">EN</button>
+                        </div>
+                    </div>
+                    <div id="ipa-${id}" class="hidden-content mt-2 text-sm text-gray-500 font-mono ml-1 border-l-2 border-yellow-400 pl-2 bg-yellow-50 p-1 rounded">${ipa}</div>
+                    <div id="en-${id}" class="hidden-content mt-1 text-sm text-blue-700 font-medium ml-1 border-l-2 border-blue-400 pl-2 bg-blue-50 p-1 rounded">${en}</div>
+                </div>
+            `;
+        }
+
+        // Helper to generate Vocab Grid
+        function generateVocabGridHTML(vocabList, prefixId) {
+            let html = `<div class="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="text-xs font-bold text-gray-500 uppercase mb-2"><i class="fas fa-lightbulb text-yellow-500 mr-1"></i> ${uiData['vocab-hint'].th}</div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">`;
+            
+            vocabList.forEach((item, index) => {
+                html += renderInteractive(`${prefixId}-${index}`, item.th, item.ipa, item.en, { type: 'compact' });
+            });
+            
+            html += `</div></div>`;
+            return html;
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            
+            // Nav
+            document.getElementById('nav-title-container').innerHTML = 
+                renderInteractive('nav', uiData['nav-title'].th, uiData['nav-title'].ipa, uiData['nav-title'].en, { textSize: 'text-xl font-bold' });
+            
+            // Section 1 (Video)
+            document.getElementById('sec1-title-container').innerHTML = 
+                renderInteractive('sec1t', uiData['sec1-title'].th, uiData['sec1-title'].ipa, uiData['sec1-title'].en);
+            document.getElementById('sec1-desc-container').innerHTML = 
+                renderInteractive('sec1d', uiData['sec1-desc'].th, uiData['sec1-desc'].ipa, uiData['sec1-desc'].en);
+
+            // Section 2 (Vocab)
+            document.getElementById('sec2-title-container').innerHTML = 
+                renderInteractive('sec2t', uiData['sec2-title'].th, uiData['sec2-title'].ipa, uiData['sec2-title'].en);
+            const vocabContainer = document.getElementById('vocab-container');
+            targetVocab.forEach((item, index) => {
+                vocabContainer.innerHTML += renderInteractive(`vocab-${index}`, item.th, item.ipa, item.en, { type: 'block', emoji: item.emoji });
+            });
+
+            // Section 3 (Script)
+            document.getElementById('sec3-title-container').innerHTML = 
+                renderInteractive('sec3t', uiData['sec3-title'].th, uiData['sec3-title'].ipa, uiData['sec3-title'].en);
+            const scriptContainer = document.getElementById('script-container');
+            scriptData.forEach((line, index) => {
+                let roleColor = "bg-gray-200";
+                if(line.role === "ตำรวจ") roleColor = "bg-gray-700 text-white"; 
+                if(line.role === "สมชัย") roleColor = "bg-blue-100 text-blue-800"; 
+                if(line.role === "ตี๋ใหญ่") roleColor = "bg-red-100 text-red-800"; 
+                const avatarFontSize = line.role.length > 3 ? "text-xs" : "text-sm";
+                const html = `
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 w-12 h-12 ${roleColor} rounded-full flex items-center justify-center font-bold shadow-sm ${avatarFontSize} overflow-hidden text-center p-1 leading-tight">
+                            ${line.role}
+                        </div>
+                        <div class="flex-grow">
+                            ${renderInteractive(`script-${index}`, line.th, line.ipa, line.en, { type: 'block' })}
+                        </div>
+                    </div>
+                `;
+                scriptContainer.innerHTML += html;
+            });
+
+            // Section 4 (Activities)
+            document.getElementById('sec4-title-container').innerHTML = 
+                renderInteractive('sec4t', uiData['sec4-title'].th, uiData['sec4-title'].ipa, uiData['sec4-title'].en);
+            
+            // Activity 1
+            const act1Header = renderInteractive('act1-t', uiData['act1-title'].th, uiData['act1-title'].ipa, uiData['act1-title'].en, { textSize: 'font-bold text-lg' });
+            const act1Inst = renderInteractive('act1-i', uiData['act1-inst'].th, uiData['act1-inst'].ipa, uiData['act1-inst'].en, { textSize: 'text-sm text-gray-600' });
+            const act1Content = renderInteractive('act1-c', 'คุณคิดว่าเครื่องรางของขลัง (Amulets) ช่วยให้คนหนังเหนียว (invincible) ได้จริงไหม?', 'kun kít wâa krêuuang-raang kăawng-kăng chûuay hâi kon năng nĭiao dâai jing măi?', 'Do you think amulets can really make people invincible/impenetrable?', { type: 'block', emoji: '🧿' });
+            const act1VocabHTML = generateVocabGridHTML(act1Vocab, 'act1v');
+
+            document.getElementById('activity-1').innerHTML = `
+                <div class="mb-2"><i class="fas fa-theater-masks mr-2 text-purple-600"></i> ${act1Header}</div>
+                <div class="mb-3 pl-6">${act1Inst}</div>
+                ${act1Content}
+                ${act1VocabHTML}
+            `;
+
+            // Activity 2
+            const act2Header = renderInteractive('act2-t', uiData['act2-title'].th, uiData['act2-title'].ipa, uiData['act2-title'].en, { textSize: 'font-bold text-lg' });
+            const act2Inst = renderInteractive('act2-i', uiData['act2-inst'].th, uiData['act2-inst'].ipa, uiData['act2-inst'].en, { textSize: 'text-sm text-gray-600' });
+            const act2Content = renderInteractive('act2-c', 'ถ้าคุณมีคาถาหายตัวได้ คุณจะทำอะไรเป็นอย่างแรก?', 'tâa kun mee kaa-tăa hăai dtua dâai, kun jà tam à-rai bpen yàang râek?', 'If you had an invisibility spell, what is the first thing you would do?', { type: 'block', emoji: '👻' });
+            const act2VocabHTML = generateVocabGridHTML(act2Vocab, 'act2v');
+
+            document.getElementById('activity-2').innerHTML = `
+                <div class="mb-2"><i class="fas fa-gavel mr-2 text-purple-600"></i> ${act2Header}</div>
+                <div class="mb-3 pl-6">${act2Inst}</div>
+                ${act2Content}
+                ${act2VocabHTML}
+            `;
+
+            // Section 5 (Extensions)
+            document.getElementById('sec5-title-container').innerHTML = 
+                renderInteractive('sec5t', uiData['sec5-title'].th, uiData['sec5-title'].ipa, uiData['sec5-title'].en);
+
+            // Extension: Game
+            const gameTitle = renderInteractive('ext-g-t', uiData['ext-game-title'].th, uiData['ext-game-title'].ipa, uiData['ext-game-title'].en, { textSize: 'font-bold text-lg' });
+            const gameInst = renderInteractive('ext-g-i', uiData['ext-game-inst'].th, uiData['ext-game-inst'].ipa, uiData['ext-game-inst'].en, { textSize: 'text-sm text-gray-600' });
+            const gameVocabHTML = generateVocabGridHTML(gameVocab, 'gamev');
+            
+            document.getElementById('ext-game').innerHTML = `
+                <div class="mb-2"><i class="fas fa-dice mr-2 text-orange-600"></i> ${gameTitle}</div>
+                <div class="mb-3 pl-6 bg-orange-50 p-2 rounded border border-orange-100">${gameInst}</div>
+                <div class="grid grid-cols-3 gap-2 text-center mt-2">
+                    <div class="p-2 bg-white border rounded shadow-sm text-3xl">💍</div>
+                    <div class="p-2 bg-white border rounded shadow-sm text-3xl">🖊️</div>
+                    <div class="p-2 bg-white border rounded shadow-sm text-3xl">👓</div>
+                </div>
+                ${gameVocabHTML}
+            `;
+
+            // Extension: Story
+            const storyTitle = renderInteractive('ext-s-t', uiData['ext-story-title'].th, uiData['ext-story-title'].ipa, uiData['ext-story-title'].en, { textSize: 'font-bold text-lg' });
+            const storyInst = renderInteractive('ext-s-i', uiData['ext-story-inst'].th, uiData['ext-story-inst'].ipa, uiData['ext-story-inst'].en, { textSize: 'text-sm text-gray-600' });
+            const storyContent = renderInteractive('ext-s-c', 'ชื่อ: ______\nฉายา (Alias): ______\nพลังพิเศษ: ______\nจุดอ่อน: ______', 'chêuu: ___, chăa-yaa: ___, pa-lang pí-sèht: ___, jùt àawn: ___', 'Name: ___, Alias: ___, Special Power: ___, Weakness: ___', { type: 'block', emoji: '📝' });
+            const storyVocabHTML = generateVocabGridHTML(storyVocab, 'storyv');
+
+            document.getElementById('ext-story').innerHTML = `
+                <div class="mb-2"><i class="fas fa-book mr-2 text-orange-600"></i> ${storyTitle}</div>
+                <div class="mb-3 pl-6">${storyInst}</div>
+                ${storyContent}
+                ${storyVocabHTML}
+            `;
+
+            // Footer
+            document.getElementById('footer-container').innerHTML = 
+                renderInteractive('foot', uiData['footer-text'].th, uiData['footer-text'].ipa, uiData['footer-text'].en);
+        };
+    </script>
+</body>
+</html>
