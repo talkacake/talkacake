@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Thai Lesson: 7-Eleven & Roadside Food</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f7fafc;
+        }
+        .thai, .thai-text {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1.1em;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            margin-bottom: 0.5rem;
+        }
+        .seller-bubble {
+            background-color: #e2e8f0;
+            align-self: flex-start;
+        }
+        .buyer-bubble {
+            background-color: #ccebfb;
+            align-self: flex-end;
+        }
+        .prompt {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 0.25rem;
+            font-size: 1em;
+            vertical-align: middle;
+        }
+        .toggle-btn {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            margin-left: 0.5rem;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .toggle-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .toggle-btn.active {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+        .reveal-answer-btn {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .reveal-answer-btn:hover {
+            background-color: #eef2ff;
+            border-color: #c7d2fe;
+        }
+        .answer-element {
+            display: none;
+            margin-top: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid #60a5fa;
+        }
+        .translatable-content-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .translatable-details {
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        .phonetics, .translation {
+            display: none;
+            padding: 0.25rem 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+        }
+        .review-question {
+            background-color: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-teal-600"></h1>
+        </header>
+
+        <!-- Part 1: Review Previous Lessons -->
+        <div class="card">
+            <h2 id="part1-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part1-instruction" class="mb-4"></p>
+            <div id="review-questions">
+                <!-- Review questions will be inserted here by JS -->
+            </div>
+        </div>
+        
+        <!-- Part 2: New Lesson: 7-Eleven & Street Food -->
+        <div class="card">
+            <h2 id="part2-heading" class="text-2xl font-semibold mb-3 text-purple-700"></h2>
+            <p id="part2-instruction" class="mb-4"></p>
+            
+            <h3 id="part2-vocab-heading" class="text-xl font-semibold mb-2"></h3>
+             <div id="vocab-list-711" class="space-y-4 mb-6">
+                <!-- 7-Eleven Vocabulary will be inserted here by JS -->
+            </div>
+
+            <h3 id="part2-vocab-heading-streetfood" class="text-xl font-semibold mb-2"></h3>
+             <div id="vocab-list-streetfood" class="space-y-4 mb-6">
+                <!-- Street Food Vocabulary will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 3: Role-Play (7-Eleven) -->
+        <div class="card">
+            <h2 id="part3-heading" class="text-2xl font-semibold mb-3 text-purple-700"></h2>
+            <p id="part3-instruction" class="mb-4"></p>
+            
+            <div class="mb-8">
+                <div id="roleplay1-chat" class="flex flex-col space-y-2 bg-white p-4 rounded-lg border h-64 overflow-y-auto"></div>
+                <button id="roleplay1-next" class="mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"></button>
+            </div>
+
+            <!-- Role-Play 2 (Street Food) -->
+            <h2 id="part3-heading-streetfood" class="text-2xl font-semibold mb-3 text-purple-700"></h2>
+            <p id="part3-instruction-streetfood" class="mb-4"></p>
+            
+            <div class="mb-8">
+                <div id="roleplay2-chat" class="flex flex-col space-y-2 bg-white p-4 rounded-lg border h-64 overflow-y-auto"></div>
+                <button id="roleplay2-next" class="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition"></button>
+            </div>
+        </div>
+
+        <!-- Part 4: Wrap-up -->
+        <div class="card bg-teal-50 border-l-4 border-teal-500">
+            <h2 id="part4-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part4-final-message" class="mt-4 font-semibold text-teal-800"></p>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Data ---
+    
+    const reviewQuestions = [
+        {
+            q: { thai: 'ถ้าหมอนวด นวดแรงเกินไป คุณจะพูดว่าอะไรคะ', roman: 'thâa mŏr-nûat nûat raeng goen bpai, khun jà phûut wâa à-rai khá', eng: 'If the masseuse is too strong, what do you say?' },
+            a: { thai: 'เบาๆ หน่อยค่ะ/ครับ', roman: 'bao bao nòi khâ/khráp', eng: 'A little softer, please.' },
+            reveal: { thai: 'เฉลย', roman: 'chà-lŏei', eng: 'Show Answer' }
+        },
+        {
+            q: { thai: 'คุณอยากขอลองแว่นตาที่ร้าน Gentle Monster คุณจะพูดว่าอะไรคะ', roman: 'khun yàak kŏr long wâen-dtaa thîi ráan Gentle Monster, khun jà phûut wâa à-rai khá', eng: 'You want to try on glasses at Gentle Monster. What do you say?' },
+            a: { thai: 'ขอลองอันนี้ได้ไหมคะ/ครับ', roman: 'kŏr long an níi dâi măi khá/khráp', eng: 'Can I try this one on?' },
+            reveal: { thai: 'เฉลย', roman: 'chà-lŏei', eng: 'Show Answer' }
+        },
+        {
+            q: { thai: 'คุณอยากซื้อของที่ตลาด แต่คิดว่าแพงไป คุณจะพูดว่าอะไรคะ', roman: 'khun yàak séu kŏng thîi dtà-làat, dtàe khít wâa pɛɛng bpai. khun jà phûut wâa à-rai khá', eng: 'You want to buy something at the market, but think it\'s too expensive. What do you say?' },
+            a: { thai: 'ลดได้ไหมคะ/ครับ', roman: 'lót dâi măi khá/khráp', eng: 'Can you give a discount?' },
+            reveal: { thai: 'เฉลย', roman: 'chà-lŏei', eng: 'Show Answer' }
+        }
+    ];
+
+    const sevenElevenVocab = [
+        { thai: 'เวฟไหม (คะ/ครับ)', roman: 'wéhp măi (khá/khráp)', eng: 'Do you want this heated (in the microwave)?' },
+        { thai: 'รับถุงไหม (คะ/ครับ)', roman: 'ráp thŭng măi (khá/khráp)', eng: 'Do you want a bag? (Note: They often charge 1-2 Baht for it now)' },
+        { thai: 'มี All Member ไหม (คะ/ครับ)', roman: 'mii Oll Mem-bôoe măi (khá/khráp)', eng: 'Do you have an All Member card?' },
+        { thai: 'รับ...เพิ่มไหม (คะ/ครับ)', roman: 'ráp... phôoem măi (khá/khráp)', eng: 'Would you like to add...? (e.g., "รับซาลาเปาเพิ่มไหม" - Want to add a steamed bun?)' },
+        { thai: 'รับใบเสร็จไหม (คะ/ครับ)', roman: 'ráp bai-sèt măi (khá/khráp)', eng: 'Do you want the receipt?' }
+    ];
+
+    const streetFoodVocab = [
+        { thai: '...ไม้ (ค่ะ/ครับ)', roman: '...mâai (khâ/khráp)', eng: '... stick(s) (e.g., เอาหมูปิ้ง 5 ไม้ - I want 5 pork skewers)' },
+        { thai: '...ชิ้น (ค่ะ/ครับ)', roman: '...chín (khâ/khráp)', eng: '... piece(s) (e.g., เอาปาท่องโก๋ 10 ชิ้น - I want 10 pieces of fried dough)' },
+        { thai: '...กล่อง (ค่ะ/ครับ)', roman: '...glòng (khâ/khráp)', eng: '... box(es) (e.g., ขนมกล่องนี้ - this box of snacks)' }
+    ];
+    
+    // Role-play 1 (7-Eleven)
+    const roleplayPrompts1 = [
+        { type: 'seller', data: { speaker: 'พนักงาน', line: 'สวัสดีค่ะ', roman: 'sà-wàt-dii khâ', eng: 'Hello.' } },
+        { type: 'context', data: { line: 'คุณยื่นแซนวิชแฮมชีสกับน้ำเปล่าให้พนักงาน', roman: 'khun yêun saaen-wít haem-chîit gàp nám-bplào hâi phá-nák-ngaan', eng: 'You hand a ham & cheese sandwich and a bottle of water to the cashier.' } },
+        { type: 'seller', data: { speaker: 'พนักงาน', line: 'เวฟไหมคะ', roman: 'wéhp măi khá', eng: 'Heat it up?' } },
+        // Student responds
+        { type: 'seller', data: { speaker: 'พนักงาน', line: 'มี All Member ไหมคะ', roman: 'mii Oll Mem-bôoe măi khá', eng: 'Have All Member card?' } },
+        // Student responds
+        { type: 'seller', data: { speaker: 'พนักงาน', line: 'รับถุงไหมคะ', roman: 'ráp thŭng măi khá', eng: 'Do you want a bag?' } },
+        // Student responds
+        { type: 'seller', data: { speaker: 'พนักงาน', line: 'รับใบเสร็จไหมคะ', roman: 'ráp bai-sèt măi khá', eng: 'Want the receipt?' } },
+        // Student responds
+        { type: 'seller', data: { speaker: 'พนักงาน', line: 'ทั้งหมด 45 บาทค่ะ', roman: 'tháng-mòt sìi-sìp-hâa bàat khâ', eng: '45 Baht in total.' } }
+    ];
+
+    // Role-play 2 (Street Food)
+    const roleplayPrompts2 = [
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'รับอะไรดีคะ', roman: 'ráp à-rai dii khá', eng: 'What would you like?' } },
+        { type: 'context', data: { line: 'คุณกำลังอยู่ที่ร้านหมูปิ้ง', roman: 'khun gam-lang yòo thîi ráan mŏo-bpîng', eng: 'You are at a grilled pork stall.' } },
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'หมูปิ้งไม้ละ 10 บาทค่ะ', roman: 'mŏo-bpîng mâai lá sìp bàat khâ', eng: 'Grilled pork is 10 baht per stick.' } },
+        // Student responds (e.g., เอา 5 ไม้ค่ะ)
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'รับข้าวเหนียวด้วยไหมคะ', roman: 'ráp khâao-nĭao dûay măi khá', eng: 'Would you like sticky rice too?' } },
+        // Student responds (e.g., เอา 1 ถุงค่ะ)
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'ทั้งหมด 60 บาทค่ะ', roman: 'tháng-mòt hòk-sìp bàat khâ', eng: '60 baht in total.' } },
+        { type: 'context', data: { line: 'ต่อมา... คุณอยู่ที่ร้านปาท่องโก๋', roman: 'dtòr maa... khun yòo thîi ráan bpaa-thông-gŏh', eng: 'Later... you are at a fried dough stall.' } },
+        { type: 'seller', data: { speaker: 'พ่อค้า', line: 'ปาท่องโก๋ไหมครับ ชิ้นละ 2 บาท', roman: 'bpaa-thông-gŏh măi khráp, chín lá sŏng bàat', eng: 'Fried dough? 2 baht per piece.' } },
+        // Student responds (e.g., เอา 10 ชิ้นค่ะ)
+        { type: 'seller', data: { speaker: 'พ่อค้า', line: 'ครับ 20 บาทครับ', roman: 'khráp, yîi-sìp bàat khráp', eng: 'Okay, 20 baht.' } },
+        { type: 'context', data: { line: 'ไปร้านขนมต่อค่ะ...', roman: 'bpai ráan khà-nŏm dtòr khâ...', eng: 'On to the snack shop...' } },
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'รับขนมอะไรดีคะ', roman: 'ráp khà-nŏm à-rai dii khá', eng: 'What snack would you like?' } },
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'ซื้อกล่องไซส์อะไรคะ เล็ก กลาง หรือใหญ่', roman: 'séu glòng sái à-rai khá, lék, glaang, rĕu yài', eng: 'What size box do you want? Small, medium, or large?' } },
+        // Student responds (e.g., "เอากล่องเล็กค่ะ")
+        { type: 'seller', data: { speaker: 'แม่ค้า', line: 'รับกี่กล่องดีคะ', roman: 'ráp gìi glòng dii khá', eng: 'How many boxes would you like?' } }
+        // Student responds (e.g., "เอา 2 กล่องค่ะ")
+    ];
+
+    const uiText = {
+        mainTitle: { thai: 'เซเว่นกับร้านข้างทาง', roman: 'se-wên gàp ráan khâang thaang', eng: '7-Eleven & Roadside Stalls' },
+        part1: {
+            heading: { thai: 'ทบทวน', roman: 'thóp-thuan', eng: 'Review' },
+            instruction: { thai: 'ลองตอบคำถามเหล่านี้ดูนะคะ', roman: 'long dtòp kham-thăam lào-níi duu ná khá', eng: 'Try to answer these questions.' }
+        },
+        part2: {
+            heading: { thai: 'สถานการณ์ใหม่: เซเว่น & ร้านข้างทาง', roman: 'sà-thăa-ná-gaan mài: se-wên & ráan khâang thaang', eng: 'New Scenario: 7-Eleven & Roadside Stalls' },
+            instruction: { thai: 'มาเตรียมตัวสำหรับคำถามที่พบบ่อยกันค่ะ', roman: 'maa dtriiam dtua săm-ràp kham-thăam thîi phóp bòi gan khâ', eng: 'Let\'s prepare for common questions.' },
+            vocab_heading: { thai: 'ประโยคที่จะได้ยินบ่อย (เซเว่น)', roman: 'bprà-yòk thîi jà dâi-yin bòi (se-wên)', eng: 'Common Phrases You\'ll Hear (7-Eleven)' },
+            vocab_heading_streetfood: { thai: 'คำศัพท์ร้านข้างทาง (ลักษณนาม)', roman: 'kham-sàp ráan khâang thaang (lák-sà-nà-naam)', eng: 'Roadside Stall Vocabulary (Classifiers)' }
+        },
+        part3: {
+            heading: { thai: 'ฝึกพูด: ที่เซเว่น', roman: 'fèuk phûut: thîi se-wên', eng: 'Speaking Practice: At 7-Eleven' },
+            instruction: { thai: 'ครูจะเป็นพนักงานเซเว่นค่ะ', roman: 'khruu jà bpen phá-nák-ngaan se-wên khâ', eng: 'I will be the 7-Eleven cashier.' },
+            heading_streetfood: { thai: 'ฝึกพูด: ร้านข้างทาง', roman: 'fèuk phûut: ráan khâang thaang', eng: 'Speaking Practice: Roadside Stall' },
+            instruction_streetfood: { thai: 'ตอนนี้ครูเป็นแม่ค้า/พ่อค้า ร้านรถเข็นค่ะ', roman: 'dton-níi khruu bpen mɛ̂ɛ-kháa / phôo-kháa ráan rót-khĕn khâ', eng: 'Now I am a street cart vendor.' }
+        },
+        part4: {
+            heading: { thai: 'สรุปบทเรียน', roman: 'sà-rùp bòt-riian', eng: 'Lesson Wrap-up' },
+            final_message: { thai: 'ยอดเยี่ยมมากค่ะ! ตอนนี้คุณพร้อมรับมือกับเซเว่นและร้านข้างทางแล้ว! จำคีย์เวิร์ด "เวฟ", "ถุง", "เมมเบอร์" และ "ไม้", "ชิ้น" ไว้ให้ดีนะคะ!', roman: 'yôt yîam mâak khâ! dton-níi khun phróm ráp-meuu gàp se-wên láe ráan khâang thaang láew! jam khee-woeht "wéhp", "thŭng", "mem-bôoe" láe "mâai", "chín" wái hâi dii ná khá!', eng: 'Excellent! You\'re ready for 7-Eleven and roadside stalls! Remember the keywords "wave", "bag", "member", "stick", and "piece" well!' }
+        }
+    };
+    
+    // --- Web Speech API Setup ---
+    let synth;
+    let voices;
+    function loadVoices() {
+        if (typeof speechSynthesis === 'undefined') return;
+        synth = window.speechSynthesis;
+        const setVoices = () => { voices = synth.getVoices(); };
+        setVoices();
+        if (synth.onvoiceschanged !== undefined) { synth.onvoiceschanged = setVoices; }
+    }
+    loadVoices();
+
+    function speak(text) {
+        if (!synth) { console.error('TTS not supported.'); return; }
+        if (synth.speaking) { synth.cancel(); }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.9;
+        const thaiVoice = (voices || []).find(voice => voice.lang === 'th-TH');
+        if (thaiVoice) utterance.voice = thaiVoice;
+        synth.speak(utterance);
+    }
+
+    // --- Helper Function ---
+    function createTranslatableElement(data, tag = 'div', classes = '') {
+        const container = document.createElement(tag);
+        container.className = `translatable-unit ${classes}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'translatable-content-wrapper';
+        wrapper.innerHTML = `
+            <span class="thai-text">${data.thai}</span>
+            <button class="speak-btn" aria-label="Speak">🔊</button>
+            <button class="toggle-btn ipa-toggle" aria-label="Toggle IPA">IPA</button>
+            <button class="toggle-btn en-toggle" aria-label="Toggle English">EN</button>
+        `;
+        
+        const details = document.createElement('div');
+        details.className = 'translatable-details';
+        details.innerHTML = `
+            <p class="phonetics text-sm text-gray-500 italic">${data.roman}</p>
+            <p class="translation text-sm text-gray-700">${data.eng}</p>
+        `;
+
+        container.appendChild(wrapper);
+        container.appendChild(details);
+        return container;
+    }
+    
+    // --- Helper for Click-to-Reveal Review Question ---
+    function createReviewQuestionElement(item) {
+        const div = document.createElement('div');
+        div.className = 'review-question';
+        
+        const qElement = createTranslatableElement(item.q, 'p', 'font-semibold');
+        
+        const revealBtn = document.createElement('button');
+        revealBtn.className = 'reveal-answer-btn';
+        revealBtn.textContent = item.reveal.thai;
+        
+        const aElement = createTranslatableElement(item.a, 'div', 'answer-element');
+        
+        revealBtn.addEventListener('click', () => {
+            const answer = div.querySelector('.answer-element');
+            const isHidden = answer.style.display === 'none';
+            answer.style.display = isHidden ? 'block' : 'none';
+            revealBtn.textContent = isHidden ? item.reveal.thai : 'ซ่อนคำตอบ';
+        });
+
+        div.appendChild(qElement);
+        div.appendChild(revealBtn);
+        div.appendChild(aElement);
+        return div;
+    }
+
+
+    // --- Populate UI with Thai text ---
+    function populateUI() {
+        document.getElementById('main-title').appendChild(createTranslatableElement(uiText.mainTitle, 'span'));
+        
+        document.getElementById('part1-heading').appendChild(createTranslatableElement(uiText.part1.heading, 'span'));
+        document.getElementById('part1-instruction').appendChild(createTranslatableElement(uiText.part1.instruction, 'span'));
+        
+        document.getElementById('part2-heading').appendChild(createTranslatableElement(uiText.part2.heading, 'span'));
+        document.getElementById('part2-instruction').appendChild(createTranslatableElement(uiText.part2.instruction, 'span'));
+        document.getElementById('part2-vocab-heading').appendChild(createTranslatableElement(uiText.part2.vocab_heading, 'span'));
+        document.getElementById('part2-vocab-heading-streetfood').appendChild(createTranslatableElement(uiText.part2.vocab_heading_streetfood, 'span'));
+
+        document.getElementById('part3-heading').appendChild(createTranslatableElement(uiText.part3.heading, 'span'));
+        document.getElementById('part3-instruction').appendChild(createTranslatableElement(uiText.part3.instruction, 'span'));
+        document.getElementById('roleplay1-next').textContent = "ต่อไป"; // "Next"
+        
+        document.getElementById('part3-heading-streetfood').appendChild(createTranslatableElement(uiText.part3.heading_streetfood, 'span'));
+        document.getElementById('part3-instruction-streetfood').appendChild(createTranslatableElement(uiText.part3.instruction_streetfood, 'span'));
+        document.getElementById('roleplay2-next').textContent = "ต่อไป"; // "Next"
+
+        document.getElementById('part4-heading').appendChild(createTranslatableElement(uiText.part4.heading, 'span'));
+        document.getElementById('part4-final-message').appendChild(createTranslatableElement(uiText.part4.final_message, 'span'));
+    }
+    populateUI();
+
+    // --- Populate Content ---
+    
+    // Part 1: Review Questions
+    const reviewContainer = document.getElementById('review-questions');
+    reviewQuestions.forEach(item => {
+        reviewContainer.appendChild(createReviewQuestionElement(item));
+    });
+
+    // Part 2: 7-Eleven Vocab
+    const vocabList711 = document.getElementById('vocab-list-711');
+    sevenElevenVocab.forEach(item => vocabList711.appendChild(createTranslatableElement(item, 'div', 'p-3 bg-gray-50 rounded-lg border')));
+    
+    // Part 2: Street Food Vocab
+    const vocabListStreetFood = document.getElementById('vocab-list-streetfood');
+    streetFoodVocab.forEach(item => vocabListStreetFood.appendChild(createTranslatableElement(item, 'div', 'p-3 bg-gray-50 rounded-lg border')));
+    
+
+    // --- Event Delegation for whole page ---
+    document.body.addEventListener('click', (e) => {
+        const speakBtn = e.target.closest('.speak-btn');
+        if (speakBtn) {
+            e.stopPropagation();
+            const text = speakBtn.parentElement.querySelector('.thai-text').textContent.replace(/<[^>]*>?/gm, '').trim();
+            speak(text);
+            return;
+        }
+
+        const ipaToggle = e.target.closest('.ipa-toggle');
+        if (ipaToggle) {
+            e.stopPropagation();
+            const parentUnit = ipaToggle.closest('.translatable-unit');
+            const phonetics = parentUnit.querySelector('.phonetics');
+            if (phonetics) {
+                phonetics.style.display = phonetics.style.display === 'block' ? 'none' : 'block';
+                ipaToggle.classList.toggle('active');
+            }
+            return;
+        }
+
+        const enToggle = e.target.closest('.en-toggle');
+        if (enToggle) {
+            e.stopPropagation();
+            const parentUnit = enToggle.closest('.translatable-unit');
+            const translation = parentUnit.querySelector('.translation');
+            if (translation) {
+                translation.style.display = translation.style.display === 'block' ? 'none' : 'block';
+                enToggle.classList.toggle('active');
+            }
+            return;
+        }
+    });
+
+    // --- Role-Play Logic ---
+    const roleplay1Chat = document.getElementById('roleplay1-chat');
+    const roleplay1NextBtn = document.getElementById('roleplay1-next');
+    let roleplayIndex1 = 0;
+
+    const roleplay2Chat = document.getElementById('roleplay2-chat');
+    const roleplay2NextBtn = document.getElementById('roleplay2-next');
+    let roleplayIndex2 = 0;
+
+    function addBubble(container, data, speaker) {
+        const bubble = document.createElement('div');
+        const speakerClass = speaker === 'seller' ? 'seller-bubble' : 'buyer-bubble';
+        bubble.className = `chat-bubble ${speakerClass}`;
+        const content = createTranslatableElement({thai: data.line, roman: data.roman, eng: data.eng}, 'div');
+        bubble.appendChild(content);
+        container.appendChild(bubble);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function addContextBubble(container, data) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble text-sm text-gray-500 italic text-center self-center`;
+        const content = createTranslatableElement({thai: data.line, roman: data.roman, eng: data.eng}, 'div');
+        bubble.appendChild(content);
+        container.appendChild(bubble);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    roleplay1NextBtn.addEventListener('click', () => {
+        if (roleplayIndex1 >= roleplayPrompts1.length) {
+             roleplay1NextBtn.disabled = true;
+             roleplay1NextBtn.textContent = "จบแล้ว!";
+             return;
+        }
+        const current = roleplayPrompts1[roleplayIndex1];
+        if (current.type === 'seller') {
+            addBubble(roleplay1Chat, current.data, 'seller');
+        } else if (current.type === 'context') {
+            addContextBubble(roleplay1Chat, current.data);
+        }
+        roleplayIndex1++;
+        roleplay1NextBtn.textContent = "ต่อไป"; // Next
+    });
+
+    roleplay2NextBtn.addEventListener('click', () => {
+        if (roleplayIndex2 >= roleplayPrompts2.length) {
+             roleplay2NextBtn.disabled = true;
+             roleplay2NextBtn.textContent = "จบแล้ว!";
+             return;
+        }
+        const current = roleplayPrompts2[roleplayIndex2];
+        if (current.type === 'seller') {
+            addBubble(roleplay2Chat, current.data, 'seller');
+        } else if (current.type === 'context') {
+            addContextBubble(roleplay2Chat, current.data);
+        }
+        roleplayIndex2++;
+        roleplay2NextBtn.textContent = "ต่อไป"; // Next
+    });
+    
+    // Start both roleplays
+    roleplay1NextBtn.click();
+    roleplay2NextBtn.click();
+
+});
+</script>
+
+</body>
+</html>
