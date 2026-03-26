@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Detective: Find the Mistakes!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ebf5fb; /* Detective blue background */
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #2980b9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #5dade2;
+            border-radius: 12px;
+            background-color: #fff;
+        }
+        
+        /* Buttons */
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin: 5px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .btn:hover { background-color: #2980b9; transform: scale(1.05); }
+        
+        .control-btn {
+            background: #f8f9fa;
+            border: 1px solid #d5d8dc;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 3px 8px;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+            margin-left: 5px;
+            vertical-align: middle;
+            color: #2c3e50;
+        }
+        .control-btn:hover { background-color: #ebedef; }
+        .speak-btn { color: #d35400; border-color: #d35400; }
+        .trans-btn { color: #27ae60; border-color: #27ae60; }
+        
+        .big-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            margin-top: 15px;
+            background-color: #f1c40f;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .big-btn:hover { background-color: #f39c12; }
+
+        /* Story/Dialogue Box */
+        .story-box {
+            background-color: #fef9e7;
+            padding: 20px;
+            border-left: 6px solid #f1c40f;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        .bad-grammar {
+            color: #c0392b;
+            text-decoration: line-through;
+            font-weight: bold;
+            background: #fadbd8;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .good-grammar {
+            color: #27ae60;
+            font-weight: bold;
+            background: #eaeded;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+
+        /* Task Box */
+        .task-box {
+            background-color: #f4f6f7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #bdc3c7;
+            line-height: 1.6;
+        }
+
+        .hidden-answer {
+            display: none;
+            margin-top: 10px;
+            color: #1e8449;
+            font-weight: bold;
+            background: #eafaf1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed #2ecc71;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .rule-line {
+            margin: 10px 0;
+            padding: 10px;
+            border-bottom: 1px dashed #eaecee;
+            background: white;
+            border-radius: 5px;
+        }
+
+        /* Detective Game Display */
+        #game-card {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: #34495e;
+            color: white;
+            border-radius: 10px;
+            border: 4px solid #2c3e50;
+            min-height: 180px;
+            position: relative;
+        }
+        .game-topic {
+            font-size: 0.9rem;
+            color: #f1c40f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .game-bad-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ff9999;
+            margin-bottom: 15px;
+        }
+        .game-good-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #82e0aa;
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #7f8c8d;
+        }
+        .thai-text { 
+            color: #95a5a6; 
+            font-size: 1rem; 
+            display: none; 
+            margin-top: 5px; 
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        Grammar Detective 🕵️‍♂️🔍
+        <button class="control-btn speak-btn" onclick="speak('Grammar Detective')">🔊</button>
+        <button class="control-btn trans-btn" onclick="toggleTrans('h1-trans')">🇹🇭</button>
+        <span id="h1-trans" class="thai-text" style="color: #7f8c8d;">นักสืบไวยากรณ์ (หาจุดผิดและแก้ไข)</span>
+    </h1>
+
+    <div style="text-align: center; margin-bottom: 30px; font-size: 1.1rem; color: #7f8c8d;">
+        Your mission: Find the mistakes and fix them! <br>
+        <span style="font-size: 0.9rem;">(ภารกิจของคุณ: หาจุดผิดและแก้ไขมันให้ถูกต้อง!)</span>
+    </div>
+
+    <!-- SECTION 1: WARM UP -->
+    <div class="section" style="background-color: #fdf2e9; border-color: #e67e22;">
+        <h2>
+            1. Detective Training (Warm Up) 🧠
+            <button class="control-btn speak-btn" onclick="speak('Detective Training Warm Up')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-1-trans')">🇹🇭</button>
+            <span id="h2-1-trans" class="thai-text">ฝึกฝนนักสืบ (อุ่นเครื่อง)</span>
+        </h2>
+        <p style="text-align:center;">Read the bad sentence. Speak the correct sentence! (อ่านประโยคที่ผิด แล้วพูดประโยคที่ถูก!)</p>
+        
+        <div class="task-box" style="background: white;">
+            <div class="rule-line">
+                <span style="font-size: 1.5rem;">👽</span> <b>Alien says:</b> "I <b>is</b> a student."
+                <button class="control-btn speak-btn" onclick="speak('I is a student.')">🔊</button>
+                <div style="margin-top: 10px;">
+                    <button class="btn" style="background-color:#2ecc71;" onclick="toggleAnswer('ans-w1')">Show Correction 👀</button>
+                    <div id="ans-w1" class="hidden-answer"><b>You say:</b> "I <b>am</b> a student." (Is/Am/Are)</div>
+                </div>
+            </div>
+
+            <div class="rule-line">
+                <span style="font-size: 1.5rem;">👽</span> <b>Alien says:</b> "He <b>go</b> to the mall every day."
+                <button class="control-btn speak-btn" onclick="speak('He go to the mall every day.')">🔊</button>
+                <div style="margin-top: 10px;">
+                    <button class="btn" style="background-color:#2ecc71;" onclick="toggleAnswer('ans-w2')">Show Correction 👀</button>
+                    <div id="ans-w2" class="hidden-answer"><b>You say:</b> "He <b>goes</b> to the mall every day." (Present Simple -s/es)</div>
+                </div>
+            </div>
+
+            <div class="rule-line">
+                <span style="font-size: 1.5rem;">👽</span> <b>Alien says:</b> "Yesterday, I <b>am</b> at the cinema."
+                <button class="control-btn speak-btn" onclick="speak('Yesterday, I am at the cinema.')">🔊</button>
+                <div style="margin-top: 10px;">
+                    <button class="btn" style="background-color:#2ecc71;" onclick="toggleAnswer('ans-w3')">Show Correction 👀</button>
+                    <div id="ans-w3" class="hidden-answer"><b>You say:</b> "Yesterday, I <b>was</b> at the cinema." (Past Simple was/were)</div>
+                </div>
+            </div>
+            
+            <div class="rule-line">
+                <span style="font-size: 1.5rem;">👽</span> <b>Alien says:</b> "How <b>much</b> apples do you want?"
+                <button class="control-btn speak-btn" onclick="speak('How much apples do you want?')">🔊</button>
+                <div style="margin-top: 10px;">
+                    <button class="btn" style="background-color:#2ecc71;" onclick="toggleAnswer('ans-w4')">Show Correction 👀</button>
+                    <div id="ans-w4" class="hidden-answer"><b>You say:</b> "How <b>many</b> apples do you want?" (Countable nouns)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: THE INTERROGATION ROOM (Role Play) -->
+    <div class="section" style="background-color: #ebf5fb; border-color: #2980b9;">
+        <h2>
+            2. Case File: The Hungry Ghost 👻🍔
+            <button class="control-btn speak-btn" onclick="speak('Case File: The Hungry Ghost')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-2-trans')">🇹🇭</button>
+            <span id="h2-2-trans" class="thai-text">แฟ้มคดี: ผีจอมหิว</span>
+        </h2>
+        <p style="text-align:center;">Be the detective! Correct the ghost's bad grammar. (เป็นนักสืบ! แก้แกรมม่าของผีให้ถูกต้อง)</p>
+
+        <div class="story-box" style="background-color: #f4ecf7; border-color: #8e44ad;">
+            <p>
+                <b>Ghost:</b> Hello. <span class="bad-grammar">I is</span> <span class="good-grammar" style="display:none;" id="c1">I am</span> a ghost. 
+                <button class="btn" style="padding: 2px 8px; font-size: 0.8rem;" onclick="document.getElementById('c1').style.display='inline'">Fix 🔧</button>
+            </p>
+            <p>
+                <b>Ghost:</b> I want to order food. Do you have <span class="bad-grammar">some waters</span>? <span class="good-grammar" style="display:none;" id="c2">any water</span>?
+                <button class="btn" style="padding: 2px 8px; font-size: 0.8rem;" onclick="document.getElementById('c2').style.display='inline'">Fix 🔧</button>
+            </p>
+            <p>
+                <b>Ghost:</b> I want to eat <span class="bad-grammar">two childs</span>. <span class="good-grammar" style="display:none;" id="c3">two children</span>.
+                <button class="btn" style="padding: 2px 8px; font-size: 0.8rem;" onclick="document.getElementById('c3').style.display='inline'">Fix 🔧</button>
+            </p>
+            <p>
+                <b>Detective (You):</b> No! You cannot eat children! Do you want <span class="bad-grammar">this sandwiches</span>? <span class="good-grammar" style="display:none;" id="c4">these sandwiches</span>?
+                <button class="btn" style="padding: 2px 8px; font-size: 0.8rem;" onclick="document.getElementById('c4').style.display='inline'">Fix 🔧</button>
+            </p>
+            <p>
+                <b>Ghost:</b> Okay. Yesterday, I <span class="bad-grammar">eat</span> <span class="good-grammar" style="display:none;" id="c5">ate</span> a sandwich and it <span class="bad-grammar">were</span> <span class="good-grammar" style="display:none;" id="c6">was</span> good!
+                <button class="btn" style="padding: 2px 8px; font-size: 0.8rem;" onclick="document.getElementById('c5').style.display='inline'; document.getElementById('c6').style.display='inline'">Fix 🔧</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: THE GRAMMAR ROULETTE (Main Speaking Activity) -->
+    <div class="section" style="background-color: #fdfefe; border-color: #1abc9c;">
+        <h2>
+            3. The Ultimate Grammar Roulette 🎯
+            <button class="control-btn speak-btn" onclick="speak('The Ultimate Grammar Roulette')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-3-trans')">🇹🇭</button>
+            <span id="h2-3-trans" class="thai-text">รูเล็ตไวยากรณ์ขั้นสุดยอด</span>
+        </h2>
+        <p style="text-align:center;">Generate a wrong sentence. Speak it correctly to win! <br> <span style="font-size: 0.9rem; color: #7f8c8d;">(สุ่มประโยคที่ผิด พูดให้ถูกเพื่อชนะ!)</span></p>
+
+        <div id="game-card">
+            <div id="g-topic" class="game-topic">TOPIC: ???</div>
+            <div id="g-bad" class="game-bad-text">Press SPIN to start!</div>
+            <div id="g-thai" class="thai-text" style="color:#bdc3c7;">(คำแปลจะอยู่ตรงนี้)</div>
+            
+            <div id="g-good" class="game-good-text">Correct Sentence</div>
+        </div>
+
+        <div style="text-align:center; margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+            <button class="btn" style="background-color:#e74c3c; font-size: 1.1rem; padding: 10px 20px;" onclick="speakBadSentence()">🔊 Listen to Error</button>
+            <button class="btn" style="background-color:#2ecc71; font-size: 1.1rem; padding: 10px 20px;" onclick="showCorrectSentence()">👀 Show Answer</button>
+            <button class="btn" style="background-color:#3498db; font-size: 1.1rem; padding: 10px 20px;" onclick="toggleGameThai()">🇹🇭 Hint</button>
+        </div>
+        <button class="big-btn" onclick="spinGame()">SPIN NEW SENTENCE 🔄</button>
+    </div>
+
+    <!-- SECTION 4: SPEAKING CHALLENGES (Pair Work) -->
+    <div class="section" style="background-color: #fdf2e9; border-color: #e67e22;">
+        <h2>
+            4. Speaking Challenge (Pair Work) 🗣️
+            <button class="control-btn speak-btn" onclick="speak('Speaking Challenge')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-4-trans')">🇹🇭</button>
+            <span id="h2-4-trans" class="thai-text">ความท้าทายในการพูด</span>
+        </h2>
+        <p style="text-align:center;">Teacher reads the BAD sentence. Student must INTERRUPT and FIX it immediately!</p>
+
+        <div class="task-box">
+            <p class="rule-line">
+                ❌ <b>Teacher:</b> She <u>going to</u> order a wonton soup.<br>
+                ✅ <b>Student:</b> Wait! She <b>is going to</b> order a wonton soup! (Future Simple)
+            </p>
+            <p class="rule-line">
+                ❌ <b>Teacher:</b> <u>There is</u> two pillows on the bed.<br>
+                ✅ <b>Student:</b> Wait! <b>There are</b> two pillows on the bed! (There is/are)
+            </p>
+            <p class="rule-line">
+                ❌ <b>Teacher:</b> I don't like <u>he</u>.<br>
+                ✅ <b>Student:</b> Wait! I don't like <b>him</b>! (Object Pronouns)
+            </p>
+            <p class="rule-line">
+                ❌ <b>Teacher:</b> Does you have any vegetables?<br>
+                ✅ <b>Student:</b> Wait! <b>Do</b> you have any vegetables? (Do/Does)
+            </p>
+            <p class="rule-line">
+                ❌ <b>Teacher:</b> I am a owl.<br>
+                ✅ <b>Student:</b> Wait! I am <b>an</b> owl! (Articles)
+            </p>
+        </div>
+    </div>
+
+    <!-- SECTION 5: EXTENSION ACTIVITIES (For extra time) -->
+    <div class="section" style="background-color: #f4ecf7; border-color: #8e44ad;">
+        <h2>
+            5. Extension: Extra Detective Work! ⏱️🔍
+            <button class="control-btn speak-btn" onclick="speak('Extension: Extra Detective Work!')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-5-trans')">🇹🇭</button>
+            <span id="h2-5-trans" class="thai-text" style="color: #7f8c8d;">กิจกรรมเสริม: งานนักสืบพิเศษ! (เผื่อเวลาเหลือ)</span>
+        </h2>
+        
+        <p style="text-align:center; font-size: 1.1rem; color: #555;">
+            Finished early? Let's play more games!
+            <button class="control-btn trans-btn" onclick="toggleTrans('ext-subtitle')">🇹🇭</button>
+            <span id="ext-subtitle" class="thai-text">เสร็จเร็วเหรอ? มาเล่นเกมเพิ่มกันเถอะ!</span>
+        </p>
+
+        <!-- Extension A: The Broken Robot -->
+        <div class="task-box" style="background-color: #fff; border-color: #9b59b6;">
+            <h3>
+                A. Role Play: The Broken Robot 🤖💥
+                <button class="control-btn speak-btn" onclick="speak('Role Play: The Broken Robot')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('ext-a-title')">🇹🇭</button>
+                <span id="ext-a-title" class="thai-text">บทบาทสมมติ: หุ่นยนต์พัง</span>
+            </h3>
+            <p style="color: #7f8c8d;">
+                <b>Rule:</b> The teacher is a robot. Ask the robot questions. The robot will answer with BAD grammar. Fix the robot!
+                <button class="control-btn trans-btn" onclick="toggleTrans('ext-a-rule')">🇹🇭</button>
+                <span id="ext-a-rule" class="thai-text">กฎ: ครูเป็นหุ่นยนต์ ให้นักเรียนถามคำถาม หุ่นยนต์จะตอบผิดแกรมม่า ให้นักเรียนแก้ให้ถูก!</span>
+            </p>
+            
+            <div class="rule-line">
+                <p>
+                    🗣️ <b>You ask:</b> What are you doing?
+                    <button class="control-btn speak-btn" onclick="speak('What are you doing?')">🔊</button>
+                </p>
+                <p>
+                    🤖 <b>Robot:</b> <span class="bad-grammar">I is talking.</span>
+                    <button class="control-btn speak-btn" onclick="speak('I is talking.')">🔊</button>
+                </p>
+                <p>
+                    🗣️ <b>You fix:</b> No! You <b>are</b> talking. (Or: I <b>am</b> talking)
+                    <button class="control-btn speak-btn" onclick="speak('No! You are talking. Or, I am talking.')">🔊</button>
+                </p>
+            </div>
+            
+            <div class="rule-line">
+                <p>
+                    🗣️ <b>You ask:</b> Do you like apples?
+                    <button class="control-btn speak-btn" onclick="speak('Do you like apples?')">🔊</button>
+                </p>
+                <p>
+                    🤖 <b>Robot:</b> <span class="bad-grammar">Yes, I likes apples.</span>
+                    <button class="control-btn speak-btn" onclick="speak('Yes, I likes apples.')">🔊</button>
+                </p>
+                <p>
+                    🗣️ <b>You fix:</b> No! I <b>like</b> apples. (No 's')
+                    <button class="control-btn speak-btn" onclick="speak('No! I like apples.')">🔊</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- Extension B: Stop the Teacher -->
+        <div class="task-box" style="background-color: #fff; border-color: #e74c3c;">
+            <h3>
+                B. Listening Game: STOP! 🛑👂
+                <button class="control-btn speak-btn" onclick="speak('Listening Game: Stop!')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('ext-b-title')">🇹🇭</button>
+                <span id="ext-b-title" class="thai-text">เกมการฟัง: หยุดนะ!</span>
+            </h3>
+            <p style="color: #7f8c8d;">
+                <b>Rule:</b> The teacher reads a story. When you hear bad grammar, shout <b>"STOP!"</b> and fix it.
+                <button class="control-btn trans-btn" onclick="toggleTrans('ext-b-rule')">🇹🇭</button>
+                <span id="ext-b-rule" class="thai-text">กฎ: ครูเล่าเรื่อง เมื่อคุณได้ยินแกรมม่าที่ผิด ให้ตะโกนว่า "หยุด!" แล้วแก้ให้ถูก</span>
+            </p>
+
+            <div class="rule-line" style="background-color: #fdf2e9; border: 1px solid #fad7a0;">
+                <p>
+                    <b>Teacher's Secret Story (Don't let the student read this!):</b><br>
+                    "Yesterday, I <span class="bad-grammar">is</span> (was) very tired. 
+                    I went to the supermarket to buy <span class="bad-grammar">a</span> (an) apple. 
+                    But <span class="bad-grammar">there was</span> (there were) many people! 
+                    So, I didn't <span class="bad-grammar">bought</span> (buy) anything."
+                </p>
+            </div>
+        </div>
+
+        <!-- Extension C: 2 Good, 1 Bad -->
+        <div class="task-box" style="background-color: #fff; border-color: #2ecc71;">
+            <h3>
+                C. Game: 2 Good, 1 Bad 🎯
+                <button class="control-btn speak-btn" onclick="speak('Game: 2 Good, 1 Bad')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('ext-c-title')">🇹🇭</button>
+                <span id="ext-c-title" class="thai-text">เกม: ถูก 2 ผิด 1</span>
+            </h3>
+            <p style="color: #7f8c8d;">
+                <b>Rule:</b> Find the ONE sentence that has bad grammar!
+                <button class="control-btn trans-btn" onclick="toggleTrans('ext-c-rule')">🇹🇭</button>
+                <span id="ext-c-rule" class="thai-text">กฎ: หาประโยค 1 ประโยคที่ผิดแกรมม่า!</span>
+            </p>
+
+            <div class="rule-line">
+                <b>Round 1:</b>
+                <button class="control-btn speak-btn" onclick="speak('Round 1. One: She always wakes up early. Two: How much water do you drink? Three: I don\'t likes vegetables.')">🔊</button>
+                <ol>
+                    <li>She always wakes up early.</li>
+                    <li>How much water do you drink?</li>
+                    <li style="cursor: pointer;" onclick="this.innerHTML = '❌ I don\'t <b>like</b> vegetables. (No S after don\'t)'">I don't likes vegetables. (Click to reveal)</li>
+                </ol>
+            </div>
+
+            <div class="rule-line">
+                <b>Round 2:</b>
+                <button class="control-btn speak-btn" onclick="speak('Round 2. One: Look! That birds are flying. Two: He was at the cinema yesterday. Three: We are going to travel to Japan.')">🔊</button>
+                <ol>
+                    <li style="cursor: pointer;" onclick="this.innerHTML = '❌ Look! <b>Those</b> birds are flying. (Plural)'">Look! That birds are flying. (Click to reveal)</li>
+                    <li>He was at the cinema yesterday.</li>
+                    <li>We are going to travel to Japan.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- MASSIVE ERROR CORRECTION DATA (Covering all past topics) ---
+    const errorData = [
+        // Household items / Rooms / There is/are
+        {bad: "There is three pillows on my bed.", good: "There are three pillows on my bed.", topic: "There is / There are", th: "มีหมอนสามใบอยู่บนเตียง"},
+        {bad: "I don't have some toothbrushes.", good: "I don't have any toothbrushes.", topic: "Some / Any", th: "ฉันไม่มีแปรงสีฟันเลย"},
+        {bad: "There aren't a wardrobe in the room.", good: "There isn't a wardrobe in the room.", topic: "There isn't / aren't", th: "ไม่มีตู้เสื้อผ้าในห้อง"},
+        {bad: "She turn on the A/C every night.", good: "She turns on the A/C every night.", topic: "Present Simple (-s/-es)", th: "เธอเปิดแอร์ทุกคืน"},
+
+        // Food Ordering / How much/many / Uncountable
+        {bad: "How much apples do you want?", good: "How many apples do you want?", topic: "How much / How many", th: "คุณต้องการแอปเปิ้ลกี่ลูก?"},
+        {bad: "I want two waters, please.", good: "I want two glasses (or bottles) of water, please. / I want some water.", topic: "Countable / Uncountable", th: "ขอน้ำ 2 แก้ว/ขวด ครับ"},
+        {bad: "Do you want a garlic?", good: "Do you want some garlic?", topic: "Articles / Quantifiers", th: "คุณรับกระเทียมไหม?"},
+        {bad: "We eat too many meat.", good: "We eat too much meat.", topic: "Too much / Too many", th: "พวกเรากินเนื้อสัตว์เยอะเกินไป"},
+        {bad: "They doesn't like mashed potatoes.", good: "They don't like mashed potatoes.", topic: "Do / Don't", th: "พวกเขาไม่ชอบมันฝรั่งบด"},
+
+        // Is/Am/Are & Present Continuous
+        {bad: "I is a vegetarian.", good: "I am a vegetarian.", topic: "Is / Am / Are", th: "ฉันเป็นมังสวิรัติ"},
+        {bad: "Look! The monkey eat a banana.", good: "Look! The monkey is eating a banana.", topic: "Present Continuous", th: "ดูสิ! ลิงกำลังกินกล้วย"},
+        {bad: "Are you listen to the teacher?", good: "Are you listening to the teacher?", topic: "Present Continuous (Questions)", th: "คุณกำลังฟังครูอยู่หรือเปล่า?"},
+
+        // Future Simple (going to)
+        {bad: "I going to travel to Las Vegas.", good: "I am going to travel to Las Vegas.", topic: "Is/Am/Are + going to", th: "ฉันกำลังจะไปเที่ยวลาสเวกัส"},
+        {bad: "What are you go to do tomorrow?", good: "What are you going to do tomorrow?", topic: "Future Simple (Questions)", th: "พรุ่งนี้คุณจะทำอะไร?"},
+
+        // Object Pronouns
+        {bad: "My mom loves I.", good: "My mom loves me.", topic: "Object Pronouns", th: "แม่รักฉัน"},
+        {bad: "Look at they! They are hugging.", good: "Look at them! They are hugging.", topic: "Object Pronouns", th: "ดูพวกเขาอดสิ! พวกเขากำลังกอดกัน"},
+
+        // Adverbs of Frequency & Routines
+        {bad: "I play usually games at 10pm.", good: "I usually play games at 10pm.", topic: "Adverbs of Frequency", th: "ปกติฉันเล่นเกมตอน 4 ทุ่ม"},
+        {bad: "She gets up early always.", good: "She always gets up early.", topic: "Adverbs of Frequency", th: "เธอตื่นเช้าเสมอ"},
+        {bad: "What time do you goes to bed?", good: "What time do you go to bed?", topic: "Do/Does + Routines", th: "คุณเข้านอนกี่โมง?"},
+
+        // Singular/Plural, -es, Irregular
+        {bad: "He has three watchs.", good: "He has three watches.", topic: "When to add -es", th: "เขามีนาฬิกา 3 เรือน"},
+        {bad: "I saw five mouse in the kitchen.", good: "I saw five mice in the kitchen.", topic: "Irregular Plurals", th: "ฉันเห็นหนู 5 ตัวในครัว"},
+        {bad: "The woman are cooking.", good: "The women are cooking. (Or: The woman is cooking)", topic: "Irregular Plurals", th: "ผู้หญิง(หลายคน)กำลังทำอาหาร"},
+        {bad: "I brush my tooths every day.", good: "I brush my teeth every day.", topic: "Irregular Plurals", th: "ฉันแปรงฟันทุกวัน"},
+
+        // Demonstrative Pronouns
+        {bad: "I want to buy this shoes.", good: "I want to buy these shoes.", topic: "Demonstrative Pronouns", th: "ฉันอยากซื้อรองเท้าคู่นี้"},
+        {bad: "Look at that birds in the sky!", good: "Look at those birds in the sky!", topic: "Demonstrative Pronouns", th: "ดูนกพวกนั้นบนฟ้าสิ!"},
+
+        // Was / Were
+        {bad: "Yesterday, I are at the mall.", good: "Yesterday, I was at the mall.", topic: "Was / Were", th: "เมื่อวานนี้ฉันอยู่ที่ห้าง"},
+        {bad: "The singers was very noisy.", good: "The singers were very noisy.", topic: "Was / Were", th: "นักร้องเสียงดังมาก (อดีต)"},
+        {bad: "There were a ghost in the house.", good: "There was a ghost in the house.", topic: "There was / There were", th: "เคยมีผีอยู่ในบ้าน"}
+    ];
+
+    let currentGameItem = {};
+
+    function spinGame() {
+        // Animation
+        const badText = document.getElementById('g-bad');
+        const goodText = document.getElementById('g-good');
+        const topicText = document.getElementById('g-topic');
+        const thaiText = document.getElementById('g-thai');
+
+        badText.innerText = "Searching for errors... 🔍";
+        goodText.style.display = 'none';
+        topicText.innerText = "TOPIC: ???";
+        thaiText.style.display = 'none';
+
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * errorData.length);
+            currentGameItem = errorData[randomIndex];
+            
+            topicText.innerText = "TOPIC: " + currentGameItem.topic;
+            badText.innerHTML = "❌ " + currentGameItem.bad;
+            goodText.innerHTML = "✅ " + currentGameItem.good;
+            thaiText.innerText = currentGameItem.th;
+        }, 500);
+    }
+
+    function showCorrectSentence() {
+        const goodText = document.getElementById('g-good');
+        if (currentGameItem.good) {
+            goodText.style.display = 'block';
+            speak(currentGameItem.good);
+        }
+    }
+
+    function speakBadSentence() {
+        if(currentGameItem.bad) {
+            speak(currentGameItem.bad);
+        }
+    }
+
+    function toggleGameThai() {
+        const thaiEl = document.getElementById('g-thai');
+        if (thaiEl.style.display === 'block') {
+            thaiEl.style.display = 'none';
+        } else {
+            thaiEl.style.display = 'block';
+        }
+    }
+
+    function toggleTrans(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.style.display === 'inline' || el.style.display === 'block') {
+            el.style.display = 'none';
+        } else {
+            el.style.display = el.tagName === 'DIV' ? 'block' : 'inline';
+        }
+    }
+
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.style.display === 'block') {
+            el.style.display = 'none';
+        } else {
+            el.style.display = 'block';
+        }
+    }
+
+    // --- TTS UTILITY ---
+    function speak(text) {
+        // Remove emojis and UI characters before speaking
+        let cleanText = text.replace(/[❌✅👽🔍]/g, '').trim();
+        
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; // Slightly slower for A1 student
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // Init the game
+    spinGame();
+
+</script>
+
+</body>
+</html>
