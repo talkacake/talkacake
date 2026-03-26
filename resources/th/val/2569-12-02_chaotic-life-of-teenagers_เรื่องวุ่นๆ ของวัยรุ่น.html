@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaotic Life - Funny Speaking Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Sarabun Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fffbeb; /* Amber-50 tint for fun vibe */
+        }
+        
+        .ipa-text {
+            color: #d946ef; /* Fuchsia-500 */
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .en-text {
+            color: #2563eb; /* Blue-600 */
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        /* Toggle Button Styles */
+        .btn-toggle {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            transition: all 0.2s;
+            background: white;
+        }
+        .btn-toggle:hover {
+            background-color: #f3f4f6;
+        }
+        .btn-toggle.active-ipa {
+            background-color: #fdf4ff;
+            border-color: #d946ef;
+            color: #d946ef;
+            font-weight: bold;
+        }
+        .btn-toggle.active-en {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="text-gray-800 pb-20">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-amber-100">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-amber-600 flex items-center gap-2">
+                <i class="fas fa-laugh-wink"></i>
+                <!-- CHANGED: Removed "A2" -->
+                <span>เรื่องวุ่นๆ ของวัยรุ่น</span>
+            </h1>
+            <div class="text-xs text-gray-400 font-light">60-Min Speaking Lesson</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-3xl mx-auto px-4 mt-6 space-y-10">
+
+        <!-- Intro Section -->
+        <section class="text-center space-y-2 bg-white p-6 rounded-2xl card-shadow border-t-4 border-amber-400">
+            <div id="intro-title"></div>
+            <div id="intro-desc"></div>
+        </section>
+
+        <!-- ACTIVITY 1: Vocab Roulette (Warm Up) -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                    <i class="fas fa-random"></i>
+                </div>
+                <div id="heading-roulette" class="flex-1"></div>
+            </div>
+
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-100 text-center">
+                <div id="roulette-instruction" class="mb-4"></div>
+                
+                <div id="vocab-card" class="bg-white p-8 rounded-xl shadow-lg min-h-[180px] flex flex-col items-center justify-center mb-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-indigo-200"></div>
+                    <p class="text-gray-400 italic">Press the button to spin...</p>
+                </div>
+
+                <button onclick="spinRoulette()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform active:scale-95 transition-all flex items-center gap-2 mx-auto">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>สุ่มคำศัพท์ (Spin)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 2: Funny Role Play -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <div id="heading-roleplay" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl card-shadow border-l-8 border-rose-500">
+                <div id="rp-title" class="mb-4"></div>
+                
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-rose-50 p-4 rounded-lg border border-rose-100">
+                        <div class="font-bold text-rose-800 mb-1"><i class="fas fa-user-nurse mr-2"></i>Role A: หมอ (Doctor)</div>
+                        <div id="rp-role-a"></div>
+                    </div>
+                    <div class="bg-gray-800 text-white p-4 rounded-lg border border-gray-700">
+                        <div class="font-bold text-rose-400 mb-1"><i class="fas fa-mask mr-2"></i>Role B: ฆาตกรสุภาพ (Polite Killer)</div>
+                        <div id="rp-role-b"></div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <div class="text-yellow-800 font-bold text-sm mb-2"><i class="fas fa-lightbulb"></i> Vocab to use:</div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white rounded text-sm shadow-sm">ฆาตกรต่อเนื่อง</span>
+                        <span class="px-2 py-1 bg-white rounded text-sm shadow-sm">ปวดท้อง</span>
+                        <span class="px-2 py-1 bg-white rounded text-sm shadow-sm">พิษ</span>
+                        <span class="px-2 py-1 bg-white rounded text-sm shadow-sm">สุภาพ</span>
+                        <span class="px-2 py-1 bg-white rounded text-sm shadow-sm">สืบสวน</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 3: Funny Debate -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                    <i class="fas fa-comments-dollar"></i>
+                </div>
+                <div id="heading-debate" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl card-shadow border-l-8 border-emerald-500">
+                <div id="debate-topic" class="mb-6"></div>
+
+                <div class="flex flex-col md:flex-row gap-4">
+                    <!-- Team A -->
+                    <div class="flex-1 bg-emerald-50 p-4 rounded-xl border border-emerald-100 relative">
+                        <div class="absolute -top-3 -left-2 bg-emerald-600 text-white px-3 py-1 rounded-lg text-sm font-bold shadow">Team A</div>
+                        <div class="mt-2 text-center">
+                            <i class="fas fa-sad-tear text-4xl text-emerald-300 mb-2"></i>
+                            <div id="debate-team-a"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center text-gray-300 font-bold italic">VS</div>
+
+                    <!-- Team B -->
+                    <div class="flex-1 bg-blue-50 p-4 rounded-xl border border-blue-100 relative">
+                        <div class="absolute -top-3 -right-2 bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-bold shadow">Team B</div>
+                        <div class="mt-2 text-center">
+                            <i class="fas fa-users text-4xl text-blue-300 mb-2"></i>
+                            <div id="debate-team-b"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 4: Crazy Storytelling -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div id="heading-story" class="flex-1"></div>
+            </div>
+
+            <div class="bg-amber-50 p-6 rounded-2xl border-2 border-dashed border-amber-300">
+                <div id="story-instruction" class="mb-4"></div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider mb-2">Story Starter:</div>
+                    <div id="story-start"></div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2 justify-center">
+                    <span class="text-xs font-bold text-gray-400">Must include:</span>
+                    <!-- CHANGED: Removed English text in brackets -->
+                    <span class="badge bg-white px-2 py-1 rounded border text-xs">แฟนเก่า</span>
+                    <span class="badge bg-white px-2 py-1 rounded border text-xs">หมอนิติเวช</span>
+                    <span class="badge bg-white px-2 py-1 rounded border text-xs">ส้มตำ</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXTENSION ACTIVITIES (If time remains) -->
+        <section class="space-y-4 pt-8 border-t border-gray-200">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <!-- CHANGED: Converted header to Smart Text (in JS) -->
+                <div id="heading-extension" class="flex-1"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <!-- Task 1 -->
+                <div class="bg-white p-4 rounded-xl border border-gray-200">
+                    <div id="ext-task-1-title" class="font-bold mb-2"></div>
+                    <div id="ext-task-1-desc" class="text-sm text-gray-600"></div>
+                </div>
+                <!-- Task 2 -->
+                <div class="bg-white p-4 rounded-xl border border-gray-200">
+                    <div id="ext-task-2-title" class="font-bold mb-2"></div>
+                    <div id="ext-task-2-desc" class="text-sm text-gray-600"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-6 text-center text-gray-400 text-sm">
+        <p>Lesson generated for Thai Student</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- 1. DATA STORE (Content) ---
+        const content = {
+            intro: {
+                title: { thai: "ยินดีต้อนรับสู่คลาสเรียนสุดป่วน!", ipa: "yin-dii dtɔ̂ɔn-ráp sùu kláat-rian sùt bpùan", en: "Welcome to the chaotic class!" },
+                desc: { thai: "วันนี้เราจะฝึกพูดคำศัพท์ยากๆ ให้เป็นเรื่องตลก", ipa: "wan-níi rao jà fʉ̀k pûut kam-sàp yâak yâak hâi bpen rʉ̂ang dtà-lòk", en: "Today we practice difficult vocab by making it funny." }
+            },
+            headings: {
+                roulette: { thai: "1. วงล้อวัดดวง (แต่งประโยคตลกๆ)", ipa: "wong-lɔ́ɔ wát duang", en: "1. Vocab Roulette (Make funny sentences)" },
+                roleplay: { thai: "2. บทบาทสมมติ: ฆาตกรสุภาพ", ipa: "bòt-bàat sǒm-mút: kâat-dtà-gɔɔn sù-pâap", en: "2. Role Play: The Polite Serial Killer" },
+                debate: { thai: "3. โต้วาที: รวยแต่เหงา vs จนแต่เพื่อนเยอะ", ipa: "dtôo-waa-tii: ruai dtɛ̀ɛ ngǎo vs jon dtɛ̀ɛ pʉ̂an yə́", en: "3. Debate: Rich & Lonely vs Poor & Popular" },
+                story: { thai: "4. นิทาน: ความลับของหมอ", ipa: "ní-taan: kwaam-láp kɔ̌ɔng mɔ̌ɔ", en: "4. Story: The Doctor's Secret" },
+                // CHANGED: Added Extension Heading
+                extension: { thai: "กิจกรรมเสริม (ถ้ามีเวลาเหลือ)", ipa: "gìt-jà-gam sěrm (tâa mii wee-laa lʉ̌a)", en: "Extension Activities (If time remains)" }
+            },
+            roulette: {
+                instruction: { thai: "กดปุ่มเพื่อสุ่มคำศัพท์ แล้วแต่งประโยคที่ 'แปลก' ที่สุด", ipa: "gòt bpùm pʉ̂a sùm kam-sàp lɛ́ɛo dtɛ̀ng bprà-yòok tîi 'bplɛ̀ɛk' tîi-sùt", en: "Press to spin, then make the 'weirdest' sentence possible." }
+            },
+            roleplay: {
+                title: { thai: "สถานการณ์: ที่คลินิกหมอ", ipa: "sà-tǎa-ná-gaan: tîi kli-nìk mɔ̌ɔ", en: "Scenario: At the doctor's clinic" },
+                roleA: { thai: "คุณเป็นหมอที่ขี้สงสัย พยายามถามคนไข้ว่าไปทำอะไรมาถึงเจ็บ", ipa: "kun bpen mɔ̌ɔ tîi kîi sǒng-sǎi", en: "You are a suspicious doctor trying to ask how the patient got hurt." },
+                roleB: { thai: "คุณเป็นฆาตกรต่อเนื่องที่ปวดหลังเพราะ 'แบกของหนัก' (ศพ) แต่ต้องพูดจาสุภาพมาก", ipa: "kun bpen kâat-dtà-gɔɔn dtɔ̀ɔ-nʉ̂ang... dtɔ̂ng pûut-jaa sù-pâap mâak", en: "You are a serial killer with back pain from 'carrying heavy things' (bodies) but must be very polite." }
+            },
+            debate: {
+                topic: { thai: "หัวข้อ: เป็นคนรวยที่ไม่มีใครรัก ดีกว่า เป็นคนจนที่มีเพื่อนเยอะ จริงไหม?", ipa: "hǔa-kɔ̂ɔ: bpen kon ruai... dii gwàa... jing mǎi?", en: "Topic: Being rich & unloved is better than being poor & popular. True?" },
+                teamA: { thai: "ทีมรวย: ร้องไห้บนรถเบนซ์ ดีกว่าหัวเราะบนรถเมล์", ipa: "tiim ruai: rɔ́ɔng-hâi bon rót benz dii gwàa...", en: "Team Rich: Crying in a Benz is better than laughing on a bus." },
+                teamB: { thai: "ทีมจน: มีเงินแต่ไม่มีคนกอด มันหนาวนะ", ipa: "tiim jon: mii ngən dtɛ̀ɛ mâi mii kon gɔ̀ɔt...", en: "Team Poor: Having money but no hugs is cold." }
+            },
+            story: {
+                instruction: { thai: "แต่งเรื่องต่อกัน คนละ 1 ประโยค", ipa: "dtɛ̀ng rʉ̂ang dtɔ̀ɔ gan kon lá 1 bprà-yòok", en: "Continue the story, 1 sentence each." },
+                start: { thai: "เมื่อวานนี้ แฟนเก่าของฉันโทรมา... แต่เสียงเขาเหมือนผี...", ipa: "mʉ̂a-waan-níi fɛɛn-gào kɔ̌ɔng chǎn too maa... dtɛ̀ɛ sǐang kǎo mʉ̌an pǐi...", en: "Yesterday my ex called... but he sounded like a ghost..." }
+            },
+            extension: {
+                task1: { 
+                    // CHANGED: Removed English text in brackets
+                    title: { thai: "เกมสัมภาษณ์ตลก", ipa: "game sǎm-pâat dtà-lòk", en: "Funny Interview Game" },
+                    desc: { thai: "สัมภาษณ์เพื่อนว่าเป็น 'มนุษย์ต่างดาว' หรือไม่ (ใช้คำศัพท์: ยานอวกาศ, ผิวหนัง, อาหาร)", ipa: "sǎm-pâat pʉ̂an wâa bpen má-nút dtàang daao rʉ̌ʉ mâi", en: "Interview your friend to see if they are an alien." }
+                },
+                task2: {
+                    // CHANGED: Removed English text in brackets
+                    title: { thai: "นักรีวิวอาหารยอดแย่", ipa: "nák rii-wiu aa-hǎan yɔ̂ɔt yɛ̂ɛ", en: "The Terrible Food Reviewer" },
+                    desc: { thai: "รีวิวร้านอาหารที่รสชาติแย่มาก แต่ต้องพูดชม (Sarcasm)", ipa: "rii-wiu ráan aa-hǎan tîi rót-châat yɛ̂ɛ mâak dtɛ̀ɛ dtɔ̂ng pûut chom", en: "Review a terrible restaurant but you must compliment it (Sarcasm)." }
+                }
+            }
+        };
+
+        // CHANGED: Added Emojis to vocabPool
+        const vocabPool = [
+            { t: "🔪 ฆาตกรต่อเนื่อง", i: "kâat-dtà-gɔɔn dtɔ̀ɔ-nʉ̂ang", e: "Serial killer" },
+            { t: "🚽 ท้องเสีย", i: "tɔ́ɔng sǐa", e: "Diarrhea" },
+            { t: "👵 มนุษย์ป้า", i: "má-nút bpâa", e: "Karen (Auntie human)" }, 
+            { t: "💔 แฟนเก่า", i: "fɛɛn gào", e: "Ex-boyfriend/girlfriend" },
+            { t: "🩺 หมอนิติเวช", i: "mɔ̌ɔ ní-dtì-wêet", e: "Forensic Doctor" },
+            { t: "😤 ยาดม", i: "yaa-dom", e: "Inhaler" },
+            { t: "💸 ต่อราคา", i: "dtɔ̀ɔ raa-kaa", e: "Bargain/Negotiate price" },
+            { t: "💉 เจาะเลือด", i: "jɔ̀ lʉ̂at", e: "Draw blood" },
+            { t: "😐 ตลกหน้าตาย", i: "dtà-lòk nâa dtaai", e: "Deadpan funny" },
+            { t: "🔮 น้ำมันพราย", i: "nám-man praai", e: "Love potion (superstition)" }, 
+            { t: "🥗 ส้มตำปูปลาร้า", i: "sôm-dtam bpuu bplaa-ráa", e: "Papaya salad with fermented fish" },
+            { t: "🚗 รถติด", i: "rót dtìt", e: "Traffic jam" },
+            { t: "🦥 ขี้เกียจ", i: "kîi-gìat", e: "Lazy" },
+            { t: "🗣️ คนพูดเยอะ", i: "kon pûut yə́", e: "Chatterbox" }
+        ];
+
+        // --- 2. CORE FUNCTIONS ---
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            // Clean emojis before speaking so TTS doesn't say "Knife symbol" etc.
+            const cleanText = text.replace(/[\u{1F600}-\u{1F6FF}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+            
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Generate Smart Text Component
+        function createSmartText(data, classes = "text-lg") {
+            const id = Math.random().toString(36).substr(2, 9);
+            const thai = data.thai || data.t;
+            const ipa = data.ipa || data.i;
+            const en = data.en || data.e;
+
+            return `
+                <div class="smart-text-container relative inline-block w-full text-left" id="${id}">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span class="thai-text font-bold ${classes} text-gray-800 cursor-pointer hover:text-amber-600 transition-colors" onclick="speak('${thai}')">
+                            ${thai}
+                        </span>
+                        
+                        <div class="inline-flex gap-1 ml-2">
+                            <button onclick="speak('${thai}')" class="w-6 h-6 rounded-full bg-gray-100 hover:bg-amber-100 text-gray-400 hover:text-amber-600 flex items-center justify-center transition-all">
+                                <i class="fas fa-volume-up text-xs"></i>
+                            </button>
+                            <button onclick="toggleVisibility('${id}', 'ipa', this)" class="btn-toggle text-gray-500">IPA</button>
+                            <button onclick="toggleVisibility('${id}', 'en', this)" class="btn-toggle text-gray-500">EN</button>
+                        </div>
+                    </div>
+
+                    <div class="ipa-content hidden mt-1 ml-2 pl-2 border-l-2 border-fuchsia-200" data-target="ipa">
+                        <span class="ipa-text">/${ipa}/</span>
+                    </div>
+                    <div class="en-content hidden mt-1 ml-2 pl-2 border-l-2 border-blue-200" data-target="en">
+                        <span class="en-text">${en}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleVisibility(containerId, type, btn) {
+            const container = document.getElementById(containerId);
+            const content = container.querySelector(`[data-target="${type}"]`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                if (type === 'ipa') btn.classList.add('active-ipa');
+                else btn.classList.add('active-en');
+            } else {
+                content.classList.add('hidden');
+                if (type === 'ipa') btn.classList.remove('active-ipa');
+                else btn.classList.remove('active-en');
+            }
+        }
+
+        function spinRoulette() {
+            const card = document.getElementById('vocab-card');
+            card.innerHTML = `<i class="fas fa-spinner fa-spin text-4xl text-indigo-300"></i>`;
+            
+            setTimeout(() => {
+                const word = vocabPool[Math.floor(Math.random() * vocabPool.length)];
+                card.innerHTML = `
+                    <div class="animate-pop w-full text-center">
+                        <div class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">Word to use:</div>
+                        ${createSmartText(word, "text-3xl")}
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
+                            Make a funny sentence with this!
+                        </div>
+                    </div>
+                `;
+                speak(word.t);
+            }, 800);
+        }
+
+        // --- 3. INIT PAGE ---
+        window.onload = function() {
+            // Header & Intro
+            document.getElementById('intro-title').innerHTML = createSmartText(content.intro.title, "text-2xl");
+            document.getElementById('intro-desc').innerHTML = createSmartText(content.intro.desc);
+
+            // Headings
+            document.getElementById('heading-roulette').innerHTML = createSmartText(content.headings.roulette, "text-xl font-bold");
+            document.getElementById('heading-roleplay').innerHTML = createSmartText(content.headings.roleplay, "text-xl font-bold");
+            document.getElementById('heading-debate').innerHTML = createSmartText(content.headings.debate, "text-xl font-bold");
+            document.getElementById('heading-story').innerHTML = createSmartText(content.headings.story, "text-xl font-bold");
+            // CHANGED: Inject Extension Heading
+            document.getElementById('heading-extension').innerHTML = createSmartText(content.headings.extension, "text-lg font-bold");
+
+            // Roulette
+            document.getElementById('roulette-instruction').innerHTML = createSmartText(content.roulette.instruction);
+
+            // Roleplay
+            document.getElementById('rp-title').innerHTML = createSmartText(content.roleplay.title, "text-lg");
+            document.getElementById('rp-role-a').innerHTML = createSmartText(content.roleplay.roleA, "text-base");
+            document.getElementById('rp-role-b').innerHTML = createSmartText(content.roleplay.roleB, "text-base");
+
+            // Debate
+            document.getElementById('debate-topic').innerHTML = createSmartText(content.debate.topic, "text-xl");
+            document.getElementById('debate-team-a').innerHTML = createSmartText(content.debate.teamA);
+            document.getElementById('debate-team-b').innerHTML = createSmartText(content.debate.teamB);
+
+            // Story
+            document.getElementById('story-instruction').innerHTML = createSmartText(content.story.instruction);
+            document.getElementById('story-start').innerHTML = createSmartText(content.story.start, "text-xl");
+
+            // Extension
+            document.getElementById('ext-task-1-title').innerHTML = createSmartText(content.extension.task1.title, "text-base font-bold");
+            document.getElementById('ext-task-1-desc').innerHTML = createSmartText(content.extension.task1.desc, "text-sm");
+            document.getElementById('ext-task-2-title').innerHTML = createSmartText(content.extension.task2.title, "text-base font-bold");
+            document.getElementById('ext-task-2-desc').innerHTML = createSmartText(content.extension.task2.desc, "text-sm");
+        };
+    </script>
+</body>
+</html>
