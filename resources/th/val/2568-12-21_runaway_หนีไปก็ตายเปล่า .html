@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>หนีไปก็ตายเปล่า RUNAWAY</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+        .font-thai { font-family: 'Sarabun', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        * { -webkit-tap-highlight-color: transparent; }
+        button { touch-action: manipulation; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            60% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .animate-bounceIn { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body class="bg-indigo-50 text-slate-800">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        
+        // --- Inline Icons ---
+        const IconBase = ({ children, size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+
+        const Icons = {
+            Volume2: (props) => (<IconBase {...props}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /></IconBase>),
+            RefreshCw: (props) => (<IconBase {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 21h-5v-5" /></IconBase>),
+            Mic: (props) => (<IconBase {...props}><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /><line x1="8" x2="16" y1="22" y2="22" /></IconBase>),
+            Star: (props) => (<IconBase {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></IconBase>),
+            BookOpen: (props) => (<IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></IconBase>),
+            Shuffle: (props) => (<IconBase {...props}><polyline points="16 3 21 3 21 8" /><line x1="4" x2="21" y1="20" y2="3" /><polyline points="21 16 21 21 16 21" /><line x1="15" x2="21" y1="15" y2="21" /><line x1="4" x2="9" y1="4" y2="9" /></IconBase>),
+            Brain: (props) => (<IconBase {...props}><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" /><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" /></IconBase>),
+            Briefcase: (props) => (<IconBase {...props}><rect width="20" height="14" x="2" y="7" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></IconBase>),
+            Search: (props) => (<IconBase {...props}><circle cx="11" cy="11" r="8" /><line x1="21" x2="16.65" y1="21" y2="16.65" /></IconBase>)
+        };
+
+        const { Volume2, RefreshCw, Mic, Star, BookOpen, Shuffle, Brain, Briefcase, Search } = Icons;
+
+        // --- TTS Helper ---
+        const getThaiVoice = () => {
+            const voices = window.speechSynthesis.getVoices();
+            return voices.find(v => v.lang.includes('th') || v.name.includes('Thai'));
+        };
+
+        // --- Emoji Helper ---
+        const getEmojiForVocab = (meaning) => {
+            const m = meaning.toLowerCase();
+            if (m.includes('eat') || m.includes('food') || m.includes('rice') || m.includes('meal')) return '🍚';
+            if (m.includes('drink') || m.includes('water') || m.includes('coffee') || m.includes('tea')) return '🥤';
+            if (m.includes('happy') || m.includes('glad') || m.includes('fun')) return '😊';
+            if (m.includes('sad') || m.includes('cry') || m.includes('sorry') || m.includes('regret')) return '😢';
+            if (m.includes('angry') || m.includes('mad')) return '😠';
+            if (m.includes('love') || m.includes('like') || m.includes('heart')) return '❤️';
+            if (m.includes('money') || m.includes('cash') || m.includes('price') || m.includes('expensive')) return '💰';
+            if (m.includes('work') || m.includes('job') || m.includes('company') || m.includes('boss')) return '💼';
+            if (m.includes('study') || m.includes('learn') || m.includes('school') || m.includes('student') || m.includes('teacher')) return '📚';
+            if (m.includes('home') || m.includes('house') || m.includes('room')) return '🏠';
+            if (m.includes('car') || m.includes('drive') || m.includes('traffic') || m.includes('road')) return '🚗';
+            if (m.includes('police') || m.includes('crime') || m.includes('kill')) return '👮';
+            if (m.includes('doctor') || m.includes('hospital') || m.includes('sick') || m.includes('pain')) return '🏥';
+            if (m.includes('time') || m.includes('day') || m.includes('month') || m.includes('year') || m.includes('minute')) return '⏰';
+            if (m.includes('dog') || m.includes('cat') || m.includes('animal')) return '🐾';
+            if (m.includes('sleep') || m.includes('bed') || m.includes('dream')) return '😴';
+            if (m.includes('walk') || m.includes('run') || m.includes('go')) return '🏃';
+            if (m.includes('look') || m.includes('see') || m.includes('watch')) return '👀';
+            if (m.includes('listen') || m.includes('hear')) return '👂';
+            if (m.includes('speak') || m.includes('talk') || m.includes('say')) return '🗣️';
+            return '✨'; // Default
+        };
+
+        // --- Data: Full Vocab List ---
+        // Note: Using tabs \t as delimiter based on input format
+        const rawVocabData = `การอ่าน	gaan àan	reading
+ทักษะการคิควิเคราะห์	ták-sà gaan kít wí-krɔ́	critical thinking skills (analyse)
+เพลงเพราะ	pleeng prɔ́	Beautiful songs
+เป็นกันเอง	bpen gan eeng	friendly (not serious) / casual
+จ้ะ	jâ	ending particle (when you talk to someone younger)
+อก	òk	chest
+ใช้ได้จริง	chái dâai jing	Can use for real / practical
+ฆาตกรต่อเนื่อง	kâat-dtà-gɔɔn dtɔ̀ɔ-nʉ̂ʉang	Serial killer
+เสียใจ	sǐia-jai	Regret / Sorry (Feelings)
+เสื้อเชิ้ต	sʉ̂ʉa-chə́ət	Shirts
+แลก	lɛ̂ɛk	exchange
+โทรศัพท์	too-rá-sàp	phone
+น่าจะแบบสิ้นปีนี้	nâa jà bàɛp sîn-bpii-níi	Likely to be towards the end of this year
+ไม่ก็ปีหน้าเลย	mâi gɔ̂ɔ bpii-nâa ləəi	or else it'll be next year
+เส้นเล็ก	sên-lék	Thin(small) noodles (strings)
+น้ำใส	nám-sǎi	Clear soup
+ผักบุ้ง	pàk-bûng	Morning glory
+นั่งตรงไหนดี	nâng dtrong nǎi dii	Where's good to sit?
+หิมะตก	hì-má-dtòk	Snow falls
+ทานให้อร่อยนะคะ	taan hâi à-rɔ̀i ná ká	Enjoy your meal!
+การบ้าน	gaan bâan	homework
+เก็บ	gèp	keep / collect
+เขียน	kǐan	write
+คนพูดเยอะที่สุด	kon pûut yə́ tîi sùt	People speak a lot the most
+ครู	kruu	Teacher
+คืน	kʉʉn	Return
+โครงสร้างประโยค	kroong sâang bprà yòok	Sentence structure
+ชู	chuu	hold sth up
+ฐานะทางบ้าน	tǎa ná taang bâan	Social economic status (way house)
+ตัวเลข	dtua lêek	Numbers
+ตัวอักษร	dtua àk sɔ̌ɔn	Consonants / Characters / Alphabet
+เตือนความจำ	dtʉan kwaam jam	To remind
+นักเรียน	nák rian	Student
+พัดลม	pát lom	fan
+พูดในใจ	pûut nai jai	Speak silently to yourself (nobody can hear)
+ฟังช่วยให้เข้าใจ	fang chûai hâi kâo jai	Listen helps to understand
+รูป	rûup	Pictures
+เรียนจบ	rian jòp	Graduate
+โรงเรียน	roong rian	school
+วาดรูป	wâat rûup	draw
+วิทยาลัย	wít tá yaa lai	College
+ศิลปะ	sǐn lá bpà	art
+สระ	sà rà	Vowels
+สอน	sɔ̌ɔn	Teach
+สะกด	sà gòt	Spell
+สำเนียง	sǎm niang	accent
+สู้	sûu	battle / fight
+หนังสือ	nǎng sʉ̌ʉ	Books
+อ่านในใจ	àan nai jai	Read silently
+อ่านออกเสียง	àan ɔ̀ɔk sǐang	Read aloud
+คน	kon	People
+จัดการ	jàt gaan	Manage
+ช่วย	chûai	Help
+เดิน	dəən	Walk
+เดินป่า	dəən bpàa	Hike (walk forest)
+ได้ยิน	dâi yin	Hear
+กลางคืน	glaang kʉʉn	nighttime
+ตัวเอก	dtua èek	Main character
+ตื่น	dtʉ̀ʉn	Wake up
+เต้น	dtên	Dance
+ถู	tǔu	rub
+ทำ	tam	do/make
+ทุก	túk	Every
+โทรศัพท์มือถือ	too rá sàp mʉʉ tʉ̌ʉ	mobile phone
+นอน	nɔɔn	Sleep / Lie down
+น่าสนใจ	nâa sǒn jai	Interesting
+บางเพลง	baang pleeng	Some songs
+ปลูกต้นไม้	bplùuk dtôn mái	grow plants
+ผู้นำ	pûu nam	Leaders
+ฝาแฝด	fǎa fɛ̀ɛt	Twins
+ฟัง	fang	Listen
+มองไม่เห็น	mɔɔng mâi hěn	Cannot see
+มีประโยชน์	mii bprà yòot	Have advantage = Useful
+เม้ามอย	máao mɔɔi	to chit-chat
+ยาก	yâak	Difficult
+ร้องเพลง	rɔ́ɔng pleeng	Sing songs
+ระหว่าง	rá wàang	between
+ล่าสุด	lâa sùt	Latest / Recent(ly)
+เล่น	lên	Play
+เล่นเครื่องเล่น	lên krʉ̂ang lên	get on rides
+วงเก่า	wong gào	Old bands
+สระผม	sà pǒm	Wash hair
+เสียง	sǐang	Voice / Sound / Noise
+เสียงดัง	sǐang dang	Noisy / Loud
+ไส	sǎi	Push (sth big)
+หมา	mǎa	dog
+หลายเพลง	lǎai pleeng	Many songs
+หัวเราะ	hǔa rɔ́	laugh
+หา	hǎa	Search
+ออกกำลังกาย	ɔ̀ɔk gam lang gaai	To do exercise (out strength body)
+อ่าน	àan	Read
+กระสอบทราย	grà sɔ̀ɔp saai	punchbag
+กีฬา	gii laa	Sports
+แข่ง	kɛ̀ng	Compete
+ทรมาน	tɔɔ rá maan	It's a torture.
+นวม	nuam	boxing gloves
+นักเซิร์ฟ	nák sə́əf	Surfer
+รางวัล	raang wan	Prize
+เร็ว	reo	Fast
+วิ่ง	wîng	Run
+เหรียญ	rǐan	Medal / Coin
+อยากให้แม่สมัครฟิตเนส	yàak hây mɛ̂ɛ samàk fít nêet 	Want mum to sign up for the gym
+อุปกรณ์มวย	ù bpà gɔɔn muai	Boxing equipment
+ก่อนย้ายบ้าน	gɔ̀ɔn yáai bâan	Before moving house
+การเติบโต	gaan dtə̀əp dtoo	Growing up / Growth
+กุญแจรถ	gun jɛɛ rót	Car key
+ของเล่น	kɔ̌ɔng lên	Toys (stuff play)
+ขอยืมเงินหน่อยนะ	kɔ̌ɔ yʉʉm ngən nɔ̀ɔi ná	Can I borrow some money, please?
+เขย	kə̌əi	in-law (masc)
+ครอบครัว	krɔ̂ɔp krua 	Family
+งานศพ	ngaan sòp	Funeral (event)
+ชั้น	chán	Floor
+ตา	dtaa	eyes/maternal grandpa
+ตี	dtii	Hit
+แต่งงาน	dtɛ̀ng ngaan	get married
+ทะเลาะกัน	tá lɔ́ gan	quarrel / have an argument with each other
+บ่น	bòn	Complain
+บังคับ	bang káp	To force
+โบสถ์	bòot	church
+ปัญหาครอบครัว	bpan hǎa krɔ̂ɔp krua	family problems
+ปา	bpaa	Throw
+เปิดประตู	bpə̀ət bprà dtuu	open the door
+ผมหงอก	pǒm ngɔ̀ɔk	grey hair
+พระเจ้า	prá jâo	Gods
+พุทธ	pút	Buddhism
+เพื่อนรัก	pʉ̂an rák	best friend
+แฟนเก่า	fɛɛn gào	Old partner = Ex
+มาดาม	maa daam	Madam
+มาหา	maa hǎa	come visit
+มีใจ	mii jai	Like
+ลูกครึ่ง	lûuk krʉ̂ng	Half / Mixed race
+ลูกพี่ลูกน้อง	lûuk pîi lûuk nɔ́ɔng	Cousin
+ศาสนา	sàat sà nǎa	Religion
+สะใภ้	sà pái	in-law (fem)
+หมู่บ้าน	mùu bâan	Village / Housing Estate
+ห้องรับแขก	hɔ̂ɔng ráp kɛ̀ɛk	Living room (host guest)
+ห้องอาบน้ำ	hɔ̂ɔng àap náam	Shower room
+ให้ยืม	hâi yʉʉm	Lend 
+อา	aa	Aunt/Uncle (younger than dad)
+อ่าง	àang	bathtub
+เอ็นดู	en duu	adore
+กรีดร้อง	grìit rɔ́ɔng	scream
+กลอนสั้น	glɔɔn sân	short poem
+กลายเป็น	glaai bpen	become
+การฆาตกรรม	gaan kâat dtà gam	Murder
+เกิดอะไรขึ้น	gə̀ət à rai kʉ̂n	What happened?
+คนดัง	kon dang	famous people
+ความลึกลับ	kwaam lʉ́k láp	Mystery
+ฆาตกรรม	kâat dtà gam	Crimes
+เงา	ngao	shadow
+เงินรางวัล	ngən raang wan	Cash prize
+จน	jon	Poor (status)
+จอร์เจียเป็นแม่ที่ดี	jɔɔ jia bpen mɛ̂ɛ tîi dii	Georgia is a mum that is good.
+จุด	jùt	Point / Dot
+เจอ	jəə	found / meet
+ชนะ	chá ná	Win
+ซับซ้อน	sáp sɔ́ɔn	Complex
+ดาดฟ้า	dàat fáa	Rooftop
+ดารา	daa raa	movie stars
+เดาได้	dao dâi	predictable 
+ได้รับแรงบันดาลใจจาก	dâi ráp rɛɛng ban daan jai jàak	Get inspiration from
+ตัวร้าย	dtua ráai	villain
+แต่งเพลง	dtɛ̀ng pleeng	compose songs
+ถูกฆ่า	tùuk kâa	Get killed
+ทำซีรีส์ไม่เหมือนกัน	tam sii rîi mâi mʉ̌an gan	Film making is not the same.
+ทำทุกอย่างเพื่อลูก	tam túk yàang pʉ̂a lûuk	Do everything for children
+ทำลาย	tam laai	Destroy
+นักฆ่า	nák kâa	Killer
+นักร้อง	nák rɔ́ɔng	Singer
+นักแสดง	nák sà dɛɛng	actor
+นั่งตัก	nâng dtàk	Sit on the lap
+เป็นแรงบันดาลใจ	bpen rɛɛng ban daan jai	To be an inspiration
+พากย์	pâak	To (audio)dub
+พื้น	pʉ́ʉn	ground / floor
+ภาค	pâak	season (sequel)
+มีความหมายดี	mîik waam mǎai dii	Have good meaning / Meaningful
+มีอะไรให้ช่วยครับ	mii à rai hâi chûai kráp	How can I help?
+ไม่หันมา	mâi hǎn maa	Didn't turn around
+รวย	ruai	Rich
+เลิกกัน	lə̂ək gan	Break up
+ศูนย์	sǔun	Zero
+สัตว์ประหลาด	sàt bprà làat	Monster
+สืบสวน	sʉ̀ʉp sǔan	Investigate
+หนัง	nǎng	movie
+หนี้	nîi	Debts
+หูดี	hǔu dii	good ears
+หูฟัง	hǔu fang	Headphones / earphones
+เหงื่อออก	ngʉ̀a ɔ̀ɔk	To sweat
+เอาเปรียบ	ao bprìap	Take advantage of someone
+โกรธ	gròot	angry
+เครียด	krîat	stressed
+ง่วง	ngûang	Sleepy
+ดีใจ	dii jai	happy (when sth good happened)
+ตื่นเต้น	dtʉ̀ʉn dtên	Excited
+น่ากลัว	nâa glua	scary
+น่ารังเกียจ	nâa rang gìat	Disgusting
+มีความสุข	mii kwaam sùk	Happy
+เกษียณ	gà sǐan	Retired
+รัก	rák	Love
+สบายใจ	sà baai jai	Comfortable (emotionally)
+อบอุ่น	òp un	Warm
+ก็	gɔ̂ɔ	then
+ก็เลย	gɔ̂ɔ ləəi	so
+กว่า	gwàa	comparative
+กว่าจะถึง	gwàa jà tʉ̌ng	By the time (Until) we (will) arrive
+ก่อน	gɔ̀ɔn	Before
+กัน	gan	together
+กับ	gàp	and/with
+กำลังไป	gam lang bpai	on the way
+กำลังไปไหน	gam lang bpai nǎi	Where are you on the way to?
+กำลังมา	gam lang maa	coming
+กินสิ	gin sì	Eat!
+เก่า	gào	old
+เกินไป	gəən bpai	too + adj/adv
+เกี่ยวกับ	gìao gàp	about
+ใกล้	glâi	Near
+ของ	kɔ̌ɔng	of (possessive)
+เข้า	kâo	Enter
+เข้ากับ	kâo gàp	get along with
+คนเดียว	kon diao	alone (person solo)
+คล้าย	kláai	similar
+ควร	kuan	should
+คู่	kûu	pairs
+เคย	kəəi	Ever / Used to
+แค่	kɛ̂ɛ	Just / only
+จริงๆแล้ว	jing jing lɛ́ɛo	Actually
+จะ	jà	will
+เช่น	chên	such as 
+ดู	duu	Look / watch
+เดิม	dəəm	Same old / usual / before
+ใด	dai	any / which
+ได้กินเลย	dâi gin ləəi	Get to eat immediately
+ต่อ	dtɔ̀ɔ	Continue / Next / Per
+ต้อง	dtɔ̂ng	Have to / Must
+ต้องการ	dtɔ̂ng gaan	want / need
+จอง	jɔɔng	Reserve / book
+แต่	dtɛ̀ɛ	but / only
+แต่ละวันทำอะไรบ้าง	dtɛ̀ɛ lá wan tam à rai bâang	What do you do each day?
+ถ้า	tâa	If
+ถึง	tʉ̌ng	To / Until
+ถูก	tùuk	get (+ V = passive voice) / cheap / correct
+ถูกรังแก	tǔu grang gɛɛ	Get messed with / Get bullied
+ทั้งหมด	táng mòt	All / Total / Whole
+ทำให้	tam hâi	to make sb adj
+ที่	tîi	at/which/that/who
+ที่สุด	tîi sùt	The most
+ที่ไหนก็ได้	tîi nǎi gɔ̂ɔ dâi	Wherever
+เท่ากับ	tâo gàp	equal
+เท่านั้น	tâo nán	only
+นั่งสิ	nâng sì	Sit!
+แน่ใจ	nɛ̂ɛ jai	Sure
+ใน	nai	In
+ในอาคาร	nai aa kaan	Within the building
+บางอย่าง	baang yàang	Something
+ปกติ	bpà gà dtì	Normally
+ประโยค	bprà yòok	sentence
+เป็น	bpen	Be (is/am/are)
+เป็นยังไงบ้าง	bpen yang ngai bâang	How's ...?
+ไปกินข้าวมา	bpai gin kâao maa	I went to eat.
+ไปไหนมา	bpai nǎi maa	Where did you go?
+ผิด	pìt	wrong(ly)
+พยายาม	pá yaa yaam	try / attempt
+พร้อม	phrɔ́ɔm	ready / together with
+พา	paa	Take
+เพราะ	prɔ́	Because
+เพิ่ง	pə̂əng	just / recently
+เพิ่ม	pə̂əm	Additional / Extra
+เพื่อ	pʉ̂a	for / in order to
+เพื่อนคนละคน	pʉ̂an kon lá kon	different friends
+มักจะ	mák jà	tend to / typically
+มา	maa	Indicating past tense / come
+มากกว่า	mâak gwàa	More (than)
+มี	mii	Have
+เมื่อไร	mʉ̂a rài	When?
+ไม่รู้ทำไม	mâi rúu tam mai	Don't know why
+รวม	ruam	include
+รู้	rúu	know
+เริ่ม	rə̂əm	start
+เรียก	rîak	Call (names)
+เรียนสิ	rian sì	Study!
+เรื่อง	rʉ̂ang	story
+ลอง	lɔɔng	try / experiment
+เลือก	lʉ̂ak	Choose
+แล้วแต่	lɛ́ɛo dtɛ̀ɛ 	It depends
+เว้นแต่ว่า	wén dtɛ̀ɛ wâa	Unless / Except
+ส่วนใหญ่	sùan yài	mostly / majority
+สำหรับ	sǎm ràp	for
+หรือ	rʉ̌ʉ	or
+หลัง	lǎng	After / behind / back
+หลาย	lǎai	many
+เห็น	hěn	think / see
+เหมาะกับ	mɔ̀ gàp	To suit / suitable with
+เหมือนเดิม	mʉ̌an dəəm	Same old / Same as usual
+เหรอ	rə̌ə	Really?
+ให้	hâi	for / give / allow
+ใหญ่	yài	Big
+ไหน	nǎi	Which
+อยาก	yàak	Want to
+อย่างน้อย	yàang nɔ́ɔi	At least
+อยู่	yùu	at / -ing
+อยู่คนเดียวตลอด	yùu kon diao dtà lɔ̀ɔt	always be alone
+อาจจะ	àat jà	maybe
+อีก	ìik	More 
+อื่น	ʉ̀ʉn	Other
+คุณเค้กเครียดเหรอ พ่ออยู่ที่โรงพยาบาล	khun khéek khrîat rə̌ə phɔ̂ɔ yùu thîi rooŋphayaabaan	Are you stressed that your dad is at the hospital?
+ใคร	krai	Who?
+จะกินข้าวแล้วเหรอ	jà gin kâao lɛ́ɛo rə̌ə	Will you eat already, right (really)?
+จะกินข้าวหรือเปล่าล่ะ	cà kinkhâaw rʉ̌ʉplàaw lâ	So, will you eat or not?
+จะกินข้าวหรือยัง	cà kinkhâaw rʉ̌ʉyaŋ	Will you eat or not yet?
+จะกินข้าวหรือยังนะ	cà kinkhâaw rʉ̌ʉyaŋ ná	นะ ná is used to ask again if you didn't catch the answer the first time.
+บ้าง	bâang	expecting more than 1 answer
+แปลว่าอะไรนะ	bplɛɛ wâa à rai ná	What does that (translate) mean?
+เริ่มงานหรือยัง	rə̂əm ŋaan rʉ̌ʉyaŋ	Have you started working?
+แล้วคุณล่ะ	lɛ́ɛw khun lâ	What about you?
+ก่อสร้าง	gɔ̀ɔ sâang	contruct
+แข็งแรง	kɛ̌ng rɛɛng	strong
+เก้าอี้	gâo îi	chair
+ขยัน	kà yǎn	Hardworking
+ข้อความ	kɔ̂ɔ kwaam	Message
+เข้าเวร(เข้ายาม)	kâo ween (kâo yaam)	On shift / roster
+คนไข้	kon kâi	Patients
+คำตอบ	kam dtɔ̀ɔp	answer (word reply)
+คำย่อ	kam yɔ̂ɔ	Abbreviation
+คุย	kui	talk
+เครือเดียวกัน	krʉa diao gan	Under the same umbrella (companies)
+จริงใจ	jing jai	Sincere
+จะใช้ระบบเทรนใหม่เมื่อไร	jà chái rá bòp treen mài mʉ̂a rài	When will you use the new training system?
+จับฉลาก	jàp chà làak	Lucky draw (catch labels)
+ซื่อสัตย์	sʉ̂ʉ sàt	Honest
+เด็กใหม่	dèk mài	Newbies
+ต้องบอกบอส	dtɔ̂ɔng bɔ̀ɔk bɔ́ɔt	Have to tell boss
+ตังค์	dtang	money
+ตั้งใจ	dtâng jai	intentionally
+ตัดสินใจ	dtàt sǐn jai	Decide
+ติ๊ด	dtít	Tap
+เตรียม	dtriam	Prepare
+เถียง	tǐang	argue
+ทัศนคติต่อการเรียน	tát sà ná ká dtì dtɔ̀ɔ gaan rian	Attitude toward learning
+ทางการ	taang gaan	Formal
+นักกายภาพบำบัด	nák gaai yá pâap bam bàt	physiotherapist
+นักจิตวิทยา	nák jìt dtà wít tá yaa	psychologist
+น่าเบื่อ	nâa bʉ̀a	Boring
+บริษัท	bɔɔ rí sàt	Company
+บ่อย	bɔ̀ɔi	Often
+ประมาณ	bprà maan	About / Around / Approximately
+ประเมิน	bprà məən	Appraise / Evaluate / Assess
+ปัญหา	bpan hǎa	problems
+เปลี่ยน	bplìan	Change
+ผ่าน	pàan	pass
+เพื่อนร่วมงาน	pʉ̂an rûam ngaan	Co-workers (friends)
+มีประสบการณ์	mii bprà sòp gaan	To experience
+ยาม	yaam	Security guard (old term)
+ยุ่ง	yûng	busy
+รบกวน	róp guan	Disturb
+รปภ.	rɔɔ bpɔɔ pɔɔ	Security guard (modern term)
+ระบบเทรนใหม่	rá bòp treen mài	New training system
+รักษาความปลอดภัย	rák sǎa kwaam bplɔ̀ɔt pai	Security guard (protect safety)
+เรียนรู้	rian rúu	gain knowledge
+ลา	laa	Take a leave
+ลาพักร้อน	laa pák rɔ́ɔn	Take a vacation leave
+ลูกน้อง	lûuk nɔ́ɔng	Subordinates
+วันแรงงาน	wan rɛɛng ngaan	Labour Day
+วันหยุด	wan yùt	holiday
+สตางค์	sà dtaang	cents
+สมควรแล้ว	sǒm kuan lɛ́ɛo	You deserve it.
+สมัคร	sà màk	Apply
+สวัสดิการ	sà wàt dì gaan	Welfare & benefits
+ตลอด	talɔ̀ɔt	always (put at the end of the sentence)
+สาขา	sǎa kǎa	Branches
+หนึ่งทุ่ม	nʉ̀ng tûm	7PM
+หยุด	yùt	stop
+หวังดี	wǎng dii	(Hope) They mean well. 
+อนุมัติ	à nú mát	approve
+อสังหา	à sǎng hǎa	real estate
+อะไรใหม่ๆ	à rai mài mài	New things
+อายุ	aa yú	age
+กระเป๋า	grà bpǎo	Bags (with zip)
+แกล้งทำตัว	glɛ̂ɛng tam dtua	pretend to act
+ขวด	kùat	Bottle
+ของฝาก	kɔ̌ɔng fàak	souvenirs
+ขาย	kǎai	Sell
+เข้าไปเลย	kâo bpai ləəi	Go in now.
+เขาโอเคที่ฉันต่อราคา	kǎo oo kee tîi chǎn dtɔ̀ɔ raa kaa	They're ok with me bargaining.
+แขนสั้น	kɛ̌ɛn sân	Short-sleeved
+คนขาย	kon kǎai	Seller
+คู่เดียวกัน	kûu diao gan	Exact same (single) pair
+เครื่องทำกาแฟ	krʉ̂ang tam gaa fɛɛ	Coffee machine
+เครื่องสำอาง	krʉ̂ang sǎm aang	cosmetics / beauty products
+เงิน	ngən	Money
+จ่าย	jàai	pay
+ซื้อ	sʉ́ʉ	Buy
+ดอกไม้	dɔ̀ɔk mái	Flowers
+เดี๋ยวไปส่งนะครับ	dǐao bpai sòng ná kráp	I'll send you off in a bit.
+ต่อราคา	dtɔ̀ɔ raa kaa	negotiate the price
+ถอด	tɔ̀ɔt	take off
+น้ำหอม	nám hɔ̌ɔm	Perfume
+ใบสีดำตรงนั้นครับ	bai sǐi dam dtrong nán kráp	The black one over there.
+เปลี่ยนสี	bplìan sǐi	change colour
+พอดี	pɔɔ dii	Fit
+พิเศษ	pí sèet	Special
+แพง	pɛɛng	Expensive
+รองเท้า	rɔɔng táao	shoes (to cushion feet)
+ลองได้นะครับ	lɔɔng dâi ná kráp	You can try it on.
+ลูกค้า	lûuk káa	Customer
+ลูกค้าซื้อให้แฟนหรือเปล่าครับ	lûuk káa sʉ́ʉ hâi fɛɛn rʉ̌ʉ bplào kráp	Are you buying it for your partner?
+เล่ม	lêm	Classifier for books
+แล้วใบนี้ใส่โทรศัพท์ได้ไหมครับ	lɛ́ɛo bai níi sài toon sàp dâi mǎi kráp	Can I fit a phone in this bag?
+แว่น	wɛ̂ɛn	Glasses
+แว่นกันแดด	wɛ̂ɛn gan dɛ̀ɛt	sunglasses (protect sunlight)
+สนใจใบไหนครับ	sǒn jai bai nǎi kráp	Which (classifier for)bag are you interested in?
+สร้อยข้อมือ	sɔ̂ɔi kɔ̂ɔ mʉʉ	bracelet (wrist)
+เสีย	sǐa	broken
+เสื้อผ้า	sʉ̂a pâa	Clothes
+เสื้อยืด	sʉ̂a yʉ̂ʉt	t-shirt (tops stretch)
+ใส่	sài	Put on/wear/add
+เหล็ก	lèk	Metal
+ใหม่	mài	New
+ขวา	kwǎa	Right
+ข้างบน	kâang bon	Up above / upstairs
+ข้างล่าง	kâang lâang	Down below / Downstairs
+ข้างหน้า	kâang nâa	In front (face)
+ข้างหลัง	kâang lǎng	Back side / Behind
+ขึ้นบันไดเลื่อน	kʉ̂n ban dai lʉ̂an	Go up the escalator (stairs move)
+ชั้นบน	chán bon	Top(on) shelf(floor) / upstairs
+เชื่อมกัน	chʉ̂am gan	Connected/Lined to each other
+ซ้าย	sáai	Left
+ตรงนั้นเลยครับ	dtrong nán ləəi kráp	Right there.
+ตรงนี้	dtrong níi	Right here
+ตรงนู้น	dtrong núun	Right over there
+ตรงไป	dtrong bpai	Go straight
+ตรงไหน	dtrong nǎi	Where? (which)
+ถาม	tǎam	To ask questions
+ทางออก	taang ɔ̀ɔk	Exit (way out)
+บอก	bɔ̀ɔk	Tell
+ตำรวจ	dtam rùat	Police
+ลง	long	Down / Get off
+ล็อก	lɔ́k	Aisle
+หันหน้า	hǎn nâa	To face
+อีกรอบนึง	ìik rɔ̂ɔp nʉng	One more time(round)
+กระเช้า	grà cháo	Cable car
+กลาง	glaang	central / medium
+เกาะ	gɔ̀	island
+ไกด์	gái	Tour guide
+ข้างนอก	kâang nɔ̂ɔk	Outside
+ขี่	kìi	ride
+แขก	kɛ̀ɛk	Guest
+ครึ่งทาง	krʉ̂ng taang	Half way
+คลื่นไม่ใหญ่พอ	klʉ̂ʉn mâi yài pɔɔ	The wave is not big enough.
+เครื่องบิน	krʉ̂ang bin	plane
+งง	ngong	confused
+ตัดผม	dtàt pǒm	Cut hair
+จับปู	jàp bpuu	Catch crabs
+ชัน	chan	steep
+ชายแดน	chaai dɛɛn	border
+ชายหาด	chaai hàat	beach
+ใช้เงิน	chái ngən	use money = spend
+ดัง	dang	Famous
+เดินทางปลอดภัย	dəən taang bplɔ̀ɔt pai 	Safe travels!
+ต้นไม้	dtôn mái	trees
+ตั๋ว	dtǔa	Tickets
+ใต้	dtâi	south
+ถ่ายรูป	tàai rûup	Take photos/pictures
+ทะเล	tá lee	the sea
+ทั้งคู่	táng kûu	Both (all pair)
+ท่าเรือตกปลา	tâa rʉa dtòk pblaa	Fishing port
+ที่อื่น	tîi ʉ̀ʉn	Other places
+นั่งเรือ	nâng rʉa	Take the boat
+เปิด	bpə̀ət	Open / Turn on
+ผลัก	plàk	push
+เผลอ	plə̌ə	accidentally
+ภูเขา	puu kǎo	Mountain
+มอเตอร์ไซค์	mɔɔ dtəə sai	motorcycle
+มีชื่อ	mii chʉ̂ʉ	well-known
+ไม่มีอะไรทำ	mâi mii à rai tam	There's nothing to do.
+รูปปั้น	rûup bpân	statues
+โรงแรม	roong rɛɛm	Hotel
+ลืมเอามา	lʉʉm ao maa	Forgot to bring
+วัด	wát	Temples
+สงบ	sà ngòp	calm / peaceful
+ส่งมาให้ฉัน	sòng maa hâi chǎn	Send them to me
+สระว่ายน้ำ	sà wâai náam	Swimming pool
+สวนสนุก	sǔan sà nùk	fun park = amusement park
+สะดวก	sà dùak	Convenient
+สังเคราะห์แสง	sǎng krɔ́ sɛ̌ɛng	photosynthesise
+สาขาอื่น	sǎa kǎa ʉ̀ʉn	Other branches/outlets
+สายการบิน	sǎai gaan bin	airline (flying)
+สุ่ม	sùm	random
+หนัก	nàk	weigh
+หยาบคาย	yàap kaai	rude
+ห้อง	hɔ̂ɔng	rooms
+เหนือ	nʉ̌a	north
+อยู่บนเรือ	yùu bon rʉa	Stay on the boat
+อาบแดด	àap dɛ̀ɛt	sunbathe
+กล้า	glâa	dare / brave
+ขี้เกียจ	kîi gìat	lazy
+ใจดี	jai dii 	Kind
+ฉลาด	chà làat	Smart / Intelligent
+ซน	son	naughty
+ดื้อ	dʉ̂ʉ	stubborn
+ตลก	dtà lòk	funny
+น่ารำคาญ	nâa ram kaan	annoying
+นิสัย	ní sǎi	personality
+เป็นธรรมชาติ	bpen tam má châat	Natural (nature)
+โมโห	moo hǒo	Furious
+เริ่มก้าวแรก	rə̂əm gâaw rɛ̂ɛk	(start) Take the first step
+ไว	wai	Fast
+เกาหลี	gao lǐi	Korea
+ไต้หวัน	dtâi wǎn	Taiwan
+ประเทศ	bprà têet	Country
+ฝรั่งเศส	fà ràng sèet	France
+พม่า	pá mâa	Myanmar / Burma
+อังกฤษ	ang grìt	the UK / English
+วันจันทร์	wan can	Monday
+วันพฤหัส	wan prí hàt	Thursday
+วันพุธ	wan pút	Wednesday
+วันเสาร์	wan sǎo	Saturday
+วันอังคาร	wan ang kaan	Tuesday
+วันอาทิตย์	wan aa tít	Sunday
+ตาม	dtaam	Follow
+กลางปี	glaang bpii	midyear
+กี่โมง	gìi moong	How many o'clock? = What time?
+ครั้งที่แล้ว	khráŋ thîilɛ́ɛw	Last time
+ครึ่ง	krʉ̂ng	Half
+คืนนี้	kʉʉn níi	Tonight
+ฉี่ทั้งคืน	chìi táng kʉʉn	Pee the entire night.
+ช่วงนี้	chûang níi	Lately
+ชั่วโมง	chûa moong	Hours
+ใช้เวลา	chái wee laa	(use) take time / spend time
+ดึก	dʉ̀k	late in the night
+เดี๋ยวไปกินข้าวกับเพื่อน	dǐao bpai gin kâao gàp pʉ̂an	In a bit, I'll go eat with friends.
+เดือน	dʉan	month
+เดือนที่แปด	dʉan tîi bpɛ̀ɛt	The 8th month / August
+ตอน	dtɔɔn	When
+ตอนขับรถ	dtɔɔn kàp rót	While driving,
+ต่อมา	dtɔ̀ɔ maa	Next ...
+แต่ก่อน	dtɛ̀ɛ gɔ̀ɔn	Before this
+ทั้งปี	táng bpii	The whole year
+ทั้งอาทิตย์	táng aa tít	the whole week
+ที	tii	Times 
+เที่ยง	tîang	noon
+เที่ยงครึ่ง	tîang krʉ̂ng	12:30PM
+นาที	naa tii	Minutes
+นาน	naan	Long time
+บางครั้ง	baang kráng	Sometimes
+บางที	baang tii	Sometimes
+บ่ายโมง	bàai moong	1PM
+บ่ายโมงครึ่ง	bàai moong krʉ̂ng	1:30PM
+บ่ายสอง	bàai sɔ̌ɔng	2PM
+บ่ายหนึ่งโมง	bàai nʉ̀ng moong	1PM
+ปีหน้า	bpii nâa	next year
+ปุ๊บปั๊บ	bpúp bpáp	Last minute
+มะรืนนี้	má rʉʉn níi	The day after tomorrow
+เมื่อวาน	mʉ̂a waan	Yesterday
+ยาว	yaaw	long 
+รอ	rɔɔ	wait
+สองทุ่ม	sɔ̌ɔng tûm	8PM
+สี่ทุ่มครึ่ง	sìi tûm krʉ̂ng	10.30pm
+สุดท้าย	sùt táai	Final / Last
+เสาร์อาทิตย์	sǎo aa tít	Saturday&Sunday
+อาทิตย์ที่แล้ว       	aa tít tîi lɛ́ɛo	Last week
+อาทิตย์หน้า	aa tít nâa	Next week
+นา	naa	rice field
+สวน	sǔan	Park
+ห้าง	hâang	Mall
+...ไว้	wái	Indicating past event / finished action
+ขั้นตอน	kân dtɔɔn	process / steps
+ชั่งน้ำหนัก	châng nám nàk	To weigh
+ตรงกลาง	dtrong glaang	Middle
+ที่นั่ง	tîi nâng	seats
+บิน	bin	Fly
+ผู้โดยสารมีกระเป๋าโหลดไหมคะ	pûu dooi sǎan mii grà bpǎo lòot mǎi ká	Do you loaded baggage, passenger?
+ไม่มีกระเป๋าโหลดค่ะ	mâi mii grà bpǎo lòot kâ	I don't any bags to load.
+ริมทางเดิน	rim taang dəən	Aisle seat
+ริมหน้าต่าง	rim nâa dtàang	Window seat
+เรียบร้อยค่ะ	rîap rɔ́ɔi kâ	All set.
+และขึ้นเครื่องตอนสองทุ่มห้านาที	lɛ́ kʉ̂n krʉ̂ang dtɔɔn sɔ̌ɔng tûm hâa naa tii	And go up the plane at 8.05pm.
+วันนี้ประตูเกท 31	wan níip rá dtuu gèet 31	Today, the gate is 31.
+สนามบิน	sà nǎam bin	Airport (field)
+สวัสดีค่ะ เดินทางไปเชียงใหม่ค่ะ	sà wát dii kâ dəən taang bpai chiang mài kâ	Hello, I'm traveling to Chiang Mai.
+สวัสดีค่ะ เดินทางไปไหนคะ	sà wát dii kâ dəən taang bpai nǎi ká	Hello, where are you travelling to?
+หนักไป	nàk bpai	Too heavy
+มัน	man	It
+อี 	ii	Prefix to call a friend jokingly when they prank you or call someone you don't like
+กระดาษ	grà dàat	Paper
+ของมึง	kɔ̌ɔng mʉng	This is yours (of you)
+งี้ก็เมาแย่	ngíi gɔ̂ɔ mao yɛ̂ɛ	Like this, I'll be drunk so badly.
+เงินสด	ngən sòt	Cash (fresh money)
+ถัง	tǎng	Bucket
+ถ้าอย่างงั้น ของพี่อิงฟ้าก็ต้องเป็น ลาเต้เย็น หวาน 50% ใช่ไหมคะ	tâa yàang ngán kɔ̌ɔng pîi ing fáa gɔ̂ɔ dtɔ̂ɔng bpen laa dtê yen wǎan 50% châi mǎi ká	So, yours is iced latte sweet 50%
+ถุง	tǔng	Bags (no zip)
+ถูกกว่า	tùuk gwàa	Cheaper
+นม	nom	Milk
+บัตร	bàt	Card
+ฝา	fǎa	Lid
+พี่อิงฟ้าจำได้ด้วยเหรอคะ	pîi ing fáa jam dâi dûai rə̌ə ká	You can also remember.
+แมคคีอาโต้ หวาน 25% ของน้องเอิร์นค่ะ	mɛ̂ɛk kii aa dtôo wǎan 25% kɔ̌ɔng nɔ́ɔng əən kâ	Macchiato 25% sweet for Earn
+ไม่ค่ะ ของหมอ ลาเต้ร้อน	mâi kâ kɔ̌ɔng mɔ̌ɔ laa dtê rɔ́ɔn	No hot latte for me 
+เล็ก	lék	Small
+หลอด	lɔ̀ɔt	straw
+ไหนสิงห์(ของ)กูอะ	nǎi sǐng (kɔ̌ɔng) guu à	Where is the Singha of mine?
+อเมริกาโน่ ร้อน ไม่หวาน ของพี่หมอฟ้าลดาค่ะ	à mee rí gaa nôo rɔ́ɔn mâi wǎan kɔ̌ɔng pîi mɔ̌ɔ fáa rá daa kâ	Hot unsweetened americano 
+น้ำเปล่าสองครับพี่	náam bplào sɔ̌ɔng kráp pîi	2 servings of plain water.
+น้ำเปล่าเหมือนกัน	náam bplào mʉ̌an gan	Plain water, too.
+นี่	nîi	Here.
+พอแล้วไอสัตว์	pɔɔ lɛ́ɛo ai sàt	Enough, you animal.
+พี่ครับๆ	pîi kráp pîi kráp	Brother/Sister!
+เฟรนฟรายพ่อมึงอะ	freen fraai pɔ̂ɔ mʉng à	French fries, your dad.
+เฟรนฟรายเหรอมึง	freen fraai rə̌ə mʉng	Do you want french fries?
+มึงอ่ะ	mʉng à	What about you?
+แล้วก็ไอธารล่ะ	lɛ́ɛo gɔ̂ɔ ai taan lâ	What about Tharn?
+สไปรท์	sà bprai	Sprite
+สไปรท์อีกหนึ่งครับ	sà bprai ìik nʉ̀ng kráp	One more sprite
+ส่วนน้ำเป็นน้ำเปล่าครับผม	sùan náam bpen náam bplào kráp pǒm	As for drinks, I want plain water.
+สั่งอาหารหน่อยครับ	sàng aa hǎan nɔ̀ɔi kráp	Order food, please.
+เอา	ao	I want ...
+เอาแค่นี้ก่อนครับ	ao kɛ̂ɛ níi gɔ̀ɔn kráp	That's all for now.
+ฮาวาเอี่ยนถาดใหญ่นะครับผม	haa waa ìan tàat yài ná kráp pǒm	Large tray of Hawaiian pizza
+กา	gaa	Crow
+ขอกินอาหารคน	kɔ̌ɔ gin aa hǎan kon	beg for human food
+ฉลาม	chà lǎam	sharks
+ช้าง	cháang	Elephant
+ปลากระเบน	bplaa grà been	stingrays
+ปูนา	bpuu naa	Rice field crab
+พิษ	pít	poison
+ไม่รู้ว่า หมาทุกตัวปีนโต๊ะไหม	mâi rúu wâa mǎa túk dtua bpiin dtó mǎi	Don't know whether every dog climbs the table or not
+รู	ruu	Hole
+วัว	wua	cow
+สัตว์น้ำจืด	sàt náam jʉ̀ʉt	Fresh(bland) water animal
+สิงโต	sǐng dtoo	lions
+เสือ	sʉ̌a	Tigers
+หนีบ	nìip	Tweak / Pin
+หมาตัวอื่น	mǎa dtua ʉ̀ʉn	Other dogs
+ให้นม	hâi nom	breastfeed (give milk)
+กากี	gaa gii 	khaki
+ขาว	kǎao	White
+เขียว	kǐao	green
+ดำ	dam	Black
+เทา	tao	grey
+น้ำตาล	nám dtaan	Brown
+ม่วง	mûang	purple
+ส้ม	sôm	orange
+สี	sǐi	Colour
+สีเขียว	sǐi kǐao	Green
+สีน้ำเงิน	sǐi nám ngən	Dark blue
+สีฟ้า	sǐi fáa	Sky blue
+กรน	gron	snore
+กระดูก	grà dùuk	bones
+กราม	graam	jaws
+เกา	gao	Scratch
+เกือบตาย	gʉ̀ap dtaai	almost die
+แกล้งป่วย	glɛ̂ɛng bpùai	Pretend to be sick
+แกว่งเร็วๆนะครับ	gwɛ̀ng reo reo ná kráp	Sway fast!
+ขา	kǎa	Legs
+เข่า	kào	Knees
+เข้ากับคนไข้ได้	kâo gàp kon kâi dâi	can get along with patients
+นั่ง	nâng	sit (as a passenger) / get on
+คนอายุน้อยเล่นมากขึ้น	kon aa yú nɔ́ɔi lên mâak kʉ̂n	Yonger people play more than before
+คอ	kɔɔ	Neck
+คอผมจะหัก	kɔɔ pǒm jà hàk	My neck is on the verge of breaking.
+เคล็ด	klét	sprain
+แค่หูอักเสบนิดหน่อยครับ	kɛ̂ɛ hǔu àk sèep nít nɔ̀ɔi kráp	Just the ears are a bit inflamed.
+ฉีก	chìik	Torn / Ripped
+ช้ำ	chám	have bruises
+ใช้	chái	Use
+ใช้สมอง	chái sà mɔ̌ɔng	Use brain
+ดิ้น	dîn	toss and turn
+เดี๋ยวหาว่าผมรังแกหมอ	dǐao hǎa wâa pǒm rang gɛɛ mɔ̌ɔ	Or in a bit anyone will accuse me of messing with you.
+ตะคริว	dtà kriu	Cramps
+ตับ	dtàp	Liver
+ตัว	dtua 	body
+ตาย	dtaai	Die
+ติดหวัด	dtìt wàt	Catch(stick) a cold
+เตียง	dtiang	Beds
+แตก	dtɛ̀ɛk	broken
+ไต	dtai	kidney
+ไตวาย	dtai waai	kidney failure
+ถ้ากระดิ่งแกว่งหันไปทางไหน	tâa grà dìng gwɛ̀ng hǎn bpai taang nǎi	If the bell sway turning to whichever way,
+ถูพื้น	tǔu pʉ́ʉn	mop/rub the floor/ground
+ท้อง	tɔ́ɔng	Pregnant / Stomach
+ท้องเสีย	tɔ́ɔng sǐa	Diarrhea
+ทา	taa	Apply (med)
+โทษนะครับคุณหมอ	tôot ná kráp kun mɔ̌ɔ	Sorry, doc.
+น้ำเข้าหู	náam kâo hǔu	Water enters ears.
+น้ำมูกไหล	náam mûuk lǎi	runny nose (nasal discharge flow)
+น้ำหนัก	nám nàk	weight (heavy)
+บวม	buam	swell
+บาดเจ็บ	bàat jèp	Get injured (sharp pain)
+เบาหวาน	bawwǎan	light sweet = diabetes
+ประสาท	bprà sàat	nerve
+ปวด	bpùat	ache 
+ปวดกล้ามเนื้อ	bpùat glâam nʉ́a	muscle strain
+ปวดหลังล่าง	bpùat lǎng lâang	Lower back pain
+ปีนผา	bpiin pǎa	Climbing
+เป็นเม็น	bpen men	Have a period
+เป็นหวัด	bpen wàt	have a cold
+เป็นหอบ	bpen hɔ̀ɔp	have asthma
+เป็นอะไร	bpen à rai	What's wrong?
+ไปหาหมอ	bpai hǎa mɔ̌ɔ	see/visit the doctor
+ผลัดกันเป็นหวัด	plàt gan bpen wàt	Take turns to have a cold
+ผ่าเข่า	pàa kào	Have a knee surgery
+ผ่าตัด	pàa dtàt	Surgery / Operation
+ผิว	pǐu	skin (human)
+ฝังเข็ม	fǎng kěm	acupuncture (bury needles)
+ฝังเข็มแบบตะวันตก	fǎng kěm bɛ̀ɛp dtà wan dtòk	dry needling (Western way of burying needles)
+พัก	pák	rest
+แพร่	prɛ̂ɛ	spread
+ฟอกไต	fɔ̂ɔk dtai	Bleach the kidney
+ภูมิแพ้	puum pɛ́ɛ	allergies
+ไม่ทราบว่าเป็นไรมาครับ	mâi sâap wâa bpen rai mâa kráp	May I ask what's wrong with you?
+ยกแขน	yók kɛ̌ɛn	raise arms
+ยกแขนไม่ได้	yók kɛ̌ɛn mâi dâi	Cannot raise arms
+ยา	yaa	Drugs/medicine
+โรค	rôok	Disease
+โรคซึมเศร้า	rôok sʉm sâo	depression (storm / mental health issue)
+โรงพยาบาล	rooŋphayaabaan	Hospital (nurse)
+ล้ม	lóm	fall down
+ลื่น	lʉ̂ʉn	slippery
+สะอึก	sà ʉ̀k	hiccup
+เสียหาย	sǐa hǎai	damaged
+หนวกบ้าอะไรอ่ะหมอ	nùak bâa à rai à mɔ̌ɔ	What the heck do you mean it's deaf?
+หน้า	nâa	Face / Page
+หมอว่า หูคุณหนวกแล้ว	mɔ̌ɔ wâa hǔu kun nùak lɛ́ɛo	I think that your ears are deaf already.
+หยอดยา	yɔ̀ɔt yaa	To drop ear/eye drops
+หาย	hǎai	Recover
+หูตก	hǔu dtòk	Ears falling down
+หูตั้ง	hǔu dtâng	Ears straight up
+หูอักเสบ	hǔu àk sèep	Ear infection
+เหม็น	měn	Stinky / Smelly
+ให้คุณหันไปทางนั้นนะครับ	hâi kun hǎn bpai taang nán ná kráp	you have to turn to that way.
+ไหล่ติด	lài dtìt	frozen shoulder
+อ้วน	ûan	fat 
+อาการคอยื่น	aa gaan kɔɔ yʉ̂ʉn	Forward head posture (symptoms)
+อุบัติเหตุ	ù bàt dtì hèet	accident
+อุลตร้าซาวด์	un dtrâa saao	Ultrasound
+ไอ	ai	cough
+ตาโต	dtaa dtoo	Big eyes
+ผอม	pɔ̌ɔm	Skinny
+ปาก	bpàak	mouth
+มือ	mue	hands
+หู	hǔu	ears
+ไหล่	lài	Shoulders
+กี่องศา	gìi ong sǎa	How many degrees?
+ชื้น	chʉ́ʉn	Humid
+ใบไม้ผลิ	bai mái plì	spring (leaves bloom)
+มีเมฆ	mii mêek	Cloudy
+เมฆ	mêek	Clouds
+ฤดู	rʉ́ duu	season
+หนาว	nǎao	cold (weather)
+หิมะ	hì má	snow
+อากาศ	aa gàat	Weather
+กล่องข้าว	glɔ̀ɔng kâao	Meal box
+กล่องข้าวเที่ยง	glɔ̀ɔng kâao tîang	lunch box
+กะทิ	gà tí	coconut milk
+กินข้าวยัง	gin kâao yang	Have you eaten yet?
+แกง	gɛɛng	Curry
+ไก่ตุ๋น	gài dtǔn	braised chicken
+ขนม	kà nǒm	snacks / desserts
+ขนมปัง	kà nǒm bpang	Bread
+ขนมปังปิ้ง	kà nǒm bpang bpîng	Toast
+ขอบ	kɔ̀ɔp	Edge / pizza crust
+ข้าวผัดสัปปะรด	kâao pàt sàp bpà rót	Pineapple fried rice
+ข้าวเหนียวมะม่วง	kâao nǐao má mûang	Mango sticky rice
+ไข่คน	kài kon	scrambled eggs
+ค้างคืน	káang kʉʉn	overnight
+จืด	jʉ̀ʉt	bland
+ช้อน	chɔ́ɔn	Spoon
+ชานมไข่มุก	chaa nom kài múk	Bubble tea (pearls)
+ซาลาเปา	saa laa bpao	Chinese buns
+ดิบ	dìp	Raw
+ต้ม	dtôm	boil
+ตู้เย็น	dtûu yen	fridge (cupboard cool)
+เต้าหู้เหม็น	dtâo hûu měn	Stinky tofu
+ทอด	tɔ̂ɔt	(Deep) Fry
+ทำเอง	tam eeng	DIY / Do it by self
+เท	tee	Pour
+น้ำแข็ง	nám kɛ̌ng	ice (solid ice)
+น้ำเปล่า	náam bplàao	Plain water
+เนย	nəəi	butter
+เนื้อสัตว์	nʉ́a sàt	meat
+บางกรอบ	baang grɔ̀ɔp	Thin and crispy
+เบา	bao	light
+ปลา	bplaa	fish
+ปลาไหล	bplaa lǎi	eel
+ปวดท้อง	bpùat tɔ́ɔng	To have a stomachache
+ปิ้ง	pîŋ	Toast
+เปรี้ยว	bprîao	sour
+เปลือกหอย	bplʉ̀ak hɔ̌ɔi	seashell (skin, not human skin)
+ผลไม้	pǒn lá mái	Fruit
+ผัก	pàk	Veggies
+ผัดผัก	pàt pàk	Stir fried veggies
+แพ้	pɛ́ɛ	allergic to
+มะเขือเทศ	má kʉ̌a têet	tomatoes
+มะนาว	má naao	Lemon/Lime
+เมนูเส้น	meenuu sên	Noodles menu
+เมล็ด	má lét	Seeds
+ไม่เย็น	mâi yen	not cold (room temp)
+ยังไม่กิน	yang mâi gin	Not yet eaten
+ย่าง	yâang	grill
+เยอะ	yə́	A lot
+รสชาติ	rót châat	Tastes/Flavours
+ร้านอาหาร	ráan aa hǎan	Restaurant (food shop)
+ลูกชิ้น	lûuk chín	meatballs
+สด	sòt	Fresh
+สตูว์เนื้อ	sà dtuu nʉ́a	beef stew
+ส้อม	sɔ̂ɔm	Fork
+สั่ง	sàŋ	Order
+ใส	sǎi	Clear
+ใส่ในตู้เย็น	sài nai dtûu yen	Put it in the fridge
+หมูตุ๋น	mǔu dtǔn	Braised pork
+หอยเป๋าฮื้อ	hɔ̌ɔi bpǎo hʉ́ʉ	abalone (clams / shellfish eg. oysters, mussels, shells, scallops)
+เหล้า	lâo	Liquor
+อิ่ม	ìm	Full (stomach)
+มะพร้าว	má práao	Coconut
+อัยการ	ai yá gaan	prosecutor
+หมอนิติเวช	mɔ̌ɔ ní dtì wêet	Forensic doctor
+ไขคดี	kǎi ká dii	Solve crime(cases)
+เมือง	muang	City / Town
+เมา	mao	To get drunk
+เป็นไงจ๊ะแม่ค้า	bpen ngai já mɛ̂ɛ káa	How's it going, seller (fem)?
+ไข่ต้มจ้ะ	kài dtôm jâ	Boiled eggs
+ขายยังไงจ๊ะแม่ค้า	kǎai yang ngai já mɛ̂ɛ káa	How do you sell it?
+ฟองละห้าบาทจ้า	fɔɔng lá hâa bàat jâa	5 baht for(per) 1 (classifier for eggs)
+แม่ค้า ทำไมขายแพงอย่างนั้นน่ะ	mɛ̂ɛ káa tam mai kǎai pɛɛng yàang nán nà	Seller, why are you selling it expensive like that?
+ค่าของแพงจ้า	kâa kɔ̌ɔng pɛɛng jâa	The cost of the stuff is expensive.
+ตอนนี้ฟองนึงแปดบาทนะจ๊า	dtɔɔn níi fɔɔng nʉng bpɛ̀ɛt bàat ná jáa	Right now, one egg is 8 baht.
+ฉันขายห้าบาทขาดทุน	chǎn kǎai hâa bàat kàat tun	Selling at 5 baht is a loss. (deficient/lacking fund/cost/capital)
+เจ๊งกะบ๊ง	jéng gà bóng	Faled / Gone bankrupt
+อันละยี่สิบ	an lá yîi sìp	20 baht each
+จะหมดอายุแล้ว	jà mòt aa yú lɛ́ɛo	Will expire already (run out of age)
+ไม่ฮิตมากเท่าบลูเบอรี่	mâi hít mâak tâo bluu bəə rîi	Not as popular (equal) as blueberries.
+อะไรอย่างนี้	à rai yàang níi	Things like this
+มด	mót	ants
+โดน	doon	get (passive voice)
+กัด	gàt	bite
+กล้ามเนื้อ	glâam nʉ́a	muscles
+รถไฟ	rót fai	Train
+พอ	pɔɔ	enough
+ร่างกายคน	râang gaai kon	human body
+กินเยอะไป	gin yə́ bpai	eat too much
+เพลงเดิม	pleeng dəəm	same old song
+เครื่อง	krʉ̂ang	machine
+เตรียมใจ	dtriam jai	Mentally preapre self
+รถเมล์สายเดียว	rót mee sǎai diao	Only one bus line/no.
+ข้าม	kâam	To cross / go across sth
+ร้องไห้	rɔ́ɔng hâi	Cry
+ทางรถไฟ	taang rót fai	Train tracks
+เรือ	rʉa	Boat
+ใต้ดิน	dtâi din	Underground
+ลอดอุโมงค์	lɔ̂ɔt ù moong	Go through the tunnel
+กึ่งเกษียณ	gʉ̀ng gà sian	semi-retired
+ต่อรถ	dtɔ̀ɔ rót	Switch/transfer transport (Continue vehicle/transport)
+แน่น	nɛ̂ɛn	packed / crowded
+ปลากระป๋อง	bplaa grà bpɔ̌ɔng	canned fish
+สิงคโปร์ไม่มีคนเยอะจนเป็นปลากระป๋อง	sing ka bpoo mâi mii kon yə́ jon bpen bplaa grà bpɔ̌ɔng	Singapore doesn't so many people that you turn you into sardines.
+สัมภาษณ์	sǎm pâat	Interview
+...ต่อ	dtɔ̀ɔ	... next
+มีทั้งเมืองและธรรมชาติ	mii táng mʉang lɛ́ tam má châat	It has both city and nature.
+เงียบ	ngîap	quiet
+สายพาน	sǎai paan	Treadmill
+ตรวจสุขภาพ	dtrùat sùk pâap	Health check-up
+เอ็กซเรย์ปอด	ék sà ree pòt	Chest(lung) x-ray
+วัดความดัน	wát kwaam dan	Measure blood pressure
+เจาะเลือด	jɔ̀ lʉ̂at	Draw blood
+นอนไม่หลับ	nɔɔn mâi làp	Lie down but can't fall asleep
+ห่วงเพื่อนที่เครียด	hùang pʉ̂an tîi krîat	Worry about a friend who's stressed
+ป่า	bpàa	Forest
+ผ้า	pâa	Cloth
+แกะดำ	gɛ̀ dam	Black sheep / outcasts
+อารมณ์	aa rom	Emotions
+ตลกหน้าตาย	dtlòk nâa dtaai	throwing jokes while making a poker face
+ประชดประชัน	bprà chót bprà chan	Sarcastic
+คิดได้	kít dâi	Realise
+สิ่งที่คิด	sìng tîi kít	Thing that you think
+ไม่ว่าจะพยายามแค่ไหน	mâi wâa jà pá yaa yaam kɛ̂ɛ nǎi	No matter how hard you try
+น่าผิดหวัง	nâa pìt wǎng	Disappointing
+เคยเจออะไรแบบนี้	kəəi jəə à rai bɛ̀ɛp níi	Has faced something like this
+รองเท้าผ้าใบ	rɔɔng táao pâa bai	Sneakers (canvas)
+สูง	sǔung	Tall / High
+ไฟแดง	fai dɛɛng	Traffic lights (red)
+ข้ามถนน	kâam tà nǒn	Cross the road/street
+ติดกับ	dtìt gàp	Next to (attach/stick)
+ตรงข้าม	dtrong kâam	Opposite (straight cross)
+ที่จอดรถ	tîi jɔ̀ɔt rót	Car park
+หน่อย	nɔ̀ɔi	Please (put at the end of sentence)
+กล้ามเนื้อบาดเจ็บ	glâam nʉ́a bàat jèp	glâam nʉ́a bàat jèp
+ก้าวยาว	gâao yaao	take a long step
+ร้านขายยา	ráan kǎai yaa	Pharmacy (shop sell medicine)
+สอนอะไรที่ทำได้ยาก	sɔ̌ɔn à rai tîi tam dâi yâak	Teach something that's hard to do.
+ความสัมพันธ์ที่ดี	kwaam sǎm pan tîi dii	Good relationship
+ตรง	dtrong	Direct
+กางเกงยีนส์	gaang geeng yiin	Jeans
+กรมท่า	grom má tâa	Navy blue
+ราคา	raa kaa	price
+ขึ้น	kʉ̂n	go up / get on
+บทความ	bòt-kwaam	article
+ตื่นสาย	dtʉ̀ʉn sǎai	Wake up late (in the morning)
+โลก	lôok	world
+ตก	dtòk	fall / drop (v)
+นอนดึก	nɔɔn dʉ̀k	Sleep late (at night)
+เพลงเศร้า	pleeng sâo	Sad songs
+นักท่องเที่ยว	nák tɔ̂ɔng tîao	Tourist
+น้ำเงิน	nám-ngən	Dark blue
+บทสนทนา	bòt sǒn-tá-naa	dialogue
+ออก	ɔ̀ɔk	exit
+ป้า	bpâa	Mum & dad's older siblings (fem) - Aunt
+เนี่ย	nîa	นี่ + อ่ะ
+ลุง	lung	Mum & dad's older siblings (masc) - Uncle
+ถุงเท้า	tǔng-táao	socks
+แก้ว	gâaeo	glass; cup; tumbler; gem; jewel; crystal
+ห่อของขวัญ	hòr kǎawng-kwǎn	Wrap gift
+สีเงิน	sǐi ngern	silver color; silver
+คออักเสบ	kɔɔ àk-sèep	Pharyngitis
+ไข้	kâi	fever
+อบ	òp	To bake
+กางเกง	gaang-geeng	pants / trousers
+หลงทาง	lǒng taang	lost
+ฝั่ง	fàng	side
+นู้น	núun	that
+เจอรถติด เพราะเธอเนี่ย	joer rót dtìt prɔ́ ter nîia	We face traffic jam because of you.
+คนละคัน	kon lá kan	different vehicles (classifier for vehicle)
+ตม.	dtɔɔ mɔɔ	immigration
+ช้า	cháa	slow
+เลย	ləəi	go past / drive past
+คนอื่น	kon èun	other people
+อ่างเก็บน้ำ	àang-gèp-náam	reservoir
+หมวก	mùuak	hat / cap
+กลางเดือน	glaang-deuan	middle of month
+หลังจาก	lăng-jàak	after
+เครื่องดื่ม	krêuang-deùm	beverages
+พนักงาน	pá-nák-ngaan	Staff
+แขน	kǎen	arms
+ทักทาย	ták-taai	To greet
+เปลี่ยนชุด	plìian chút	Get changed (outfit)
+แรงไปไหม	raeng bpai mái	Is it too strong?
+แรงกว่านี้	raeng gwàa níi	Stronger than this.
+เบากว่านี้	bao gwàa níi	Lighter than this.
+กลางวัน	glaang-wan	during the day
+วันศุกร์	wan-sùk	Friday
+สาย	sǎai	string / cable
+เหลือง	lʉ̌ʉang	yellow
+ถูกนวด	tòok-nûuat	get massaged
+คัน	kan	itchy
+ทาง	taang	Way / Directions
+รับ	ráp	take someone in for the job / hire / pick up / accept
+เชิญ	chəən	invite / please
+สองหมื่นห้า	sɔ̌ɔng-mʉ̀ʉn-hâa	25,000
+แสน	sɛ̌ɛn	hundred thousand
+ล้าน	láan	million
+ห้าแสนแปด	hâa-sɛ̌ɛn-bpɛ̀ɛt	580,000
+ล้านสอง	láan-sɔ̌ɔng	1,200,000
+แสนเจ็ด	sɛ̌ɛn-jèt	170,000
+หมื่นหก	mʉ̀ʉn-hòk	16,000
+พันหนึ่ง	pan-nʉ̀ng	1,100
+กระจก	grà-jòk	mirror
+เดี๋ยวมาใหม่	dǐiao-maa-mài	I'll come again.
+แห้ง	hɛ̂ɛng	Dry
+พักผ่อน	pák-pɔ̀n	To rest
+นึ่ง	nûng	steam
+อุ่น	ùn	heat up / warm
+ใบเสร็จ	bai-sèt	receipt
+ไม้	mái	sticks
+กล่อง	glàwng	box
+นมข้น	nom kôn	condense milk
+ตะโก้	dtà-gôh	Thai tapioca pudding with corn
+กรัม	gram	gram
+ขีด	kìit	100 grams / dash
+ทางด่วน	taang-dùuan	expressway (way urgent)
+แยกที่ 3	yâek tîi saam	the third junction / intersection / separate
+ทราย	saai	sand
+สีทอง	sǐi-thɔ̌ɔng	gold (colour)
+ตุ๋น	dtǔn	To braise
+ประทับใจ	bprà-tháp-jai	impressive / impressed
+นาฬิกา	naa-lí-gaa	clock / watch
+...โปรด	... bpròot	Favourite
+ยาดม	yaa-dom	inhaler
+วัฒนธรรม	wát-thá-na-tham	culture
+หลาย...	lǎai...	Many
+มีคนไข้หลายคน	mii khon-khâi lǎai khon	There are many patients.
+จอง(ไว้)แล้ว	jɔɔng (wái) lɛ́ɛo	book (for sometime earlier) already
+เหลือ...	lʉ̌a...	remaining
+ต่างจังหวัด	dtàang jang-wàt	countryside / upcountry
+ตกปลา	dtòk-bplaa	To fish
+ชาวประมง	chaao bprà-mong	fisherman
+โดยไม่	dooi mâi	without
+ถั่ว	thùa	nuts / peas
+ไข่ทอด	khài-thɔ̂ɔt	fried egg
+แก้แค้น	gâae káaen	take revenge
+ของขวัญ	kŏng-kwăn	gifts / presents
+ทำสีผม	tam-sĕe-pŏm	To colour/dye hair
+ถูกละเลย	tòok lá-loie	be neglected
+ทำไมฝันโกรธขนาดนั้น	tam-mai făn gròoht kà-nàat nán	Why was Fan that angry? (size)
+อยากหายเร็วแค่ไหน	yàak hăai reo kâae nǎi	How fast do you want to recover?`;
+
+        // --- Investigation Vocab List (Filtered Top 5) ---
+        const investigationVocab = [
+            { w: "ฆาตกร", i: "kâat-dtà-gɔɔn", m: "Killer" },
+            { w: "ตำรวจ", i: "dtam rùat", m: "Police" },
+            { w: "พยาน", i: "pá yaan", m: "Witness" },
+            { w: "หลักฐาน", i: "làk tǎan", m: "Evidence" },
+            { w: "ความจริง", i: "kwaam jing", m: "Truth" }
+        ];
+
+        // --- Script ---
+        const scriptLines = [
+            { role: "บุญ", text: "กรุณาอย่าจับค่ะ", ipa: "gà-rú-naa yàa jàp kâ", en: "Please don't touch." },
+            { role: "วิน", text: "อันนี้มันยันต์กันผีเหรอคะ", ipa: "an níi man yan gan pǐi rə̌ə ká", en: "Is this a talisman to ward off ghosts?" },
+            { role: "วิน", text: "เฮ้ย", ipa: "hə́i", en: "Hey!" },
+            { role: "วิน", text: "คนเขาพูดด้วยดีๆอ่ะ", ipa: "kon kǎo pûut dûai dii dii à", en: "I'm speaking to you nicely." },
+            { role: "วิน", text: "ตอบหน่อยดิคุณ", ipa: "dtɔ̀ɔp nɔ̀ɔi dì kun", en: "Answer me." },
+            { role: "วิน", text: "แค่ถามเองนะ", ipa: "kɛ̂ɛ tǎam eeng ná", en: "Just asking." },
+            { role: "วิน", text: "โอ๊ย", ipa: "óoi", en: "Ouch!" }
+        ];
+
+        // --- Components ---
+
+        const SmartText = ({ text, ipa, en, size = "md", color = "text-gray-800", isBlock = false, highlight = false, hideControls = false, emoji = null, onClick }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const speak = (e) => {
+                e.stopPropagation();
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.8;
+                const thaiVoice = getThaiVoice();
+                if (thaiVoice) utterance.voice = thaiVoice;
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const sizeClasses = {
+                sm: "text-base",
+                md: "text-lg md:text-xl",
+                lg: "text-xl md:text-2xl font-bold",
+                xl: "text-3xl md:text-4xl font-bold"
+            };
+
+            return (
+                <div 
+                    className={`flex flex-col ${isBlock ? 'w-full' : 'inline-flex align-top'} mb-2 ${onClick ? 'cursor-pointer' : ''}`}
+                    onClick={onClick}
+                >
+                    <div className="flex flex-wrap items-center gap-2">
+                        {emoji && <span className="text-2xl md:text-3xl mr-1">{emoji}</span>}
+                        <button 
+                            onClick={speak} 
+                            className="p-2 md:p-1.5 text-indigo-600 bg-indigo-100 hover:bg-indigo-200 rounded-full transition shrink-0 active:scale-95" 
+                            title="Listen"
+                        >
+                            <Volume2 size={18} />
+                        </button>
+                        <span className={`${sizeClasses[size]} ${color} ${highlight ? 'bg-yellow-100 px-1 rounded' : ''} font-thai leading-relaxed`}>
+                            {text}
+                        </span>
+                        
+                        {!hideControls && (ipa || en) && (
+                            <div className="flex gap-1 ml-1">
+                                {ipa && (
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); setShowIPA(!showIPA); }}
+                                        className={`px-3 py-1 md:px-2 md:py-0.5 text-[11px] md:text-[10px] rounded-full border transition font-bold uppercase tracking-wide
+                                            ${showIPA ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-gray-50 text-gray-400 border-gray-200 hover:text-gray-600'}`}
+                                    >
+                                            IPA
+                                    </button>
+                                )}
+                                {en && (
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); setShowEN(!showEN); }}
+                                        className={`px-3 py-1 md:px-2 md:py-0.5 text-[11px] md:text-[10px] rounded-full border transition font-bold uppercase tracking-wide
+                                            ${showEN ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-50 text-gray-400 border-gray-200 hover:text-gray-600'}`}
+                                    >
+                                            EN
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {(showIPA || showEN) && (
+                        <div className="mt-1 ml-9 pl-3 border-l-2 border-gray-200 text-left animate-fadeIn">
+                            {showIPA && <div className="text-indigo-600 font-mono text-sm mb-0.5">/{ipa}/</div>}
+                            {showEN && <div className="text-gray-600 italic text-sm">{en}</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [parsedVocab, setParsedVocab] = useState([]);
+            const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+            const [activeTab, setActiveTab] = useState('review');
+            const [showScript, setShowScript] = useState(false);
+
+            useEffect(() => {
+                const lines = rawVocabData.trim().split('\n');
+                const vocab = lines.map(line => {
+                    const parts = line.split('\t'); 
+                    if (parts.length >= 3) {
+                        return { word: parts[0].trim(), ipa: parts[1].trim(), meaning: parts[2].trim() };
+                    }
+                    return null;
+                }).filter(item => item !== null);
+                
+                setParsedVocab(vocab);
+                if (vocab.length > 0) {
+                    setCurrentReviewIndex(Math.floor(Math.random() * vocab.length));
+                }
+            }, []);
+
+            const nextReview = () => {
+                if (parsedVocab.length === 0) return;
+                let newIndex;
+                do {
+                    newIndex = Math.floor(Math.random() * parsedVocab.length);
+                } while (newIndex === currentReviewIndex && parsedVocab.length > 1);
+                setCurrentReviewIndex(newIndex);
+            };
+
+            const currentVocab = parsedVocab.length > 0 ? parsedVocab[currentReviewIndex] : { word: "Loading...", ipa: "", meaning: "" };
+
+            return (
+                <div className="min-h-screen bg-indigo-50 pb-20">
+                    <nav className="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-200 px-4 py-3 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+                        <div className="max-w-3xl mx-auto flex justify-between items-center overflow-x-auto gap-2 no-scrollbar">
+                            <div className="mr-4 flex items-center gap-2 shrink-0">
+                                <Briefcase className="text-indigo-600" size={24} />
+                                <SmartText text="หนีไปก็ตายเปล่า RUNAWAY" ipa="" en="" size="md" color="text-slate-800 font-bold" hideControls={true} />
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                                <button onClick={() => setActiveTab('review')} className={`p-2.5 md:p-2 rounded-lg ${activeTab === 'review' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500'}`}><RefreshCw size={20}/></button>
+                                <button onClick={() => setActiveTab('lesson')} className={`p-2.5 md:p-2 rounded-lg ${activeTab === 'lesson' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500'}`}><BookOpen size={20}/></button>
+                                <button onClick={() => setActiveTab('activity')} className={`p-2.5 md:p-2 rounded-lg ${activeTab === 'activity' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500'}`}><Mic size={20}/></button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <main className="max-w-3xl mx-auto p-4 md:p-6 space-y-8 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+                        
+                        {/* TAB 1: REVIEW */}
+                        {activeTab === 'review' && (
+                            <div className="animate-slideIn">
+                                <div className="text-center mb-6">
+                                    <div className="flex justify-center mb-2">
+                                        <span className="text-4xl animate-bounce">🎲</span>
+                                    </div>
+                                    <SmartText 
+                                        text="สุ่มคำศัพท์แต่งประโยค" 
+                                        ipa="sùm kam sàp dtɛ̀ng bprà yòok" 
+                                        en="Random Vocab for Sentence Making" 
+                                        size="xl" 
+                                        isBlock={true} 
+                                    />
+                                    <div className="flex justify-center mt-1">
+                                        <SmartText text="ลองแต่งประโยคจากคำที่ได้ (Crime 🔪, Daily Life 🏠, Feelings ❤️)" ipa="" en="" size="sm" color="text-gray-500" hideControls={true} />
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+                                    <div className="text-center w-full">
+                                        <div className="text-6xl mb-6 animate-bounceIn">
+                                            {getEmojiForVocab(currentVocab.meaning)}
+                                        </div>
+                                        <div className="mb-8 p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl inline-block w-full border border-indigo-100">
+                                            <div className="flex justify-center">
+                                                <SmartText 
+                                                    text={currentVocab.word} 
+                                                    ipa={currentVocab.ipa} 
+                                                    en={currentVocab.meaning} 
+                                                    size="xl" 
+                                                    color="text-indigo-900"
+                                                    highlight={true}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex justify-center">
+                                    <div 
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={nextReview}
+                                        className="flex items-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-full shadow-lg transition active:scale-95 cursor-pointer select-none font-bold text-lg"
+                                    >
+                                        <Shuffle size={24} />
+                                        <span>สุ่มคำใหม่ (Next Word) ⏭️</span>
+                                    </div>
+                                </div>
+                                <p className="text-center text-xs text-gray-400 mt-4">Database: {parsedVocab.length} words loaded. 📚</p>
+                            </div>
+                        )}
+
+                        {/* TAB 2: LESSON */}
+                        {activeTab === 'lesson' && (
+                            <div className="animate-slideIn space-y-6">
+                                <div className="bg-gray-900 rounded-xl overflow-hidden shadow-lg aspect-video relative flex items-center justify-center group">
+                                    <div className="absolute inset-0 bg-opacity-60 bg-black flex flex-col items-center justify-center p-4 text-center">
+                                        <div className="mb-4">
+                                            <SmartText text="คลิปวิดีโอ (ตัวอย่าง) 🎬" ipa="" en="Video Lesson (Example)" size="sm" color="text-gray-300" hideControls={true} />
+                                        </div>
+                                        <a 
+                                            href="https://www.tiktok.com/@runawaytheseries/video/7569159603934481672" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition transform group-hover:scale-105"
+                                        >
+                                            <span className="font-thai font-bold text-lg">ดูวิดีโอ (Watch) ▶️</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 animate-fadeIn">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <Star className="text-indigo-500" />
+                                        <SmartText text="บทสนทนา (Script) 📜" ipa="bòt sǒn tá naa" en="Conversation" size="xl" color="text-gray-800 font-bold" />
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        {scriptLines.map((line, idx) => (
+                                            <div key={idx} className={`p-4 rounded-lg border-l-4 ${line.role === 'บุญ' ? 'bg-pink-50 border-pink-400' : 'bg-blue-50 border-blue-400'}`}>
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${line.role === 'บุญ' ? 'bg-pink-200 text-pink-800' : 'bg-blue-200 text-blue-800'}`}>
+                                                        {line.role === 'บุญ' ? '👩 บุญ' : '👨 วิน'}
+                                                    </span>
+                                                </div>
+                                                <SmartText text={line.text} ipa={line.ipa} en={line.en} size="lg" isBlock={true} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* TAB 3: ACTIVITIES */}
+                        {activeTab === 'activity' && (
+                            <div className="animate-slideIn space-y-8">
+                                <div className="text-center">
+                                    <div className="text-4xl mb-2">🕵️‍♂️ 🔦</div>
+                                    <SmartText text="กิจกรรมเสริม (Crime & Mystery)" ipa="gìt jà gam sěerm" en="Extension Activities" size="xl" />
+                                </div>
+
+                                {/* 1. Role Play: Investigation (Updated with Vocab) */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                    <div className="flex items-center gap-3 mb-4 border-b pb-2">
+                                        <div className="p-2 bg-purple-100 text-purple-600 rounded-lg"><Star size={24} /></div>
+                                        <SmartText text="บทบาทสมมติ: สืบสวนสอบสวน 👮‍♂️" ipa="bòt bàat sǒm mút : sʉ̀ʉp sǔan sɔ̀ɔp sǔan" en="Role Play: Investigation" size="lg" />
+                                    </div>
+                                    
+                                    {/* Dialogue Section */}
+                                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 space-y-4 mb-6">
+                                        <div>
+                                            <span className="font-bold text-purple-700">A (Police 👮):</span> 
+                                            <SmartText text="คุณเห็นฆาตกรไหมครับ?" ipa="kun hěn kâat-dtà-gɔɔn mǎi kráp?" en="Did you see the killer?" size="sm" />
+                                        </div>
+                                        <div>
+                                            <span className="font-bold text-purple-700">B (Witness 👁️):</span> 
+                                            <SmartText text="ไม่เห็นครับ มันมืดมาก" ipa="mâi hěn kráp · man mʉ̂ʉt mâak" en="No, it was very dark." size="sm" />
+                                        </div>
+                                    </div>
+
+                                    {/* Relevant Vocab Section (Appended) */}
+                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Briefcase size={18} className="text-gray-500" />
+                                            <span className="font-bold text-gray-600 text-sm">ศัพท์น่าใช้ (Useful Vocab)</span>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-2">
+                                            {investigationVocab.map((v, i) => (
+                                                <div key={i} className="bg-white px-4 py-3 rounded-lg border border-gray-100 shadow-sm">
+                                                    <SmartText 
+                                                        text={v.w} 
+                                                        ipa={v.i} 
+                                                        en={v.m} 
+                                                        size="md" 
+                                                        color="text-indigo-700 font-bold" 
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 2. Discussion Questions */}
+                                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                    <div className="flex items-center gap-3 mb-4 border-b pb-2">
+                                        <div className="p-2 bg-yellow-100 text-yellow-600 rounded-lg"><Brain size={24} /></div>
+                                        <SmartText text="ชวนคุย 3 ข้อ (Discussion) 🗣️" ipa="chuan kui" en="Discussion" size="lg" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        {[
+                                            { t: "ถ้าคุณถูกหวยรางวัลที่ 1 คุณจะบอกใครไหม? 🎫", i: "tâa kun tùuk hǔai raang-wan tîi nʉ̀ng · kun jà bɔ̀ɔk krai mǎi?", e: "If you won the 1st prize lottery, would you tell anyone?" },
+                                            { t: "คุณคิดว่าเงินซื้อความสุขได้ไหม? 💰", i: "kun kít wâa ngən sʉ́ʉ kwaam sùk dâi mǎi?", e: "Do you think money can buy happiness?" },
+                                            { t: "อาชีพในฝันของคุณคืออะไร? ⭐", i: "aa chîip nai fǎn kɔ̌ɔng kun kʉʉ à rai?", e: "What is your dream job? (Doctor, Prosecutor, etc.)" }
+                                        ].map((q, idx) => (
+                                            <div key={idx} className="p-3 bg-gray-50 rounded-lg border-l-4 border-yellow-400">
+                                                <SmartText text={q.t} ipa={q.i} en={q.e} size="md" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
