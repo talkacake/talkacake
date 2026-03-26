@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Thai Lesson: How to Bargain at a Market</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f7fafc;
+        }
+        .thai, .thai-text {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1.1em;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .insight {
+            display: none;
+            border-left: 3px solid #4299e1;
+            padding-left: 1rem;
+            margin-top: 0.5rem;
+            background-color: #ebf8ff;
+            border-radius: 4px;
+        }
+        .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            margin-bottom: 0.5rem;
+        }
+        .seller-bubble {
+            background-color: #e2e8f0;
+            align-self: flex-start;
+        }
+        .buyer-bubble {
+            background-color: #ccebfb;
+            align-self: flex-end;
+        }
+        .prompt {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .translatable-container {
+            cursor: pointer;
+        }
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 0.25rem;
+            font-size: 1em; /* Adjust size relative to text */
+            vertical-align: middle;
+        }
+        .translation-block {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-teal-600"></h1>
+        </header>
+
+        <!-- Part 2: Listening Practice -->
+        <div class="card">
+            <h2 id="part2-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part2-instruction" class="mb-4"></p>
+            <a href="https://www.instagram.com/reel/DOpswcqj_45/" target="_blank" class="block mb-6">
+                <div class="bg-gray-200 rounded-lg p-6 text-center hover:bg-gray-300 transition duration-300">
+                    <img src="https://placehold.co/600x300/e2e8f0/333333?text=Click+to+Watch+Video&font=sarabun" alt="Thai market stall" class="w-full h-auto object-cover rounded-lg mb-4">
+                    <p class="font-semibold text-blue-600">Open Video in New Tab</p>
+                    <p class="text-sm text-gray-500">Video source: Instagram</p>
+                </div>
+            </a>
+            <h3 id="part2-comprehension-heading" class="font-semibold text-lg mt-4"></h3>
+            <ul id="part2-questions" class="list-disc list-inside mt-2 text-gray-700 space-y-2">
+            </ul>
+        </div>
+        
+        <!-- Part 3: Vocabulary & Pronunciation -->
+        <div class="card">
+            <h2 id="part3-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part3-instruction" class="mb-4"></p>
+            <div id="vocab-list" class="space-y-4">
+                <!-- Vocabulary will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 4: Listening & Reading with Script -->
+        <div class="card">
+            <h2 id="part4-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part4-instruction" class="mb-4"></p>
+            <div id="script-container" class="space-y-2 bg-gray-50 p-4 rounded-lg">
+                <!-- Script will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 5: Speaking Practice - Role-Play -->
+        <div class="card">
+            <h2 id="part5-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part5-instruction" class="mb-4"></p>
+            
+            <div class="mb-8">
+                <h3 id="roleplay1-heading" class="text-xl font-semibold mb-2"></h3>
+                <p id="roleplay1-instruction" class="mb-4"></p>
+                <div id="roleplay1-chat" class="flex flex-col space-y-2 bg-white p-4 rounded-lg border h-64 overflow-y-auto"></div>
+                <button id="roleplay1-next" class="mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"></button>
+            </div>
+
+            <div>
+                <h3 id="roleplay2-heading" class="text-xl font-semibold mb-2"></h3>
+                <p id="roleplay2-instruction" class="mb-4"></p>
+                <div id="roleplay2-chat" class="flex flex-col space-y-2 bg-white p-4 rounded-lg border h-72 overflow-y-auto"></div>
+                <button id="roleplay2-next" class="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-600 transition"></button>
+            </div>
+        </div>
+
+        <!-- Part 6: Wrap-up & Final Tips -->
+        <div class="card bg-teal-50 border-l-4 border-teal-500">
+            <h2 id="part6-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <h3 id="part6-keyphrases-heading" class="font-semibold text-lg"></h3>
+            <ul id="part6-keyphrases-list" class="list-disc list-inside my-2 space-y-2">
+                 <!-- Key phrases here -->
+            </ul>
+            <h3 id="part6-cultural-heading" class="font-semibold text-lg mt-4"></h3>
+            <ul id="part6-cultural-tips" class="list-disc list-inside mt-2 space-y-2">
+                <!-- Tips here -->
+            </ul>
+            <p id="part6-final-message" class="mt-4 font-semibold text-teal-800"></p>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Data ---
+    const vocabulary = [
+        { thai: 'อันนี้เท่าไหร่คะ', roman: 'an-níi thâo-rài khá', eng: 'How much is this?' },
+        { thai: 'ลดได้ไหมคะ', roman: 'lót dâi măi khá', eng: 'Can you give a discount?' },
+        { thai: '...บาท ไม่ได้เหรอ', roman: '... bàat, mâi dâi lĕor', eng: 'You can\'t do ... Baht?' },
+        { thai: 'สวยดี / หนูชอบ', roman: 'sŭay dii / nŏo chôrp', eng: 'It\'s pretty / I like it.' },
+        { thai: 'เอาตัวนี้ค่ะ', roman: 'ao dtua níi khâ', eng: 'I\'ll take this one.' },
+        { thai: 'จ่ายเงินสด', roman: 'jàai ngern-sòt', eng: 'Pay with cash.' },
+        { thai: 'โอน', roman: 'ohn', eng: 'Bank transfer.' },
+        { thai: 'พี่ / น้อง / หนู', roman: 'phîi / nóng / nŏo', eng: '"You" / "Me" (based on age/status)' },
+        { thai: 'คะ / ค่ะ / จ้ะ / นะ', roman: 'khá / khâ / jâ / ná', eng: 'Polite particles' },
+    ];
+    
+    const scriptWithTranslations = [
+        { speaker: 'คนซื้อ (Buyer)', line: 'พี่คะ อันนี้เท่าไหร่อ่ะคะ', roman: 'phîi khá, an níi thâo-rài a khâ', eng: 'Excuse me, how much is this?', insight: 'A very polite and common way to get a seller’s attention and ask for the price.' },
+        { speaker: 'คนขาย (Seller)', line: '890 บาท จ้ะน้อง', roman: 'bpàet rói gâo sìp bàat jâ nóng', eng: '890 Baht, dear.', insight: 'The seller uses "จ้ะ" (jâ), a friendly particle, and "น้อง" (nóng), meaning younger sibling, showing a casual and warm tone.'},
+        { speaker: 'คนซื้อ (Buyer)', line: 'หนูจะใส่ได้ไหมคะ', roman: 'nŏo jà sài dâi măi khá', eng: 'Can I fit into it?' , insight: null },
+        { speaker: 'คนขาย (Seller)', line: 'ใส่ได้ เนี่ยพอดีเลย ไซส์ S', roman: 'sài dâi, nîa por dii loie, sai ét', eng: 'Yes, you can. It\'s a perfect fit, size S.' , insight: null },
+        { speaker: 'คนซื้อ (Buyer)', line: 'อกเท่าไหร่อ่ะคะพี่', roman: 'òk thâo-rài a khá phîi', eng: 'What\'s the bust size?' , insight: 'Asking for specifics ("อก" means chest/bust). She calls the seller "พี่" (phîi), meaning older sibling, which is polite.'},
+        { speaker: 'คนขาย (Seller)', line: 'ประมาณ 38 จ้ะ', roman: 'bprà-maan săam sìp bpàet jâ', eng: 'Around 38.' , insight: null },
+        { speaker: 'คนซื้อ (Buyer)', line: 'อุ๊ย แต่หนูอกใหญ่กว่านั้นน่ะ นมใหญ่', roman: 'úi, dtàe nŏo òk yài gwàa nán na, nom yài', eng: 'Oh, but my bust is bigger than that, I have big boobs.' , insight: 'A playful, self-deprecating comment to build rapport with the seller.'},
+        { speaker: 'คนขาย (Seller)', line: 'พี่ก็ว่างั้นแหละ ใส่สบายนะ', roman: 'phîi gôr wâa ngán làe, sài sà-baai ná', eng: 'I thought so too. It\'s comfortable to wear.' , insight: null },
+        { speaker: 'คนซื้อ (Buyer)', line: 'แต่สวยนะ หนูชอบ สวยดี ลดได้ไหมคะ', roman: 'dtàe sŭay ná, nŏo chôp, sŭay dii, lót dâi măi khá', eng: 'But it\'s pretty, I like it. It looks nice. Can you give a discount?' , insight: 'Crucial step: She shows she likes it ("สวยนะ," "หนูชอบ") *before* asking for a discount ("ลดได้ไหมคะ"). This is a great tactic!'},
+        { speaker: 'คนขาย (Seller)', line: 'ก็ได้อยู่นะนิดหน่อย 850 ละกัน', roman: 'gôr dâi yòo ná nít nòi, bpàet rói hâa sìp lá gan', eng: 'I can, a little bit. 850 then.' , insight: 'A soft first offer. "ก็ได้อยู่นะ" (It\'s possible) and "นิดหน่อย" (a little) are gentle ways to start the negotiation.'},
+        { speaker: 'คนซื้อ (Buyer)', line: '850', roman: 'bpàet rói hâa sìp', eng: '850.', insight: null },
+        { speaker: 'คนขาย (Seller)', line: 'ใช่', roman: 'châi', eng: 'Yes.', insight: null },
+        { speaker: 'คนซื้อ (Buyer)', line: '800 ไม่ได้เหรอ', roman: 'bpàet rói mâi dâi lĕor', eng: 'Can\'t you do 800?', insight: 'The buyer counters with a lower price using a polite question form, which is less aggressive than a demand.'},
+        { speaker: 'คนขาย (Seller)', line: 'อะๆ 800 ก็ได้', roman: 'a a, bpàet rói gôr dâi', eng: 'Okay, okay, 800 is fine.' , insight: 'The seller agrees quickly. The "อะๆ" sound is like "Alright, alright..."'},
+        { speaker: 'คนซื้อ (Buyer)', line: 'ได้ๆ ใช่ป่ะ', roman: 'dâi dâi, châi bpà', eng: 'Really? Right?' , insight: 'Confirming the deal in a very casual way.'},
+        { speaker: 'คนขาย (Seller)', line: 'ได้', roman: 'dâi', eng: 'Yes.' , insight: null },
+        { speaker: 'คนซื้อ (Buyer)', line: '800 ได้จริงใช่ไหมพี่ พี่ไม่ได้เล่นใช่ไหมเนี่ย', roman: 'bpàet rói dâi jing châi măi phîi, phîi mâi dâi lên châi măi nîa', eng: '800 for real, right? You\'re not kidding, are you?' , insight: 'She confirms again playfully, making sure the seller is serious. This keeps the mood light and friendly.'},
+        { speaker: 'คนขาย (Seller)', line: 'พี่ให้หนูพิเศษเลย', roman: 'phîi hâi nŏo pí-sèt loie', eng: 'I\'m giving you a special price.' , insight: '"I\'m giving you a special price." A common phrase to make the buyer feel good about the deal.'},
+        { speaker: 'คนซื้อ (Buyer)', line: 'อะ 800 โอเค เอาตัวนี้ก็แล้วกันค่ะ', roman: 'a, bpàet rói, oo-khee, ao dtua níi gôr láew gan khâ', eng: 'Okay, 800. I\'ll take this one then.' , insight: null },
+        { speaker: 'คนขาย (Seller)', line: 'โอเคจ้ะ จัดไป จ่ายเงินสดหรือว่าโอนจ๊ะ', roman: 'oo-khee jâ, jàt bpai, jàai ngern-sòt rĕu wâa ohn já', eng: 'Okay! You got it. Cash or bank transfer?' , insight: '"จัดไป" (jàt bpai) is slang for "Let\'s do it!" or "You got it!"'},
+        { speaker: 'คนซื้อ (Buyer)', line: 'เงินสดก็ได้พี่', roman: 'ngern-sòt gôr dâi phîi', eng: 'Cash is fine.' , insight: null }
+    ];
+
+    const uiText = {
+        mainTitle: { thai: 'วิธีต่อราคาสินค้าที่ตลาด', roman: 'wí-thii dtòr raa-kaa sĭn-káa thîi dtà-làat', eng: 'How to Bargain at a Market' },
+        part2: {
+            heading: { thai: 'ฝึกการฟัง', roman: 'fèuk gaan fang', eng: 'Listening Practice' },
+            instruction: { thai: 'คลิกลิงก์เพื่อดูวิดีโอ ไม่ต้องกังวลว่าจะเข้าใจทุกคำ พยายามจับใจความสำคัญของบทสนทนาก็พอ', roman: 'klík ling phêuua duu wí-dii-oo. mâi dtông gang-won wâa jà khâo-jai thúk kham. phá-yaa-yaam jàp jai-khwaam săm-khan kŏng bòt sŏn-thá-naa gôr por', eng: 'Click the link to watch the video. Don\'t worry about understanding every word. Just try to get the main idea of the conversation.' },
+            compHeading: { thai: 'ลองตอบคำถามดูนะ:', roman: 'long dtòp kham-thăam duu ná:', eng: 'Comprehension Check:' },
+            q1: { thai: 'พวกเขาอยู่ที่ไหนกัน', roman: 'phûak khăo yòo thîi năi gan', eng: 'Where are the people in the video?' },
+            q2: { thai: 'พวกเขากำลังทำอะไรอยู่', roman: 'phûak khăo gam-lang tham à-rai yòo', eng: 'What are they doing?' },
+            q3: { thai: 'บทสนทนาดูจริงจังหรือเป็นกันเอง', roman: 'bòt sŏn-thá-naa duu jing-jang rĕu bpen gan-eeng', eng: 'Does the conversation seem serious or friendly?' },
+        },
+        part3: {
+            heading: { thai: 'คำศัพท์และการออกเสียง', roman: 'kham-sàp láe gaan òk-sĭang', eng: 'Vocabulary & Pronunciation' },
+            instruction: { thai: 'มาเรียนรู้ประโยคสำคัญจากวิดีโอกัน คลิกที่ไอคอน 🔊 เพื่อฟังการออกเสียง', roman: 'maa riian-rúu bprà-yòk săm-khan jàak wí-dii-oo gan. klík thîi ai-kôn 🔊 phêuua fang gaan òk-sĭang', eng: 'Let\'s learn the key phrases from the video. Click the sound icon 🔊 to hear the pronunciation.' },
+        },
+        part4: {
+            heading: { thai: 'ฝึกฟังและอ่านไปพร้อมกับสคริปต์', roman: 'fèuk fang láe àan bpai phróm gàp sà-kríp', eng: 'Listening & Reading with Script' },
+            instruction: { thai: 'ตอนนี้ เรามาดูสคริปต์ฉบับเต็มกัน คลิกที่ประโยคไหนก็ได้เพื่อฟังเสียง คลิกที่ (?) เพื่อดู \'เกร็ดความรู้จากครู\'', roman: 'dton-níi, rao maa duu sà-kríp chà-bàp dtem gan. klík thîi bprà-yòk năi gôr dâi phêuua fang sĭang. klík thîi (?) phêuua duu \'grèt khwaam-rúu jàak khruu\'', eng: 'Now, let\'s look at the full script. Click on any line to hear it read aloud. Click the (?) to see a "Teacher\'s Insight" for that line.' },
+        },
+        part5: {
+            heading: { thai: 'มาลองฝึกพูดกัน!', roman: 'maa long fèuk phûut gan!', eng: 'Role-Play Practice!' },
+            instruction: { thai: 'ถึงตาคุณเป็นคนซื้อแล้ว! ครูจะเป็นคนขายเอง เรามาลองซ้อมบทสนทนากัน', roman: 'thĕung dtaa khun bpen khon séu láew! khruu jà bpen khon kăai eeng. rao maa long sôm bòt sŏn-thá-naa gan', eng: 'It\'s your turn to be the shopper! I\'ll be the seller. Let\'s practice the conversation.' },
+            rp1_heading: { thai: 'รอบที่ 1: ฝึกพูดตามสคริปต์', roman: 'rôp thîi nùng: fèuk phûut dtaam sà-kríp', eng: 'Round 1: Guided Role-Play' },
+            rp1_instruction: { thai: 'พูดตามสคริปต์ได้เลย คลิกปุ่มเพื่อดูประโยคถัดไป ลองพูดออกเสียงดังๆ ดูนะ!', roman: 'phûut dtaam sà-kríp dâi loie. klík bpùm phêuua duu bprà-yòk thàt bpai. long phûut òk sĭang dang-dang duu ná!', eng: 'Follow the script. Click the button to reveal your next line. Try to say it out loud!' },
+            rp1_button: { thai: 'ประโยคถัดไป', roman: 'bprà-yòk thàt bpai', eng: 'Next Line' },
+            rp2_heading: { thai: 'รอบที่ 2: ฝึกพูดด้วยตัวเอง', roman: 'rôp thîi sŏng: fèuk phûut dûay dtua-eeng', eng: 'Round 2: Independent Role-Play' },
+            rp2_instruction: { thai: 'คราวนี้ คุณจะเห็นคำใบ้เป็นภาษาอังกฤษ ลองพูดประโยคภาษาไทยที่ถูกต้อง แล้วคลิกปุ่มเพื่อดูคำตอบ', roman: 'khraao-níi, khun jà hĕn kham-bâi bpen phaa-săa ang-grìt. long phûut bprà-yòk phaa-săa thai thîi thùuk-dtông, láew klík bpùm phêuua duu kham-dtòp', eng: 'This time, you\'ll see a prompt in English. Try to say the correct Thai phrase, then click the button to check your answer.' },
+            rp2_button: { thai: 'ต่อไป', roman: 'dtòr bpai', eng: 'Next' },
+        },
+        part6: {
+            heading: { thai: 'สรุปและเคล็ดลับสุดท้าย', roman: 'sà-rùp láe khlét-láp sùt-tháai', eng: 'Wrap-up & Final Tips' },
+            keyphrases_heading: { thai: 'ประโยคสำคัญที่ควรจำ:', roman: 'bprà-yòk săm-khan thîi khuan jam:', eng: 'Key Phrases to Remember:' },
+            cultural_heading: { thai: 'เกร็ดความรู้ทางวัฒนธรรม:', roman: 'grèt khwaam-rúu thaang wát-thá-ná-tham:', eng: 'Cultural Tips:' },
+            tip1: { thai: 'ยิ้มและเป็นมิตรเข้าไว้! การต่อราคาในเมืองไทยเป็นเหมือนเกมสนุกๆ ไม่ใช่การต่อสู้ที่จริงจัง ทัศนคติที่ดีจะช่วยได้มาก', roman: 'yím láe bpen mít khâo wái! gaan dtòr raa-kaa nai meuuang thai bpen mĕuan geem sà-nùk-sà-nùk, mâi châi gaan dtòr-sûu thîi jing-jang. thát-sà-ná-khà-dtì thîi dii jà chûay dâi mâak', eng: 'Smile and be friendly! Bargaining in Thailand is a light-hearted interaction, not a serious fight. A positive attitude goes a long way.' },
+            tip2: { thai: 'รู้ว่าควรต่อราคาที่ไหน การต่อราคาเป็นเรื่องปกติในตลาดกลางคืน ตลาดนัดสุดสัปดาห์ (เช่น จตุจักร) และร้านค้าริมทาง แต่จะไม่ทำในร้านสะดวกซื้อ ซูเปอร์มาร์เก็ต หรือห้างสรรพสินค้าใหญ่ๆ ที่มีป้ายราคาชัดเจน', roman: 'rúu wâa khuan dtòr raa-kaa thîi năi...', eng: 'Know where to bargain. It\'s expected at night markets, weekend markets (like Chatuchak), and street stalls. It\'s not done in convenience stores, supermarkets, or high-end malls with fixed prices.' },
+            tip3: { thai: 'ขอให้สนุก! สนุกไปกับขั้นตอนการซื้อของและบทสนทนากับคนขายในท้องถิ่น', roman: 'kŏr hâi sà-nùk! sà-nùk bpai gàp khân-dton gaan séu kŏng láe bòt sŏn-thá-naa gàp khon-kăai nai thóng-thìn', eng: 'Have fun! Enjoy the process and the conversation with local sellers.' },
+            final_message: { thai: 'คุณทำได้เยี่ยมมาก! ขอให้สนุกกับการช้อปปิ้งที่เมืองไทยนะ!', roman: 'khun tham dâi yîam mâak! kŏr hâi sà-nùk gàp gaan chóp-bpîng thîi meuuang thai ná!', eng: 'You did a great job! Have a wonderful and fun time shopping in Thailand!' }
+        }
+    };
+    
+    // --- Web Speech API Setup ---
+    let synth;
+    let voices;
+
+    function loadVoices() {
+        if (typeof speechSynthesis === 'undefined') return;
+        synth = window.speechSynthesis;
+        const setVoices = () => {
+            voices = synth.getVoices();
+        };
+        setVoices();
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = setVoices;
+        }
+    }
+    loadVoices();
+
+    function speak(text) {
+        if (!synth) {
+            console.error('Text-to-speech not supported.');
+            return;
+        }
+        if (synth.speaking) {
+            synth.cancel();
+        }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.9;
+        const thaiVoice = (voices || []).find(voice => voice.lang === 'th-TH');
+        if (thaiVoice) utterance.voice = thaiVoice;
+        synth.speak(utterance);
+    }
+
+    // --- Helper Function ---
+    function createTranslatableElement(data, tag = 'div', classes = '') {
+        const container = document.createElement(tag);
+        container.className = `translatable-container ${classes}`;
+        container.innerHTML = `
+            <span class="thai-text">${data.thai} <button class="speak-btn">🔊</button></span>
+            <div class="translation-block" style="display: none;">
+                <p class="phonetics text-sm text-gray-500 italic">${data.roman}</p>
+                <p class="translation text-sm text-gray-700">${data.eng}</p>
+            </div>
+        `;
+        return container;
+    }
+
+    // --- Populate UI with Thai text ---
+    function populateUI() {
+        document.getElementById('main-title').appendChild(createTranslatableElement(uiText.mainTitle, 'span'));
+        document.getElementById('part2-heading').appendChild(createTranslatableElement(uiText.part2.heading, 'span'));
+        document.getElementById('part2-instruction').appendChild(createTranslatableElement(uiText.part2.instruction, 'span'));
+        document.getElementById('part2-comprehension-heading').appendChild(createTranslatableElement(uiText.part2.compHeading, 'span'));
+        
+        const qList = document.getElementById('part2-questions');
+        [uiText.part2.q1, uiText.part2.q2, uiText.part2.q3].forEach(q => {
+             qList.appendChild(createTranslatableElement(q, 'li'));
+        });
+
+        document.getElementById('part3-heading').appendChild(createTranslatableElement(uiText.part3.heading, 'span'));
+        document.getElementById('part3-instruction').appendChild(createTranslatableElement(uiText.part3.instruction, 'span'));
+
+        document.getElementById('part4-heading').appendChild(createTranslatableElement(uiText.part4.heading, 'span'));
+        document.getElementById('part4-instruction').appendChild(createTranslatableElement(uiText.part4.instruction, 'span'));
+
+        document.getElementById('part5-heading').appendChild(createTranslatableElement(uiText.part5.heading, 'span'));
+        document.getElementById('part5-instruction').appendChild(createTranslatableElement(uiText.part5.instruction, 'span'));
+        document.getElementById('roleplay1-heading').appendChild(createTranslatableElement(uiText.part5.rp1_heading, 'span'));
+        document.getElementById('roleplay1-instruction').appendChild(createTranslatableElement(uiText.part5.rp1_instruction, 'span'));
+        document.getElementById('roleplay1-next').textContent = uiText.part5.rp1_button.thai;
+        document.getElementById('roleplay2-heading').appendChild(createTranslatableElement(uiText.part5.rp2_heading, 'span'));
+        document.getElementById('roleplay2-instruction').appendChild(createTranslatableElement(uiText.part5.rp2_instruction, 'span'));
+        document.getElementById('roleplay2-next').textContent = uiText.part5.rp2_button.thai;
+
+        document.getElementById('part6-heading').appendChild(createTranslatableElement(uiText.part6.heading, 'span'));
+        document.getElementById('part6-keyphrases-heading').appendChild(createTranslatableElement(uiText.part6.keyphrases_heading, 'span'));
+
+        const keyPhrasesList = document.getElementById('part6-keyphrases-list');
+        const keyPhrases = [
+            { thai: 'อันนี้เท่าไหร่คะ', roman: 'an-níi thâo-rài khá', eng: 'How much is this?' },
+            { thai: 'ลดได้ไหมคะ', roman: 'lót dâi măi khá', eng: 'Can you give a discount?' },
+            { thai: '...บาท ไม่ได้เหรอ', roman: '...bàat, mâi dâi lĕor', eng: 'Can\'t you do ... Baht?' }
+        ];
+        keyPhrases.forEach(phrase => {
+            keyPhrasesList.appendChild(createTranslatableElement(phrase, 'li'));
+        });
+
+        document.getElementById('part6-cultural-heading').appendChild(createTranslatableElement(uiText.part6.cultural_heading, 'span'));
+        
+        const culturalTipsList = document.getElementById('part6-cultural-tips');
+        [uiText.part6.tip1, uiText.part6.tip2, uiText.part6.tip3].forEach(tip => {
+            culturalTipsList.appendChild(createTranslatableElement(tip, 'li'));
+        });
+        document.getElementById('part6-final-message').appendChild(createTranslatableElement(uiText.part6.final_message, 'span'));
+    }
+    
+    populateUI();
+
+    // --- Populate Content ---
+    const vocabList = document.getElementById('vocab-list');
+    vocabulary.forEach(item => {
+        vocabList.appendChild(createTranslatableElement(item, 'div', 'p-3 bg-gray-50 rounded-lg border'));
+    });
+
+    const scriptContainer = document.getElementById('script-container');
+    scriptWithTranslations.forEach(item => {
+        const div = document.createElement('div');
+        const speakerClass = item.speaker.includes('Buyer') ? 'text-blue-800' : 'text-green-800';
+        div.className = 'p-2 rounded-md hover:bg-blue-100 transition translatable-container';
+        div.innerHTML = `
+            <div class="flex items-center">
+                <strong class="${speakerClass} mr-2">${item.speaker}:</strong>
+                <span class="thai-text">${item.line} <button class="speak-btn">🔊</button></span>
+                ${item.insight ? `<button class="insight-toggle text-blue-500 font-bold ml-2">(?)</button>` : ''}
+            </div>
+            <div class="translation-block" style="display: none;">
+                <p class="phonetics text-sm text-gray-500 italic">${item.roman}</p>
+                <p class="translation text-sm text-gray-700">${item.eng}</p>
+            </div>
+            ${item.insight ? `<p class="insight text-sm text-gray-700">${item.insight}</p>` : ''}
+        `;
+        scriptContainer.appendChild(div);
+    });
+
+    // --- Event Delegation for whole page ---
+    document.body.addEventListener('click', (e) => {
+        const speakBtn = e.target.closest('.speak-btn');
+        if (speakBtn) {
+            e.stopPropagation(); // prevent container click
+            const text = speakBtn.closest('.thai-text, [data-text]').textContent.replace('🔊', '').trim();
+            speak(text);
+            return;
+        }
+
+        const insightToggle = e.target.closest('.insight-toggle');
+        if (insightToggle) {
+            e.stopPropagation();
+            const insightP = insightToggle.closest('.translatable-container, div').querySelector('.insight');
+            if(insightP) insightP.style.display = insightP.style.display === 'block' ? 'none' : 'block';
+            return;
+        }
+
+        const translatableContainer = e.target.closest('.translatable-container');
+        if (translatableContainer) {
+            const translationBlock = translatableContainer.querySelector('.translation-block');
+            if (translationBlock) {
+                 translationBlock.style.display = translationBlock.style.display === 'block' ? 'none' : 'block';
+            }
+        }
+    });
+
+    // --- Role-Play Logic ---
+    const roleplay1Chat = document.getElementById('roleplay1-chat');
+    const roleplay1NextBtn = document.getElementById('roleplay1-next');
+    let roleplay1Index = 0;
+
+    function addInteractiveBubble(container, data, speaker) {
+        const bubble = document.createElement('div');
+        const speakerClass = speaker === 'seller' ? 'seller-bubble' : 'buyer-bubble';
+        bubble.className = `chat-bubble ${speakerClass} translatable-container`;
+        bubble.innerHTML = `
+            <span class="thai-text">${data.line} <button class="speak-btn">🔊</button></span>
+            <div class="translation-block" style="display: none;">
+                <p class="phonetics text-xs italic">${data.roman}</p>
+                <p class="translation text-xs">${data.eng}</p>
+            </div>
+        `;
+        container.appendChild(bubble);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    roleplay1NextBtn.addEventListener('click', () => {
+        if (roleplay1Index >= scriptWithTranslations.length) {
+            roleplay1NextBtn.disabled = true;
+            roleplay1NextBtn.textContent = "จบแล้ว!";
+            return;
+        }
+        const currentLine = scriptWithTranslations[roleplay1Index];
+        const speaker = currentLine.speaker.includes('Seller') ? 'seller' : 'buyer';
+        addInteractiveBubble(roleplay1Chat, currentLine, speaker);
+        roleplay1Index++;
+    });
+
+    // Role-Play 2
+    const roleplay2Chat = document.getElementById('roleplay2-chat');
+    const roleplay2NextBtn = document.getElementById('roleplay2-next');
+    const roleplay2Prompts = [
+        { type: 'seller', line: 'สวัสดีครับ/ค่ะ มีอะไรให้ช่วยไหม', roman: 'sà-wàt-dii khráp/khâ, mii à-rai hâi chûay măi', eng: 'Hello, can I help you?' },
+        { type: 'prompt', line: 'You see a shirt you like. Ask how much it is.' },
+        { type: 'answer', data: scriptWithTranslations[0] },
+        { type: 'seller', data: scriptWithTranslations[1] },
+        { type: 'prompt', line: 'Say it\'s pretty and ask for a discount.' },
+        { type: 'answer', data: scriptWithTranslations[8] },
+        { type: 'seller', data: scriptWithTranslations[9] },
+        { type: 'prompt', line: 'Counter-offer with 800 Baht.' },
+        { type: 'answer', data: scriptWithTranslations[12] },
+        { type: 'seller', data: scriptWithTranslations[13] },
+        { type: 'prompt', line: 'Confirm the deal and say you will take it.' },
+        { type: 'answer', data: scriptWithTranslations[18] },
+        { type: 'seller', data: scriptWithTranslations[19] },
+        { type: 'prompt', line: 'Say you will pay with cash.' },
+        { type: 'answer', data: scriptWithTranslations[20] },
+        { type: 'seller', line: 'ขอบคุณครับ/ค่ะ!', roman: 'khòp khun khráp/khâ!', eng: 'Thank you!' }
+    ];
+    let roleplay2Index = 0;
+    
+    function addPrompt(container, text) {
+        const promptDiv = document.createElement('div');
+        promptDiv.className = 'prompt';
+        promptDiv.innerHTML = `<p class="font-semibold">Your turn:</p><p>${text}</p>`;
+        container.appendChild(promptDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    roleplay2NextBtn.addEventListener('click', () => {
+        if (roleplay2Index >= roleplay2Prompts.length) {
+            addInteractiveBubble(roleplay2Chat, {line: 'เก่งมากค่ะ!', roman: 'gèng mâak khâ!', eng: 'Great job!'}, 'seller');
+            roleplay2NextBtn.disabled = true;
+            roleplay2NextBtn.textContent = "จบแล้ว!";
+            return;
+        }
+        const current = roleplay2Prompts[roleplay2Index];
+        if (current.type === 'seller') {
+            addInteractiveBubble(roleplay2Chat, current.data || current, 'seller');
+        } else if (current.type === 'prompt') {
+            addPrompt(roleplay2Chat, current.line);
+            roleplay2NextBtn.textContent = "แสดงคำตอบ"; // Show Answer
+        } else if (current.type === 'answer') {
+            addInteractiveBubble(roleplay2Chat, current.data, 'buyer');
+            roleplay2NextBtn.textContent = "ต่อไป"; // Next
+        }
+        roleplay2Index++;
+    });
+});
+</script>
+
+</body>
+</html>
+
+
