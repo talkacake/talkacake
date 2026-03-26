@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: ถามเรื่องงาน (Asking About Work)</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc; /* Slate 50 background */
+        }
+        .thai-font {
+            font-family: 'Sarabun', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // TTS Helper
+        const speak = (text) => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // --- DATA ---
+
+        // 1. Previous Vocab List
+        const previousVocab = [
+            { emoji: "🍽️", thai: "สั่งอะไร", ipa: "sàng à-rai", en: "What did you order? / What are you ordering?" },
+            { emoji: "🍛", thai: "แกง", ipa: "gaaeng", en: "curry" },
+            { emoji: "🚶‍♂️⬅️📍", thai: "มา", ipa: "maa", en: "come" },
+            { emoji: "⬅️🌏🗺️", thai: "จาก", ipa: "jàak", en: "from" },
+            { emoji: "🇹🇭🇺🇸🇯🇵", thai: "ประเทศ", ipa: "bprà-thêt", en: "country" },
+            { emoji: "👂❓🗣️", thai: "ได้ยินไหม", ipa: "dâi-yin măi", en: "Can you hear me?" },
+            { emoji: "😊✨❓", thai: "สบายดีไหม", ipa: "sà-baai-dee măi", en: "How are you?" },
+            { emoji: "🥚🍳✨", thai: "ไข่", ipa: "kài", en: "egg" },
+            { emoji: "🤝➕🔗", thai: "กับ", ipa: "gàp", en: "with; to; and; along with" },
+            { emoji: "🥬🥗🌿", thai: "ผักโขม", ipa: "pàk-kǒm", en: "spinach" },
+            { emoji: "😖💥💢", thai: "ปวด", ipa: "bpùuat", en: "to ache, to hurt, to be painful" },
+            { emoji: "🧣🦒👤", thai: "คอ", ipa: "kɔɔ", en: "neck" },
+            { emoji: "🤲🎁✨", thai: "ให้", ipa: "hâi", en: "give (a favour)" },
+            { emoji: "🥶❄️", thai: "หนาว", ipa: "nǎao", en: "cold (weather)" },
+            { emoji: "🍽️🌙", thai: "อาหารเย็น", ipa: "aa-hăan-yen", en: "dinner" },
+            { emoji: "📈👍", thai: "ดีขึ้น", ipa: "dii-kʉ̂n", en: "better; improved than before" },
+            { emoji: "💧", thai: "น้ำเปล่า", ipa: "náam-bplào", en: "plain water" },
+            { emoji: "🔗", thai: "และ", ipa: "lɛ́", en: "and" },
+            { emoji: "📅⏳", thai: "ช่วงนี้", ipa: "chûang-níi", en: "this period; recently; lately" },
+            { emoji: "📝", thai: "คำ", ipa: "kam", en: "words" },
+            { emoji: "👌", thai: "ง่าย", ipa: "ngâai", en: "easy" },
+            { emoji: "⏳🔁", thai: "บางครั้ง", ipa: "baang-kráng", en: "sometimes" },
+            { emoji: "📍", thai: "ใน", ipa: "nai", en: "in" },
+            { emoji: "⚡️🏃‍♂️", thai: "เร็ว", ipa: "reo", en: "fast; quick; quickly" },
+            { emoji: "🐌", thai: "ช้า", ipa: "cháa", en: "slow; slowly; late" },
+            { emoji: "😴🌙", thai: "นอนไม่หลับ", ipa: "nɔɔn mâi làp", en: "cannot sleep; sleepless" },
+            { emoji: "😴🌙", thai: "ตื่นบ่อย", ipa: "dtʉ̀ʉn bɔ̀i", en: "wake up often; frequent waking" },
+            { emoji: "🤢🔥", thai: "กรดไหลย้อน", ipa: "grot lǎi yɔ́ɔn", en: "acid reflux; heartburn" },
+            { emoji: "❓🤔", thai: "ทำไม", ipa: "tham mai", en: "Why" },
+            { emoji: "🧧🎊", thai: "สวัสดีปีใหม่จีน", ipa: "sà-wàt-dee bpee-mài jeen", en: "Happy Chinese New Year" },
+            { emoji: "💘🌹", thai: "สุขสันต์วันวาเลนไทน์", ipa: "sùk-sǎn wan waa-len-tai", en: "Happy Valentine's Day" },
+            { emoji: "🐟🔴", thai: "ปลากะพงแดง", ipa: "bplaa ga-pong daeng", en: "red snapper" },
+            { emoji: "🧍‍♂️", thai: "คนเดียว", ipa: "kon-diiao", en: "alone (person, single)" },
+            { emoji: "💰🏷️", thai: "เท่าไร", ipa: "tâo-rài", en: "How much? / How many?" },
+            { emoji: "📍", thai: "ที่นั่น", ipa: "thîi nân", en: "there" },
+            { emoji: "✅", thai: "มี", ipa: "mii", en: "have" },
+            { emoji: "🕰️", thai: "เคย", ipa: "koei", en: "used to; have ever; once" },
+            { emoji: "🐰", thai: "กระต่าย", ipa: "grà-dtàai", en: "rabbit; bunny" },
+            { emoji: "📜", thai: "ประวัติศาสตร์", ipa: "bprà-wàt-dtì-sàat", en: "history" },
+            { emoji: "👀", thai: "ดู", ipa: "duu", en: "Watch" },
+            { emoji: "🆕✨", thai: "ใหม่", ipa: "mài", en: "new" },
+            { emoji: "🚫", thai: "ไม่", ipa: "mâi", en: "no; not" },
+            { emoji: "🧵❓", thai: "ไหม", ipa: "măi / mái", en: "silk; (question particle)" },
+            { emoji: "🐶", thai: "หมา", ipa: "măa", en: "dog" },
+            { emoji: "🐴", thai: "ม้า", ipa: "máa", en: "horse" },
+            { emoji: "🧑‍🍳🍽️", thai: "คนเสิร์ฟ", ipa: "kon sə̀əp", en: "waiter/waitress/server" },
+            { emoji: "😂🤣", thai: "ตลก", ipa: "dtà-lòk", en: "funny; comical; joke" },
+            { emoji: "📈", thai: "เยอะ", ipa: "yə́", en: "a lot; many; much" },
+            { emoji: "🛑", thai: "หยุด", ipa: "yùt", en: "stop" },
+            { emoji: "🍽️", thai: "จาน", ipa: "jaan", en: "plates" },
+            { emoji: "➕📥", thai: "ใส่", ipa: "Sài", en: "put in/add" },
+            { emoji: "🤔❓", thai: "ยังไง", ipa: "yang-ngai", en: "how" },
+            { emoji: "🟰", thai: "เป็น", ipa: "bpen", en: "To be" },
+            { emoji: "⏳🌑❓", thai: "ยัง", ipa: "yang", en: "(not) yet" },
+            { emoji: "📅", thai: "วันที่", ipa: "wan-têe", en: "date; day" },
+            { emoji: "📅🌸", thai: "มีนา", ipa: "mee-naa", en: "March" },
+            { emoji: "📅", thai: "วันเสาร์", ipa: "wan-sǎo", en: "Saturday" },
+            { emoji: "🦴🩺", thai: "ไปหาหมอจัดกระดูก", ipa: "bpai hǎa mɔ̌ɔ jàt grà-dùuk", en: "Go to see a chiropractor" },
+            { emoji: "🤝🚶", thai: "ไปด้วย", ipa: "bpai duay", en: "go with; come along; go too" },
+            { emoji: "🫸🔘", thai: "กด", ipa: "gòt", en: "to press; to push" },
+            { emoji: "🦴", thai: "หลัง", ipa: "lǎng", en: "back (body part); behind" },
+            { emoji: "🌀🤏", thai: "บิด", ipa: "bìt", en: "to twist; to wring" },
+            { emoji: "🚗", thai: "ขับรถ", ipa: "kàp rót", en: "to drive" },
+            { emoji: "🩺🦴", thai: "รู้จักหมอจัดกระดูกได้ยังไง", ipa: "rúu-jàk mŏr jàt grà-dùuk dâai yang-ngai", en: "How do you know a chiropractor?" },
+            { emoji: "👥", thai: "จากคนอื่น", ipa: "jàak kon èun", en: "From other people" },
+            { emoji: "😢", thai: "เศร้า", ipa: "sâo", en: "sad" },
+            { emoji: "😡💔", thai: "เกลียด", ipa: "glìat", en: "to hate" },
+            { emoji: "🏛️", thai: "รัฐบาล", ipa: "rat-tà-baan", en: "government" },
+            { emoji: "😱", thai: "น่ากลัว", ipa: "nâa-glua", en: "scary" },
+            { emoji: "⚔️🔥", thai: "สงคราม", ipa: "sǒng-kraam", en: "war" },
+            { emoji: "👨‍👩‍👧‍👦", thai: "ครอบครัว", ipa: "krɔ̂ɔp-krua", en: "family" },
+            { emoji: "😴🌙", thai: "ตื่นกลางดึก", ipa: "dtʉ̀ʉn glaang dʉ̀k", en: "to wake up in the middle of the night" },
+            { emoji: "🤢🤕", thai: "ปวดท้อง", ipa: "bpùat tɔ́ɔng", en: "stomach ache" },
+            { emoji: "🛒", thai: "สั่ง", ipa: "sàng", en: "order" },
+            { emoji: "📥", thai: "รับ", ipa: "ráp", en: "receive" },
+            { emoji: "🥛🍵", thai: "แก้ว", ipa: "gâeo", en: "glasses; cups" },
+            { emoji: "🍬", thai: "หวาน", ipa: "wǎan", en: "sweet" },
+            { emoji: "🔗", thai: "ของ", ipa: "khǒong", en: "of (possessive)" },
+            { emoji: "🧮", thai: "ทั้งหมด", ipa: "tháng-mòt", en: "all; in total" },
+            { emoji: "✅👍", thai: "เรียบร้อย", ipa: "rîap-róoi", en: "all set" },
+            { emoji: "⛈️🌪️", thai: "พายุ", ipa: "paa-yú", en: "storm" },
+            { emoji: "🧑‍💼", thai: "ลูกค้า", ipa: "lûuk-kháa", en: "customer" },
+            { emoji: "🏪🛍️", thai: "ร้าน", ipa: "ráan", en: "shop" },
+            { emoji: "🥤🧃", thai: "เครื่องดื่ม", ipa: "khrûeang-dùem", en: "beverages" },
+            { emoji: "🔀", thai: "หรือ", ipa: "rǔe", en: "or" },
+            { emoji: "🌴🍈", thai: "อินทผลัม", ipa: "in-tá-pá-lam", en: "date (fruit)" },
+            { emoji: "🍯🐝", thai: "น้ำผึ้ง", ipa: "náam pʉ̂ng", en: "honey" },
+            { emoji: "👍✨", thai: "ดีกว่า", ipa: "dii-gwàa", en: "better than" },
+            { emoji: "✅🔥", thai: "ต้องลอง", ipa: "dtâawng laawng", en: "Must try." },
+            { emoji: "🥚", thai: "ฟอง", ipa: "fong", en: "classifier for eggs" },
+            { emoji: "⏳", thai: "ตลอด", ipa: "dtà-làawt", en: "always" },
+            { emoji: "➕❓", thai: "บ้าง", ipa: "bâang", en: "used when expecting more than 1 answer" },
+            { emoji: "🎂📅", thai: "อายุ", ipa: "aa-yú", en: "age" },
+            { emoji: "📅", thai: "ปี", ipa: "bpii", en: "years" },
+            { emoji: "🔢", thai: "กี่", ipa: "gìi", en: "How many" },
+            { emoji: "🎓📚", thai: "นักศึกษา", ipa: "nák-sùek-sǎa", en: "university student" },
+            { emoji: "🔢", thai: "สิบเอ็ด", ipa: "sìp-èt", en: "eleven" },
+            { emoji: "🛟🚤👮", thai: "เจ้าหน้าที่หน่วยยามฝั่ง", ipa: "jâo-nâa-têe nùi yaam fàng", en: "coast guard officer" },
+            { emoji: "👨‍👩‍👧", thai: "ลูกคนเดียว", ipa: "lôok kon-diao", en: "only child" },
+            { emoji: "👨‍👩‍👧‍👦", thai: "ลูกพี่ลูกน้อง", ipa: "lûuk-pîi-lûuk-náawng", en: "cousin" },
+            { emoji: "👨‍🎓📚", thai: "นักเรียน", ipa: "nák-riian", en: "student" }
+        ];
+
+        // 2. Target Vocab (Max 5)
+        const targetVocab = [
+            { emoji: "💼", thai: "งาน", ipa: "ngaan", en: "work / job" },
+            { emoji: "😫", thai: "เหนื่อย", ipa: "nùeai", en: "tired / tiring" },
+            { emoji: "🤷‍♂️", thai: "ก็เรื่อยๆ", ipa: "gôo rûeai-rûeai", en: "so-so / ongoing / nothing special" },
+            { emoji: "👨", thai: "พ่อ", ipa: "phôo", en: "father / dad" },
+            { emoji: "❓", thai: "ไหม", ipa: "măi", en: "question particle (Is it...?)" }
+        ];
+
+        // 3. Script Data
+        const dialogueScript = [
+            { speaker: "พ่อ 👨", thai: "งานเหนื่อยไหม", ipa: "ngaan nùeai măi", en: "Is work tiring?" },
+            { speaker: "แลมป์ 👦", thai: "ก็ เรื่อยๆ ครับคุณพ่อ", ipa: "gôo rûeai-rûeai khráp khun phôo", en: "It's just so-so, dad." }
+        ];
+
+        const compQuestions = [
+            {
+                q: { thai: "พ่อถามว่าอะไร?", ipa: "phôo thǎam wâa à-rai?", en: "What did the dad ask?", emoji: "🗣️" },
+                a: { thai: "งานเหนื่อยไหม", ipa: "ngaan nùeai măi", en: "Is work tiring?", emoji: "✅" }
+            },
+            {
+                q: { thai: "แลมป์ตอบว่าอะไร?", ipa: "laem dtòop wâa à-rai?", en: "What did Lamp answer?", emoji: "👦" },
+                a: { thai: "ก็ เรื่อยๆ ครับ", ipa: "gôo rûeai-rûeai khráp", en: "Just so-so.", emoji: "✅" }
+            }
+        ];
+
+        // 4. Practice Activities
+        const practiceActivities = [
+            { emoji: "🎭", type: {thai: "บทบาทสมมติ", ipa: "bòt-bàat sǒm-mút", en: "Role-play"}, task: {thai: "คุณเจอเพื่อนหลังเลิกงาน ลองถามเพื่อนว่า 'งานเหนื่อยไหม'", ipa: "khun jooe phûean hlang lôek ngaan. loong thǎam phûean wâa 'ngaan nùeai măi'", en: "You meet a friend after work. Try asking your friend 'Is work tiring?'"} },
+            { emoji: "🎤", type: {thai: "สัมภาษณ์", ipa: "sǎm-phâat", en: "Interview"}, task: {thai: "สัมภาษณ์คุณครูเกี่ยวกับงาน ว่างานของคุณครูเหนื่อยไหม?", ipa: "sǎm-phâat khun khruu gìiao-gàp ngaan. wâa ngaan khǒong khun khruu nùeai măi?", en: "Interview the teacher about their work. Is the teacher's work tiring?"} },
+            { emoji: "💬", type: {thai: "สนทนา", ipa: "sǒn-thá-naa", en: "Discussion"}, task: {thai: "เวลาที่คุณทำงานเหนื่อย คุณชอบทำอะไร?", ipa: "wee-laa thîi khun tham ngaan nùeai, khun chôop tham à-rai?", en: "When you are tired from work, what do you like to do?"} },
+            { emoji: "🎲", type: {thai: "เกมพูดคุย", ipa: "geem phûut-khui", en: "Speaking Game"}, task: {thai: "ลองบอก 3 อย่างที่ทำให้คุณรู้สึก 'เหนื่อย'", ipa: "loong bòok sǎam yàang thîi tham-hâi khun rúu-sùek 'nùeai'", en: "Try naming 3 things that make you feel 'tired'."} }
+        ];
+
+        // 5. Extension Activities
+        const extensionActivities = [
+            { emoji: "📖", type: {thai: "เล่าเรื่อง", ipa: "lâo rûeang", en: "Story-telling"}, task: {thai: "เล่าเรื่องวันที่คุณทำงานเหนื่อยที่สุดให้ฟังหน่อย", ipa: "lâo rûeang wan thîi khun tham ngaan nùeai thîi sùt hâi fang nòi", en: "Tell a story about the day you were the most tired from work."} },
+            { emoji: "⚖️", type: {thai: "โต้วาที", ipa: "dtôo-waa-thii", en: "Debate"}, task: {thai: "ทำงานคนเดียว กับ ทำงานกับครอบครัว อะไรดีกว่ากัน?", ipa: "tham ngaan khon-diao gàp tham ngaan gàp khrôop-khrua, à-rai dii gwàa gan?", en: "Working alone vs working with family, which is better?"} },
+            { emoji: "📊", type: {thai: "นำเสนอ", ipa: "nam-sà-nǒe", en: "Presentation"}, task: {thai: "คุณอยากมีงานใหม่ไหม? งานใหม่ของคุณเป็นยังไง?", ipa: "khun yàak mii ngaan mài măi? ngaan mài khǒong khun bpen yang-ngai?", en: "Do you want to have a new job? What is your new job like?"} }
+        ];
+
+        // UI Texts
+        const uiText = {
+            mainTitle: { thai: "ถามเรื่องงาน", ipa: "thǎam rûeang ngaan", en: "Asking About Work", emoji: "💼" },
+            sectionReview: { thai: "ทบทวนคำศัพท์", ipa: "thóp-thuan kham-sàp", en: "Review Vocabulary", emoji: "🧠" },
+            instructionSentence: { thai: "แต่งประโยคจากคำนี้", ipa: "dtàeng bprà-yòok jàak kham níi", en: "Make a sentence from this word.", emoji: "✏️" },
+            btnRandom: { thai: "สุ่มคำศัพท์", ipa: "sùm kham-sàp", en: "Random Vocab", emoji: "🎲" },
+            sectionVideo: { thai: "วิดีโอ", ipa: "wí-dii-oo", en: "Video", emoji: "📺" },
+            instructionListen: { thai: "ดูวิดีโอ (0:00 - 0:12)", ipa: "duu wí-dii-oo", en: "Watch the video (0:00 - 0:12)", emoji: "👀" },
+            sectionComp: { thai: "ตอบคำถาม", ipa: "dtòop kham-thǎam", en: "Answer the Questions", emoji: "❓" },
+            btnShowAnswer: { thai: "ดูคำตอบ", ipa: "duu kham-dtòop", en: "Show Answer", emoji: "💡" },
+            sectionVocab: { thai: "คำศัพท์ใหม่ (5 คำ)", ipa: "kham-sàp mài", en: "New Vocabulary (5 words)", emoji: "📚" },
+            sectionPractice: { thai: "ฝึกพูด", ipa: "fùek phûut", en: "Speaking Practice", emoji: "🗣️" },
+            sectionExtension: { thai: "กิจกรรมเพิ่มเติม", ipa: "gìt-jà-gam phôem-dterm", en: "Extension Activities", emoji: "🚀" },
+            extensionNote: { thai: "ถ้ามีเวลาเหลือ เรามาทำกิจกรรมเหล่านี้กัน", ipa: "thâa mii wee-laa lǔea, rao maa tham gìt-jà-gam lǎo-níi gan", en: "If we have extra time, let's do these activities.", emoji: "⏳" }
+        };
+
+        // --- COMPONENTS ---
+
+        // Universal Component for Thai Text + TTS + Toggles (DOM-Safe)
+        const InteractiveText = ({ textObj, size = "md", color = "text-gray-800", isInline = false }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+            
+            let txtSize = "text-base";
+            if(size === "xl") txtSize = "text-2xl";
+            if(size === "lg") txtSize = "text-xl";
+            if(size === "sm") txtSize = "text-sm";
+            
+            return (
+                <div className={`flex flex-col gap-1 ${isInline ? 'inline-flex' : 'mb-3'} w-full`}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        {textObj.emoji && <span className={`${txtSize}`}>{textObj.emoji}</span>}
+                        <span 
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); speak(textObj.thai); }} 
+                            className="cursor-pointer inline-flex items-center justify-center text-blue-600 hover:text-blue-800 flex-shrink-0 transition-transform active:scale-90 bg-blue-100 p-1.5 rounded-full shadow-sm"
+                        >
+                            <i className="ph ph-speaker-high text-lg"></i>
+                        </span>
+                        <span className={`${txtSize} font-bold ${color} thai-font leading-snug`}>{textObj.thai}</span>
+                        
+                        <div className="flex gap-1 ml-auto">
+                            <span 
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowIPA(!showIPA); }} 
+                                className={`cursor-pointer inline-block text-[10px] px-2 py-1 rounded shadow-sm font-bold transition-colors ${showIPA ? 'bg-purple-500 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+                            >
+                                IPA
+                            </span>
+                            <span 
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowEN(!showEN); }} 
+                                className={`cursor-pointer inline-block text-[10px] px-2 py-1 rounded shadow-sm font-bold transition-colors ${showEN ? 'bg-emerald-500 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+                            >
+                                EN
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {(showIPA || showEN) && (
+                        <div className="w-full bg-white/60 rounded-lg p-2 space-y-1 mt-1 border border-blue-50 shadow-inner">
+                            {showIPA && <div className="text-purple-700 text-sm font-mono tracking-wide">/{textObj.ipa}/</div>}
+                            {showEN && <div className="text-emerald-700 text-sm italic">"{textObj.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const RandomVocabGenerator = () => {
+            const [currentWord, setCurrentWord] = useState(null);
+
+            const pickRandom = () => {
+                const randomIdx = Math.floor(Math.random() * previousVocab.length);
+                setCurrentWord(previousVocab[randomIdx]);
+            };
+
+            useEffect(() => {
+                pickRandom();
+            }, []);
+
+            return (
+                <div className="bg-white rounded-2xl shadow-sm border-2 border-indigo-100 p-5 mb-6">
+                    <InteractiveText textObj={uiText.instructionSentence} size="md" color="text-gray-600" />
+                    
+                    <div className="min-h-[140px] flex flex-col items-center justify-center bg-indigo-50 rounded-xl p-4 my-4 border border-indigo-200 shadow-inner">
+                        {currentWord ? (
+                            <div className="text-center w-full">
+                                <div className="text-5xl mb-3">{currentWord.emoji}</div>
+                                <InteractiveText textObj={{thai: currentWord.thai, ipa: currentWord.ipa, en: currentWord.en}} size="xl" color="text-indigo-900" />
+                            </div>
+                        ) : (
+                            <span className="text-gray-400">...</span>
+                        )}
+                    </div>
+
+                    <div className="flex justify-center mt-2">
+                        <span onClick={pickRandom} className="cursor-pointer bg-indigo-500 hover:bg-indigo-600 text-white w-full py-3 rounded-xl shadow-md font-bold flex flex-col items-center gap-1 transition-transform active:scale-95">
+                             <InteractiveText textObj={uiText.btnRandom} size="md" color="text-white" />
+                        </span>
+                    </div>
+                </div>
+            );
+        };
+
+        const VocabCard = ({ item }) => {
+            return (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-blue-100 flex flex-col">
+                    <InteractiveText textObj={item} size="lg" color="text-blue-900" />
+                </div>
+            );
+        };
+
+        const CompQuestionItem = ({ qData }) => {
+            const [showAnswer, setShowAnswer] = useState(false);
+            
+            return (
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-3">
+                    <InteractiveText textObj={qData.q} size="md" color="text-slate-800" />
+                    
+                    {!showAnswer ? (
+                        <span 
+                            onClick={() => setShowAnswer(true)} 
+                            className="cursor-pointer mt-2 inline-flex items-center gap-1 bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-slate-200 transition-colors"
+                        >
+                            <i className="ph ph-lightbulb"></i> {uiText.btnShowAnswer.thai}
+                        </span>
+                    ) : (
+                        <div className="mt-3 pt-3 border-t border-slate-100 bg-emerald-50 p-3 rounded-lg">
+                            <InteractiveText textObj={qData.a} size="md" color="text-emerald-800" />
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const ActivityCard = ({ activity }) => {
+            return (
+                <div className="bg-white border-2 border-slate-100 p-4 rounded-xl shadow-sm mb-3">
+                    <div className="mb-2 inline-block bg-slate-100 px-2 py-1 rounded-lg">
+                        <InteractiveText textObj={{...activity.type, emoji: activity.emoji}} size="sm" color="text-slate-600" isInline={true} />
+                    </div>
+                    <InteractiveText textObj={activity.task} size="md" color="text-slate-800" />
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <div className="max-w-2xl mx-auto min-h-screen pb-20">
+                    {/* Header */}
+                    <header className="bg-blue-600 text-white p-6 rounded-b-3xl shadow-md mb-8 sticky top-0 z-50 border-b-4 border-blue-800">
+                        <InteractiveText textObj={uiText.mainTitle} size="xl" color="text-white" />
+                    </header>
+
+                    <div className="px-4 space-y-10">
+                        
+                        {/* 1. Review (Random Vocab) */}
+                        <section>
+                            <div className="mb-4 bg-indigo-100 p-3 rounded-2xl inline-block shadow-sm">
+                                <InteractiveText textObj={uiText.sectionReview} size="lg" color="text-indigo-900" />
+                            </div>
+                            <RandomVocabGenerator />
+                        </section>
+
+                        {/* 2. Video & Comprehension */}
+                        <section>
+                            <div className="mb-4 bg-slate-200 p-3 rounded-2xl inline-block shadow-sm">
+                                <InteractiveText textObj={uiText.sectionVideo} size="lg" color="text-slate-900" />
+                            </div>
+                            
+                            {/* YouTube Video Embed */}
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
+                                <div className="text-center mb-3">
+                                     <InteractiveText textObj={uiText.instructionListen} size="md" color="text-slate-700" />
+                                </div>
+                                <div className="relative w-full overflow-hidden rounded-xl shadow-inner bg-black" style={{ paddingTop: '56.25%' }}>
+                                    <iframe 
+                                        className="absolute top-0 left-0 w-full h-full"
+                                        src="https://www.youtube.com/embed/584Dgp4GtA0?start=0&end=12" 
+                                        title="YouTube video player" 
+                                        frameBorder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowFullScreen>
+                                    </iframe>
+                                </div>
+                                
+                                <div className="mt-5 space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    {dialogueScript.map((item, idx) => (
+                                        <div key={idx} className="border-l-4 border-blue-400 pl-3">
+                                            <div className="text-xs font-bold text-slate-400 mb-1">{item.speaker}</div>
+                                            <InteractiveText textObj={item} size="md" color="text-slate-800" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mb-4 inline-block">
+                                <InteractiveText textObj={uiText.sectionComp} size="md" color="text-slate-800" />
+                            </div>
+                            
+                            {compQuestions.map((q, idx) => (
+                                <CompQuestionItem key={idx} qData={q} />
+                            ))}
+                        </section>
+
+                        {/* 3. Target Vocab */}
+                        <section>
+                            <div className="mb-4 bg-blue-100 p-3 rounded-2xl inline-block shadow-sm">
+                                <InteractiveText textObj={uiText.sectionVocab} size="lg" color="text-blue-900" />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {targetVocab.map((item, idx) => (
+                                    <VocabCard key={idx} item={item} />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 4. Real-life Tasks (Practice) */}
+                        <section>
+                            <div className="mb-4 bg-emerald-100 p-3 rounded-2xl inline-block shadow-sm">
+                                <InteractiveText textObj={uiText.sectionPractice} size="lg" color="text-emerald-900" />
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                {practiceActivities.map((act, idx) => (
+                                    <ActivityCard key={idx} activity={act} />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 5. Extension Activities */}
+                        <section>
+                            <div className="mb-4 bg-purple-100 p-3 rounded-2xl inline-block shadow-sm">
+                                <InteractiveText textObj={uiText.sectionExtension} size="lg" color="text-purple-900" />
+                            </div>
+                            <div className="bg-white rounded-2xl shadow-sm border-2 border-purple-100 p-5 mb-6">
+                                <div className="bg-purple-50 border border-purple-200 p-3 rounded-xl mb-4 text-center">
+                                    <InteractiveText textObj={uiText.extensionNote} size="sm" color="text-purple-800" />
+                                </div>
+                                
+                                <div className="space-y-3">
+                                    {extensionActivities.map((act, idx) => (
+                                        <ActivityCard key={idx} activity={act} />
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
