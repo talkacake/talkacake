@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Thai Lesson: Massage & Shopping</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f7fafc;
+        }
+        .thai, .thai-text {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1.1em;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            margin-bottom: 0.5rem;
+        }
+        .seller-bubble {
+            background-color: #e2e8f0;
+            align-self: flex-start;
+        }
+        .buyer-bubble {
+            background-color: #ccebfb;
+            align-self: flex-end;
+        }
+        .prompt {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 0.25rem;
+            font-size: 1em;
+            vertical-align: middle;
+        }
+        .toggle-btn {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            margin-left: 0.5rem;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .toggle-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .toggle-btn.active {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+        .translatable-content-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .translatable-details {
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        .phonetics, .translation {
+            display: none;
+            padding: 0.25rem 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-teal-600"></h1>
+        </header>
+
+        <!-- Part 1: Listening Practice (Massage) -->
+        <div class="card">
+            <h2 id="part1-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part1-instruction" class="mb-4"></p>
+            <a href="https://www.instagram.com/reel/DN51KlCD64f/?igsh=emlpaDY5dHQycW84" target="_blank" class="block mb-6">
+                <div class="bg-gray-200 rounded-lg p-6 text-center hover:bg-gray-300 transition duration-300">
+                    <img src="https://placehold.co/600x300/e2e8f0/333333?text=Click+to+Watch+Video+(Massage)&font=sarabun" alt="Massage video" class="w-full h-auto object-cover rounded-lg mb-4">
+                    <p class="font-semibold text-blue-600">Open Video in New Tab</p>
+                    <p class="text-sm text-gray-500">Video source: Instagram</p>
+                </div>
+            </a>
+            <h3 id="part1-comprehension-heading" class="font-semibold text-lg mt-4"></h3>
+            <ul id="part1-questions" class="list-disc list-inside mt-2 text-gray-700 space-y-2">
+            </ul>
+        </div>
+        
+        <!-- Part 2: Key Phrases (Massage) -->
+        <div class="card">
+            <h2 id="part2-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part2-instruction" class="mb-4"></p>
+            <div id="vocab-list-massage" class="space-y-4">
+                <!-- Massage Vocabulary will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 3: Role-Play (Massage) -->
+        <div class="card">
+            <h2 id="part3-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part3-instruction" class="mb-4"></p>
+            
+            <div class="mb-8">
+                <h3 id="roleplay1-heading" class="text-xl font-semibold mb-2"></h3>
+                <p id="roleplay1-instruction" class="mb-4"></p>
+                <div id="roleplay1-chat" class="flex flex-col space-y-2 bg-white p-4 rounded-lg border h-64 overflow-y-auto"></div>
+                <button id="roleplay1-next" class="mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"></button>
+            </div>
+        </div>
+
+        <!-- Part 4: New Scenario (Gentle Monster) -->
+        <div class="card">
+            <h2 id="part4-heading" class="text-2xl font-semibold mb-3 text-purple-700"></h2>
+            <p id="part4-instruction" class="mb-4"></p>
+            
+            <h3 id="part4-vocab-heading" class="text-xl font-semibold mb-2"></h3>
+             <div id="vocab-list-shop" class="space-y-4 mb-6">
+                <!-- Shop Vocabulary will be inserted here by JS -->
+            </div>
+
+            <h3 id="part4-script-heading" class="text-xl font-semibold mb-2"></h3>
+            <div id="script-container-shop" class="space-y-2 bg-gray-50 p-4 rounded-lg">
+                <!-- Shop Script will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 5: Wrap-up & Final Tips -->
+        <div class="card bg-teal-50 border-l-4 border-teal-500">
+            <h2 id="part5-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <h3 id="part5-cultural-heading" class="font-semibold text-lg mt-4"></h3>
+            <ul id="part5-cultural-tips" class="list-disc list-inside mt-2 space-y-2">
+            </ul>
+            <p id="part5-final-message" class="mt-4 font-semibold text-teal-800"></p>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Data ---
+    const massageVocab = [
+        { thai: 'สบายไหม', roman: 'sà-baai măi', eng: 'Are you comfortable?' },
+        { thai: 'สบายมาก', roman: 'sà-baai mâak', eng: 'Very comfortable.' },
+        { thai: 'เจ็บไหม', roman: 'jèp măi', eng: 'Does it hurt?' },
+        { thai: 'ไม่เจ็บ', roman: 'mâi jèp', eng: 'It doesn\'t hurt.' },
+        { thai: 'ขอหนักๆหน่อยค่ะ', roman: 'kŏr nàk-nàk nòi khâ', eng: 'A little harder, please.' },
+        { thai: 'ขอเบาๆหน่อยค่ะ', roman: 'kŏr bao-bao nòi khâ', eng: 'A little softer, please.' },
+        { thai: 'พอไหม', roman: 'por măi', eng: 'Is that enough?' },
+        { thai: 'พอแล้วค่ะ', roman: 'por láew khâ', eng: 'That\'s enough.' },
+        { thai: 'คอ บ่า ไหล่', roman: 'khor, bàa, lài', eng: 'Neck, upper back, shoulders.' },
+        { thai: 'เน้นตรงนี้', roman: 'nén dtrong níi', eng: 'Focus on this spot.' }
+    ];
+
+    const shopVocab = [
+        { thai: 'มีอะไรให้ช่วยไหมคะ', roman: 'mii à-rai hâi chûay măi khá', eng: 'May I help you?' },
+        { thai: 'ขอโทษนะคะ', roman: 'kŏr-thôot ná khá', eng: 'Excuse me...' },
+        { thai: 'ขอดูเฉยๆ ค่ะ', roman: 'kŏr duu chŏei-chŏei khâ', eng: 'I\'m just looking, thanks.' },
+        { thai: 'อันนี้ราคาเท่าไหร่คะ', roman: 'an níi raa-kaa thâo-rài khá', eng: 'How much is this one?' },
+        { thai: 'ขอลองอันนี้ได้ไหมคะ', roman: 'kŏr long an níi dâi măi khá', eng: 'Can I try this one on?' },
+        { thai: 'มีสีอื่นไหมคะ', roman: 'mii sĭi èun măi khá', eng: 'Do you have other colors?' },
+        { thai: 'รับบัตรเครดิตไหมคะ', roman: 'ráp bàt-khree-dìt măi khá', eng: 'Do you accept credit cards?' }
+    ];
+    
+    const shopScript = [
+        { speaker: 'พนักงาน (Staff)', line: 'สวัสดีค่ะ มีอะไรให้ช่วยไหมคะ', roman: 'sà-wàt-dii khâ, mii à-rai hâi chûay măi khá', eng: 'Hello, may I help you?'},
+        { speaker: 'ลูกค้า (Customer)', line: 'สวัสดีค่ะ ขอดูเฉยๆ ก่อนค่ะ', roman: 'sà-wàt-dii khâ, kŏr duu chŏei-chŏei gòn khâ', eng: 'Hello, I\'m just looking for now.'},
+        { speaker: 'พนักงาน (Staff)', line: 'ได้ค่ะ ตามสบายเลยนะคะ', roman: 'dâi khâ, dtaam sà-baai loie ná khá', eng: 'Of course, take your time.'},
+        { speaker: 'ลูกค้า (Customer)', line: '(สักพักหนึ่ง...) ขอโทษนะคะ', roman: '(sàk phák nùng...) kŏr-thôot ná khá', eng: '(A moment later...) Excuse me...'},
+        { speaker: 'ลูกค้า (Customer)', line: 'แว่นตาอันนี้ราคาเท่าไหร่คะ', roman: 'wâen-dtaa an níi raa-kaa thâo-rài khá', eng: 'How much is this pair of glasses?'},
+        { speaker: 'พนักงาน (Staff)', line: 'อันนี้ 9,500 บาทค่ะ', roman: 'an níi gâo phan hâa rói bàat khâ', eng: 'This one is 9,500 Baht.'},
+        { speaker: 'ลูกค้า (Customer)', line: 'ขอลองได้ไหมคะ', roman: 'kŏr long dâi măi khá', eng: 'Can I try (them) on?'},
+        { speaker: 'พนักงาน (Staff)', line: 'ได้ค่ะ เชิญทางนี้เลยค่ะ', roman: 'dâi khâ, choen thaang níi loie khâ', eng: 'Yes, please, this way.'}
+    ];
+
+    const uiText = {
+        mainTitle: { thai: 'บทเรียน: ร้านนวด & ร้านแว่นตา', roman: 'bòt-riian: ráan nûat & ráan wâen-dtaa', eng: 'Lesson: Massage Parlour & Glasses Shop' },
+        part1: {
+            heading: { thai: 'ฝึกการฟัง: ที่ร้านนวด', roman: 'fèuk gaan fang: thîi ráan nûat', eng: 'Listening Practice: At the Massage Parlour' },
+            instruction: { thai: 'ดูวิดีโอตลกๆ นี้ แล้วลองตอบคำถามดูนะคะ', roman: 'duu wí-dii-oo dtà-lòk-dtà-lòk níi, láew long dtòp kham-thăam duu ná khá', eng: 'Watch this funny video, then try to answer the questions.' },
+            compHeading: { thai: 'คำถาม:', roman: 'kham-thăam:', eng: 'Questions:' },
+            q1: { thai: 'ผู้หญิงในวิดีอกำลังทำอะไร', roman: 'phûu-yĭng nai wí-dii-oo gam-lang tham à-rai', eng: 'What is the woman in the video doing?' },
+            q2: { thai: 'เขารู้สึกอย่างไร (เจ็บ หรือ สบาย)', roman: 'kăo rúu-sèuk yàang-rai (jèp rĕu sà-baai)', eng: 'How does he feel (pained or relaxed)?' },
+            q3: { thai: 'คุณคิดว่าหมอนวดกำลังพูดอะไรกับเขา', roman: 'khun khít wâa mŏr-nûat gam-lang phûut à-rai gàp kăo', eng: 'What do you think the masseuse is saying to him?' },
+        },
+        part2: {
+            heading: { thai: 'ประโยคสำคัญ: ที่ร้านนวด', roman: 'bprà-yòk săm-khan: thîi ráan nûat', eng: 'Key Phrases: At the Massage Parlour' },
+            instruction: { thai: 'คำศัพท์เหล่านี้จำเป็นมากสำหรับการไปนวดที่เมืองไทย!', roman: 'kham-sàp lào-níi jam-bpen mâak săm-ràp gaan bpai nûat thîi meuuang-thai!', eng: 'This vocabulary is essential for getting a massage in Thailand!' },
+        },
+        part3: {
+            heading: { thai: 'ฝึกพูด: ที่ร้านนวด', roman: 'fèuk phûut: thîi ráan nûat', eng: 'Speaking Practice: At the Massage Parlour' },
+            instruction: { thai: 'มาลองเล่นบทบาทสมมติกัน! คุณเป็นลูกค้าที่มานวด', roman: 'maa long lên bòt-bàat sŏm-mút gan! khun bpen lûuk-káa thîi maa nûat', eng: 'Let\'s try a role-play! You are the customer getting a massage.' },
+            rp1_heading: { thai: 'สถานการณ์: นวดไทยครั้งแรก!', roman: 'sà-thăa-ná-gaan: nûat thai khráng râek!', eng: 'Scenario: First Thai Massage!' },
+            rp1_instruction: { thai: 'ครูจะเป็นหมอนวดเองค่ะ ทำตามคำใบ้แล้วลองพูดดูนะ', roman: 'khruu jà bpen mŏr-nûat eeng khâ. tham dtaam kham-bâi láew long phûut duu ná', eng: 'I will be the masseuse. Follow the prompts and try to speak.' },
+            rp1_button: { thai: 'ต่อไป', roman: 'dtòr bpai', eng: 'Next' },
+        },
+        part4: {
+            heading: { thai: 'สถานการณ์ใหม่: ร้าน Gentle Monster', roman: 'sà-thăa-ná-gaan mài: ráan Gentle Monster', eng: 'New Scenario: Gentle Monster Store' },
+            instruction: { thai: 'นวดเสร็จแล้ว ไปช้อปปิ้งต่อ! แต่การคุยในร้านหรูจะสุภาพและแตกต่างจากตลาดนัด', roman: 'nûat sèt láew, bpai chóp-bpîng dtòr! dtàe gaan khui nai ráan rŭu jà sù-phâap láe dtàek-dtàang jàak dtà-làat-nát', eng: 'Massage finished, let\'s go shopping! But conversation in a high-end store is more polite and different from a market.' },
+            vocab_heading: { thai: 'ประโยคสำคัญ: ที่ร้านค้า', roman: 'bprà-yòk săm-khan: thîi ráan-kháa', eng: 'Key Phrases: At the Shop' },
+            script_heading: { thai: 'ตัวอย่างบทสนทนา', roman: 'dtua-yàang bòt sŏn-thá-naa', eng: 'Example Conversation' },
+        },
+        part5: {
+            heading: { thai: 'สรุปและเคล็ดลับ', roman: 'sà-rùp láe khlét-láp', eng: 'Wrap-up & Tips' },
+            cultural_heading: { thai: 'เกร็ดความรู้:', roman: 'grèt khwaam-rúu:', eng: 'Tips:' },
+            tip1: { thai: 'การสื่อสารสำคัญที่สุด: ที่ร้านนวด อย่ากลัวที่จะพูดว่า "เจ็บ" หรือ "เบาๆ" เขาอยากให้คุณรู้สึกสบายที่สุด!', roman: 'gaan sèu-săan săm-khan thîi-sùt: thîi ráan nûat, yàa gluua thîi jà phûut wâa "jèp" rĕu "bao bao". kăo yàak hâi khun rúu-sèuk sà-baai thîi-sùt!', eng: 'Communication is key: At a massage, don\'t be afraid to say "jèp" (it hurts) or "bao bao" (softer). They want you to be comfortable!' },
+            tip2: { thai: 'ความสุภาพในร้านค้า: ในร้านค้าราคาแพง การใช้ "ค่ะ" (khâ) / "ครับ" (khráp) ตลอดเวลา และพูดอย่างใจเย็นเป็นเรื่องปกติ การต่อราคาไม่เป็นที่นิยมในร้านเหล่านี้', roman: 'khwaam sù-phâap nai ráan-kháa...', eng: 'Politeness in shops: In high-end stores, using "khâ/khráp" constantly and speaking calmly is normal. Bargaining is not common in these shops.' },
+            final_message: { thai: 'คุณทำได้เยี่ยมมาก! หวังว่าคุณจะได้ไปนวดผ่อนคลาย (จริงๆ) ที่เมืองไทยนะคะ!', roman: 'khun tham dâi yîam mâak! wăng wâa khun jà dâi bpai nûat pòn-klaai (jing-jing) thîi meuuang-thai ná khá!', eng: 'You did a great job! I hope you get a (truly) relaxing massage in Thailand!' }
+        }
+    };
+    
+    // --- Web Speech API Setup ---
+    let synth;
+    let voices;
+    function loadVoices() {
+        if (typeof speechSynthesis === 'undefined') return;
+        synth = window.speechSynthesis;
+        const setVoices = () => { voices = synth.getVoices(); };
+        setVoices();
+        if (synth.onvoiceschanged !== undefined) { synth.onvoiceschanged = setVoices; }
+    }
+    loadVoices();
+
+    function speak(text) {
+        if (!synth) { console.error('TTS not supported.'); return; }
+        if (synth.speaking) { synth.cancel(); }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.9;
+        const thaiVoice = (voices || []).find(voice => voice.lang === 'th-TH');
+        if (thaiVoice) utterance.voice = thaiVoice;
+        synth.speak(utterance);
+    }
+
+    // --- Helper Function ---
+    function createTranslatableElement(data, tag = 'div', classes = '') {
+        const container = document.createElement(tag);
+        container.className = `translatable-unit ${classes}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'translatable-content-wrapper';
+        wrapper.innerHTML = `
+            <span class="thai-text">${data.thai}</span>
+            <button class="speak-btn" aria-label="Speak">🔊</button>
+            <button class="toggle-btn ipa-toggle" aria-label="Toggle IPA">IPA</button>
+            <button class="toggle-btn en-toggle" aria-label="Toggle English">EN</button>
+        `;
+        
+        const details = document.createElement('div');
+        details.className = 'translatable-details';
+        details.innerHTML = `
+            <p class="phonetics text-sm text-gray-500 italic">${data.roman}</p>
+            <p class="translation text-sm text-gray-700">${data.eng}</p>
+        `;
+
+        container.appendChild(wrapper);
+        container.appendChild(details);
+        return container;
+    }
+
+    // --- Populate UI with Thai text ---
+    function populateUI() {
+        document.getElementById('main-title').appendChild(createTranslatableElement(uiText.mainTitle, 'span'));
+        document.getElementById('part1-heading').appendChild(createTranslatableElement(uiText.part1.heading, 'span'));
+        document.getElementById('part1-instruction').appendChild(createTranslatableElement(uiText.part1.instruction, 'span'));
+        document.getElementById('part1-comprehension-heading').appendChild(createTranslatableElement(uiText.part1.compHeading, 'span'));
+        const qList = document.getElementById('part1-questions');
+        [uiText.part1.q1, uiText.part1.q2, uiText.part1.q3].forEach(q => qList.appendChild(createTranslatableElement(q, 'li')));
+
+        document.getElementById('part2-heading').appendChild(createTranslatableElement(uiText.part2.heading, 'span'));
+        document.getElementById('part2-instruction').appendChild(createTranslatableElement(uiText.part2.instruction, 'span'));
+        
+        document.getElementById('part3-heading').appendChild(createTranslatableElement(uiText.part3.heading, 'span'));
+        document.getElementById('part3-instruction').appendChild(createTranslatableElement(uiText.part3.instruction, 'span'));
+        document.getElementById('roleplay1-heading').appendChild(createTranslatableElement(uiText.part3.rp1_heading, 'span'));
+        document.getElementById('roleplay1-instruction').appendChild(createTranslatableElement(uiText.part3.rp1_instruction, 'span'));
+        document.getElementById('roleplay1-next').textContent = uiText.part3.rp1_button.thai;
+
+        document.getElementById('part4-heading').appendChild(createTranslatableElement(uiText.part4.heading, 'span'));
+        document.getElementById('part4-instruction').appendChild(createTranslatableElement(uiText.part4.instruction, 'span'));
+        document.getElementById('part4-vocab-heading').appendChild(createTranslatableElement(uiText.part4.vocab_heading, 'span'));
+        document.getElementById('part4-script-heading').appendChild(createTranslatableElement(uiText.part4.script_heading, 'span'));
+
+        document.getElementById('part5-heading').appendChild(createTranslatableElement(uiText.part5.heading, 'span'));
+        document.getElementById('part5-cultural-heading').appendChild(createTranslatableElement(uiText.part5.cultural_heading, 'span'));
+        const culturalTipsList = document.getElementById('part5-cultural-tips');
+        [uiText.part5.tip1, uiText.part5.tip2].forEach(tip => culturalTipsList.appendChild(createTranslatableElement(tip, 'li')));
+        document.getElementById('part5-final-message').appendChild(createTranslatableElement(uiText.part5.final_message, 'span'));
+    }
+    populateUI();
+
+    // --- Populate Content ---
+    const massageVocabList = document.getElementById('vocab-list-massage');
+    massageVocab.forEach(item => massageVocabList.appendChild(createTranslatableElement(item, 'div', 'p-3 bg-gray-50 rounded-lg border')));
+    
+    const shopVocabList = document.getElementById('vocab-list-shop');
+    shopVocab.forEach(item => shopVocabList.appendChild(createTranslatableElement(item, 'div', 'p-3 bg-gray-50 rounded-lg border')));
+
+    const shopScriptContainer = document.getElementById('script-container-shop');
+    shopScript.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-2 rounded-md';
+        const speakerClass = item.speaker.includes('ลูกค้า') ? 'text-blue-800' : 'text-green-800';
+        
+        const lineWrapper = document.createElement('div');
+        lineWrapper.className = 'flex items-start';
+        
+        const speakerStrong = document.createElement('strong');
+        speakerStrong.className = `${speakerClass} mr-2 flex-shrink-0 pt-1`;
+        speakerStrong.textContent = `${item.speaker}:`;
+        
+        const translatablePart = createTranslatableElement({ thai: item.line, roman: item.roman, eng: item.eng }, 'div', 'flex-grow');
+        
+        lineWrapper.appendChild(speakerStrong);
+        lineWrapper.appendChild(translatablePart);
+        itemDiv.appendChild(lineWrapper);
+        shopScriptContainer.appendChild(itemDiv);
+    });
+
+    // --- Event Delegation for whole page ---
+    document.body.addEventListener('click', (e) => {
+        const speakBtn = e.target.closest('.speak-btn');
+        if (speakBtn) {
+            e.stopPropagation();
+            const text = speakBtn.parentElement.querySelector('.thai-text').textContent.replace(/<[^>]*>?/gm, '').trim();
+            speak(text);
+            return;
+        }
+
+        const ipaToggle = e.target.closest('.ipa-toggle');
+        if (ipaToggle) {
+            e.stopPropagation();
+            const parentUnit = ipaToggle.closest('.translatable-unit');
+            const phonetics = parentUnit.querySelector('.phonetics');
+            if (phonetics) {
+                phonetics.style.display = phonetics.style.display === 'block' ? 'none' : 'block';
+                ipaToggle.classList.toggle('active');
+            }
+            return;
+        }
+
+        const enToggle = e.target.closest('.en-toggle');
+        if (enToggle) {
+            e.stopPropagation();
+            const parentUnit = enToggle.closest('.translatable-unit');
+            const translation = parentUnit.querySelector('.translation');
+            if (translation) {
+                translation.style.display = translation.style.display === 'block' ? 'none' : 'block';
+                enToggle.classList.toggle('active');
+            }
+            return;
+        }
+    });
+
+    // --- Role-Play Logic (Massage) ---
+    const roleplay1Chat = document.getElementById('roleplay1-chat');
+    const roleplay1NextBtn = document.getElementById('roleplay1-next');
+    
+    const roleplayPrompts = [
+        { type: 'seller', data: { speaker: 'หมอนวด', line: 'สวัสดีค่ะ เชิญค่ะ วันนี้อยากนวดอะไรดีคะ', roman: 'sà-wàt-dii khâ, choen khâ. wan-níi yàak nûat à-rai dii khâ', eng: 'Hello, welcome. What would you like to have massaged today?' } },
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'บอกหมอนวดว่าอยากนวด "คอ บ่า ไหล่"', roman: 'bòk mŏr-nûat wâa yàak nûat "khor, bàa, lài"', eng: 'Tell the masseuse you want "neck, upper back, shoulders".' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'นวดคอ บ่า ไหล่ ค่ะ/ครับ', roman: 'nûat khor bàa lài khâ/khráp', eng: 'Neck, upper back, shoulders massage, please.' } },
+        { type: 'seller', data: { speaker: 'หมอนวด', line: 'ได้ค่ะ... หนักพอไหมคะ', roman: 'dâi khâ... nàk por măi khá', eng: 'Okay... Is this hard enough?' } },
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'ขอแรงกว่านี้หน่อย', roman: 'kŏr raeng gwàa níi nòi', eng: 'Ask for it to be a bit harder.' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'ขอหนักๆ หน่อยค่ะ/ครับ', roman: 'kŏr nàk-nàk nòi khâ/khráp', eng: 'A little harder, please.' } },
+        { type: 'seller', data: { speaker: 'หมอนวด', line: 'หนักพอไหมคะ', roman: 'nàk por măi khá', eng: 'Is this hard enough?' } },
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'บอกว่า "พอแล้วค่ะ" และ "สบายมาก"', roman: 'bòk wâa "por láew khâ" láe "sà-baai mâak"', eng: 'Say "That\'s enough" and "Very comfortable".' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'พอแล้วค่ะ สบายมาก', roman: 'por láew khâ, sà-baai mâak', eng: 'That\'s enough. Very comfortable.' } },
+        { type: 'seller', data: { speaker: 'หมอนวด', line: 'ตรงนี้เจ็บไหมคะ', roman: 'dtrong níi jèp măi khá', eng: 'Does it hurt here?' } },
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'บอกว่า "ไม่เจ็บ" และขอให้ "เน้นตรงนี้"', roman: 'bòk wâa "mâi jèp" láe kŏr hâi "nén dtrong níi"', eng: 'Say "It doesn\'t hurt" and ask to "Focus on this spot".' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'ไม่เจ็บค่ะ เน้นตรงนี้หน่อยค่ะ', roman: 'mâi jèp khâ, nén dtrong níi nòi khâ', eng: 'It doesn\'t hurt. Focus on this spot, please.' } }
+    ];
+    let roleplayIndex = 0;
+
+    function addInteractiveBubble(container, data, speaker) {
+        const bubble = document.createElement('div');
+        const speakerClass = speaker === 'seller' ? 'seller-bubble' : 'buyer-bubble';
+        bubble.className = `chat-bubble ${speakerClass}`;
+        const content = createTranslatableElement({thai: data.line, roman: data.roman, eng: data.eng}, 'div');
+        bubble.appendChild(content);
+        container.appendChild(bubble);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function addPrompt(container, data) {
+        const promptDiv = document.createElement('div');
+        promptDiv.className = 'prompt';
+        const yourTurn = createTranslatableElement(data.yourTurn, 'p', 'font-semibold');
+        const promptLine = createTranslatableElement(data.promptLine, 'p');
+        promptDiv.appendChild(yourTurn);
+        promptDiv.appendChild(promptLine);
+        container.appendChild(promptDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    roleplay1NextBtn.addEventListener('click', () => {
+        if (roleplayIndex >= roleplayPrompts.length) {
+             roleplay1NextBtn.disabled = true;
+             roleplay1NextBtn.textContent = "จบแล้ว!";
+             return;
+        }
+        const current = roleplayPrompts[roleplayIndex];
+        if (current.type === 'seller') {
+            addInteractiveBubble(roleplay1Chat, current.data, 'seller');
+        } else if (current.type === 'prompt') {
+            addPrompt(roleplay1Chat, current.data);
+            roleplay1NextBtn.textContent = "แสดงคำตอบ"; // Show Answer
+        } else if (current.type === 'answer') {
+            addInteractiveBubble(roleplay1Chat, current.data, 'buyer');
+            roleplay1NextBtn.textContent = "ต่อไป"; // Next
+        }
+        roleplayIndex++;
+    });
+
+});
+</script>
+
+</body>
+</html>
