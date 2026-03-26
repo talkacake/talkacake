@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- FIX: Title updated -->
+    <title>A2+ Thai Lesson: ซื้อของข้างทาง</title>
+    <script src="https://cdn/tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f7fafc;
+            color: #1a202c;
+        }
+        .thai, .thai-text {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+        }
+        .tts-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            margin-left: 6px;
+            color: #4a5568;
+            transition: color 0.2s;
+            vertical-align: middle; /* Aligns button with text */
+        }
+        .tts-button:hover {
+            color: #2b6cb0;
+        }
+        .tts-button svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+        /* NEW: Styles for toggle buttons and container */
+        .thai-container {
+            margin-bottom: 8px; /* Adds spacing between items */
+        }
+        .thai-text {
+            display: inline; /* Keeps text inline */
+            font-size: 1.1em; /* Default text size */
+            line-height: 1.5;
+        }
+        .thai-container h1 .thai-text { font-size: 1.875rem; font-weight: bold; }
+        .thai-container h2 .thai-text { font-size: 1.5rem; font-weight: 600; }
+        .thai-container h3 .thai-text { font-size: 1.25rem; font-weight: 600; }
+        .thai-container strong .thai-text { font-size: 1.125rem; font-weight: 600; }
+
+        .toggle-btn-group {
+            display: inline-flex;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .toggle-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem; /* 12px */
+            font-weight: 600;
+            padding: 2px 8px;
+            border: 1px solid #cbd5e1; /* slate-300 */
+            border-radius: 4px;
+            margin-left: 4px;
+            cursor: pointer;
+            background-color: #f8fafc; /* slate-50 */
+            color: #475569; /* slate-600 */
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+            background-color: #e2e8f0; /* slate-200 */
+            border-color: #94a3b8; /* slate-400 */
+        }
+        .toggle-btn.active {
+             background-color: #bfdbfe; /* blue-200 */
+             border-color: #3b82f6; /* blue-500 */
+             color: #1e40af; /* blue-800 */
+        }
+        /* Re-purposed .details style for phonetic/english blocks */
+        .details {
+            display: none;
+            margin-top: 8px;
+            padding: 10px;
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-left-width: 4px;
+            border-left-color: #4299e1;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .details.phonetic-block {
+            font-style: italic;
+            color: #4a5568;
+            border-left-color: #60a5fa; /* blue-400 */
+            background-color: #f0f9ff; /* blue-50 */
+        }
+        .details.english-block {
+            color: #2d3748;
+            border-left-color: #34d399; /* emerald-400 */
+            background-color: #f0fdfa; /* emerald-50 */
+        }
+        /* End of new styles */
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            margin-bottom: 0.5rem;
+        }
+        .seller-bubble {
+            background-color: #e2e8f0;
+            align-self: flex-start;
+        }
+        .buyer-bubble {
+            background-color: #ccebfb;
+            align-self: flex-end;
+        }
+        .highlight-box {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <!-- FIX: Title changed, subtitle removed, new buttons added -->
+            <div class="thai-container">
+                <h1 class="text-3xl md:text-4xl font-bold text-blue-700 thai">
+                    <span class="thai-text">ซื้อของข้างทาง</span>
+                    <button class="tts-button" onclick="speak('ซื้อของข้างทาง')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h1>
+                <div class="phonetic-block details" style="display: none;">sʉ́ʉ kŏng kâang thaang</div>
+                <div class="english-block details" style="display: none;">Buying Things on the Roadside</div>
+            </div>
+            <!-- REMOVED: Subtitle -->
+        </header>
+
+        <!-- 1. Warm-up & Vocab Review -->
+        <section class="card" id="warmup">
+            <!-- FIX: Removed (Warm-up & Vocab Review), added new button structure -->
+            <div class="thai-container">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2 thai">
+                    <span class="thai-text">ส่วนที่ 1: อุ่นเครื่องและทบทวนคำศัพท์</span>
+                    <button class="tts-button" onclick="speak('ส่วนที่ 1: อุ่นเครื่องและทบทวนคำศัพท์')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h2>
+                <div class="phonetic-block details" style="display: none;">sùan thîi nùng: ùn-khrêuuang láe thóp-thuan kham-sàp</div>
+                <div class="english-block details" style="display: none;">Part 1: Warm-up & Vocab Review</div>
+            </div>
+
+            <!-- FIX: Replaced .interactive-thai with .thai-container and new buttons -->
+            <div class="thai-container">
+                <strong class="thai text-lg">
+                    <span class="thai-text">สถานการณ์: บอกทาง</span>
+                    <button class="tts-button" onclick="speak('สถานการณ์: บอกทาง')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </strong>
+                <div class="phonetic-block details" style="display: none;">sà-thăa-ná-gaan: bòk thaang</div>
+                <div class="english-block details" style="display: none;">Scenario: Giving Directions</div>
+            </div>
+            
+            <!-- FIX: Replaced .interactive-thai with .thai-container and new buttons -->
+            <div class="thai-container">
+                <div class="english-block details" style="display: none;">Scenario: Giving Directions</div>
+            </div>
+            
+            <!-- FIX: Split into two lines -->
+            <div class="thai-container">
+                <span class="thai-text text-gray-700 mt-2">ครู (คนขับแท็กซี่) จะถามทางไป... (เช่น: โรงพยาบาล, โบสถ์, ร้านหนังสือ).</span>
+                <button class="tts-button" onclick="speak('ครู (คนขับแท็กซี่) จะถามทางไป... (เช่น: โรงพยาบาล, โบสถ์, ร้านหนังสือ).')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                <div class="toggle-btn-group">
+                    <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                    <button class="toggle-btn" data-target=".english-block">EN</button>
+                </div>
+                <div class="phonetic-block details" style="display: none;">kruu (kon khàp tháek-sîi) jà thăam thaang bpai... (chên: roong-phá-yaa-baan, bòot, ráan-năng-sʉ̌ʉ).</div>
+                <div class="english-block details" style="display: none;">Teacher (taxi driver) will ask for directions to... (e.g., hospital, church, bookstore).</div>
+            </div>
+            <div class="thai-container">
+                <span class="thai-text text-gray-700">นักเรียน (คนท้องถิ่น) ช่วยบอกทางครูหน่อย</span>
+                <button class="tts-button" onclick="speak('นักเรียน (คนท้องถิ่น) ช่วยบอกทางครูหน่อย')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                <div class="toggle-btn-group">
+                    <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                    <button class="toggle-btn" data-target=".english-block">EN</button>
+                </div>
+                <div class="phonetic-block details" style="display: none;">nák-riian (kon thóng-thìn) chûay bòk thaang kruu nòi.</div>
+                <div class="english-block details" style="display: none;">Student (local) help give directions.</div>
+            </div>
+            <!-- END FIX -->
+            
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div class="thai-container">
+                    <strong class="thai">
+                        <span class="thai-text">คำศัพท์ที่ต้องใช้</span>
+                        <button class="tts-button" onclick="speak('คำศัพท์ที่ต้องใช้')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                        <div class="toggle-btn-group">
+                            <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                            <button class="toggle-btn" data-target=".english-block">EN</button>
+                        </div>
+                    </strong>
+                    <div class="phonetic-block details" style="display: none;">kham-sàp thîi dtông chái</div>
+                    <div class="english-block details" style="display: none;">Vocab to use</div>
+                </div>
+
+                <div class="vocab-grid mt-2">
+                    <!-- FIX: Updated vocab items to new structure -->
+                    <div class="thai-container"><span class="thai-text">ซ้าย</span><button class="tts-button" onclick="speak('ซ้าย')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">sáai</div><div class="english-block details" style="display: none;">left</div></div>
+                    <div class="thai-container"><span class="thai-text">ขวา</span><button class="tts-button" onclick="speak('ขวา')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">kwǎa</div><div class="english-block details" style="display: none;">right</div></div>
+                    <div class="thai-container"><span class="thai-text">ไฟแดง</span><button class="tts-button" onclick="speak('ไฟแดง')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">fai dɛɛng</div><div class="english-block details" style="display: none;">traffic lights</div></div>
+                    <div class="thai-container"><span class="thai-text">ตรงข้าม</span><button class="tts-button" onclick="speak('ตรงข้าม')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">dtrong kâam</div><div class="english-block details" style="display: none;">opposite</div></div>
+                    <div class="thai-container"><span class="thai-text">ติดกับ</span><button class="tts-button" onclick="speak('ติดกับ')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">dtìt-kàp</div><div class="english-block details" style="display: none;">next to</div></div>
+                    <div class="thai-container"><span class="thai-text">โบสถ์</span><button class="tts-button" onclick="speak('โบสถ์')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">bòot</div><div class="english-block details" style="display: none;">Church</div></div>
+                    <div class="thai-container"><span class="thai-text">ร้านหนังสือ</span><button class="tts-button" onclick="speak('ร้านหนังสือ')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">ráan-năng-sʉ̌ʉ</div><div class="english-block details" style="display: none;">book shop</div></div>
+                    <div class="thai-container"><span class="thai-text">โรงพยาบาล</span><button class="tts-button" onclick="speak('โรงพยาบาล')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">roong-pá-yaa-baan</div><div class="english-block details" style="display: none;">hospital</div></div>
+                    <div class="thai-container"><span class="thai-text">สถานี</span><button class="tts-button" onclick="speak('สถานี')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">sà-tǎa-nii</div><div class="english-block details" style="display: none;">Station</div></div>
+                    <div class="thai-container"><span class="thai-text">ป้ายรถเมล์</span><button class="tts-button" onclick="speak('ป้ายรถเมล์')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">bpâai rót-mee</div><div class="english-block details" style="display: none;">Bus stop</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Listening Practice -->
+        <section class="card" id="listening">
+            <!-- FIX: Removed (Listening Practice from Video), added new button structure -->
+            <div class="thai-container">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2 thai">
+                    <span class="thai-text">ส่วนที่ 2: ฝึกการฟังจากวิดีโอ</span>
+                    <button class="tts-button" onclick="speak('ส่วนที่ 2: ฝึกการฟังจากวิดีโอ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h2>
+                <div class="phonetic-block details" style="display: none;">sùan thîi sŏng: fèuk gaan fang jàak wí-dii-oo</div>
+                <div class="english-block details" style="display: none;">Part 2: Listening Practice from Video</div>
+            </div>
+            
+            <div class="thai-container">
+                <span class="thai-text text-gray-700 mb-4">ดูวิดีโอนี้แล้วลองตอบคำถาม พยายามฟังน้ำเสียงและคำพูดที่เป็นธรรมชาตินะ</span>
+                <button class="tts-button" onclick="speak('ดูวิดีโอนี้แล้วลองตอบคำถาม พยายามฟังน้ำเสียงและคำพูดที่เป็นธรรมชาตินะ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                <div class="toggle-btn-group">
+                    <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                    <button class="toggle-btn" data-target=".english-block">EN</button>
+                </div>
+                <div class="phonetic-block details" style="display: none;">duu wí-dii-oo níi láew long dtòp kham-thăam. phà-yaa-yaam fang nâam-sĭang láe kham-phûut thîi bpen tham-má-châat ná</div>
+                <div class="english-block details" style="display: none;">Watch this video and try to answer the questions. Try to listen for the tone and natural phrasing.</div>
+            </div>
+            
+            <a href="https://www.facebook.com/reel/1356417045508998" target="_blank" class="block my-6">
+                <div class="bg-gray-200 rounded-lg p-6 text-center hover:bg-gray-300 transition duration-300">
+                    <img src="https://placehold.co/600x300/e2e8f0/333333?text=Click+to+Watch+Moo+Ping+Video&font=sarabun" alt="Thai street food stall" class="w-full h-auto object-cover rounded-lg mb-4">
+                    <p class="font-semibold text-blue-600">เปิดวิดีโอในแท็บใหม่ (Open Video in New Tab)</p>
+                    <p class="text-sm text-gray-500">Video source: Facebook</p>
+                </div>
+            </a>
+            
+            <div class="thai-container">
+                <h3 class="font-semibold text-lg thai">
+                    <span class="thai-text">คำถาม</span>
+                    <button class="tts-button" onclick="speak('คำถาม')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h3>
+                <div class="phonetic-block details" style="display: none;">kham-thăam</div>
+                <div class="english-block details" style="display: none;">Questions:</div>
+            </div>
+            
+            <ul class="list-disc list-inside mt-2 space-y-2 thai">
+                <li><div class="thai-container"><span class="thai-text">หมูปิ้งไม้ละเท่าไร</span><button class="tts-button" onclick="speak('หมูปิ้งไม้ละเท่าไร')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">mŏo-bpîng mâi lá thâo-rai</div><div class="english-block details" style="display: none;">How much is one pork skewer?</div></div></li>
+                <li><div class="thai-container"><span class="thai-text">คนซื้อเอาทั้งหมดกี่ไม้</span><button class="tts-button" onclick="speak('คนซื้อเอาทั้งหมดกี่ไม้')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">khon-sʉ́ʉ ao tháng-mòt gìi mâi</div><div class="english-block details" style="display: none;">How many skewers did the buyer get in total?</div></div></li>
+                <li><div class="thai-container"><span class="thai-text">ทำไมคนซื้อถึงพูดว่า "จะเอาไปปิ้งไก่"</span><button class="tts-button" onclick="speak('ทำไมคนซื้อถึงพูดว่า "จะเอาไปปิ้งไก่"')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">tham-mai khon-sʉ́ʉ thʉ̌ng phûut wâa 'jà ao bpai bpîng gài'</div><div class="english-block details" style="display: none;">Why did the buyer say 'I'm going to use them to grill chicken'?</div></div></li>
+                <li><div class="thai-container"><span class="thai-text">คำว่า "หาตั้งนาน" ตอนท้าย, หมายความว่ายังไง</span><button class="tts-button" onclick="speak('คำว่า "หาตั้งนาน" ตอนท้าย, หมายความว่ายังไง')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">kham wâa 'hăa dtâng naan' dtòn tháai, măai khwaam wâa yang-ngai</div><div class="english-block details" style="display: none;">The phrase 'ha dtang naan' at the end, what does it mean?</div></div></li>
+            </ul>
+        </section>
+
+        <!-- 3. Script Analysis -->
+        <section class="card" id="script">
+            <!-- FIX: Removed (Script & Slang Analysis), added new button structure -->
+            <div class="thai-container">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2 thai">
+                    <span class="thai-text">ส่วนที่ 3: วิเคราะห์สคริปต์และคำสแลง</span>
+                    <button class="tts-button" onclick="speak('ส่วนที่ 3: วิเคราะห์สคริปต์และคำสแลง')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h2>
+                <div class="phonetic-block details" style="display: none;">sùan thîi săam: wí-khrór sà-kríp láe kham-sà-laeng</div>
+                <div class="english-block details" style="display: none;">Part 3: Script & Slang Analysis</div>
+            </div>
+            
+            <div class="thai-container">
+                <span class="thai-text text-gray-700 mb-4">เรามาดูบทสนทนาจริงๆ กัน สังเกตคำที่พูดแบบสั้นๆ หรือคำที่ใช้พูดกันจริงๆนะ</span>
+                <button class="tts-button" onclick="speak('เรามาดูบทสนทนาจริงๆ กัน สังเกตคำที่พูดแบบสั้นๆ หรือคำที่ใช้พูดกันจริงๆนะ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                <div class="toggle-btn-group">
+                    <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                    <button class="toggle-btn" data-target=".english-block">EN</button>
+                </div>
+                <div class="phonetic-block details" style="display: none;">rao maa duu bòt-sŏn-thá-naa jing-jing gan. săng-gèt kham thîi phûut bàep sâan-sâan dtem-dtua</div>
+                <div class="english-block details" style="display: none;">Let's look at the real script. Notice the clipped words or slang.</div>
+            </div>
+
+            <div class="flex flex-col space-y-2 bg-gray-50 p-4 rounded-lg mt-4">
+                <!-- FIX: Updated all chat bubbles -->
+                <div class="chat-bubble seller-bubble thai-container">
+                    <span class="thai-text"><strong>คนขาย:</strong> หมูปิ้งไหมครับพี่</span>
+                    <button class="tts-button" onclick="speak('หมูปิ้งไหมครับพี่')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">mŏo-bpîng măi khráp phîi</div><div class="english-block details" style="display: none;">Pork skewers? (sir/ma'am)</div>
+                </div>
+                <div class="chat-bubble seller-bubble thai-container">
+                    <span class="thai-text"><strong>คนขาย:</strong> หมูปิ้งครับ</span>
+                    <button class="tts-button" onclick="speak('หมูปิ้งครับ')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">mŏo-bpîng khráp</div><div class="english-block details" style="display: none;">Pork skewers, sir.</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> ไม้เท่าไรพี่</span>
+                    <button class="tts-button" onclick="speak('ไม้เท่าไรพี่')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">mâi thâo rai phîi</div><div class="english-block details" style="display: none;">How much a skewer, (older) brother?</div>
+                </div>
+                <div class="chat-bubble seller-bubble thai-container">
+                    <span class="thai-text"><strong>คนขาย:</strong> 6 บาททุกไม้ครับพี่</span>
+                    <button class="tts-button" onclick="speak('6 บาททุกไม้ครับพี่')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">hòk bàat thúk mâi khráp phîi</div><div class="english-block details" style="display: none;">6 Baht every skewer, sir.</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> 6 บาททุกไม้เลยเหรอ</span>
+                    <button class="tts-button" onclick="speak('6 บาททุกไม้เลยเหรอ')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">hòk bàat thúk mâi loei rŏe</div><div class="english-block details" style="display: none;">6 Baht every skewer, really?</div>
+                </div>
+                <div class="chat-bubble seller-bubble thai-container">
+                    <span class="thai-text"><strong>คนขาย:</strong> ครับผม</span>
+                    <button class="tts-button" onclick="speak('ครับผม')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">khráp phŏm</div><div class="english-block details" style="display: none;">Yes, sir.</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> ผมเอา 5 ไม้พอพี่</span>
+                    <button class="tts-button" onclick="speak('ผมเอา 5 ไม้พอพี่')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">phŏm ao hâa mâi phor phîi</div><div class="english-block details" style="display: none;">I'll just take 5 skewers, that's enough.</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> 6 บาททุกไม้ใช่ป่ะ</span>
+                    <button class="tts-button" onclick="speak('6 บาททุกไม้ใช่ป่ะ')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">hòk bàat thúk mâi châi bpà</div><div class="english-block details" style="display: none;">6 Baht every skewer, right? (slang)</div>
+                </div>
+                <div class="chat-bubble seller-bubble thai-container">
+                    <span class="thai-text"><strong>คนขาย:</strong> ครับ</span>
+                    <button class="tts-button" onclick="speak('ครับ')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">khráp</div><div class="english-block details" style="display: none;">Yes.</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> เอาแค่นี้แหละพี่</span>
+                    <button class="tts-button" onclick="speak('เอาแค่นี้แหละพี่')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">ao khâe níi lâe phîi</div><div class="english-block details" style="display: none;">Just this much is enough. (slang)</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> จะเอาไปปิ้งไก่พี่</span>
+                    <button class="tts-button" onclick="speak('จะเอาไปปิ้งไก่พี่')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">jà ao bpai bpîng gài phîi</div><div class="english-block details" style="display: none;">Going to use them to grill chicken.</div>
+                </div>
+                <div class="chat-bubble buyer-bubble thai-container">
+                    <span class="thai-text"><strong>คนซื้อ:</strong> หาตั้งนาน</span>
+                    <button class="tts-button" onclick="speak('หาตั้งนาน')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">hăa dtâng naan</div><div class="english-block details" style="display: none;">Been looking for so long.</div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <div class="thai-container">
+                    <strong class="thai">
+                        <span class="thai-text">จุดสังเกต</span>
+                        <button class="tts-button" onclick="speak('จุดสังเกต')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                        <div class="toggle-btn-group">
+                            <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                            <button class="toggle-btn" data-target=".english-block">EN</button>
+                        </div>
+                    </strong>
+                    <div class="phonetic-block details" style="display: none;">jùt săng-gèt</div>
+                    <div class="english-block details" style="display: none;">Slang/Natural Phrasing:</div>
+                </div>
+                <ul class="list-disc list-inside thai mt-2 space-y-3">
+                    <!-- FIX: Converted LIs to thai-container -->
+                    <li>
+                        <div class="thai-container">
+                            <span class="thai-text"><strong>ไม้เท่าไรพี่:</strong> ลดรูปจาก "ไม้ละเท่าไหร่ครับพี่"</span>
+                            <button class="tts-button" onclick="speak('ไม้เท่าไรพี่: ลดรูปจาก ไม้ละเท่าไหร่ครับพี่')">...</button>
+                            <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                            <div class="phonetic-block details" style="display: none;">mâi thâo rai phîi</div>
+                            <div class="english-block details" style="display: none;">Clipped form of "How much per skewer?"</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="thai-container">
+                            <span class="thai-text"><strong>...ใช่ป่ะ:</strong> เป็นคำสแลง มาจาก "ใช่หรือเปล่า"</span>
+                            <button class="tts-button" onclick="speak('...ใช่ป่ะ: เป็นคำสแลง มาจาก ใช่หรือเปล่า')">...</button>
+                            <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                            <div class="phonetic-block details" style="display: none;">châi bpà</div>
+                            <div class="english-block details" style="display: none;">Slang for "right? / is that so?"</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="thai-container">
+                            <span class="thai-text"><strong>...แหละพี่:</strong> คำลงท้ายแบบเป็นกันเอง</span>
+                            <button class="tts-button" onclick="speak('...แหละพี่: คำลงท้ายแบบเป็นกันเอง')">...</button>
+                            <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                            <div class="phonetic-block details" style="display: none;">...lâe phîi</div>
+                            <div class="english-block details" style="display: none;">"Just... / ...that's it."</div>
+                        </div>
+                    </li>
+                     <li>
+                        <div class="thai-container">
+                            <span class="thai-text"><strong>หาตั้งนาน:</strong> "ตั้งนาน" แปลว่า "for a long time". "หาตั้งนาน" - นี่คือมุกตลก!</span>
+                            <button class="tts-button" onclick="speak('หาตั้งนาน: ตั้งนาน แปลว่า for a long time. หาตั้งนาน - นี่คือมุกตลก!')">...</button>
+                            <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                            <div class="phonetic-block details" style="display: none;">hăa dtâng naan / dtâng naan</div>
+                            <div class="english-block details" style="display: none;">"dtâng naan" means "for a long time". "hăa dtâng naan" (I've been looking for so long) - This is the joke!</div>
+                        </div>
+                    </li>
+                    <!-- END FIX -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- 4. Speaking Practice -->
+        <section class="card" id="speaking">
+            <!-- FIX: Removed (Role-Play Practice), added new button structure -->
+            <div class="thai-container">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2 thai">
+                    <span class="thai-text">ส่วนที่ 4: ฝึกพูดสวมบทบาท</span>
+                    <button class="tts-button" onclick="speak('ส่วนที่ 4: ฝึกพูดสวมบทบาท')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h2>
+                <div class="phonetic-block details" style="display: none;">sùan thîi sìi: fèuk phûut sŭam bòt-bàat</div>
+                <div class="english-block details" style="display: none;">Part 4: Role-Play Practice</div>
+            </div>
+            
+            <!-- Scenario 1 -->
+            <div class="mb-6">
+                <div class="thai-container">
+                    <strong class="thai-text text-lg">สถานการณ์ที่ 1: สั่งหมูปิ้ง</strong>
+                    <button class="tts-button" onclick="speak('สถานการณ์ที่ 1: สั่งหมูปิ้ง')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">sà-thăa-ná-gaan thîi nùng: sàng mŏo-bpîng</div>
+                    <div class="english-block details" style="display: none;">Scenario 1: Order Moo Ping</div>
+                </div>
+                <div class="thai-container">
+                    <span class="thai-text text-gray-700 mt-1">ลองสลับกันเป็นคนซื้อและคนขายตามวิดีโอ (นักเรียนเริ่มเป็นคนซื้อก่อน)</span>
+                    <button class="tts-button" onclick="speak('ลองสลับกันเป็นคนซื้อและคนขายตามวิดีโอ (นักเรียนเริ่มเป็นคนซื้อก่อน)')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">long sà-làp gàn bpen khon-sʉ́ʉ láe khon-kăai dtaam wí-dii-oo (nák-riian rôem bpen khon-sʉ́ʉ gòn)</div>
+                    <div class="english-block details" style="display: none;">Let's take turns being the buyer and seller from the video (Student starts as buyer).</div>
+                </div>
+            </div>
+
+            <!-- Scenario 2 -->
+            <div>
+                <div class="thai-container">
+                    <strong class="thai-text text-lg">สถานการณ์ที่ 2: แนะนำร้านเด็ด (และบอกทาง)</strong>
+                    <button class="tts-button" onclick="speak('สถานการณ์ที่ 2: แนะนำร้านเด็ด (และบอกทาง)')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">sà-thăa-ná-gaan thîi sŏng: nâe-nam ráan dèt (láe bòk thaang)</div>
+                    <div class="english-block details" style="display: none;">Scenario 2: Recommend Your Fave Stall (and give directions)</div>
+                </div>
+                <div class="thai-container">
+                    <span class="thai-text text-gray-700 mt-1">นักเรียน (คนท้องถิ่น) แนะนำ 'ร้านอาหาร' ร้านโปรดให้ครู (เพื่อน) ฟังหน่อย, และบอกทางไปที่ร้านด้วย</span>
+                    <button class="tts-button" onclick="speak('นักเรียน (คนท้องถิ่น) แนะนำ "ร้านอาหาร" ร้านโปรดให้ครู (เพื่อน) ฟังหน่อย, และบอกทางไปที่ร้านด้วย')">...</button>
+                    <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                    <div class="phonetic-block details" style="display: none;">nák-riian (kon thóng-thìn) nâe-nam 'ráan-aa-hăan' ráan bpròt hâi kruu (phʉ̂an) fang nòi, láe bòk thaang bpai thîi ráan dûay</div>
+                    <div class="english-block details" style="display: none;">Student (local) recommend your favorite 'restaurant' to the teacher (friend), and give directions to the stall.</div>
+                </div>
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div class="thai-container">
+                        <strong class="thai">
+                            <span class="thai-text">คำศัพท์ที่เป็นประโยชน์</span>
+                            <button class="tts-button" onclick="speak('คำศัพท์ที่เป็นประโยชน์')">...</button>
+                            <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                        </strong>
+                        <div class="phonetic-block details" style="display: none;">kham-sàp thîi bpen bprà-yòt</div>
+                        <div class="english-block details" style="display: none;">Useful Vocab:</div>
+                    </div>
+                    <ul class="list-disc list-inside thai mt-2 space-y-3">
+                        <!-- FIX: Converted LIs to thai-container -->
+                        <li>
+                            <div class="thai-container">
+                                <span class="thai-text">อร่อยมาก</span>
+                                <button class="tts-button" onclick="speak('อร่อยมาก')">...</button>
+                                <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                                <div class="phonetic-block details" style="display: none;">à-ròi mâak</div>
+                                <div class="english-block details" style="display: none;">must try!</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="thai-container">
+                                <span class="thai-text">ร้านอยู่ติดกับ...</span>
+                                <button class="tts-button" onclick="speak('ร้านอยู่ติดกับ')">...</button>
+                                <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                                <div class="phonetic-block details" style="display: none;">ráan yùu dtìt-gàp...</div>
+                                <div class="english-block details" style="display: none;">The shop is next to...</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="thai-container">
+                                <span class="thai-text">ร้านอยู่ตรงข้าม...</span>
+                                <button class="tts-button" onclick="speak('ร้านอยู่ตรงข้าม')">...</button>
+                                <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                                <div class="phonetic-block details" style="display: none;">ráan yùu dtrong-kâam...</div>
+                                <div class="english-block details" style="display: none;">The shop is opposite...</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="thai-container">
+                                <span class="thai-text">เดินตรงไป</span>
+                                <button class="tts-button" onclick="speak('เดินตรงไป')">...</button>
+                                <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                                <div class="phonetic-block details" style="display: none;">dəən dtrong bpai</div>
+                                <div class="english-block details" style="display: none;">Go straight</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="thai-container">
+                                <span class="thai-text">เลี้ยวซ้าย/ขวา ที่ไฟแดง</span>
+                                <button class="tts-button" onclick="speak('เลี้ยวซ้าย/ขวา ที่ไฟแดง')">...</button>
+                                <div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div>
+                                <div class="phonetic-block details" style="display: none;">líiao sáai / kwǎa thîi fai dɛɛng</div>
+                                <div class="english-block details" style="display: none;">Turn left/right at the traffic lights</div>
+                            </div>
+                        </li>
+                        <!-- END FIX -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Wrap-up -->
+        <section class="card bg-blue-50 border-l-4 border-blue-500" id="wrapup">
+            <!-- FIX: Removed (Wrap-up), added new button structure -->
+            <div class="thai-container">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-800 thai">
+                    <span class="thai-text">ส่วนที่ 5: สรุปบทเรียน</span>
+                    <button class="tts-button" onclick="speak('ส่วนที่ 5: สรุปบทเรียน')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+                    <div class="toggle-btn-group">
+                        <button class="toggle-btn" data-target=".phonetic-block">IPA</button>
+                        <button class="toggle-btn" data-target=".english-block">EN</button>
+                    </div>
+                </h2>
+                <div class="phonetic-block details" style="display: none;">sùan thîi hâa: sà-rùp bòt-riian</div>
+                <div class="english-block details" style="display: none;">Part 5: Wrap-up</div>
+            </div>
+            
+            <ul class="list-disc list-inside space-y-2 thai">
+                <li><div class="thai-container"><span class="thai-text">วันนี้เป็นยังไงบ้าง? มุกตลกในวิดีโอ ('หาตั้งนาน') ตลกไหม</span><button class="tts-button" onclick="speak('วันนี้เป็นยังไงบ้าง? มุกตลกในวิดีโอ ("หาตั้งนาน") ตลกไหม')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">wan-níi bpen yang-ngai bâang? múk dtà-lòk nai wí-dii-oo ('hăa dtâng naan') dtà-lòk măi</div><div class="english-block details" style="display: none;">How was today? Was the joke in the video ('ha dtang naan') funny?</div></div></li>
+                <li><div class="thai-container"><span class="thai-text">มีคำถามอะไรไหม</span><button class="tts-button" onclick="speak('มีคำถามอะไรไหม')">...</button><div class="toggle-btn-group"><button class="toggle-btn" data-target=".phonetic-block">IPA</button><button class="toggle-btn" data-target=".english-block">EN</button></div><div class="phonetic-block details" style="display: none;">mii kham-thăam à-rai măi</div><div class="english-block details" style="display: none;">Do you have any questions?</div></div></li>
+            </ul>
+        </section>
+
+    </div>
+
+    <script>
+        // --- Text-to-Speech Function (Global) ---
+        let synth;
+        let voices;
+
+        function loadVoices() {
+            if (typeof speechSynthesis === 'undefined') return;
+            synth = window.speechSynthesis;
+            const setVoices = () => {
+                voices = synth.getVoices();
+            };
+            setVoices();
+            if (synth.onvoiceschanged !== undefined) {
+                synth.onvoiceschanged = setVoices;
+            }
+        }
+        
+        loadVoices();
+
+        function speak(text) {
+            if (!synth) {
+                console.error('Text-to-speech not supported.');
+                return;
+            }
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9;
+            const thaiVoice = (voices || []).find(voice => voice.lang === 'th-TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+            synth.speak(utterance);
+        }
+
+        // --- Interactive Click Function ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Replace SVG placeholders in vocab grid
+            const vocabSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>`;
+            document.querySelectorAll('.vocab-grid .tts-button').forEach(btn => btn.innerHTML = vocabSvg);
+            document.querySelectorAll('#listening .tts-button').forEach(btn => btn.innerHTML = vocabSvg);
+            document.querySelectorAll('#script .tts-button').forEach(btn => btn.innerHTML = vocabSvg);
+            document.querySelectorAll('#speaking .tts-button').forEach(btn => btn.innerHTML = vocabSvg);
+            document.querySelectorAll('#wrapup .tts-button').forEach(btn => btn.innerHTML = vocabSvg);
+
+
+            // New Event Delegation for Toggles
+            document.body.addEventListener('click', function(e) {
+                // Handle TTS Button Clicks
+                const ttsButton = e.target.closest('.tts-button');
+                if (ttsButton) {
+                    e.stopPropagation();
+                    // The speak function is already in the inline onclick, so just stopping propagation is enough.
+                    // If we remove inline onclick, we'd add the speak logic here.
+                    return; 
+                }
+
+                // Handle Toggle Button Clicks (IPA / EN)
+                const toggleButton = e.target.closest('.toggle-btn');
+                if (toggleButton) {
+                    e.stopPropagation();
+                    
+                    const container = toggleButton.closest('.thai-container');
+                    if (!container) return;
+
+                    const targetClass = toggleButton.dataset.target; // e.g., ".phonetic-block"
+                    const targetBlock = container.querySelector(targetClass);
+                    
+                    if (!targetBlock) return;
+
+                    // Check if it's already active
+                    const isActive = toggleButton.classList.contains('active');
+
+                    // --- START FIX ---
+                    // Toggle the current button and block independently
+                    if (isActive) {
+                        toggleButton.classList.remove('active');
+                        targetBlock.style.display = 'none';
+                    } else {
+                        toggleButton.classList.add('active');
+                        targetBlock.style.display = 'block';
+                    }
+                    // --- END FIX ---
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
