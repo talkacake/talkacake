@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Thai Lesson: Giving Directions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f7fafc;
+        }
+        .thai, .thai-text {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1.1em;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .insight {
+            display: none;
+            border-left: 3px solid #4299e1;
+            padding-left: 1rem;
+            margin-top: 0.5rem;
+            background-color: #ebf8ff;
+            border-radius: 4px;
+        }
+        .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            margin-bottom: 0.5rem;
+        }
+        .seller-bubble {
+            background-color: #e2e8f0;
+            align-self: flex-start;
+        }
+        .buyer-bubble {
+            background-color: #ccebfb;
+            align-self: flex-end;
+        }
+        .prompt {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 0.25rem;
+            font-size: 1em;
+            vertical-align: middle;
+        }
+        .scenario-card {
+            background-color: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .scenario-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+         .scenario-story {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: #374151;
+        }
+        .vocab-subtitle {
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+        .toggle-btn {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            margin-left: 0.5rem;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .toggle-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .toggle-btn.active {
+            background-color: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+        .translatable-content-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .translatable-details {
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        .phonetics, .translation {
+            display: none;
+            padding: 0.25rem 0.5rem;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-teal-600"></h1>
+        </header>
+
+        <!-- Part 1: Listening Practice -->
+        <div class="card">
+            <h2 id="part1-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part1-instruction" class="mb-4"></p>
+            <a href="https://www.facebook.com/watch/?v=1354020272629982" target="_blank" class="block mb-6">
+                <div class="bg-gray-200 rounded-lg p-6 text-center hover:bg-gray-300 transition duration-300">
+                    <img src="https://placehold.co/600x300/e2e8f0/333333?text=Click+to+Watch+Video+(Directions)&font=sarabun" alt="Directions video" class="w-full h-auto object-cover rounded-lg mb-4">
+                    <p class="font-semibold text-blue-600">Open Video in New Tab</p>
+                    <p class="text-sm text-gray-500">Video source: Facebook</p>
+                </div>
+            </a>
+            <h3 id="part1-comprehension-heading" class="font-semibold text-lg mt-4"></h3>
+            <ul id="part1-questions" class="list-disc list-inside mt-2 text-gray-700 space-y-2">
+            </ul>
+        </div>
+        
+        <!-- Part 2: Vocabulary & Pronunciation -->
+        <div class="card">
+            <h2 id="part2-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part2-instruction" class="mb-4"></p>
+            <div id="vocab-list" class="space-y-4">
+                <!-- Vocabulary will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 3: Listening & Reading with Script -->
+        <div class="card">
+            <h2 id="part3-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part3-instruction" class="mb-4"></p>
+            <div id="script-container" class="space-y-2 bg-gray-50 p-4 rounded-lg">
+                <!-- Script will be inserted here by JS -->
+            </div>
+        </div>
+
+        <!-- Part 4: Speaking Practice - Role-Play -->
+        <div class="card">
+            <h2 id="part4-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <p id="part4-instruction" class="mb-4"></p>
+            
+            <div class="mb-8">
+                <h3 id="roleplay1-heading" class="text-xl font-semibold mb-2"></h3>
+                <p id="roleplay1-instruction" class="mb-4"></p>
+                <div id="roleplay1-chat" class="flex flex-col space-y-2 bg-white p-4 rounded-lg border h-64 overflow-y-auto"></div>
+                <button id="roleplay1-next" class="mt-4 w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"></button>
+            </div>
+
+        </div>
+
+        <!-- Part 5: Wrap-up & Final Tips -->
+        <div class="card bg-teal-50 border-l-4 border-teal-500">
+            <h2 id="part5-heading" class="text-2xl font-semibold mb-3 text-teal-700"></h2>
+            <h3 id="part5-cultural-heading" class="font-semibold text-lg mt-4"></h3>
+            <ul id="part5-cultural-tips" class="list-disc list-inside mt-2 space-y-2">
+            </ul>
+            <p id="part5-final-message" class="mt-4 font-semibold text-teal-800"></p>
+        </div>
+
+        <!-- Bonus Vocabulary Review -->
+        <div class="card">
+            <h2 id="bonus-heading" class="text-2xl font-semibold mb-3 text-purple-700"></h2>
+            <p id="bonus-instruction" class="mb-4"></p>
+            <div id="bonus-vocab-scenarios" class="space-y-6">
+                <!-- Bonus Vocab Scenarios will be inserted here -->
+            </div>
+        </div>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Data ---
+    const vocabulary = [
+        { thai: 'ขึ้นสะพาน', roman: 'khêun sà-phaan', eng: 'Go up the bridge' },
+        { thai: 'ไปเรื่อยๆ', roman: 'bpai rêuuai-rêuuai', eng: 'Keep going / Go straight on' },
+        { thai: 'ชิดขวา', roman: 'chít khwăa', eng: 'Keep right' },
+        { thai: 'เลี้ยวขวา', roman: 'líiao khwăa', eng: 'Turn right' },
+        { thai: 'เลี้ยวหลิง', roman: 'líiao lĭng', eng: 'Turn Ling (Turn Left)' },
+        { thai: 'เลี้ยวออม', roman: 'líiao om', eng: 'Turn Aom (Turn Right)' },
+        { thai: 'น่ารักว่ะ', roman: 'nâa-rák wâ', eng: 'So cute (very informal slang)' },
+    ];
+    
+    const scriptWithTranslations = [
+        { speaker: 'คนขับ (Driver)', line: 'ขึ้นสะพานไปเรื่อยๆเลยนะ', roman: 'khêun sà-phaan bpai rêuuai-rêuuai loie ná', eng: 'Keep going up the bridge, okay?', insight: '"ไปเรื่อยๆ" is a very common phrase for "keep going" or "continue straight on".'},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'ชิดขวาสักเลนหนึ่งก็ได้', roman: 'chít khwăa sàk leen nùng gôr dâi', eng: 'You can keep right in one of the lanes.', insight: '"ชิดขวา" (keep right) and "ชิดซ้าย" (keep left) are essential for navigating multi-lane roads.'},
+        { speaker: 'คนขับ (Driver)', line: 'ขวาคือฝั่งนู้น', roman: 'khwăa kheuu fàng nóon', eng: 'Right is that side.', insight: 'The driver seems confused about left and right, which sets up the main joke of the video.'},
+        { speaker: 'คนขับ (Driver)', line: 'ฝั่งหลิง?', roman: 'fàng lĭng?', eng: 'Ling\'s side?', insight: 'Here it starts! The driver associates a direction with a person\'s name, "Ling".'},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'ถ้างั้นอย่างนี้ เลี้ยวหลิงกับเลี้ยวออมดีไหม', roman: 'thâa ngán yàang níi, líiao lĭng gàp líiao om dii măi', eng: 'In that case, how about "turn Ling" and "turn Aom"?', insight: 'The navigator creates a new system on the spot. This shows how Thai speakers can be playful and creative with language among friends.'},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'เดี๋ยวอันนี้ไม่ต้องขึ้นสะพานละนะคะ', roman: 'dĭao an níi mâi dtông khêun sà-phaan lá ná khá', eng: 'Okay, for this one, don\'t go up the bridge.', insight: null},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'เดี๋ยวเราจะไปคำว่า เจริญราษฎร์ค่ะ', roman: 'dĭao rao jà bpai kham wâa jà-roen-râat khâ', eng: 'We are going towards "Charoen Rat".', insight: 'Directions in Thailand are often given using street names or major landmarks.'},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'แล้วต้องชิดออมนะคะ', roman: 'láew dtông chít om ná khá', eng: 'And you have to keep "Aom" (right).', insight: 'She uses the new system: "ชิดออม" (keep Aom) instead of "ชิดขวา" (keep right).'},
+        { speaker: 'คนขับ (Driver)', line: 'เลี้ยวออมๆ', roman: 'líiao om om', eng: 'Turn Aom, turn Aom.', insight: 'The driver confirms using the new, funny vocabulary.'},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'เดี๋ยวเตรียมเลี้ยวขวานะ ไป', roman: 'dĭao dtriiam líiao khwăa ná, bpai', eng: 'Get ready to turn right now, go.', insight: 'She briefly switches back to the standard "ขวา" (right) before being corrected.'},
+        { speaker: 'คนขับ (Driver)', line: 'เลี้ยวหลิง', roman: 'líiao lĭng', eng: 'Turn Ling.', insight: 'The driver playfully corrects her, insisting on their special code. "Ling" must mean left.'},
+        { speaker: 'คนบอกทาง (Navigator)', line: 'น่ารักว่ะ', roman: 'nâa-rák wâ', eng: 'So cute.', insight: 'A very informal, slangy way to say something is cute. "ว่ะ" (wâ) is a particle used between very close friends.'}
+    ];
+
+    const uiText = {
+        mainTitle: { thai: 'เลี้ยวหลิง เลี้ยวออม', roman: 'líiao lĭng, líiao om', eng: 'Turn Ling, Turn Aom' },
+        part1: {
+            heading: { thai: 'ฝึกการฟัง', roman: 'fèuk gaan fang', eng: 'Listening Practice' },
+            instruction: { thai: 'ดูวิดิโอแล้วลองตอบคำถามดูนะ', roman: 'duu wí-dii-oo láew long dtòp kham-thăam duu ná', eng: 'Watch the video and try to answer the questions.' },
+            compHeading: { thai: 'คำถาม:', roman: 'kham-thăam:', eng: 'Questions:' },
+            q1: { thai: 'คนในรถกำลังทำอะไรกัน', roman: 'khon nai rót gam-lang tham à-rai gan', eng: 'What are the people in the car doing?' },
+            q2: { thai: 'ทำไมเขาถึงใช้คำว่า "หลิง" กับ "ออม" แทน "ซ้าย" กับ "ขวา"', roman: 'tham-mai kăo thĕung chái kham wâa "lĭng" gàp "om" thaen "sáai" gàp "khwăa"', eng: 'Why do they use the words "Ling" and "Aom" instead of "left" and "right"?' },
+            q3: { thai: 'บรรยากาศในรถดูเป็นอย่างไร', roman: 'ban-yaa-gàat nai rót duu bpen yàang-rai', eng: 'What is the atmosphere in the car like?' },
+        },
+        part2: {
+            heading: { thai: 'ประโยคสำคัญจากวิดีโอ', roman: 'bprà-yòk săm-khan jàak wí-dii-oo', eng: 'Key Phrases from the Video' },
+            instruction: { thai: 'มาเรียนรู้ประโยคสำคัญจากวิดิโอกัน', roman: 'maa riian-rúu bprà-yòk săm-khan jàak wí-dii-oo gan', eng: 'Let\'s learn the key phrases from the video.' },
+        },
+        part3: {
+            heading: { thai: 'ฝึกฟังและอ่านไปพร้อมกับสคริปต์', roman: 'fèuk fang láe àan bpai phróm gàp sà-kríp', eng: 'Listening & Reading with Script' },
+            instruction: { thai: 'ตอนนี้ เรามาดูสคริปต์ฉบับเต็มกัน คลิกที่ประโยคเพื่อฟังเสียงและดูคำแปล', roman: 'dton-níi, rao maa duu sà-kríp chà-bàp dtem gan. klík thîi bprà-yòk phêuua fang sĭang láe duu kham-bplae', eng: 'Now, let\'s look at the full script. Click a sentence to hear it and see the translation.' },
+        },
+        part4: {
+            heading: { thai: 'มาลองฝึกพูดกัน!', roman: 'maa long fèuk phûut gan!', eng: 'Role-Play Practice!' },
+            instruction: { thai: 'สมมติว่าคุณกำลังบอกทางให้เพื่อนชาวไทยที่สับสนซ้ายขวา', roman: 'sŏm-mút wâa khun gam-lang bòk thaang hâi phêuan chaao thai thîi sàp-sŏn sáai-khwăa', eng: 'Imagine you are giving directions to a Thai friend who gets left and right confused.' },
+            rp1_heading: { thai: 'ฝึกพูดตามสถานการณ์', roman: 'fèuk phûut dtaam sà-thăa-ná-gaan', eng: 'Scenario Role-Play' },
+            rp1_instruction: { thai: 'ทำตามคำใบ้ แล้วลองพูดประโยคที่ถูกต้องดูนะ', roman: 'tham dtaam kham-bâi, láew long phûut bprà-yòk thîi thùuk-dtông duu ná', eng: 'Follow the prompts and try to say the correct sentences.' },
+            rp1_button: { thai: 'ต่อไป', roman: 'dtòr bpai', eng: 'Next' },
+        },
+        part5: {
+            heading: { thai: 'สรุปและเคล็ดลับ', roman: 'sà-rùp láe khlét-láp', eng: 'Wrap-up & Tips' },
+            cultural_heading: { thai: 'เกร็ดความรู้:', roman: 'grèt khwaam-rúu:', eng: 'Tips:' },
+            tip1: { thai: 'ใช้ ซ้าย (sâai) และ ขวา (khwăa) กับคนทั่วไป: "เลี้ยวหลิง เลี้ยวออม" เป็นวิธีพูดที่น่ารักสำหรับเพื่อนสนิท แต่เวลาบอกทางคนขับแท็กซี่หรือคนไม่รู้จัก ควรใช้คำว่า "เลี้ยวซ้าย" (líiao sáai) และ "เลี้ยวขวา" (líiao khwăa) นะคะ', roman: 'chái sâai láe khwăa gàp khon thûua-bpai...', eng: 'Use ซ้าย (sâai) and ขวา (khwăa) with the general public: "Turn Ling, Turn Aom" is a cute way to talk to close friends, but when giving directions to a taxi driver or stranger, you should use the standard "líiao sâai" (turn left) and "líiao khwăa" (turn right).' },
+            tip2: { thai: 'คนไทยมักบอกทางโดยใช้แลนด์มาร์ก: นอกจากชื่อถนนแล้ว คนไทยนิยมบอกทางโดยอ้างอิงจากสถานที่เด่นๆ เช่น "เลี้ยวซ้ายตรงเซเว่น" (líiao sâai dtrong sàeh-wên - Turn left at the 7-Eleven) หรือ "ผ่านธนาคารไปก่อน" (phàan thá-naa-khaan bpai gòn - Go past the bank first).', roman: 'khon thai mák bòk thaang dooi chái laen-mâak...', eng: 'Thais often use landmarks for directions: Besides street names, it\'s very common to give directions based on prominent places, like "Turn left at the 7-Eleven" or "Go past the bank first".' },
+            final_message: { thai: 'ยอดเยี่ยมมาก! ตอนนี้คุณก็พร้อมที่จะบอกทาง (แบบงงๆ) ในกรุงเทพฯ แล้ว!', roman: 'yôt yîam mâak! dton-níi khun gôr phróm thîi jà bòk thaang (bàep ngong-ngong) nai grung-thêep láew!', eng: 'Excellent! Now you\'re ready to give (confusing) directions in Bangkok!' }
+        },
+        bonus: {
+            heading: { thai: 'ทบทวนคำศัพท์การบอกทาง', roman: 'thóp-thuan kham-sàp gaan bòk thaang', eng: 'Bonus: Directions Vocabulary Review' },
+            instruction: { thai: 'ลองใช้คำศัพท์ในสถานการณ์จำลองเหล่านี้ดูนะ', roman: 'long chái kham-sàp nai sà-thăa-ná-gaan jam-long lào-níi duu ná', eng: 'Try using the vocabulary in these simulated scenarios!' }
+        }
+    };
+
+    const bonusScenarios = [
+        {
+            title: { thai: 'สถานการณ์ที่ 1: นักท่องเที่ยวผู้หิวโหย', roman: 'sà-thăa-ná-gaan thîi nùng: nák thâwng-thîao phûu hĭu-hŏi', eng: 'Scenario 1: The Hungry Tourist' },
+            story: { thai: 'คุณบอกให้เพื่อน <b class="text-blue-600">ตรงไป</b> แต่เขาดัน <b class="text-blue-600">เลี้ยวซ้าย</b> ที่ <b class="text-blue-600">สี่แยก</b> เพราะเห็นร้านหมูปิ้ง สุดท้ายก็เลยเจอ <b class="text-blue-600">รถติด</b> จนต้องเรียก <b class="text-blue-600">มอเตอร์ไซค์รับจ้าง</b> กลับโรงแรม!', roman: 'khun bòk hâi phêuan dtrong bpai, dtàe kăo dan líiao sáai thîi sìi-yâek, phró hĕn ráan mŏo-bpîng. sùt-tháai gôr loie jooe rót dìt jon dtông rîak mor-dtoe-sai-ráp-jâang glàp rohng-raaem!', eng: 'You tell your friend to <b>go straight</b>, but they <b>turn left</b> at the <b>intersection</b> because they see a grilled pork stall. In the end, they get stuck in a <b>traffic jam</b> and have to call a <b>motorcycle taxi</b> to get back to the hotel!' },
+            subtitle: { thai: 'คำศัพท์ที่ควรใช้:', roman: 'kham-sàp thîi khuan chái:', eng: 'Vocabulary to use:' },
+            vocab: [
+                { thai: 'ตรงไป', roman: 'dtrong bpai', eng: 'Go straight' }, { thai: 'เลี้ยวซ้าย', roman: 'líiao sáai', eng: 'Turn left' }, { thai: 'สี่แยก', roman: 'sìi yâek', eng: 'Intersection' }, { thai: 'รถติด', roman: 'rót dtìt', eng: 'Traffic jam' }, { thai: 'มอเตอร์ไซค์รับจ้าง', roman: 'mor-dtoe-sai ráp-jâang', eng: 'Motorcycle taxi' }
+            ]
+        },
+        {
+            title: { thai: 'สถานการณ์ที่ 2: GPS เจ้าปัญหา', roman: 'sà-thăa-ná-gaan thîi sŏng: jii-phii-ét jâo bpan-hăa', eng: 'Scenario 2: The Problematic GPS' },
+            story: { thai: 'GPS บอกให้คุณ <b class="text-blue-600">กลับรถ</b> แต่คุณขับเลยไปแล้ว! ตอนนี้คุณอยู่บน <b class="text-blue-600">ทางด่วน</b> และไม่มีที่ให้ <b class="text-blue-600">จอดรถ</b> เลย คุณเลยต้องเปิด <b class="text-blue-600">แผนที่</b> กระดาษดูแทน', roman: 'jii-phii-ét bòk hâi khun glàp rót, dtàe khun kàp loie bpai láew! dton-níi khun yòo bon thaang-dùan láe mâi mii thîi hâi jòt rót loie. khun loie dtông bpòet phăen-thîi grà-dàat duu thaen.', eng: 'The GPS tells you to make a <b>U-turn</b>, but you\'ve already passed it! Now you are on the <b>expressway</b> with nowhere to <b>park the car</b>. You have to open a paper <b>map</b> instead.' },
+            subtitle: { thai: 'คำศัพท์ที่ควรใช้:', roman: 'kham-sàp thîi khuan chái:', eng: 'Vocabulary to use:' },
+            vocab: [
+                { thai: 'กลับรถ', roman: 'glàp rót', eng: 'Make a U-turn' }, { thai: 'ทางด่วน', roman: 'thaang dùan', eng: 'Expressway' }, { thai: 'จอดรถ', roman: 'jòt rót', eng: 'Park the car' }, { thai: 'แผนที่', roman: 'phăen thîi', eng: 'Map' }
+            ]
+        }
+    ];
+    
+    // --- Web Speech API Setup ---
+    let synth;
+    let voices;
+    function loadVoices() {
+        if (typeof speechSynthesis === 'undefined') return;
+        synth = window.speechSynthesis;
+        const setVoices = () => { voices = synth.getVoices(); };
+        setVoices();
+        if (synth.onvoiceschanged !== undefined) { synth.onvoiceschanged = setVoices; }
+    }
+    loadVoices();
+
+    function speak(text) {
+        if (!synth) { console.error('TTS not supported.'); return; }
+        if (synth.speaking) { synth.cancel(); }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.9;
+        const thaiVoice = (voices || []).find(voice => voice.lang === 'th-TH');
+        if (thaiVoice) utterance.voice = thaiVoice;
+        synth.speak(utterance);
+    }
+
+    // --- Helper Function ---
+    function createTranslatableElement(data, tag = 'div', classes = '') {
+        const container = document.createElement(tag);
+        container.className = `translatable-unit ${classes}`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'translatable-content-wrapper';
+        wrapper.innerHTML = `
+            <span class="thai-text">${data.thai}</span>
+            <button class="speak-btn" aria-label="Speak">🔊</button>
+            <button class="toggle-btn ipa-toggle" aria-label="Toggle IPA">IPA</button>
+            <button class="toggle-btn en-toggle" aria-label="Toggle English">EN</button>
+        `;
+        
+        const details = document.createElement('div');
+        details.className = 'translatable-details';
+        details.innerHTML = `
+            <p class="phonetics text-sm text-gray-500 italic">${data.roman}</p>
+            <p class="translation text-sm text-gray-700">${data.eng}</p>
+        `;
+
+        container.appendChild(wrapper);
+        container.appendChild(details);
+        return container;
+    }
+
+    // --- Populate UI with Thai text ---
+    function populateUI() {
+        document.getElementById('main-title').appendChild(createTranslatableElement(uiText.mainTitle, 'span'));
+        document.getElementById('part1-heading').appendChild(createTranslatableElement(uiText.part1.heading, 'span'));
+        document.getElementById('part1-instruction').appendChild(createTranslatableElement(uiText.part1.instruction, 'span'));
+        document.getElementById('part1-comprehension-heading').appendChild(createTranslatableElement(uiText.part1.compHeading, 'span'));
+        const qList = document.getElementById('part1-questions');
+        [uiText.part1.q1, uiText.part1.q2, uiText.part1.q3].forEach(q => qList.appendChild(createTranslatableElement(q, 'li')));
+
+        document.getElementById('part2-heading').appendChild(createTranslatableElement(uiText.part2.heading, 'span'));
+        document.getElementById('part2-instruction').appendChild(createTranslatableElement(uiText.part2.instruction, 'span'));
+        document.getElementById('part3-heading').appendChild(createTranslatableElement(uiText.part3.heading, 'span'));
+        document.getElementById('part3-instruction').appendChild(createTranslatableElement(uiText.part3.instruction, 'span'));
+        document.getElementById('part4-heading').appendChild(createTranslatableElement(uiText.part4.heading, 'span'));
+        document.getElementById('part4-instruction').appendChild(createTranslatableElement(uiText.part4.instruction, 'span'));
+        document.getElementById('roleplay1-heading').appendChild(createTranslatableElement(uiText.part4.rp1_heading, 'span'));
+        document.getElementById('roleplay1-instruction').appendChild(createTranslatableElement(uiText.part4.rp1_instruction, 'span'));
+        document.getElementById('roleplay1-next').textContent = uiText.part4.rp1_button.thai;
+
+        document.getElementById('part5-heading').appendChild(createTranslatableElement(uiText.part5.heading, 'span'));
+        document.getElementById('part5-cultural-heading').appendChild(createTranslatableElement(uiText.part5.cultural_heading, 'span'));
+        const culturalTipsList = document.getElementById('part5-cultural-tips');
+        [uiText.part5.tip1, uiText.part5.tip2].forEach(tip => culturalTipsList.appendChild(createTranslatableElement(tip, 'li')));
+        document.getElementById('part5-final-message').appendChild(createTranslatableElement(uiText.part5.final_message, 'span'));
+
+        document.getElementById('bonus-heading').appendChild(createTranslatableElement(uiText.bonus.heading, 'span'));
+        document.getElementById('bonus-instruction').appendChild(createTranslatableElement(uiText.bonus.instruction, 'span'));
+    }
+    populateUI();
+
+    // --- Populate Content ---
+    const vocabList = document.getElementById('vocab-list');
+    vocabulary.forEach(item => vocabList.appendChild(createTranslatableElement(item, 'div', 'p-3 bg-gray-50 rounded-lg border')));
+
+    const scriptContainer = document.getElementById('script-container');
+    scriptWithTranslations.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-2 rounded-md';
+
+        const lineWrapper = document.createElement('div');
+        lineWrapper.className = 'flex items-start';
+
+        const speakerStrong = document.createElement('strong');
+        const speakerClass = item.speaker.includes('ขับ') ? 'text-blue-800' : 'text-green-800';
+        speakerStrong.className = `${speakerClass} mr-2 flex-shrink-0 pt-1`; // Added padding top for alignment
+        speakerStrong.textContent = `${item.speaker}:`;
+        
+        const translatablePart = createTranslatableElement({ thai: item.line, roman: item.roman, eng: item.eng }, 'div', 'flex-grow');
+        
+        if (item.insight) {
+            const wrapper = translatablePart.querySelector('.translatable-content-wrapper');
+            const insightBtn = document.createElement('button');
+            insightBtn.className = 'insight-toggle text-blue-500 font-bold ml-2';
+            insightBtn.textContent = '(?)';
+            insightBtn.setAttribute('aria-label', 'Toggle insight');
+            wrapper.appendChild(insightBtn);
+        }
+
+        lineWrapper.appendChild(speakerStrong);
+        lineWrapper.appendChild(translatablePart);
+        itemDiv.appendChild(lineWrapper);
+
+        if (item.insight) {
+            const insightP = document.createElement('p');
+            insightP.className = 'insight text-sm text-gray-700 ml-4'; // Added margin for alignment
+            insightP.textContent = item.insight;
+            itemDiv.appendChild(insightP);
+        }
+
+        scriptContainer.appendChild(itemDiv);
+    });
+
+    const bonusScenariosContainer = document.getElementById('bonus-vocab-scenarios');
+    bonusScenarios.forEach(scenario => {
+        const scenarioDiv = document.createElement('div');
+        scenarioDiv.className = 'scenario-card';
+
+        const title = createTranslatableElement(scenario.title, 'h4', 'scenario-title');
+        const story = createTranslatableElement(scenario.story, 'p', 'scenario-story');
+        story.querySelector('.thai-text').innerHTML = `${scenario.story.thai} <button class="speak-btn" aria-label="Speak">🔊</button>`;
+        const subtitle = createTranslatableElement(scenario.subtitle, 'h5', 'vocab-subtitle');
+        
+        const vocabGrid = document.createElement('div');
+        vocabGrid.className = 'vocab-grid';
+
+        scenario.vocab.forEach(item => {
+            vocabGrid.appendChild(createTranslatableElement(item, 'div', 'p-2 border rounded'));
+        });
+        
+        scenarioDiv.appendChild(title);
+        scenarioDiv.appendChild(story);
+        scenarioDiv.appendChild(subtitle);
+        scenarioDiv.appendChild(vocabGrid);
+        bonusScenariosContainer.appendChild(scenarioDiv);
+    });
+
+
+    // --- Event Delegation for whole page ---
+    document.body.addEventListener('click', (e) => {
+        const speakBtn = e.target.closest('.speak-btn');
+        if (speakBtn) {
+            e.stopPropagation();
+            const text = speakBtn.parentElement.querySelector('.thai-text').textContent.replace(/<[^>]*>?/gm, '').trim();
+            speak(text);
+            return;
+        }
+
+        const insightToggle = e.target.closest('.insight-toggle');
+        if (insightToggle) {
+            e.stopPropagation();
+            const parentItem = insightToggle.closest('.p-2');
+            const insightP = parentItem.querySelector('.insight');
+            if(insightP) {
+                insightP.style.display = insightP.style.display === 'block' ? 'none' : 'block';
+            }
+            return;
+        }
+        
+        const ipaToggle = e.target.closest('.ipa-toggle');
+        if (ipaToggle) {
+            e.stopPropagation();
+            const parentUnit = ipaToggle.closest('.translatable-unit');
+            const phonetics = parentUnit.querySelector('.phonetics');
+            if (phonetics) {
+                phonetics.style.display = phonetics.style.display === 'block' ? 'none' : 'block';
+                ipaToggle.classList.toggle('active');
+            }
+            return;
+        }
+
+        const enToggle = e.target.closest('.en-toggle');
+        if (enToggle) {
+            e.stopPropagation();
+            const parentUnit = enToggle.closest('.translatable-unit');
+            const translation = parentUnit.querySelector('.translation');
+            if (translation) {
+                translation.style.display = translation.style.display === 'block' ? 'none' : 'block';
+                enToggle.classList.toggle('active');
+            }
+            return;
+        }
+    });
+
+    // --- Role-Play Logic ---
+    const roleplay1Chat = document.getElementById('roleplay1-chat');
+    const roleplay1NextBtn = document.getElementById('roleplay1-next');
+    
+    const roleplayPrompts = [
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'บอกเพื่อนให้ขับตรงไปเรื่อยๆ', roman: 'bòk phêuan hâi kàp dtrong bpai rêuuai-rêuuai', eng: 'Tell your friend to drive straight on.' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'ตรงไปเรื่อยๆ เลย', roman: 'dtrong bpai rêuuai-rêuuai loie', eng: 'Go straight on.' } },
+        { type: 'seller', data: { speaker: 'เพื่อน', line: 'โอเค!', roman: 'oo-khee', eng: 'Okay!' } },
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'ข้างหน้าต้องขึ้นสะพาน บอกเพื่อนให้เตรียมตัว', roman: 'khâang-nâa dtông khêun sà-phaan, bòk phêuan hâi dtriiam dtua', eng: 'There\'s a bridge ahead. Tell your friend to get ready.' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'เดี๋ยวเราต้องขึ้นสะพานนะ', roman: 'dĭao rao dtông khêun sà-phaan ná', eng: 'We have to go up the bridge soon.' } },
+        { type: 'seller', data: { speaker: 'เพื่อน', line: 'แล้วต้องเลี้ยวทางไหน', roman: 'láew dtông líiao thaang năi', eng: 'And which way do I have to turn?' } },
+        { type: 'prompt', data: { yourTurn: { thai: 'ตาคุณแล้ว:', roman: 'dtaa khun láew:', eng: 'Your turn:' }, promptLine: { thai: 'บอกให้เพื่อน "เลี้ยวออม"', roman: 'bòk hâi phêuan "líiao om"', eng: 'Tell your friend to "turn Aom".' } } },
+        { type: 'answer', data: { speaker: 'คุณ', line: 'เตรียมเลี้ยวออมนะ', roman: 'dtriiam líiao om ná', eng: 'Get ready to turn Aom (right).' } },
+        { type: 'seller', data: { speaker: 'เพื่อน', line: 'เลี้ยวออม!', roman: 'líiao om', eng: 'Turn Aom!' } }
+    ];
+    let roleplayIndex = 0;
+
+    function addInteractiveBubble(container, data, speaker) {
+        const bubble = document.createElement('div');
+        const speakerClass = speaker === 'seller' ? 'seller-bubble' : 'buyer-bubble';
+        bubble.className = `chat-bubble ${speakerClass}`;
+        const content = createTranslatableElement({thai: data.line, roman: data.roman, eng: data.eng}, 'div');
+        bubble.appendChild(content);
+        container.appendChild(bubble);
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    function addPrompt(container, data) {
+        const promptDiv = document.createElement('div');
+        promptDiv.className = 'prompt';
+        const yourTurn = createTranslatableElement(data.yourTurn, 'p', 'font-semibold');
+        const promptLine = createTranslatableElement(data.promptLine, 'p');
+        promptDiv.appendChild(yourTurn);
+        promptDiv.appendChild(promptLine);
+        container.appendChild(promptDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    roleplay1NextBtn.addEventListener('click', () => {
+        if (roleplayIndex >= roleplayPrompts.length) {
+             roleplay1NextBtn.disabled = true;
+             roleplay1NextBtn.textContent = "จบแล้ว!";
+             return;
+        }
+        const current = roleplayPrompts[roleplayIndex];
+        if (current.type === 'seller') {
+            addInteractiveBubble(roleplay1Chat, current.data, 'seller');
+        } else if (current.type === 'prompt') {
+            addPrompt(roleplay1Chat, current.data);
+            roleplay1NextBtn.textContent = "แสดงคำตอบ"; // Show Answer
+        } else if (current.type === 'answer') {
+            addInteractiveBubble(roleplay1Chat, current.data, 'buyer');
+            roleplay1NextBtn.textContent = "ต่อไป"; // Next
+        }
+        roleplayIndex++;
+    });
+
+});
+</script>
+
+</body>
+</html>
+
