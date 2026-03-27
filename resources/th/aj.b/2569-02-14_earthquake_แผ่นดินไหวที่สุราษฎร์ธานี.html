@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แผ่นดินไหวที่สุราษฎร์ธานี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', 'Noto Sans Thai', sans-serif; }
+        .tts-button {
+            cursor: pointer;
+            font-size: 1.25rem;
+            margin-left: 8px;
+            color: #2563EB;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .tts-button:active { transform: scale(0.9); }
+        .tts-button.playing { color: #EF4444; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .hidden-content { display: none; }
+        .vocab-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        /* สถานะซ่อนสำหรับคำอ่านและคำแปล */
+        .ipa, .en { display: none; margin-top: 0.25rem; }
+        .ipa { color: #D97706; font-style: italic; font-size: 0.9em; } 
+        .en { color: #6B7280; font-size: 0.9em; }
+
+        /* คลาสสำหรับการแสดงผล */
+        .reveal { display: block !important; }
+
+        /* สไตล์ปุ่มกด */
+        .toggle-btn {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            background-color: #F3F4F6;
+            color: #4B5563;
+            cursor: pointer;
+            margin-right: 6px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover { background-color: #E5E7EB; color: #1F2937; }
+        .toggle-btn.active {
+            background-color: #DBEAFE;
+            color: #1D4ED8;
+            border-color: #93C5FD;
+        }
+        
+        .controls-row {
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .pop-in { animation: popIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800 pb-20">
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        
+        <!-- ส่วนหัวข้อ -->
+        <header class="text-center mb-10 p-8 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-2xl shadow-xl content-block">
+            <h1 class="text-4xl font-bold mb-2">
+                แผ่นดินไหวที่สุราษฎร์ธานี
+                <button class="tts-button text-white" onclick="playTTS('แผ่นดินไหวที่สุราษฎร์ธานี', this)">🔊</button>
+            </h1>
+            <div class="flex justify-center gap-2 mb-2">
+                <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+            </div>
+            <div class="ipa text-orange-100 font-medium text-lg">phàen-din-wǎi thîi sù-rât-thaa-nii</div>
+            <div class="en text-white opacity-90 text-lg">Earthquake in Surat Thani</div>
+        </header>
+
+        <!-- 1. ทบทวนคำศัพท์เก่า -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-amber-400">
+            <div class="content-block mb-6 text-center">
+                <h2 class="text-2xl font-bold text-gray-800 inline-flex items-center">
+                    1. ทบทวนคำศัพท์เก่า
+                    <button class="tts-button" onclick="playTTS('ทบทวนคำศัพท์เก่า', this)">🔊</button>
+                </h2>
+                <div class="controls-row justify-center mb-4">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                </div>
+                <div class="ipa">thóp-thuan kham-sàp kào</div>
+                <div class="en">Review Old Vocabulary</div>
+
+                <div class="content-block mt-2 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <p class="text-gray-700">
+                        กดปุ่มเพื่อสุ่มคำศัพท์ แล้วลองแต่งประโยคจากคำที่ได้
+                        <button class="tts-button" onclick="playTTS('กดปุ่มเพื่อสุ่มคำศัพท์ แล้วลองแต่งประโยคจากคำที่ได้', this)">🔊</button>
+                    </p>
+                    <div class="controls-row justify-center">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">gòt bpùm phʉ̂ʉa sùm kham-sàp láew lɔɔng dtàeng bprà-yôok jàak kham thîi dâi</div>
+                    <div class="en">Press the button to randomize a word, then try to make a sentence.</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div id="word-display-area" class="w-full h-52 flex flex-col justify-center items-center bg-slate-50 rounded-2xl border-2 border-dashed border-amber-300 mb-6 p-4">
+                    <p class="text-slate-400 italic">พร้อมแล้วกดปุ่มด้านล่าง</p>
+                </div>
+                <button onclick="randomizeWord()" class="bg-amber-500 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:bg-amber-600 transition active:scale-95 text-lg">
+                    🎲 สุ่มคำศัพท์
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. กิจกรรมนำเข้า -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-cyan-500">
+            <div class="content-block mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                    2. ก่อนเริ่มบทเรียน
+                    <button class="tts-button" onclick="playTTS('ก่อนเริ่มบทเรียน', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                </div>
+                <div class="ipa">kɔ̀ɔn rə̂əm bòt-rian</div>
+                <div class="en">Lead-in Questions</div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-cyan-50 p-5 rounded-xl content-block">
+                    <p class="text-lg font-medium">คุณเคยรู้สึกถึงแผ่นดินไหวบ้างไหม? รู้สึกอย่างไร? <button class="tts-button" onclick="playTTS('คุณเคยรู้สึกถึงแผ่นดินไหวบ้างไหม รู้สึกอย่างไร', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">khun khoei rúu-sʉ̀k thʉ̌ng phàen-din-wǎi bâang mǎi? rúu-sʉ̀k yàang-rai?</div>
+                    <div class="en">Have you ever felt an earthquake? How did it feel?</div>
+                </div>
+                <div class="bg-cyan-50 p-5 rounded-xl content-block">
+                    <p class="text-lg font-medium">ถ้าเกิดแผ่นดินไหวตอนนี้ คุณจะทำอย่างไรเป็นอย่างแรก? <button class="tts-button" onclick="playTTS('ถ้าเกิดแผ่นดินไหวตอนนี้ คุณจะทำอย่างไรเป็นอย่างแรก', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">thâa gə̀ət phàen-din-wǎi dtɔɔn-níi khun jà tham yàang-rai bpen yàang râaek?</div>
+                    <div class="en">If an earthquake happened now, what would you do first?</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. การฟัง -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-red-600">
+            <div class="content-block mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                    3. การฟังจากวิดีโอ
+                    <button class="tts-button" onclick="playTTS('การฟังจากวิดีโอ', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                </div>
+                <div class="ipa">gaan fang jàak wí-dii-oo</div>
+                <div class="en">Listening from Video</div>
+            </div>
+            
+            <div class="mb-8 p-6 bg-slate-100 rounded-2xl text-center">
+                <p class="mb-4 font-bold text-red-700">ดูวิดีโอข่าวแผ่นดินไหวที่สุราษฎร์ธานี</p>
+                <a href="https://www.youtube.com/watch?v=PbadejNIOjg" target="_blank" class="inline-block bg-red-600 text-white font-bold px-8 py-3 rounded-full hover:bg-red-700 transition shadow-lg active:scale-95">
+                    ▶️ เปิดวิดีโอ
+                </a>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center">
+                    ทดสอบความเข้าใจ
+                    <button class="tts-button" onclick="playTTS('ทดสอบความเข้าใจ', this)">🔊</button>
+                </h3>
+                
+                <div class="space-y-8">
+                    <!-- Q1 Video -->
+                    <div class="content-block">
+                        <p class="font-semibold mb-1">1. แผ่นดินไหวที่สุราษฎร์ธานีเกิดขึ้นกี่ครั้งในรอบ 2 วัน? <button class="tts-button" onclick="playTTS('แผ่นดินไหวที่สุราษฎร์ธานีเกิดขึ้นกี่ครั้งในรอบสองวัน', this)">🔊</button></p>
+                        <div class="controls-row mb-3">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">phàen-din-wǎi thîi sù-rât-thaa-nii gə̀ət khʉ̂n gìi khráng nai rɔ̂ɔp sɔ̌ɔng wan?</div>
+                        <div class="en">How many times did it occur in 2 days?</div>
+                        
+                        <div class="pl-4 space-y-2 mt-2">
+                            <label class="block cursor-pointer"><input type="radio" name="vq1" class="mr-2"> ก. 2 ครั้ง</label>
+                            <label class="block cursor-pointer"><input type="radio" name="vq1" class="mr-2"> ข. 5 ครั้ง</label>
+                            <label class="block cursor-pointer"><input type="radio" name="vq1" class="mr-2"> ค. 9 ครั้ง</label>
+                        </div>
+                        <button onclick="toggleId('vq1-ans')" class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full mt-3 font-semibold text-center">เฉลย</button>
+                        <div id="vq1-ans" class="hidden-content mt-2 p-3 bg-green-50 rounded-lg text-green-700">ตอบ ค. 9 ครั้ง</div>
+                    </div>
+
+                    <!-- Q2 Video -->
+                    <div class="content-block border-t pt-6">
+                        <p class="font-semibold mb-1">2. ผู้เชี่ยวชาญบอกว่าความรุนแรงระดับใดจึงจะกระทบโครงสร้างอาคาร? <button class="tts-button" onclick="playTTS('ผู้เชี่ยวชาญบอกว่าความรุนแรงระดับใดจึงจะกระทบโครงสร้างอาคาร', this)">🔊</button></p>
+                        <div class="controls-row mb-3">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">phûu-chîiao-chaan bòrk wâa khwaam-run-raeng rá-dàp dai chʉng jà grà-thóp khroong-srâang aa-khaan?</div>
+                        <div class="en">At what magnitude level do experts say building structures would be affected?</div>
+
+                        <div class="pl-4 space-y-2 mt-2">
+                            <label class="block cursor-pointer"><input type="radio" name="vq2" class="mr-2"> ก. 1.9 - 3.2</label>
+                            <label class="block cursor-pointer"><input type="radio" name="vq2" class="mr-2"> ข. 4 - 5 ขึ้นไป</label>
+                            <label class="block cursor-pointer"><input type="radio" name="vq2" class="mr-2"> ค. มากกว่า 7</label>
+                        </div>
+                        <button onclick="toggleId('vq2-ans')" class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full mt-3 font-semibold text-center">เฉลย</button>
+                        <div id="vq2-ans" class="hidden-content mt-2 p-3 bg-green-50 rounded-lg text-green-700">ตอบ ข. 4 - 5 ขึ้นไป</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. บทอ่าน -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-indigo-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                4. บทอ่าน
+                <button class="tts-button" onclick="playTTS('บทอ่าน', this)">🔊</button>
+            </h2>
+
+            <div class="bg-indigo-50 p-6 rounded-2xl text-gray-700 space-y-8 leading-relaxed border border-indigo-100">
+                <!-- P1 -->
+                <div class="content-block">
+                    <p class="text-lg">เกิดแผ่นดินไหวในพื้นที่จังหวัดสุราษฎร์ธานี 9 ครั้งในช่วง 2 วันที่ผ่านมา ทำให้ชาวบ้านรู้สึก <strong class="text-indigo-800 font-bold underline">หวาดผวา</strong> เพราะกลัวว่าบ้านจะพังลงมา <button class="tts-button" onclick="playTTS('เกิดแผ่นดินไหวในพื้นที่จังหวัดสุราษฎร์ธานี 9 ครั้งในช่วง 2 วันที่ผ่านมา ทำให้ชาวบ้านรู้สึกหวาดผวา เพราะกลัวว่าบ้านจะพังลงมา', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">gə̀ət phàen-din-wǎi nai phʉ́ʉn-thîi jang-wàt sù-rât-thaa-nii gâo khráng nai chûuang sɔ̌ɔng wan thîi phàan maa, tham hâi chao-baan rúu-sʉ̀k wàat-phà-wǎa phró glua wâa bâan jà phang long maa</div>
+                    <div class="en">9 earthquakes in Surat Thani in 2 days left villagers terrified that their homes would collapse.</div>
+                </div>
+
+                <!-- P2 -->
+                <div class="content-block border-t border-indigo-200 pt-6">
+                    <p class="text-lg">วิศวกรยืนยันว่า <strong class="text-indigo-800 font-bold underline">แรงสั่นสะเทือน</strong> ครั้งนี้ยังไม่รุนแรงพอที่จะ <strong class="text-indigo-800 font-bold underline">กระทบ</strong> ต่อโครงสร้างอาคาร สาเหตุเกิดจาก <strong class="text-indigo-800 font-bold underline">รอยเลื่อน</strong> คลองมะรุ่ย ซึ่งเป็นรอยเลื่อนที่มีพลัง <button class="tts-button" onclick="playTTS('วิศวกรยืนยันว่า แรงสั่นสะเทือนครั้งนี้ยังไม่รุนแรงพอที่จะกระทบต่อโครงสร้างอาคาร สาเหตุเกิดจาก รอยเลื่อน คลองมะรุ่ย ซึ่งเป็นรอยเลื่อนที่มีพลัง', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">wít-sà-wá-gɔɔn yuuen-yan wâa raeng sàn-sà-thʉʉan khráng níi yang mâi run-raeng phɔɔ thîi jà grà-thóp dtɔ̀ɔ khroong-srâang aa-khaan. sǎa-hèet gə̀ət jàak rɔɔy-lʉ̂an khlɔɔng-má-rûi sʉ̂ng bpen rɔɔy-lʉ̂an thîi mii phà-lang</div>
+                    <div class="en">Engineers confirm the tremors weren't strong enough to impact buildings. The cause is the active Khlong Marui fault line.</div>
+                </div>
+
+                <!-- P3 -->
+                <div class="content-block border-t border-indigo-200 pt-6">
+                    <p class="text-lg">หน่วยงานที่เกี่ยวข้องยืนยันว่าแผ่นดินไหวครั้งนี้ไม่ส่งผลกระทบต่อความ <strong class="text-indigo-800 font-bold underline">มั่นคง</strong> ของเขื่อนรัชประภา แต่ยังต้อง <strong class="text-indigo-800 font-bold underline">เฝ้าระวัง</strong> และติดตาม <strong class="text-indigo-800 font-bold underline">สถานการณ์</strong> อย่างใกล้ชิด <button class="tts-button" onclick="playTTS('หน่วยงานที่เกี่ยวข้องยืนยันว่าแผ่นดินไหวครั้งนี้ไม่ส่งผลกระทบต่อความมั่นคงของเขื่อนรัชประภา แต่ยังต้องเฝ้าระวังและติดตามสถานการณ์อย่างใกล้ชิด', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">nùuay-ngaan thîi gìiao-khɔ̂ɔng yuuen-yan wâa phàen-din-wǎi khráng níi mâi sòng phǒn grà-thóp dtɔ̀ɔ khwaam mân-khong khɔ̌ɔng khʉ̀uan rát-chà-bprà-phaa, dtàe yang dtông fâo-rá-wang láe dtìt-daam sà-thǎa-ná-gaan yàang glâi-chít</div>
+                    <div class="en">Authorities confirm no impact on Rajjaprabha Dam's stability, but close monitoring of the situation continues.</div>
+                </div>
+            </div>
+
+            <!-- Reading Comprehension Questions -->
+            <div class="mt-10 p-6 bg-slate-50 rounded-xl border border-indigo-100">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    คำถามเพื่อความเข้าใจจากบทอ่าน
+                    <button class="tts-button" onclick="playTTS('คำถามเพื่อความเข้าใจจากบทอ่าน', this)">🔊</button>
+                </h3>
+                
+                <div class="space-y-6">
+                    <div class="content-block">
+                        <p class="font-semibold mb-1">1. ทำไมชาวบ้านในจังหวัดสุราษฎร์ธานีจึงรู้สึก "หวาดผวา"? <button class="tts-button" onclick="playTTS('ทำไมชาวบ้านในจังหวัดสุราษฎร์ธานีจึงรู้สึก หวาดผวา', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">tham-mai chao-baan nai jang-wàt sù-rât-thaa-nii chʉng rúu-sʉ̀k wàat-phà-wǎa?</div>
+                        <div class="en">Why do villagers feel terrified?</div>
+                        <div class="pl-4 space-y-2 mt-2">
+                            <label class="block cursor-pointer"><input type="radio" name="rq1" class="mr-2"> ก. เพราะกลัวน้ำท่วม</label>
+                            <label class="block cursor-pointer"><input type="radio" name="rq1" class="mr-2"> ข. เพราะกลัวโครงสร้างบ้านจะพังลงมา</label>
+                            <label class="block cursor-pointer"><input type="radio" name="rq1" class="mr-2"> ค. เพราะกลัวพายุเข้า</label>
+                        </div>
+                        <button onclick="toggleId('rq1-ans')" class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full mt-3 font-semibold text-center">เฉลย</button>
+                        <div id="rq1-ans" class="hidden-content mt-2 p-2 bg-green-50 rounded text-green-700">ตอบ ข. เพราะกลัวโครงสร้างบ้านจะพังลงมา</div>
+                    </div>
+
+                    <div class="content-block border-t border-slate-200 pt-6">
+                        <p class="font-semibold mb-1">2. รอยเลื่อนที่เป็นสาเหตุของแผ่นดินไหวครั้งนี้มีลักษณะอย่างไร? <button class="tts-button" onclick="playTTS('รอยเลื่อนที่เป็นสาเหตุของแผ่นดินไหวครั้งนี้มีลักษณะอย่างไร', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">rɔɔy-lʉ̂an thîi bpen sǎa-hèet khɔ̌ɔng phàen-din-wǎi khráng níi mii lák-sà-nà yàang-rai?</div>
+                        <div class="en">What is the characteristic of the fault line causing this earthquake?</div>
+                        <div class="pl-4 space-y-2 mt-2">
+                            <label class="block cursor-pointer"><input type="radio" name="rq2" class="mr-2"> ก. เป็นรอยเลื่อนที่หยุดทำงานแล้ว</label>
+                            <label class="block cursor-pointer"><input type="radio" name="rq2" class="mr-2"> ข. เป็นรอยเลื่อนขนาดเล็กในเมืองหลวง</label>
+                            <label class="block cursor-pointer"><input type="radio" name="rq2" class="mr-2"> ค. เป็นรอยเลื่อนที่มีพลัง</label>
+                        </div>
+                        <button onclick="toggleId('rq2-ans')" class="text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full mt-3 font-semibold text-center">เฉลย</button>
+                        <div id="rq2-ans" class="hidden-content mt-2 p-2 bg-green-50 rounded text-green-700">ตอบ ค. เป็นรอยเลื่อนที่มีพลัง</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. คำศัพท์หลัก -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                5. คำศัพท์หลัก
+                <button class="tts-button" onclick="playTTS('คำศัพท์หลัก', this)">🔊</button>
+            </h2>
+            <div id="target-vocab-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-center sm:text-left"></div>
+        </section>
+
+        <!-- 6. กิจกรรมฝึกพูด -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-2xl shadow-xl border-l-8 border-pink-500">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 flex items-center">
+                6. กิจกรรมฝึกพูด
+                <button class="tts-button" onclick="playTTS('กิจกรรมฝึกพูด', this)">🔊</button>
+            </h2>
+
+            <div class="space-y-10">
+                <!-- A: Role Play -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center">
+                        A. บทบาทสมมติ: นักข่าวกับชาวบ้าน 
+                        <button class="tts-button" onclick="playTTS('บทบาทสมมติ นักข่าวกับชาวบ้าน', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa mb-1">bòt-bàat sǒm-mút: nák-khào gàp chao-baan</div>
+                    <div class="en mb-3 text-sm italic">Role-play: Reporter interviewing a panicked villager.</div>
+                    
+                    <div class="bg-white p-4 rounded-lg">
+                        <p class="text-gray-700">คนหนึ่งเป็นนักข่าว อีกคนเป็นชาวบ้านที่ **หวาดผวา** นักข่าวต้องถามเกี่ยวกับ **สถานการณ์** และชาวบ้านต้องเล่าความรู้สึก <button class="tts-button" onclick="playTTS('คนหนึ่งเป็นนักข่าว อีกคนเป็นชาวบ้านที่หวาดผวา นักข่าวต้องถามเกี่ยวกับสถานการณ์ และชาวบ้านต้องเล่าความรู้สึก', this)">🔊</button></p>
+                        <div class="controls-row">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">khon nʉ̀ng bpen nák-khào, ìik khon bpen chao-baan thîi wàat-phà-wǎa. nák-khào dtông thǎam gìiao-gàp sà-thǎa-ná-gaan láe chao-baan dtông lâo khwaam rúu-sʉ̀k.</div>
+                        <div class="en">Reporter vs panicked villager. Reporter asks about situation, villager describes feelings.</div>
+                        <p class="mt-3 text-sm text-pink-600 font-bold">คำศัพท์แนะนำ: หวาดผวา / แรงสั่นสะเทือน / สถานการณ์</p>
+                    </div>
+                </div>
+
+                <!-- B: Debate -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center">
+                        B. โต้วาที: การก่อสร้างในเขตเสี่ยงภัย 
+                        <button class="tts-button" onclick="playTTS('โต้วาที การก่อสร้างในเขตเสี่ยงภัย', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">dtôo-waa-thii: gaan gɔ̀ɔ-srâang nai khèet sìiang phai</div>
+                    <div class="en mb-3 text-sm italic">Debate: Construction in risk zones.</div>
+
+                    <div class="bg-white p-4 rounded-lg">
+                        <p class="text-gray-700">ฝ่ายหนึ่งเห็นว่า "สร้างได้ถ้ามีโครงสร้างที่ดี" อีกฝ่ายเห็นว่า "ไม่ควรเสี่ยงเพราะอันตรายเกินไป" <button class="tts-button" onclick="playTTS('ฝ่ายหนึ่งเห็นว่า สร้างได้ถ้ามีโครงสร้างที่ดี อีกฝ่ายเห็นว่า ไม่ควรเสี่ยงเพราะอันตรายเกินไป', this)">🔊</button></p>
+                        <div class="controls-row">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">fài nʉ̀ng hěn wâa "srâang dâi thâa mii khroong-srâang thîi dii", ìik fài hěn wâa "mâi khuaan sìiang phró an-dtà-raai gəən bpai".</div>
+                        <div class="en">One side: build with good structure. Other side: don't risk it, too dangerous.</div>
+                        <p class="mt-3 text-sm text-pink-600 font-bold">คำศัพท์แนะนำ: โครงสร้าง / กระทบ / รอยเลื่อน</p>
+                    </div>
+                </div>
+
+                <!-- C: Presentation -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center">
+                        C. การนำเสนอ: วิธีเอาตัวรอด 
+                        <button class="tts-button" onclick="playTTS('การนำเสนอ วิธีเอาตัวรอด', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">gaan nam-sà-nə̌ə: wí-thii ao-dtua-rɔ̂ɔt</div>
+                    <div class="en mb-3 text-sm italic">1-min presentation on survival.</div>
+
+                    <div class="bg-white p-4 rounded-lg">
+                        <p class="text-gray-700">ให้นักเรียนพูดนำเสนอเป็นเวลา 1 นาที เกี่ยวกับ "3 สิ่งที่ต้องทำทันทีเมื่อรู้สึกถึงแรงสั่นสะเทือน" <button class="tts-button" onclick="playTTS('ให้นักเรียนพูดนำเสนอเป็นเวลาหนึ่งนาที เกี่ยวกับ สามสิ่งที่ต้องทำทันทีเมื่อรู้สึกถึงแรงสั่นสะเทือน', this)">🔊</button></p>
+                        <div class="controls-row">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa">hâi nák-rian phûut nam-sà-nə̌ə bpen wee-laa nʉ̀ng naa-thii gìiao-gàp sǎam sìng thîi dtông tham than-thii mʉ̂a rúu-sʉ̀k thʉ̌ng raeng sàn-sà-thʉʉan.</div>
+                        <div class="en">Present for 1 minute: "3 things to do immediately when feeling tremors."</div>
+                    </div>
+                </div>
+
+                <!-- D: Interview -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center">
+                        D. สัมภาษณ์และสรุปความ 
+                        <button class="tts-button" onclick="playTTS('สัมภาษณ์และสรุปความ', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa">sǎm-phâat láe sà-rùp khwaam</div>
+                    <div class="en mb-3 text-sm italic">Interview and summary task.</div>
+
+                    <div class="bg-white p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">สัมภาษณ์ครูว่า "ครูคิดว่าเขื่อนรัชประภายังมีความ **มั่นคง** อยู่ไหม และเราควรทำอย่างไรต่อไป?" <button class="tts-button" onclick="playTTS('สัมภาษณ์ครูว่า ครูคิดว่าเขื่อนรัชประภายังมีความมั่นคงอยู่ไหม และเราควรทำอย่างไรต่อไป', this)">🔊</button></p>
+                        <div class="controls-row">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa mb-3 text-sm">sǎm-phâat khruu wâa "khruu khít wâa khʉ̀uan rát-chà-bprà-phaa yang mii khwaam mân-khong yùu mǎi? láe rao khuaan tham yàang-rai dtɔ̀ɔ-bpai?"</div>
+                        <div class="en mb-3 text-sm">"Do you think Rajjaprabha Dam is still stable, and what should we do next?"</div>
+                        
+                        <p class="font-bold text-pink-800 border-t border-pink-200 pt-3 italic">ภารกิจ: หลังจากฟังครูตอบ ให้สรุปสิ่งที่ครูพูดออกมาเป็นภาษาไทยอย่างน้อย 3 ประโยค <button class="tts-button" onclick="playTTS('หลังจากฟังครูตอบ ให้สรุปสิ่งที่ครูพูดออกมาเป็นภาษาไทยอย่างน้อยสามประโยค', this)">🔊</button></p>
+                        <div class="controls-row">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                        </div>
+                        <div class="ipa text-sm">pha-rá-gìt: lǎng-jàak fang khruu dtɔ̀ɔp, hâi sà-rùp sìng thîi khruu phûut òok maa bpen phaa-sǎa thai yàang-nɔ́ɔy sǎam bprà-yôok.</div>
+                        <div class="en text-sm">Task: Summarize teacher's answer in Thai (at least 3 sentences).</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. คำศัพท์เพิ่มเติม -->
+        <section class="mb-12 bg-slate-100 p-6 sm:p-8 rounded-2xl shadow-md border-l-8 border-slate-400">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                7. คำศัพท์เพิ่มเติม
+                <button class="tts-button" onclick="playTTS('คำศัพท์เพิ่มเติม', this)">🔊</button>
+            </h2>
+            <div id="extra-vocab-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+    </div>
+
+    <script>
+        const reviewVocab = [
+            {th: "เรียงความ", ipa: "riiang-khwaam", en: "essays"},
+            {th: "เรื่องสั้น", ipa: "rʉ̂ʉang-sân", en: "short stories"},
+            {th: "หนา", ipa: "nǎa", en: "thick"},
+            {th: "งานรับปริญญา", ipa: "ngaan-ráp-bpà-rin-yaa", en: "graduation"},
+            {th: "ดนตรีสด", ipa: "don-dtrii-sòt", en: "live music"},
+            {th: "มืออาชีพ", ipa: "mʉʉ-aa-chîip", en: "professional"},
+            {th: "เงินเดือน", ipa: "ngən dʉuan", en: "salary"},
+            {th: "นอกใจ", ipa: "nɔ̂ɔk-jai", en: "cheat on"},
+            {th: "ปลอบใจ", ipa: "plɔ̀ɔp-jai", en: "to comfort"},
+            {th: "คุณภาพ", ipa: "khun-ná-phâap", en: "quality"},
+            {th: "ภูมิศาสตร์", ipa: "phuum-mí-sàat", en: "geography"},
+            {th: "ปณิธาน", ipa: "bpà-ní-thaan", en: "resolutions"},
+            {th: "มีความคิดสร้างสรรค์", ipa: "mii khwaam-khít srâang-sǎn", en: "creative"},
+            {th: "ลักษณะเฉพาะ", ipa: "lák-sà-nà chà-phɔ́", en: "characteristic"},
+            {th: "ฉนวนกันความร้อน", ipa: "chà-nǔuan gan khwaam rɔ́ɔn", en: "insulation"},
+            {th: "สงสัย", ipa: "sǒng-sǎi", en: "wonder"}
+        ];
+
+        const targetVocabList = [
+            {th: "แรงสั่นสะเทือน", ipa: "raeng sàn-sà-thʉʉan", en: "vibration / tremor"},
+            {th: "โครงสร้าง", ipa: "khroong-srâang", en: "structure"},
+            {th: "กระทบ", ipa: "grà-thóp", en: "impact / affect"},
+            {th: "รอยเลื่อน", ipa: "rɔɔy-lʉ̂an", en: "fault line"},
+            {th: "ปลดปล่อย", ipa: "plòt-plɔ̀ɔy", en: "release / emit"},
+            {th: "เฝ้าระวัง", ipa: "fâo-rá-wang", en: "monitor / alert"},
+            {th: "สถานการณ์", ipa: "sà-thǎa-ná-gaan", en: "situation"},
+            {th: "มั่นคง", ipa: "mân-khong", en: "stable / secure"},
+            {th: "หวาดผวา", ipa: "wàat-phà-wǎa", en: "terrified / panicked"}
+        ];
+
+        const extraVocabList = [
+            {th: "วิชาการ", ipa: "wí-chaa-gaan", en: "academic"},
+            {th: "วิศวกร", ipa: "wí-sà-wá-gɔɔn", en: "engineer"},
+            {th: "ยืนยัน", ipa: "yuuen-yan", en: "confirm"},
+            {th: "แรงสั่นสะเทือน", ipa: "raeng-sàn-sà-thʉʉan", en: "tremors"},
+            {th: "กระทบ", ipa: "grà-thóp", en: "affect"},
+            {th: "รอยเลื่อน", ipa: "rɔɔy-lʉ̂an", en: "fault"},
+            {th: "หน่วยงานที่เกี่ยวข้อง", ipa: "nùuay-ngaan thîi gìiao-khɔ̂ɔng", en: "relevant agencies"},
+            {th: "ส่งผลกระทบต่อ", ipa: "sòng-phǒn-grà-thóp-dtɔ̀ɔ", en: "have an impact on"},
+            {th: "ความมั่นคง", ipa: "khwaam mân-khong", en: "stability"},
+            {th: "เขื่อน", ipa: "khʉ̀uan", en: "dam"},
+            {th: "ติดตาม", ipa: "dtìt-daam", en: "follow / monitor"},
+            {th: "ลักษณะ", ipa: "lák-sà-nà", en: "characteristic"},
+            {th: "ถล่ม", ipa: "thà-lòm", en: "collapse"}
+        ];
+
+        window.onload = () => {
+            populateVocab('target-vocab-container', targetVocabList, 'border-green-500');
+            populateVocab('extra-vocab-container', extraVocabList, 'border-slate-400');
+        };
+
+        function populateVocab(containerId, list, borderColor) {
+            const container = document.getElementById(containerId);
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 ${borderColor} transition-all`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-xl text-slate-800">${item.th}</span>
+                        <button class="tts-button" onclick="playTTS('${item.th}', this)">🔊</button>
+                    </div>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa font-medium text-amber-600">${item.ipa}</div>
+                    <div class="en text-slate-500">${item.en}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function randomizeWord() {
+            const displayArea = document.getElementById('word-display-area');
+            const word = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            displayArea.innerHTML = `
+                <div class="text-center w-full pop-in content-block">
+                    <h3 class="text-4xl font-bold text-indigo-700">${word.th}</h3>
+                    <div class="controls-row justify-center mt-3 mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">คำอ่าน</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">คำแปล</button>
+                    </div>
+                    <div class="ipa text-lg text-amber-600 font-medium mb-1">${word.ipa}</div>
+                    <div class="en text-lg text-slate-500 font-medium">${word.en}</div>
+                    <div class="mt-4">
+                        <button class="tts-button bg-indigo-100 p-2 rounded-full" onclick="playTTS('${word.th}', this)">🔊</button>
+                    </div>
+                    <p class="mt-4 text-sm text-amber-600 font-bold italic">ลองแต่งประโยคเลย!</p>
+                </div>`;
+        }
+
+        function toggleId(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden-content');
+        }
+
+        function toggleLocal(btn, type) {
+            const block = btn.closest('.content-block');
+            if (block) {
+                const targets = block.querySelectorAll('.' + type);
+                targets.forEach(t => t.classList.toggle('reveal'));
+                btn.classList.toggle('active');
+            }
+        }
+
+        function playTTS(text, btn) {
+            window.speechSynthesis.cancel();
+            if (btn) btn.classList.add('playing');
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH' || voice.lang === 'th_TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+            else utterance.lang = 'th-TH';
+            utterance.rate = 0.95;
+            utterance.onend = () => { if (btn) btn.classList.remove('playing'); };
+            utterance.onerror = () => { if (btn) btn.classList.remove('playing'); };
+            window.speechSynthesis.speak(utterance);
+        }
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+    </script>
+</body>
+</html>
