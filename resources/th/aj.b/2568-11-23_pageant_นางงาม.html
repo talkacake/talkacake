@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thai Lesson: Beauty Pageant Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+    .thai-font { font-family: 'Sarabun', sans-serif; }
+    .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; }
+    .vocab-item { padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .vocab-item:hover { background-color: #f1f5f9; }
+    .vocab-item.selected { background-color: #3b82f6; color: white; border-color: #2563eb; }
+    .vocab-item.matched { background-color: #22c55e; color: white; border-color: #16a34a; cursor: default; }
+    .vocab-item.wrong { background-color: #ef4444; color: white; border-color: #dc2626; }
+    .tts-button, .toggle-btn { background: transparent; border: 1px solid #cbd5e1; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; transition: background-color .2s; margin-left: 0.5rem; font-size: 0.75rem; flex-shrink: 0; }
+    .tts-button:hover, .toggle-btn:hover { background-color: #e2e8f0; }
+    .tts-button svg { width: 1.25rem; height: 1.25rem; color: #475569; }
+    .toggle-content { display: none; margin-top: 0.25rem; padding: 0.5rem; background-color: #f1f5f9; border-radius: 0.5rem; font-size: 0.9rem; color: #475569; }
+    .toggle-content.ipa { font-style: italic; }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md">
+    <div class="container mx-auto px-6 py-8">
+      <div id="text-container-header"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-6 py-10">
+    <!-- Interactive text element creator -->
+    <template id="interactiveTextTemplate">
+        <div class="interactive-text-block my-2">
+            <div class="flex flex-wrap items-center">
+                <p class="thai-font text-lg main-text"></p>
+                <button class="tts-button" onclick="speak(this.previousElementSibling.textContent)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg></button>
+                <button class="toggle-btn btn-ipa" onclick="toggleContent(this, 'ipa')">IPA</button>
+                <button class="toggle-btn btn-en" onclick="toggleContent(this, 'en')">EN</button>
+            </div>
+            <p class="toggle-content ipa"></p>
+            <p class="toggle-content en"></p>
+        </div>
+    </template>
+
+    <!-- 1. Review & Warm-up -->
+    <section class="mb-12">
+      <div id="text-container-part1-header" class="flex items-center mb-4 border-b-2 border-blue-500 pb-2"></div>
+      <div class="card space-y-4">
+        <div id="text-container-warmup-intro"></div>
+        <div id="text-container-warmup1"></div>
+        <div id="text-container-warmup2"></div>
+      </div>
+    </section>
+
+    <!-- 2. Watch & Discuss -->
+    <section class="mb-12">
+        <div id="text-container-part2-header" class="flex items-center mb-4 border-b-2 border-green-500 pb-2"></div>
+      <div class="card">
+        <div id="text-container-watch-intro"></div>
+        <a href="https://www.youtube.com/shorts/elF1l3_2YFY" target="_blank" class="text-blue-600 hover:underline thai-font my-4 inline-block">คลิกที่นี่เพื่อดูวิดีโอบน YouTube (Shorts)</a>
+        <div class="mt-6 space-y-4">
+            <div class="p-4 bg-green-50 rounded-lg" id="text-container-watch1"></div>
+            <div class="p-4 bg-green-50 rounded-lg" id="text-container-watch2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Read the Simplified Script -->
+    <section class="mb-12">
+        <div id="text-container-part3-header" class="flex items-center mb-4 border-b-2 border-purple-500 pb-2"></div>
+        <div class="card">
+            <div id="text-container-read-intro"></div>
+            <div class="p-4 bg-purple-50 rounded-lg my-4 space-y-3">
+                <div id="text-container-script1"></div>
+                <div id="text-container-script2"></div>
+                <div id="text-container-script3"></div>
+                <div id="text-container-script4"></div>
+                <div id="text-container-script5"></div>
+                <div id="text-container-script6"></div>
+                <div id="text-container-script7"></div>
+            </div>
+            
+            <div id="text-container-quote-header" class="mt-6 mb-2"></div>
+            <blockquote class="border-l-4 border-indigo-500 pl-4 italic text-gray-700 bg-gray-50 p-4 rounded">
+                <div id="text-container-quote"></div>
+            </blockquote>
+
+            <div id="text-container-comprehension-header" class="flex items-center my-4"></div>
+            <div class="space-y-3">
+                <div id="text-container-comp1"></div>
+                <div id="text-container-comp2"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 4. Vocabulary Game -->
+    <section class="mb-12">
+         <div id="text-container-part4-header" class="flex items-center mb-4 border-b-2 border-orange-500 pb-2"></div>
+        <div class="card">
+            <div id="text-container-game-desc"></div>
+            <div id="game-container" class="grid grid-cols-2 gap-4 md:gap-6 mt-4">
+                <div id="thai-words" class="space-y-3"></div>
+                <div id="eng-meanings" class="space-y-3"></div>
+            </div>
+            <div id="feedback" class="mt-4 text-center font-bold text-xl thai-font text-green-600"></div>
+            <button id="reset-btn" class="mx-auto mt-4 block bg-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-600 transition thai-font" style="display: none;">เล่นอีกครั้ง</button>
+        </div>
+    </section>
+
+    <!-- 5. Role-Play & Speaking -->
+    <section class="mb-12">
+        <div id="text-container-part5-header" class="flex items-center mb-4 border-b-2 border-red-500 pb-2"></div>
+        <div class="card bg-red-50 border-red-200 border">
+            <div id="text-container-roleplay-header" class="flex items-center"></div>
+            <div id="text-container-roleplay-desc" class="mt-2"></div>
+            <div id="text-container-roleplay-vocab-header" class="mt-4"></div>
+            <div class="space-y-2 mt-2">
+                <div id="text-container-vocab1"></div>
+                <div id="text-container-vocab2"></div>
+                <div id="text-container-vocab3"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Cultural Insight -->
+    <section class="mb-12">
+        <div id="text-container-part6-header" class="flex items-center mb-4 border-b-2 border-indigo-500 pb-2"></div>
+        <div class="card">
+            <div id="text-container-culture1"></div>
+        </div>
+    </section>
+
+    <!-- 7. Additional Vocabulary -->
+    <section class="mb-12">
+      <div id="text-container-additional-header" class="flex items-center mb-4 border-b-2 border-teal-500 pb-2"></div>
+      <div class="card">
+        <div class="space-y-3">
+          <div id="text-container-add-vocab1"></div>
+          <div id="text-container-add-vocab2"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  
+  <script>
+    /***** Robust TTS & Toggle Functions *****/
+    const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+    let voices = [];
+    let thaiVoice = null;
+    let voicesReadyResolve;
+    const voicesReady = new Promise(res => voicesReadyResolve = res);
+
+    function pickThaiVoice() { if (!voices.length) return; thaiVoice = voices.find(v => v.lang === 'th-TH') || voices.find(v => v.lang.startsWith('th')) || null; }
+    function loadVoices() { if (!synth) return; const list = synth.getVoices(); if (list && list.length) { voices = list; pickThaiVoice(); if (voicesReadyResolve) { voicesReadyResolve(); voicesReadyResolve = null; } } }
+    if (synth) { loadVoices(); if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices; }
+    let ttsUnlocked = false;
+    function unlockTTS() { if (!synth || ttsUnlocked) return; ttsUnlocked = true; const u = new SpeechSynthesisUtterance(''); u.volume = 0; synth.speak(u); }
+    document.addEventListener('click', unlockTTS, { once: true });
+    async function speak(text) { if (!synth) return; unlockTTS(); await voicesReady; const utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'th-TH'; utterance.rate = 0.9; if (thaiVoice) utterance.voice = thaiVoice; synth.cancel(); synth.speak(utterance); }
+    function toggleContent(btn, type) { const block = btn.closest('.interactive-text-block'); const content = block.querySelector(`.toggle-content.${type}`); if (content) { const isHidden = content.style.display === 'none' || content.style.display === ''; content.style.display = isHidden ? 'block' : 'none'; btn.classList.toggle('bg-blue-200', isHidden); } }
+    
+    const textData = {
+        'text-container-header': { thai: 'ดราม่านางงามและการให้กำลังใจ 👑✌️', ipa: 'draa-mâa naang-ngaam lɛ́ gaan hâi gam-lang-jai', en: 'Beauty Pageant Drama & Encouragement', type: 'h1', class: 'text-3xl font-bold text-slate-900 thai-font' },
+        'text-container-part1-header': { thai: 'ส่วนที่ 1: ทบทวนคำศัพท์เก่าในบริบทใหม่ 🔄', ipa: 'sùan tîi nʉ̀ŋ: tóp-tuan kam-sàp gào nai bɔɔ-rí-bòt mài', en: 'Part 1: Reviewing Old Vocab in New Context', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part2-header': { thai: 'ส่วนที่ 2: ดูวิดีโอ 📺', ipa: 'sùan tîi sɔ̌ɔng: duu wí-dii-oo', en: 'Part 2: Watch Video', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part3-header': { thai: 'ส่วนที่ 3: วิเคราะห์บทพูด (ฉบับเข้าใจง่าย) 📝', ipa: 'sùan tîi sǎam: wí-krɔ́ bòt pûut (chà-bàp kâo-jai ngâai)', en: 'Part 3: Analyzing the Script (Simplified Version)', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part4-header': { thai: 'ส่วนที่ 4: เกมคำศัพท์ 🎮', ipa: 'sùan tîi sìi: geem kam-sàp', en: 'Part 4: Vocabulary Game', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part5-header': { thai: 'ส่วนที่ 5: ฝึกพูดให้กำลังใจ 🗣️💖', ipa: 'sùan tîi hâa: fʉ̀k pûut hâi gam-lang-jai', en: 'Part 5: Speaking Practice (Giving Encouragement)', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part6-header': { thai: 'ส่วนที่ 6: เกร็ดวัฒนธรรม 🇹🇭', ipa: 'sùan tîi hòk: grèt wát-tá-ná-tam', en: 'Part 6: Cultural Insight', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        
+        'text-container-warmup-intro': { thai: 'มาลองใช้คำศัพท์จากบทเรียน "น้ำท่วม" 🌧️ และ "การเลือกเมือง" 🏙️ มาคุยเรื่องนางงามกันค่ะ', ipa: 'maa lɔɔng chái kam-sàp jàak bòt-rian "náam tûam" lɛ́ "gaan lʉ̂ak mʉang" maa kui rʉ̂ang naang-ngaam gan kà', en: 'Let\'s use vocab from the "Flood" and "City Selection" lessons to talk about beauty pageants.' },
+        'text-container-warmup1': { thai: 'ถ้าคุณเป็นกรรมการ (Judge) ⚖️ คุณมี "แนวทาง" หรือเกณฑ์ในการเลือกผู้ชนะยังไงคะ อะไรสำคัญที่สุดสำหรับคุณ', ipa: 'tâa kun bpen gam-má-gaan, kun mii "nɛɛo-taang" rʉ̌ʉ geen nai gaan lʉ̂ak pûu-chá-ná yang-ngai ká? à-rai sǎm-kan tîi-sùt sǎm-ràp kun', en: 'If you were a judge, what "guidelines" or criteria would you have for choosing a winner? What is most important to you?' },
+        'text-container-warmup2': { thai: 'คุณคิดว่าการประกวดนางงามมี "ประสิทธิภาพ" 📈 ในการช่วยสังคม หรือเป็นแค่ "งานรื่นเริง" 🎉 เฉยๆ คะ', ipa: 'kun kít wâa gaan bprà-gùat naang-ngaam mii "bprà-sìt-tí-pâap" nai gaan chûay sǎng-kom rʉ̌ʉ bpen kɛ̂ɛ "ngaan rʉ̂ʉn-rəəng" chə̌əi-chə̌əi ká', en: 'Do you think beauty pageants are "efficient" in helping society, or are they just "festive events"?' },
+
+        'text-container-watch-intro': { thai: 'วิดีโอนี้เป็น "กูรูนางงาม" (Beauty Guru) 💄 กำลังวิเคราะห์ผลการประกวด Miss Universe ล่าสุดค่ะ เขาดูผิดหวังนิดหน่อย 😕 ลองฟังดูนะคะ', ipa: 'wí-dii-oo níi bpen "guu-ruu naang-ngaam" gam-lang wí-krɔ́ pǒn gaan bprà-gùat Miss Universe lâa-sùt kà. kǎo duu pìt-wǎng nít-nɔ̀i. lɔɔng fang duu ná ká', en: 'This video is a "Beauty Guru" analyzing the latest Miss Universe results. He seems a bit disappointed. Let\'s listen.' },
+        'text-container-watch1': { thai: 'คำถามที่ 1: พิธีกรคิดว่า "เม็กซิโก" 🇲🇽 (ผู้ชนะ) ทำผลงานได้ดีที่สุดไหมคะ', ipa: 'kam-tǎam tîi nʉ̀ŋ: pí-tii-gɔɔn kít wâa "mék-sí-goo" (pûu-chá-ná) tam pǒn-ngaan dâai dii tîi-sùt mái ká', en: 'Question 1: Does the host think "Mexico" (the winner) performed the best?' },
+        'text-container-watch2': { thai: 'คำถามที่ 2: พิธีกรรู้สึกยังไงกับรายการ Miss Universe คะ 📺 (ใบ้: อยากดูต่อไหม)', ipa: 'kam-tǎam tîi sɔ̌ɔng: pí-tii-gɔɔn rúu-sʉ̀k yang-ngai gàp raai-gaan Miss Universe ká (bâi: yàak duu dtɔ̀ɔ mái)', en: 'Question 2: How does the host feel about the Miss Universe show? (Hint: Does he want to keep watching?)' },
+
+        'text-container-read-intro': { thai: 'ภาษาในวิดีโอค่อนข้างเร็วและเป็นภาษาพูด (Colloquial) 🗣️ เรามาดูเวอร์ชันที่เข้าใจง่ายขึ้นกันค่ะ', ipa: 'paa-sǎa nai wí-dii-oo kɔ̂n-kâang reo lɛ́ bpen paa-sǎa pûut. rao maa duu wəə-chan tîi kâo-jai ngâai kʉ̂n gan kà', en: 'The language in the video is quite fast and colloquial. Let\'s look at an easier version.' },
+        'text-container-script1': { thai: 'ถ้าให้ผมวิเคราะห์ 🧐 ในฐานะกูรูนางงาม', ipa: 'tâa hâi pǒm wí-krɔ́, nai tǎa-ná guu-ruu naang-ngaam', en: 'If you let me analyze, as a beauty guru...' },
+        'text-container-script2': { thai: 'เม็กซิโก ตอบคำถาม 🎤 ชุด 👗 และเดิน 👠 ไม่ได้ดีที่สุด แต่ได้ที่ 1 🏆', ipa: 'mék-sí-goo dtɔ̀ɔp kam-tǎam, chút, lɛ́ dəən, mâi dâai dii tîi-sùt, dtɛ̀ɛ dâai tîi nʉ̀ŋ', en: 'Mexico\'s answer, dress, and walk were not the best, but she got 1st place.' },
+        'text-container-script3': { thai: 'เชื่อว่าหลายคนคงถอดใจ (ยอมแพ้) 🏳️ ว่าจะเอายังไงต่อกับรายการนี้ดี เพราะเป็นแฟนคลับมานาน', ipa: 'chʉ̂a wâa lǎai kon kong tɔ̀ɔt-jai (yɔɔm-pɛ́ɛ) wâa jà ao yang-ngai dtɔ̀ɔ gàp raai-gaan níi dii, prɔ́ bpen fɛɛn-klàp maa naan', en: 'I believe many people are discouraged (giving up), wondering what to do next with this show, because they have been fans for a long time.' },
+        'text-container-script4': { thai: 'แต่ยังไงก็ขอบคุณน้องวีนา 🙏 ที่ทนแรงกดดันต่างๆ 🧱', ipa: 'dtɛ̀ɛ yang-ngai gɔ̂ kɔ̀ɔp-kun nɔ́ɔng wii-naa, tîi ton rɛɛng gòt-dan dtàang-dtàang', en: 'But anyway, thank you Veena, for enduring all the pressure.' },
+        'text-container-script5': { thai: 'และยินดีกับคุณแอนโทเนีย (รองอันดับ 1) 🥈 และน้องโอปอล (รองอันดับ 3) 🥉', ipa: 'lɛ́ yin-dii gàp kun ɛɛn-too-nia (rɔɔng an-dàp nʉ̀ŋ) lɛ́ nɔ́ɔng oo-bpɔɔ (rɔɔng an-dàp sǎam)', en: 'And congratulations to Antonia (1st Runner-up) and Opal (3rd Runner-up).' },
+        'text-container-script6': { thai: 'สิ่งที่เหมาะสมที่สุดคือ... ✅', ipa: 'sìng tîi mò-sǒm tîi-sùt kʉʉ...', en: 'The most appropriate thing is...' },
+        'text-container-script7': { thai: 'ไม่ว่าจะอยู่ที่ไหน มันจะมีพื้นที่ที่เป็นของเราเสมอ 🌏', ipa: 'mâi-wâa jà yùu tîi nǎi, man jà mii pʉ́ʉn-tîi tîi bpen kɔ̌ɔng rao sà-mə̌ə', en: 'No matter where you are, there will always be a space that belongs to us.' },
+
+        'text-container-quote-header': { thai: 'ประโยคเด็ด (The Best Quote): ✨', ipa: 'bprà-yòok dèt', en: 'The Best Quote:', type: 'h3', class: 'font-bold thai-font text-xl' },
+        'text-container-quote': { thai: '"ถ้าน้ำตรงนี้ไม่ได้ 💧 หนูออกไปมหาสมุทรที่ใหญ่กว่านี้ได้เลย 🌊 มันจะมีที่ที่คนเห็นคุณค่าของเราเสมอ 💎"', ipa: '"tâa náam dtrong-níi mâi dâai, nǔu ɔ̀ɔk bpai má-hǎa-sà-mùt tîi yài gwàa níi dâai ləəi. man jà mii tîi tîi kon hěn kun-kâa kɔ̌ɔng rao sà-mə̌ə"', en: '"If this water (place) doesn\'t work, you can go out to a bigger ocean. There will always be a place where people see your value."' },
+
+        'text-container-comprehension-header': { thai: 'คำถามเพื่อทบทวนความเข้าใจ: ❓', ipa: 'kam-tǎam pʉ̂a tóp-tuan kwaam kâo-jai', en: 'Comprehension Questions:', type: 'h3', class: 'font-bold thai-font text-xl' },
+        'text-container-comp1': { thai: '1. พิธีกรแนะนำว่า ถ้าเราไม่ประสบความสำเร็จที่นี่ เราควรทำยังไงคะ (เปรียบเทียบกับ "น้ำ" 💧 และ "มหาสมุทร" 🌊)', ipa: 'nʉ̀ŋ: pí-tii-gɔɔn nɛ́-nam wâa, tâa rao mâi bprà-sòp kwaam-sǎm-rèt tîi-nîi, rao kuan tam yang-ngai ká (bprìap-tîap gàp "náam" lɛ́ "má-hǎa-sà-mùt")', en: '1. What does the host suggest we do if we don\'t succeed here? (Compare with "water" and "ocean")' },
+        'text-container-comp2': { thai: '2. คุณเห็นด้วยไหมคะที่ว่า "มันจะมีที่ที่คนเห็นคุณค่าของเราเสมอ" 💎', ipa: 'sɔ̌ɔng: kun hěn-dûay mái ká tîi wâa "man jà mii tîi tîi kon hěn kun-kâa kɔ̌ɔng rao sà-mə̌ə"', en: '2. Do you agree that "there will always be a place where people see our value"?' },
+
+        'text-container-game-desc': { thai: 'คำศัพท์น่ารู้จากวิดีโอและการแสดงความคิดเห็นค่ะ 🧠', ipa: 'kam-sàp nâa-rúu jàak wí-dii-oo lɛ́ gaan sà-dɛɛng kwaam-kít-hěn kà', en: 'Useful vocabulary from the video and expressing opinions.' },
+
+        'text-container-roleplay-header': { thai: 'สถานการณ์: ปลอบใจนักศึกษา 🫂', ipa: 'sà-thǎa-naa-gaan: bplɔ̀ɔp-jai nák-sʉ̀k-sǎa', en: 'Scenario: Comforting a Student', type: 'h3', class: 'font-bold thai-font text-xl text-red-700' },
+        'text-container-roleplay-desc': { thai: 'สมมติว่ามีนักศึกษาคนหนึ่งของคุณ "ผิดหวัง" 😞 มากที่สอบชิงทุนไปต่างประเทศไม่ผ่าน เขา/เธอรู้สึกว่าตัวเอง "ไม่ดีพอ" คุณจะพูดให้กำลังใจเขาโดยใช้สำนวน "มหาสมุทร" 🌊 จากในวิดีโอยังไงคะ', ipa: 'sǒm-mút wâa mii nák-sʉ̀k-sǎa kon nʉ̀ŋ kɔ̌ɔng kun "pìt-wǎng" mâak tîi sɔ̀ɔp ching tun bpai dtàang-bprà-têet mâi pàan. kǎo/təə rúu-sʉ̀k wâa dtua-eeng "mâi dii pɔɔ". kun jà pûut hâi gam-lang-jai kǎo dooi chái sǎm-nuan "má-hǎa-sà-mùt" jàak nai wí-dii-oo yang-ngai ká', en: 'Suppose one of your students is very "disappointed" that they didn\'t pass a scholarship exam for abroad. They feel "not good enough." How would you encourage them using the "ocean" metaphor from the video?' },
+        'text-container-roleplay-vocab-header': { thai: 'คำ/วลี ที่อาจจะได้ใช้:', ipa: 'kam/wá-lii tîi àat jà dâai chái:', en: 'Words/phrases you might use:', type: 'p', class: 'thai-font font-semibold' },
+        'text-container-vocab1': { thai: 'อย่าเพิ่งถอดใจ 🙅‍♂️', ipa: 'yàa pə̂ng tɔ̀ɔt-jai', en: 'Don\'t give up/lose heart yet.' },
+        'text-container-vocab2': { thai: 'ทำเต็มที่แล้ว 💯', ipa: 'tam dtem-tîi lɛ́ɛo', en: 'You did your best.' },
+        'text-container-vocab3': { thai: 'เห็นคุณค่า 💎', ipa: 'hěn kun-kâa', en: 'See the value.' },
+
+        'text-container-culture1': { thai: 'คนไทยจริงจังกับการประกวดนางงาม (Beauty Pageants) มากๆ ค่ะ 🇹🇭 ถือเป็น "วาระแห่งชาติ" (National Agenda) เลยทีเดียว การวิพาก์วิจารณ์ผลการตัดสินจึงเป็นเรื่องปกติและดุเดือดมากในโซเชียลมีเดียค่ะ 📱🔥', ipa: 'kon tai jing-jang gàp gaan bprà-gùat naang-ngaam mâak-mâak kà. tʉ̌ʉ bpen "waa-rá hɛ̀ng châat" ləəi tii-diao. gaan wí-pâak-wí-jaan pǒn gaan dtàt-sǐn jʉng bpen rʉ̂ang bpòk-gà-dtì lɛ́ dù-dʉ̀at mâak nai soo-chîao mii-dia kà', en: 'Thai people are very serious about Beauty Pageants. It\'s almost a "National Agenda." Criticizing the results is normal and can be very intense on social media.' },
+
+        /* --- Additional Vocabulary Section --- */
+        'text-container-additional-header': { thai: 'คำศัพท์เพิ่มเติม 📚', ipa: '', en: 'Additional Vocabulary', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-add-vocab1': { thai: 'สถานการณ์', ipa: 'sà-thǎa-naa-gaan', en: 'situations' },
+        'text-container-add-vocab2': { thai: 'มูลค่า', ipa: 'muun-khâa', en: 'value (assets / stuff)' },
+    };
+
+    function createInteractiveText() {
+        const template = document.getElementById('interactiveTextTemplate');
+        for (const id in textData) {
+            const data = textData[id];
+            const container = document.getElementById(id);
+            if(container){
+                const clone = template.content.cloneNode(true);
+                const mainEl = clone.querySelector('.main-text');
+                let newEl;
+                if (data.type) {
+                    newEl = document.createElement(data.type);
+                    if (data.class) newEl.className = data.class;
+                    if(data.type === 'a'){ newEl.href = data.href; newEl.target = '_blank'; }
+                } else { newEl = document.createElement('p'); newEl.className = 'thai-font text-lg'; }
+                newEl.innerHTML = data.thai ?? '';
+                mainEl.replaceWith(newEl);
+
+                // Set IPA/EN contents
+                const ipaEl = clone.querySelector('.ipa');
+                const enEl  = clone.querySelector('.en');
+                ipaEl.textContent = data.ipa ?? '';
+                enEl.textContent  = data.en ?? '';
+
+                // Hide buttons if no content for that type
+                const ipaBtn = clone.querySelector('.btn-ipa');
+                const enBtn  = clone.querySelector('.btn-en');
+                if (!data.ipa || data.ipa.trim() === '') ipaBtn.style.display = 'none';
+                if (!data.en  || data.en.trim()  === '') enBtn.style.display  = 'none';
+
+                // If there's no Thai text at all, hide all controls
+                if (!data.thai || data.thai.trim() === '') {
+                    clone.querySelector('.tts-button').style.display = 'none';
+                    if (ipaBtn) ipaBtn.style.display = 'none';
+                    if (enBtn)  enBtn.style.display  = 'none';
+                }
+
+                // If explicitly tiny text (not used here), hide controls
+                if (data.class && data.class.includes('text-sm')) {
+                    clone.querySelector('.tts-button').style.display = 'none';
+                    if (ipaBtn) ipaBtn.style.display = 'none';
+                    if (enBtn)  enBtn.style.display  = 'none';
+                }
+                container.appendChild(clone);
+            }
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', createInteractiveText);
+  </script>
+  
+  <script>
+    // Game Logic
+    const vocab = [
+        { id: 1, thai: 'วิเคราะห์ 🧐', eng: 'Analyze 📊' },
+        { id: 2, thai: 'ในฐานะ 👤', eng: 'As a... 🏷️' },
+        { id: 3, thai: 'กูรู 🧠', eng: 'Guru / Expert 🎓' },
+        { id: 4, thai: 'ถอดใจ 💔', eng: 'To give up 🏳️' },
+        { id: 5, thai: 'สุมหัว 🗣️', eng: 'Brainstorm 💡' },
+        { id: 6, thai: 'กดดัน 😫', eng: 'Pressure 🏋️' },
+        { id: 7, thai: 'ผิดหวัง 😞', eng: 'Disappointed 📉' },
+        { id: 8, thai: 'เหมาะสม ✅', eng: 'Appropriate / Suitable 👔' },
+        { id: 9, thai: 'คุณค่า 💎', eng: 'Value 🌟' },
+        { id: 10, thai: 'เสียดาย 🥺', eng: 'Regret / Pity 🥀' },
+        { id: 11, thai: 'เต็มที่ 💯', eng: 'Fully / To the fullest 🔥' },
+        { id: 12, thai: 'กำลังใจ ✌️', eng: 'Moral support 💖' },
+    ];
+
+    const thaiWordsContainer = document.getElementById('thai-words');
+    const engMeaningsContainer = document.getElementById('eng-meanings');
+    const feedbackEl = document.getElementById('feedback');
+    const resetBtn = document.getElementById('reset-btn');
+
+    let selectedThai = null;
+    let selectedEng = null;
+    let matchedPairs = 0;
+    let isChecking = false;
+
+    function shuffle(array) { 
+        let currentIndex = array.length, randomIndex; 
+        while (currentIndex !== 0) { 
+            randomIndex = Math.floor(Math.random() * currentIndex); 
+            currentIndex--; 
+            // Correct swap
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; 
+        } 
+        return array; 
+    }
+
+    function initGame() {
+        thaiWordsContainer.innerHTML = '';
+        engMeaningsContainer.innerHTML = '';
+        feedbackEl.textContent = '';
+        resetBtn.style.display = 'none';
+        selectedThai = null;
+        selectedEng = null;
+        matchedPairs = 0;
+        isChecking = false;
+        
+        const shuffledThai = shuffle([...vocab]);
+        const shuffledEng = shuffle([...vocab]);
+        
+        shuffledThai.forEach(item => { 
+            const div = document.createElement('div'); 
+            div.textContent = item.thai; 
+            div.className = 'vocab-item thai-font'; 
+            div.dataset.id = item.id; 
+            div.addEventListener('click', onThaiWordClick); 
+            thaiWordsContainer.appendChild(div); 
+        });
+        
+        shuffledEng.forEach(item => { 
+            const div = document.createElement('div'); 
+            div.textContent = item.eng; 
+            div.className = 'vocab-item'; 
+            div.dataset.id = item.id; 
+            div.addEventListener('click', onEngMeaningClick); 
+            engMeaningsContainer.appendChild(div); 
+        });
+    }
+
+    function onThaiWordClick(e) { 
+        if (isChecking || e.target.classList.contains('matched')) return; 
+        if (selectedThai) selectedThai.classList.remove('selected');
+        selectedThai = e.target; 
+        selectedThai.classList.add('selected'); 
+        checkMatch();
+    }
+    
+    function onEngMeaningClick(e) { 
+        if (isChecking || e.target.classList.contains('matched')) return; 
+        if (selectedEng) selectedEng.classList.remove('selected');
+        selectedEng = e.target; 
+        selectedEng.classList.add('selected'); 
+        checkMatch();
+    }
+
+    function checkMatch() {
+        if (!selectedThai || !selectedEng) return;
+        isChecking = true; 
+
+        if (selectedThai.dataset.id === selectedEng.dataset.id) {
+            selectedThai.classList.remove('selected'); 
+            selectedEng.classList.remove('selected');
+            selectedThai.classList.add('matched'); 
+            selectedEng.classList.add('matched');
+            selectedThai = null;
+            selectedEng = null;
+            matchedPairs++;
+            if (matchedPairs === vocab.length) { 
+                feedbackEl.textContent = 'เยี่ยมมากค่ะ! ถูกต้องทั้งหมด!'; 
+                resetBtn.style.display = 'block'; 
+            }
+            isChecking = false; 
+        } else {
+            selectedThai.classList.add('wrong'); 
+            selectedEng.classList.add('wrong');
+            const wrongThai = selectedThai;
+            const wrongEng = selectedEng;
+            selectedThai = null;
+            selectedEng = null;
+            setTimeout(() => {
+                if (wrongThai) { wrongThai.classList.remove('wrong'); wrongThai.classList.remove('selected'); }
+                if (wrongEng) { wrongEng.classList.remove('wrong'); wrongEng.classList.remove('selected'); }
+                isChecking = false; 
+            }, 800);
+        }
+    }
+    
+    resetBtn.addEventListener('click', initGame);
+    initGame();
+  </script>
+
+</body>
+</html>
