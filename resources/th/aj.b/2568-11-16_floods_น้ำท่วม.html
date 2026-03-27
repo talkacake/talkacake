@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thai Lesson: Bangkok Flooding Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+    .thai-font { font-family: 'Sarabun', sans-serif; }
+    .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; }
+    .vocab-item { padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; display: flex; align-items: center; justify-content: center; }
+    .vocab-item:hover { background-color: #f1f5f9; }
+    .vocab-item.selected { background-color: #3b82f6; color: white; border-color: #2563eb; }
+    .vocab-item.matched { background-color: #22c55e; color: white; border-color: #16a34a; cursor: default; }
+    .vocab-item.wrong { background-color: #ef4444; color: white; border-color: #dc2626; }
+    .tts-button, .toggle-btn { background: transparent; border: 1px solid #cbd5e1; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; transition: background-color .2s; margin-left: 0.5rem; font-size: 0.75rem; flex-shrink: 0; }
+    .tts-button:hover, .toggle-btn:hover { background-color: #e2e8f0; }
+    .tts-button svg { width: 1.25rem; height: 1.25rem; color: #475569; }
+    .toggle-content { display: none; margin-top: 0.25rem; padding: 0.5rem; background-color: #f1f5f9; border-radius: 0.5rem; font-size: 0.9rem; color: #475569; }
+    .toggle-content.ipa { font-style: italic; }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md">
+    <div class="container mx-auto px-6 py-8">
+      <div id="text-container-header"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-6 py-10">
+    <!-- Interactive text element creator -->
+    <template id="interactiveTextTemplate">
+        <div class="interactive-text-block my-2">
+            <div class="flex flex-wrap items-center">
+                <p class="thai-font text-lg main-text"></p>
+                <button class="tts-button" onclick="speak(this.previousElementSibling.textContent)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg></button>
+                <button class="toggle-btn" onclick="toggleContent(this, 'ipa')">IPA</button>
+                <button class="toggle-btn" onclick="toggleContent(this, 'en')">EN</button>
+            </div>
+            <p class="toggle-content ipa"></p>
+            <p class="toggle-content en"></p>
+        </div>
+    </template>
+
+    <!-- 1. Warm-up & Vocab Review -->
+    <section class="mb-12">
+      <div id="text-container-part1-header" class="flex items-center mb-4 border-b-2 border-blue-500 pb-2"></div>
+      <div class="card space-y-4">
+        <div id="text-container-warmup-intro"></div>
+        <div id="text-container-warmup1"></div>
+        <div id="text-container-warmup2"></div>
+        <div id="text-container-warmup3"></div>
+      </div>
+    </section>
+
+    <!-- 2. Watch & Discuss -->
+    <section class="mb-12">
+        <div id="text-container-part2-header" class="flex items-center mb-4 border-b-2 border-green-500 pb-2"></div>
+      <div class="card">
+        <div id="text-container-watch-intro"></div>
+        <a href="https://www.youtube.com/shorts/TM89P0rZ1Fs" target="_blank" class="text-blue-600 hover:underline thai-font my-4 inline-block">คลิกที่นี่เพื่อดูวิดีโอบน YouTube</a>
+        <div class="mt-6 space-y-4">
+            <div class="p-4 bg-green-50 rounded-lg" id="text-container-watch1"></div>
+            <div class="p-4 bg-green-50 rounded-lg" id="text-container-watch2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Read the Script -->
+    <section class="mb-12">
+        <div id="text-container-part3-header" class="flex items-center mb-4 border-b-2 border-purple-500 pb-2"></div>
+        <div class="card">
+            <div id="text-container-read-intro"></div>
+            <div class="p-4 bg-purple-50 rounded-lg my-4 space-y-3">
+                <div id="text-container-script1"></div>
+                <div id="text-container-script2"></div>
+                <div id="text-container-script3"></div>
+                <div id="text-container-script4"></div>
+                <div id="text-container-script5"></div>
+                <div id="text-container-script6"></div>
+                <div id="text-container-script7"></div>
+                <div id="text-container-script8"></div>
+                <div id="text-container-script9"></div>
+                <div id="text-container-script10"></div>
+            </div>
+            <div id="text-container-comprehension-header" class="flex items-center my-4"></div>
+            <div class="space-y-3">
+                <div id="text-container-comp1"></div>
+                <div id="text-container-comp2"></div>
+                <div id="text-container-comp3"></div>
+                <div id="text-container-comp4"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 4. Vocabulary Game -->
+    <section class="mb-12">
+         <div id="text-container-part4-header" class="flex items-center mb-4 border-b-2 border-orange-500 pb-2"></div>
+        <div class="card">
+            <div id="text-container-game-desc"></div>
+            <div id="game-container" class="grid grid-cols-2 gap-4 md:gap-6 mt-4">
+                <div id="thai-words" class="space-y-3"></div>
+                <div id="eng-meanings" class="space-y-3"></div>
+            </div>
+            <div id="feedback" class="mt-4 text-center font-bold text-xl thai-font text-green-600"></div>
+            <button id="reset-btn" class="mx-auto mt-4 block bg-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-600 transition thai-font" style="display: none;">เล่นอีกครั้ง</button>
+        </div>
+    </section>
+
+    <!-- 5. Role-Play & Discussion -->
+    <section class="mb-12">
+        <div id="text-container-part5-header" class="flex items-center mb-4 border-b-2 border-red-500 pb-2"></div>
+        <div class="card space-y-6">
+            <!-- Role-play -->
+            <div>
+                <div id="text-container-roleplay-header" class="flex items-center"></div>
+                <div id="text-container-roleplay-desc" class="mt-2"></div>
+                <div id="text-container-roleplay-vocab-header" class="mt-4"></div>
+                <div class="space-y-2 mt-2">
+                    <div id="text-container-vocab1"></div>
+                    <div id="text-container-vocab2"></div>
+                    <div id="text-container-vocab3"></div>
+                </div>
+            </div>
+            <!-- Discussion: Bangkok Sinking -->
+            <div class="pt-6 border-t border-red-200">
+                <div id="text-container-discussion-header" class="flex items-center"></div>
+                <div id="text-container-discussion-desc" class="mt-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Additional Vocabulary -->
+    <section class="mb-12">
+        <div id="text-container-part7-header" class="flex items-center mb-4 border-b-2 border-teal-500 pb-2"></div>
+        <div class="card">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="text-container-add-vocab1"></div>
+                <div id="text-container-add-vocab2"></div>
+                <div id="text-container-add-vocab3"></div>
+                <div id="text-container-add-vocab4"></div>
+                <div id="text-container-add-vocab5"></div>
+                <div id="text-container-add-vocab6"></div>
+            </div>
+        </div>
+    </section>
+
+  </main>
+  
+  <script>
+    /***** Robust TTS & Toggle Functions *****/
+    const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+    let voices = [];
+    let thaiVoice = null;
+    let voicesReadyResolve;
+    const voicesReady = new Promise(res => voicesReadyResolve = res);
+
+    function pickThaiVoice() { if (!voices.length) return; thaiVoice = voices.find(v => v.lang === 'th-TH') || voices.find(v => v.lang.startsWith('th')) || null; }
+    function loadVoices() { if (!synth) return; const list = synth.getVoices(); if (list && list.length) { voices = list; pickThaiVoice(); if (voicesReadyResolve) { voicesReadyResolve(); voicesReadyResolve = null; } } }
+    if (synth) { loadVoices(); if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices; }
+    let ttsUnlocked = false;
+    function unlockTTS() { if (!synth || ttsUnlocked) return; ttsUnlocked = true; const u = new SpeechSynthesisUtterance(''); u.volume = 0; synth.speak(u); }
+    document.addEventListener('click', unlockTTS, { once: true });
+    async function speak(text) { if (!synth) return; unlockTTS(); await voicesReady; const utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'th-TH'; utterance.rate = 0.9; if (thaiVoice) utterance.voice = thaiVoice; synth.cancel(); synth.speak(utterance); }
+    function toggleContent(btn, type) { const block = btn.closest('.interactive-text-block'); const content = block.querySelector(`.toggle-content.${type}`); if (content) { const isHidden = content.style.display === 'none' || content.style.display === ''; content.style.display = isHidden ? 'block' : 'none'; btn.classList.toggle('bg-blue-200', isHidden); } }
+    
+    const textData = {
+        'text-container-header': { thai: 'ฝนถล่มกรุง: น้ำท่วมขังและแนวทางแก้ไข', ipa: 'fǒn tà-lòm grung: náam tûam kǎng lɛ́ nɛɛo-taang gɛ̂ɛ-kǎi', en: 'Bangkok Rain Barrage: Flooding and Solutions', type: 'h1', class: 'text-3xl font-bold text-slate-900 thai-font' },
+        'text-container-part1-header': { thai: 'ส่วนที่ 1: ทบทวนคำศัพท์และอุ่นเครื่อง', ipa: 'sùan tîi nʉ̀ŋ: tóp-tuan kam-sàp lɛ́ ùn krʉ̂ang', en: 'Part 1: Vocabulary Review & Warm-up', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part2-header': { thai: 'ส่วนที่ 2: ดูวิดีโอข่าว', ipa: 'sùan tîi sɔ̌ɔng: duu wí-dii-oo kàao', en: 'Part 2: Watch the News Video', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part3-header': { thai: 'ส่วนที่ 3: อ่านบทข่าว', ipa: 'sùan tîi sǎam: àan bòt kàao', en: 'Part 3: Read the News Script', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part4-header': { thai: 'ส่วนที่ 4: เกมคำศัพท์ (ข่าว)', ipa: 'sùan tîi sìi: geem kam-sàp (kàao)', en: 'Part 4: Vocabulary Game (News)', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part5-header': { thai: 'ส่วนที่ 5: สถานการณ์จำลองและการอภิปราย', ipa: 'sùan tîi hâa: sà-tǎa-ná-gaan jam-lɔɔng lɛ́ gaan à-pí-bpraai', en: 'Part 5: Role-Play & Discussion', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part6-header': { thai: 'ส่วนที่ 6: กิจกรรมเสริม (กิจกรรมพูดคุย)', ipa: 'sùan tîi hòk: gìt-jà-gam sə̌əm (gìt-jà-gam pûut-kui)', en: 'Part 6: Extension Activities (Speaking)', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        'text-container-part7-header': { thai: 'ส่วนที่ 7: คำศัพท์เพิ่มเติม', ipa: 'sùan tîi jèt: kam-sàp pə̂əm-dtəəm', en: 'Part 7: Additional Vocabulary', type: 'h2', class: 'text-2xl font-bold thai-font' },
+        
+        'text-container-warmup-intro': { thai: 'ก่อนจะเริ่มบทเรียนใหม่ เรามาทบทวนคำศัพท์จากครั้งก่อนๆ ด้วยคำถามเหล่านี้กันค่ะ', ipa: 'gɔ̀ɔn jà rə̂əm bòt-rian mài, rao maa tóp-tuan kam-sàp jàak kráng gɔ̀ɔn-gɔ̀ɔn dûay kam-tǎam lào níi gan kà', en: 'Before starting the new lesson, let\'s review vocabulary from previous times with these questions.' },
+        'text-container-warmup1': { thai: 'ในฐานะอาจารย์ ถ้ามหาวิทยาลัย "ขอความร่วมมือ" ให้ "งด" จัดกิจกรรมของคณะเพราะมีเหตุการณ์สำคัญ คุณจะสื่อสารกับนักศึกษาเพื่อให้พวกเขายอมรับ "แนวทางปฏิบัติ" นี้ยังไงคะ', ipa: 'nai tǎa-ná aa-jaan, tâa má-hǎa-wít-tá-yaa-lai "kɔ̌ɔ kwaam rûam-mʉʉ" hâi "ngót" jàt gìt-jà-gam kɔ̌ɔng ká-ná prɔ́ mii hèet-gaan sǎm-kan, kun jà sʉ̀ʉ-sǎan gàp nák-sʉ̀k-sǎa pʉ̂a hâi pûak-kǎo yɔɔm-ráp "nɛɛo-taang bpà-dtì-bàt" níi yang-ngai ká', en: 'As a lecturer, if the university "asks for cooperation" to "refrain" from faculty activities due to an important event, how would you communicate this "guideline" to your students so they accept it?' },
+        'text-container-warmup2': { thai: 'คุณคิดว่า "คุณภาพ" ชีวิตในกรุงเทพฯ เป็นยังไงบ้างคะ เมื่อเทียบกับเมืองที่คุณเคยไป "แลกเปลี่ยน" มา', ipa: 'kun kít wâa "kun-ná-pâap" chii-wít nai grung-têep bpen yang-ngai bâang ká, mʉ̂a tîap gàp mʉang tîi kun kəəi bpai "lɛ̂ɛk-bplìan" maa', en: 'What do you think of the "quality" of life in Bangkok, compared to the city where you were an "exchange" student?' },
+        'text-container-warmup3': { thai: 'ถ้าให้เลือก คุณชอบเมืองที่ "น่าอยู่" หรือเมืองที่มี "ทางเลือกหลากหลาย" มากกว่ากันคะ', ipa: 'tâa hâi lʉ̂ak, kun chɔ̂ɔp mʉang tîi "nâa-yùu" rʉ̌ʉ mʉang tîi mii "taang-lʉ̂ak làak-lǎai" mâak gwàa gan ká', en: 'If you had to choose, do you prefer a "livable" city or a city with "diverse options"?' },
+
+        'text-container-watch-intro': { thai: 'บทเรียนวันนี้เกี่ยวกับเหตุการณ์ที่เกิดขึ้นบ่อยมากในกรุงเทพฯ โดยเฉพาะช่วงนี้ค่ะ ลองดูวิดีโอข่าวสั้นๆ นี้ 1-2 ครั้ง แล้วตอบคำถามนะคะ', ipa: 'bòt-rian wan-níi gìao-gàp hèet-gaan tîi gə̀ət kʉ̂n bɔ̀ɔi mâak nai grung-têep, dooi chà-pɔ́ chûang níi kà. lɔɔng duu wí-dii-oo kàao sân-sân níi nʉ̀ŋ-sɔ̌ɔng kráng lɛ́ɛo dtɔ̀ɔp kam-tǎam ná ká', en: 'Today\'s lesson is about an event that happens very often in Bangkok, especially recently. Watch this short news video 1-2 times and answer the questions.' },
+        'text-container-watch1': { thai: 'คำถามที่ 1: ผู้ประกาศข่าวพูดถึงปัญหาอะไรเป็นหลักคะ', ipa: 'kam-tǎam tîi nʉ̀ŋ: pûu-bprà-gàat-kàao pûut tʉ̌ng bpan-hǎa à-rai bpen làk ká', en: 'Question 1: What main problem is the news reporter talking about?' },
+        'text-container-watch2': { thai: 'คำถามที่ 2: คุณได้ยินชื่อสถานที่ไหนในกรุงเทพฯ บ้างคะ', ipa: 'kam-tǎam tîi sɔ̌ɔng: kun dâai-yin chʉ̂ʉ sà-tǎan-tîi nǎi nai grung-têep bâang ká', en: 'Question 2: What place names in Bangkok did you hear?' },
+
+        'text-container-read-intro': { thai: '', ipa: '', en: '' },
+        'text-container-script1': { thai: 'เมื่อคืนนี้ฝนถล่มกรุงกลางดึกค่ะ หนักสุดที่เขตปทุมวัน เช้านี้ เจ้าหน้าที่เร่งระบายน้ำท่วมขังหลายจุด', ipa: 'mʉ̂a-kʉʉn-níi fǒn tà-lòm grung glaang-dʉ̀k kà. nàk sùt tîi kèet bpà-tum-wan. cháo-níi, jâo-nâa-tîi rêng rá-baai náam tûam kǎng lǎai jùt', en: 'Last night, rain battered Bangkok in the middle of the night. The heaviest was in Pathum Wan district. This morning, officials are accelerating the drainage of standing floodwater in many spots.' },
+        'text-container-script2': { thai: 'นายชัชชาติ สิทธิพันธุ์ ผู้ว่าราชการกรุงเทพมหานคร เปิดเผยถึงสถานการณ์ฝนตกหนักในพื้นที่กรุงเทพฯ ว่า ตั้งแต่ประมาณตีสามที่ผ่านมา พบว่า มีฝนตกต่อเนื่อง และตกหนักในหลายเขต โดยเฉพาะเขตปทุมวัน ซึ่งมีปริมาณฝนสูงสุดถึง 111 มิลลิเมตร', ipa: 'naai chát-châat sìt-tí-pan, pûu-wâa-râat-chá-gaan grung-têep-má-hǎa-ná-kɔɔn, bpə̀ət-pə̌əi tʉ̌ng sà-tǎa-ná-gaan fǒn-dtòk-nàk nai pʉ́ʉn-tîi grung-têep wâa: dtâng-dtɛ̀ɛ bprà-maan dtii-sǎam tîi pàan-maa, póp wâa mii fǒn-dtòk dtɔ̀ɔ-nʉ̂ang, lɛ́ dtòk-nàk nai lǎai kèet, dooi chà-pɔ́ kèet bpà-tum-wan, sʉ̂ng mii bpà-rí-maan fǒn sǔung-sùt tʉ̌ng nʉ̀ŋ-rɔ́ɔi-sìp-èt min-lí-méet', en: 'Mr. Chadchart Sittipunt, Governor of Bangkok, revealed the heavy rain situation in Bangkok: since about 3 AM, continuous and heavy rain was found in many districts, especially Pathum Wan, which had a maximum rainfall of 111 millimeters.' },
+        'text-container-script3': { thai: 'ฝนตกหนักเมื่อคืนนี้ส่วนใหญ่อยู่ในพื้นที่กรุงเทพฯ ชั้นในและฝั่งตะวันออกของแม่น้ำเจ้าพระยา โดยช่วงกลางดึกมีรายงานน้ำท่วมขังรวม 57 จุด ในถนนสายหลักและย่านเศรษฐกิจ', ipa: 'fǒn-dtòk-nàk mʉ̂a-kʉʉn-níi sùan-yài yùu nai pʉ́ʉn-tîi grung-têep chán-nai lɛ́ fàng dtà-wan-ɔ̀ɔk kɔ̌ɔng mɛ̂ɛ-náam jâo-prá-yaa. dooi chûang glaang-dʉ̀k mii raai-ngaan náam tûam kǎng ruam hâa-sìp-jèt jùt, nai tà-nǒn sǎai-làk lɛ́ yâan sèet-tà-gìt', en: 'The heavy rain last night was mostly in the inner Bangkok area and the east side of the Chao Phraya River. In the middle of the night, 57 flood points were reported on main roads and in economic areas.' },
+        'text-container-script4': { thai: 'ขณะที่เช้านี้ได้เร่งระบายน้ำ โดยใช้สถานีสูบน้ำ และเครื่องสูบน้ำเคลื่อนที่ในจุดวิกฤตค่ะ ทำให้ระดับน้ำท่วมลดลงอย่างรวดเร็ว', ipa: 'kà-nà tîi cháo-níi dâai rêng rá-baai náam, dooi chái sà-tǎa-nii sùup-náam lɛ́ krʉ̂ang-sùup-náam klʉ̂an-tîi nai jùt wí-grìt kà, tam-hâi rá-dàp náam tûam lót-long yàang rûat-reo', en: 'Meanwhile, this morning, drainage was accelerated by using pumping stations and mobile pumps at critical points, causing the flood level to decrease rapidly.' },
+        'text-container-script5': { thai: 'ในช่วงเวลา 6 โมงเช้าที่ผ่านมา มีรายงานเหลือจุดน้ำท่วมขังอีกเพียงแค่ 5 จุดเท่านั้น', ipa: 'nai chûang wee-laa hòk moong cháo tîi pàan-maa, mii raai-ngaan lʉ̌a jùt náam tûam kǎng ìik piiang-kɛ̂ɛ hâa jùt tâo-nán', en: 'At 6 AM this morning, it was reported that only 5 flood points remained.' },
+        'text-container-script6': { thai: 'ซึ่งคาดว่า จะแห้งในช่วงเช้าของวันนี้ค่ะ', ipa: 'sʉ̂ng kâat wâa jà hɛ̂ɛng nai chûang cháo kɔ̌ɔng wan-níi kà', en: 'It is expected that they will be dry this morning.' },
+        'text-container-script7': { thai: 'ผู้ว่าฯ ชัชชาติ ยืนยันว่า กรณีน้ำท่วมขังรอบนี้ เป็นเพียงเพราะฝนตกหนักในระยะเวลาสั้น ไม่ได้เกี่ยวกับระดับน้ำเจ้าพระยา', ipa: 'pûu-wâa chát-châat yʉʉn-yan wâa gɔɔ-rá-nii náam tûam kǎng rɔ̂ɔp níi, bpen piiang prɔ́ fǒn-dtòk-nàk nai rá-yá wee-laa sân, mâi dâai gìao-gàp rá-dàp náam jâo-prá-yaa', en: 'Governor Chadchart confirmed that this flooding incident was only because of heavy rain in a short period, not related to the Chao Phraya River level.' },
+        'text-container-script8': { thai: 'นอกจากระบบสูบน้ำ และสถานีระบายน้ำที่มีอยู่ในปัจจุบันแล้ว กทม. อยู่ในระหว่างเร่งดำเนินโครงการก่อสร้างระบบระบายน้ำบริเวณถนนรัชดาภิเษก', ipa: 'nɔ̂ɔk-jàak rá-bòp sùup-náam lɛ́ sà-tǎa-nii rá-baai-náam tîi mii yùu nai bpàt-jù-ban lɛ́ɛo, gɔɔ-tɔɔ-mɔɔ yùu nai rá-wàang rêng dam-nəən kroong-gaan gɔ̀ɔ-sâang rá-bòp rá-baai-náam bɔɔ-rí-ween tà-nǒn rát-cha-daa-pí-sèek', en: 'Besides the current pumping systems and drainage stations, the BMA is in the process of accelerating the construction project for a drainage system in the Ratchadaphisek Road area.' },
+        'text-container-script9': { thai: 'ซึ่งจะช่วยเพิ่มประสิทธิภาพการระบายน้ำในแนวถนนรัชดาภิเษก และป้องกันน้ำท่วมขังซ้ำซากในพื้นที่ชั้นใน', ipa: 'sʉ̂ng jà chûay pə̂əm bprà-sìt-tí-pâap gaan rá-baai-náam nai nɛɛo tà-nǒn rát-cha-daa-pí-sèek, lɛ́ bplɔ̂ng-gan náam tûam kǎng sám-sâak nai pʉ́ʉn-tîi chán-nai', en: 'This will help increase the efficiency of drainage along Ratchadaphisek Road and prevent recurring floods in the inner area.' },
+        'text-container-script10': { thai: 'คาดว่าจะแล้วเสร็จภายในปี 2569 ค่ะ', ipa: 'kâat wâa jà lɛ́ɛo-sèt paai-nai bpii sɔ̌ɔng-pan-hâa-rɔ́ɔi-hòk-sìp-gâo kà', en: 'It is expected to be completed within the year 2026.' },
+
+        'text-container-comprehension-header': { thai: 'คำถามเพื่อทบทวนความเข้าใจ:', ipa: 'kam-tǎam pʉ̂a tóp-tuan kwaam kâo-jai', en: 'Comprehension Questions:', type: 'h3', class: 'font-bold thai-font text-xl' },
+        'text-container-comp1': { thai: '1. เขตไหนที่ฝนตกหนักที่สุด และมีปริมาณฝนเท่าไหร่คะ', ipa: 'nʉ̀ŋ: kèet nǎi tîi fǒn dtòk nàk tîi-sùt, lɛ́ mii bpà-rí-maan fǒn tâo-rài ká', en: '1. Which district had the heaviest rain, and what was the rainfall amount?' },
+        'text-container-comp2': { thai: '2. กทม. ใช้เครื่องมืออะไรในการ "เร่งระบายน้ำ" คะ', ipa: 'sɔ̌ɔng: gɔɔ-tɔɔ-mɔɔ chái krʉ̂ang-mʉʉ à-rai nai gaan "rêng rá-baai náam" ká', en: '2. What tools did the BMA use to "accelerate drainage"?' },
+        'text-container-comp3': { thai: '3. ผู้ว่าฯ ยืนยันว่าสาเหตุของน้ำท่วมครั้งนี้คืออะไร และ *ไม่* เกี่ยวกับอะไรคะ', ipa: 'sǎam: pûu-wâa yʉʉn-yan wâa sǎa-hèet kɔ̌ɔng náam tûam kráng níi kʉʉ à-rai, lɛ́ *mâi* gìao gàp à-rai ká', en: '3. What did the governor confirm was the cause of this flood, and what was it *not* related to?' },
+        'text-container-comp4': { thai: '4. โครงการก่อสร้างใหม่จะช่วยแก้ปัญหาอะไร และจะ "แล้วเสร็จ" เมื่อไหร่คะ', ipa: 'sìi: kroong-gaan gɔ̀ɔ-sâang mài jà chûay gɛ̂ɛ bpan-hǎa à-rai, lɛ́ jà "lɛ́ɛo-sèt" mʉ̂a-rài ká', en: '4. What problem will the new construction project help solve, and when will it "be completed"?' },
+
+        'text-container-game-desc': { thai: '', ipa: '', en: '' },
+
+        'text-container-roleplay-header': { thai: 'สถานการณ์: อาจารย์มหาวิทยาลัยกับน้ำท่วม', ipa: 'sà-tǎa-ná-gaan: aa-jaan má-hǎa-wít-tá-yaa-lai gàp náam tûam', en: 'Scenario: University Lecturer and the Flood', type: 'h3', class: 'font-bold thai-font text-xl text-red-700' },
+        'text-container-roleplay-desc': { thai: 'ลองจินตนาการว่าเช้านี้ที่มหาวิทยาลัยมี "น้ำท่วมขัง" หลายจุด คุณต้องโทรหาหัวหน้าภาควิชา (Head of Department) เพื่อรายงานสถานการณ์ที่ตึกคณะ และถามเรื่องการสอนในบ่ายวันนี้', ipa: 'lɔɔng jin-dtà-naa-gaan wâa cháo-níi tîi má-hǎa-wít-tá-yaa-lai mii "náam tûam kǎng" lǎai jùt. kun dtɔ̂ng too hǎa hǔa-nâa pâak-wí-chaa pʉ̂a raai-ngaan sà-tǎa-ná-gaan tîi dtʉ̀k ká-ná, lɛ́ tǎam rʉ̂ang gaan sɔ̌ɔn nai bàai wan-níi', en: 'Imagine there is "standing floodwater" in many spots at the university this morning. You need to call your Head of Department to report the situation at your faculty building and ask about teaching this afternoon.' },
+        'text-container-roleplay-vocab-header': { thai: 'คำ/วลี ที่อาจจะได้ใช้:', ipa: 'kam/wá-lii tîi àat jà dâai chái:', en: 'Words/phrases you might use:', type: 'p', class: 'thai-font font-semibold' },
+        'text-container-vocab1': { thai: 'น้ำท่วมขัง', ipa: 'náam tûam kǎng', en: 'Standing floodwater' },
+        'text-container-vocab2': { thai: 'จุดวิกฤต', ipa: 'jùt wí-grìt', en: 'Critical point' },
+        'text-container-vocab3': { thai: 'นักศึกษากับการเดินทาง', ipa: 'nák-sʉ̀k-sǎa gàp gaan dəən-taang', en: 'Students and transportation' },
+        
+        'text-container-discussion-header': { thai: 'อภิปราย: กรุงเทพฯ จมบาดาล', ipa: 'à-pí-bpraai: grung-têep jom-bà-daan', en: 'Discussion: Bangkok Sinking', type: 'h3', class: 'font-bold thai-font text-xl text-red-700' },
+        'text-container-discussion-desc': { thai: 'คุณคงเคยได้ยินคำทำนายที่ว่า "กรุงเทพฯ จะจมบาดาล" ในอีกไม่กี่ปีนี้ ในฐานะที่คุณอาศัยและทำงานอยู่ที่นี่ คุณกังวลเรื่องนี้ไหมคะ และคุณคิดว่าโครงการ "ระบบระบายน้ำ" ใหม่ๆ ที่พูดถึงในข่าว จะช่วยได้ทันเวลาหรือเปล่า', ipa: 'kun kong kəəi dâai-yin kam-tam-naai tîi wâa "grung-têep jà jom-bà-daan" nai ìik mâi-gìi bpii níi. nai tǎa-ná tîi kun aa-sǎi lɛ́ tam-ngaan yùu tîi-nîi, kun gang-won rʉ̂ang níi mái ká? lɛ́ kun kít wâa kroong-gaan "rá-bòp rá-baai-náam" mài-mài tîi pûut-tʉ̌ng nai kàao, jà chûay dâai tan wee-laa rʉ̌ʉ bplào', en: 'You\'ve probably heard the prediction that "Bangkok will sink" in a few years. As someone living and working here, are you worried about this? And do you think the new "drainage system" projects mentioned in the news will help in time?' },
+
+        'text-container-debate-header': { thai: 'หัวข้ออภิปราย: การแก้ปัญหาน้ำท่วมซ้ำซาก', ipa: 'hǔua-kɔ̂ɔ à-pí-bpraai: gaan gɛ̂ɛ bpan-hǎa náam tûam sám-sâak', en: 'Debate Topic: Solving Recurring Floods', type: 'h3', class: 'font-bold thai-font text-xl text-indigo-700' },
+        'text-container-debate-desc': { thai: 'ระหว่าง "การสร้างเทคโนโลยีใหม่" (เช่น สถานีสูบน้ำ, อุโมงค์ยักษ์) กับ "การเปลี่ยนพฤติกรรมคน" (เช่น ลดขยะ, เพิ่มพื้นที่สีเขียว) คุณคิดว่าวิธีไหนสำคัญกว่ากันในการแก้ปัญหาน้ำท่วมในระยะยาวคะ', ipa: 'rá-wàang "gaan sâang ték-noo-loo-yii mài" (chêen sà-tǎa-nii sùup-náam, ù-moong-yák) gàp "gaan bplìan prʉ́-dtì-gam kon" (chêen lót kà-yà, pə̂əm pʉ́ʉn-tîi sǐi-kǐao), kun kít wâa wí-tii nǎi sǎm-kan gwàa gan nai gaan gɛ̂ɛ bpan-hǎa náam tûam nai rá-yá yaao ká', en: 'Between "building new technology" (e.g., pumping stations, giant tunnels) and "changing people\'s behavior" (e.g., reducing waste, increasing green spaces), which method do you think is more important for solving long-term flooding problems?' },
+    
+        'text-container-ext-roleplay-header': { thai: 'สถานการณ์จำลอง: นักวิทยาศาสตร์สติเฟื่อง', ipa: 'sà-tǎa-ná-gaan jam-lɔɔng: nák-wít-tá-yaa-sàat sà-dtì-fʉ̂ang', en: 'Role-Play: The Eccentric Scientist', type: 'h3', class: 'font-bold thai-font text-xl text-indigo-700' },
+        'text-container-ext-roleplay-desc': { thai: 'จินตนาการว่าคุณเป็น "ผู้ว่าฯ กทม." และมีนักวิทยาศาสตร์สติเฟื่องมาเสนอ "โครงการก่อสร้าง" สุดประหลาดเพื่อแก้ปัญหาน้ำท่วม (เช่น "เครื่องดูดน้ำยักษ์พลังงานเป็ดปั่น") ลองซักถามนักวิทยาศาสตร์คนนี้ (คุณครู) เกี่ยวกับ "ประสิทธิภาพ" ของเครื่อง และตัดสินใจว่าจะอนุมัติงบประมาณหรือไม่', ipa: 'jin-dtà-naa-gaan wâa kun bpen "pûu-wâa gɔɔ-tɔɔ-mɔɔ" lɛ́ mii nák-wít-tá-yaa-sàat sà-dtì-fʉ̂ang maa sà-nə̌ə "kroong-gaan gɔ̀ɔ-sâang" sùt bprà-làat pʉ̂a gɛ̂ɛ bpan-hǎa náam tûam (chêen "krʉ̂ang dùut náam yák pá-lang-ngaan bpèt bpàn"). lɔɔng sák-tǎam nák-wít-tá-yaa-sàat kon níi (kun-kruu) gìao-gàp "bprà-sìt-tí-pâap" kɔ̌ɔng krʉ̂ang, lɛ́ dtàt-sǐn-jai wâa jà à-nú-mát ngóp-bprà-maan rʉ̌ʉ mâi', en: 'Imagine you are the "Governor of BKK" and an eccentric scientist proposes a bizarre "construction project" to solve flooding (e.g., a "Giant Duck-Powered Water Sucker"). Interview this scientist (the teacher) about the machine\'s "efficiency" and decide whether to approve the budget.' },
+        'text-container-ext-debate2-header': { thai: 'หัวข้ออภิปรายที่ 2: ความรับผิดชอบ', ipa: 'hǔua-kɔ̂ɔ à-pí-bpraai tîi sɔ̌ɔng: kwaam ráp-pìt-chɔ̂ɔp', en: 'Debate Topic 2: Responsibility', type: 'h3', class: 'font-bold thai-font text-xl text-indigo-700' },
+        'text-container-ext-debate2-desc': { thai: 'คุณคิดว่าปัญหาน้ำท่วม "ซ้ำซาก" ในกรุงเทพฯ เป็นความรับผิดชอบของ "รัฐบาล" (ที่ "ดำเนินการ" โครงการ "แล้วเสร็จ" ช้า) หรือเป็นความรับผิดชอบของ "ประชาชน" (ที่ทิ้งขยะไม่เป็นที่) มากกว่ากัน', ipa: 'kun kít wâa bpan-hǎa náam tûam "sám-sâak" nai grung-têep bpen kwaam ráp-pìt-chɔ̂ɔp kɔ̌ɔng "rát-tá-baan" (tîi "dam-nəən-gaan" kroong-gaan "lɛ́ɛo-sèt" cháa) rʉ̌ʉ bpen kwaam ráp-pìt-chɔ̂ɔp kɔ̌ɔng "bprà-chaa-chon" (tîi tíng kà-yà mâi bpen tîi) mâak gwàa gan', en: 'Do you think the "recurring" flood problem in Bangkok is more the responsibility of the "government" (for "proceeding" with projects that are "completed" slowly) or the "public" (for littering)?' },
+    
+        'text-container-add-vocab1': { thai: 'เพื่อนร่วมงาน', ipa: 'pʉ̂an-rûam-ngaan', en: 'co-worker' },
+        'text-container-add-vocab2': { thai: 'มีอะไรให้ทำเยอะ', ipa: 'mii à-rai hâi tam yə́', en: 'There are lots to do.' },
+        'text-container-add-vocab3': { thai: 'น้ำท่วมถนนหลายเส้น/สาย', ipa: 'náam-tûam-tà-nǒn-lǎai-sên/sǎai', en: 'Many roads were flooded.' },
+        'text-container-add-vocab4': { thai: 'ค่าดำเนินการสอบ', ipa: 'kâa dam-nəən-gaan sɔ̀ɔp', en: 'Test processing fees' },
+        'text-container-add-vocab5': { thai: 'ภูมิศาสตร์', ipa: 'puu-mí-sàat', en: 'Geography' },
+        'text-container-add-vocab6': { thai: 'โครงสร้าง(พื้นฐาน)', ipa: 'kroong-sâang (pʉ́ʉn-tǎan)', en: 'Infrastructure' }
+    };
+
+    function createInteractiveText() {
+        const template = document.getElementById('interactiveTextTemplate');
+        for (const id in textData) {
+            const data = textData[id];
+            const container = document.getElementById(id);
+            if(container){
+                const clone = template.content.cloneNode(true);
+                const mainEl = clone.querySelector('.main-text');
+                let newEl;
+                if (data.type) {
+                    newEl = document.createElement(data.type);
+                    if (data.class) newEl.className = data.class;
+                    if(data.type === 'a'){ newEl.href = data.href; newEl.target = '_blank'; }
+                } else { newEl = document.createElement('p'); newEl.className = 'thai-font text-lg'; }
+                newEl.innerHTML = data.thai;
+                mainEl.replaceWith(newEl);
+                clone.querySelector('.ipa').textContent = data.ipa;
+                clone.querySelector('.en').textContent = data.en;
+                
+                // Hide buttons for empty Thai text
+                if (data.thai.trim() === '') {
+                    clone.querySelector('.tts-button').style.display = 'none';
+                    clone.querySelector('.toggle-btn[onclick*="\'ipa\'"]').style.display = 'none';
+                    // We keep EN button for instruction rows that are intentionally blank in Thai
+                    if (data.en.trim() === '') {
+                         clone.querySelector('.toggle-btn[onclick*="\'en\'"]').style.display = 'none';
+                    }
+                }
+
+                if (data.class && data.class.includes('text-sm')) {
+                    clone.querySelector('.tts-button').style.display = 'none';
+                    clone.querySelector('.toggle-btn').style.display = 'none';
+                }
+                container.appendChild(clone);
+            }
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', createInteractiveText);
+  </script>
+  
+  <script>
+    // Game Logic
+    const vocab = [
+        { id: 1, thai: 'ฝนถล่ม', eng: 'Rain barrage / heavy downpour' },
+        { id: 2, thai: 'น้ำท่วมขัง', eng: 'Standing floodwater' },
+        { id: 3, thai: 'เร่งระบายน้ำ', eng: 'To accelerate drainage' },
+        { id: 4, thai: 'ผู้ว่าราชการ', eng: 'Governor' },
+        { id: 5, thai: 'ปริมาณฝน', eng: 'Rainfall amount' },
+        { id: 6, thai: 'ย่านเศรษฐกิจ', eng: 'Economic area / district' },
+        { id: 7, thai: 'สถานีสูบน้ำ', eng: 'Pumping station' },
+        { id: 8, thai: 'จุดวิกฤต', eng: 'Critical point' },
+        { id: 9, thai: 'ซ้ำซาก', eng: 'Recurring / repetitive' },
+        { id: 10, thai: 'ประสิทธิภาพ', eng: 'Efficiency' },
+        { id: 11, thai: 'แล้วเสร็จ', eng: 'To be completed / finished' },
+        { id: 12, thai: 'ดำเนินการ', eng: 'To proceed / operate' }
+    ];
+
+    const thaiWordsContainer = document.getElementById('thai-words');
+    const engMeaningsContainer = document.getElementById('eng-meanings');
+    const feedbackEl = document.getElementById('feedback');
+    const resetBtn = document.getElementById('reset-btn');
+
+    let selectedThai = null;
+    let selectedEng = null;
+    let matchedPairs = 0;
+    let isChecking = false; // Lock variable to prevent clicks during animation
+
+    function shuffle(array) { 
+        let currentIndex = array.length, randomIndex; 
+        while (currentIndex !== 0) { 
+            randomIndex = Math.floor(Math.random() * currentIndex); 
+            currentIndex--; 
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; 
+        } 
+        return array; 
+    }
+
+    function initGame() {
+        thaiWordsContainer.innerHTML = '';
+        engMeaningsContainer.innerHTML = '';
+        feedbackEl.textContent = '';
+        resetBtn.style.display = 'none';
+        selectedThai = null;
+        selectedEng = null;
+        matchedPairs = 0;
+        isChecking = false;
+        
+        const shuffledThai = shuffle([...vocab]);
+        const shuffledEng = shuffle([...vocab]);
+        
+        shuffledThai.forEach(item => { 
+            const div = document.createElement('div'); 
+            div.textContent = item.thai; 
+            div.className = 'vocab-item thai-font'; 
+            div.dataset.id = item.id; 
+            div.addEventListener('click', onThaiWordClick); 
+            thaiWordsContainer.appendChild(div); 
+        });
+        
+        shuffledEng.forEach(item => { 
+            const div = document.createElement('div'); 
+            div.textContent = item.eng; 
+            div.className = 'vocab-item'; 
+            div.dataset.id = item.id; 
+            div.addEventListener('click', onEngMeaningClick); 
+            engMeaningsContainer.appendChild(div); 
+        });
+    }
+
+    function onThaiWordClick(e) { 
+        if (isChecking || e.target.classList.contains('matched')) return; 
+        
+        if (selectedThai) {
+            selectedThai.classList.remove('selected');
+        }
+        
+        selectedThai = e.target; 
+        selectedThai.classList.add('selected'); 
+        
+        checkMatch();
+    }
+    
+    function onEngMeaningClick(e) { 
+        if (isChecking || e.target.classList.contains('matched')) return; 
+
+        if (selectedEng) {
+            selectedEng.classList.remove('selected');
+        }
+
+        selectedEng = e.target; 
+        selectedEng.classList.add('selected'); 
+        
+        checkMatch();
+    }
+
+    function checkMatch() {
+        if (!selectedThai || !selectedEng) return;
+
+        isChecking = true; // Engage lock
+
+        if (selectedThai.dataset.id === selectedEng.dataset.id) {
+            // Correct Match
+            selectedThai.classList.remove('selected'); 
+            selectedEng.classList.remove('selected');
+            selectedThai.classList.add('matched'); 
+            selectedEng.classList.add('matched');
+            
+            selectedThai = null;
+            selectedEng = null;
+            
+            matchedPairs++;
+            if (matchedPairs === vocab.length) { 
+                feedbackEl.textContent = 'เยี่ยมมากค่ะ! ถูกต้องทั้งหมด!'; 
+                resetBtn.style.display = 'block'; 
+            }
+            isChecking = false; // Release lock
+        } else {
+            // Wrong Match
+            selectedThai.classList.add('wrong'); 
+            selectedEng.classList.add('wrong');
+            
+            const wrongThai = selectedThai;
+            const wrongEng = selectedEng;
+
+            selectedThai = null;
+            selectedEng = null;
+
+            setTimeout(() => {
+                if (wrongThai) {
+                    wrongThai.classList.remove('wrong'); 
+                    wrongThai.classList.remove('selected'); 
+                }
+                if (wrongEng) {
+                    wrongEng.classList.remove('wrong');
+                    wrongEng.classList.remove('selected');
+                }
+                
+                isChecking = false; // Release lock only after animation
+            }, 800);
+        }
+    }
+    
+    resetBtn.addEventListener('click', initGame);
+    initGame();
+  </script>
+
+</body>
+</html>
