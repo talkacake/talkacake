@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทเรียนภาษาไทย: การใช้คำสรรพนามในชีวิตจริง</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', 'Noto Sans Thai', sans-serif; }
+        .tts-button {
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #2563EB;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .tts-button:active { transform: scale(0.9); }
+        .tts-button.playing { color: #EF4444; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .ipa, .en { display: none; margin-top: 0.25rem; font-weight: normal; }
+        .ipa { color: #D97706; font-style: italic; font-size: 0.9em; } 
+        .en { color: #6B7280; font-size: 0.9em; }
+        .reveal { display: block !important; }
+
+        .toggle-btn {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            background-color: #F3F4F6;
+            color: #4B5563;
+            cursor: pointer;
+            margin-right: 4px;
+            font-weight: 700;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .toggle-btn:hover { background-color: #E5E7EB; }
+        .toggle-btn.active {
+            background-color: #DBEAFE;
+            color: #1D4ED8;
+            border-color: #93C5FD;
+        }
+        
+        .controls-row {
+            margin-top: 4px;
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            vertical-align: middle;
+        }
+
+        .content-block { margin-bottom: 1.5rem; }
+        .vocab-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-indigo-50 text-gray-800 pb-20">
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        
+        <!-- ส่วนหัวข้อบทเรียน -->
+        <header class="text-center mb-10 p-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl shadow-xl">
+            <div class="content-block">
+                <h1 class="text-4xl font-bold mb-2">
+                    🗣️ การใช้คำสรรพนามในชีวิตจริง
+                    <button class="tts-button text-white" onclick="playTTS('การใช้คำสรรพนามในชีวิตจริง', this)">🔊</button>
+                </h1>
+                <div class="controls-row justify-center">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa text-indigo-100">gaan-chái kham-sàp-phá-naam nai chii-wít jing</div>
+                <div class="en text-white opacity-90">Using Pronouns in Real Life</div>
+            </div>
+        </header>
+
+        <!-- 1. ส่วนทบทวนคำศัพท์ -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-amber-400">
+            <div class="content-block text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center justify-center">
+                    🔄 1. ทบทวนคำศัพท์
+                    <button class="tts-button" onclick="playTTS('หนึ่ง ทบทวนคำศัพท์', this)">🔊</button>
+                </h2>
+                <div class="controls-row justify-center mb-4">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">thóp-thuan kham-sàp</div>
+                <div class="en">Vocabulary Review</div>
+
+                <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <p class="text-gray-700">
+                        กดปุ่มเพื่อสุ่มคำศัพท์ แล้วลองแต่งประโยคจากคำที่ได้
+                        <button class="tts-button" onclick="playTTS('กดปุ่มเพื่อสุ่มคำศัพท์ แล้วลองแต่งประโยคจากคำที่ได้', this)">🔊</button>
+                    </p>
+                    <div class="controls-row justify-center">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">gòt bpùm phʉ̂ʉa sùm kham-sàp láew lɔɔng dtàeng bprà-yôok jàak kham thîi dâi</div>
+                    <div class="en text-sm">Press the button to randomize, then try to make a sentence.</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center mt-6">
+                <div id="word-display-area" class="w-full h-44 flex flex-col justify-center items-center bg-slate-50 rounded-2xl border-2 border-dashed border-amber-300 mb-6 p-4">
+                    <p class="text-slate-400 italic">พร้อมแล้วกดปุ่มด้านล่าง 🎲</p>
+                </div>
+                <button onclick="randomizeWord()" class="bg-amber-500 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:bg-amber-600 transition active:scale-95 text-lg">
+                    🎲 สุ่มคำศัพท์
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. บทนำเรื่องคำสรรพนาม -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-cyan-500">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                    👥 2. คำสรรพนามในสถานการณ์ต่างๆ
+                    <button class="tts-button" onclick="playTTS('สอง คำสรรพนามในสถานการณ์ต่างๆ', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">kham-sàp-phá-naam nai sà-thǎan-ná-gaan dtàang-dtàang</div>
+                <div class="en">Pronouns in different situations</div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="p-5 bg-cyan-50 rounded-2xl content-block">
+                    <h3 class="font-bold text-lg text-cyan-800 mb-2">🏢 ในที่สาธารณะ / ซื้อของ</h3>
+                    <p class="text-gray-700">ใช้: **ผม/ดิฉัน** (ทางการ) หรือ **พี่/น้า/ป้า/ลุง** (ตามอายุของผู้ขาย) <button class="tts-button" onclick="playTTS('ใช้ ผม ดิฉัน หรือ พี่ น้า ป้า ลุง ตามอายุของผู้ขาย', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">chái pǒm, dì-chǎn ... rʉ̌ʉ pîi, náa, bpâa, lung ...</div>
+                    <div class="en text-sm">Use: I (formal) or elder titles.</div>
+                </div>
+
+                <div class="p-5 bg-purple-50 rounded-2xl content-block">
+                    <h3 class="font-bold text-lg text-purple-800 mb-2">🤝 ระหว่างเพื่อนสนิท</h3>
+                    <p class="text-gray-700">ใช้: **เรา** (เรา), **แก** (เธอ), หรือ **ชื่อเล่น** <button class="tts-button" onclick="playTTS('ระหว่างเพื่อนสนิท ใช้ เรา แก หรือ ชื่อเล่น', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">rao, gae ... rʉ̌ʉ chʉ̂ʉ-lên</div>
+                    <div class="en text-sm">Among close friends use: We, You, or nicknames.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. บทสนทนาตัวอย่าง -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-indigo-500">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+                    💬 3. บทสนทนาตัวอย่าง
+                    <button class="tts-button" onclick="playTTS('สาม บทสนทนาตัวอย่าง', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa text-sm">bòt-sǒn-thá-naa dtua-yàang</div>
+                <div class="en text-sm">Example Dialogues</div>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Situation 1 -->
+                <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                    <h4 class="font-bold text-indigo-800 mb-3 italic">🛒 1. ซื้อของที่ตลาด (Public Space)</h4>
+                    <div class="space-y-4">
+                        <div class="content-block">
+                            <p><strong>นักเรียน:</strong> "พี่ครับ ส้มก้อนนี้กิโลละเท่าไหร่ครับ?" <button class="tts-button" onclick="playTTS('พี่ครับ ส้มก้อนนี้กิโลละเท่าไหร่ครับ', this)">🔊</button></p>
+                            <div class="controls-row">
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                            </div>
+                            <div class="ipa">pîi khráp, sôm gâwn níi gì-loo-lá thâo-rài khráp?</div>
+                            <div class="en">Student: Brother, how much per kilo for this orange lump?</div>
+                        </div>
+                        <div class="content-block">
+                            <p><strong>แม่ค้า:</strong> "กิโลละ 50 บาทจ้ะ อยากได้กี่กิโลดีจ๊ะ?" <button class="tts-button" onclick="playTTS('กิโลละ ห้าสิบ บาทจ้ะ อยากได้กี่กิโลดีจ๊ะ', this)">🔊</button></p>
+                            <div class="controls-row">
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                            </div>
+                            <div class="ipa">gì-loo-lá hâa-sìp bàat jâ. yàak dâi gìi gì-loo dii já?</div>
+                            <div class="en">Seller: 50 baht per kilo. How many kilos?</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Situation 2 -->
+                <div class="bg-red-50 p-6 rounded-2xl border border-red-100">
+                    <h4 class="font-bold text-red-800 mb-3 italic">🔥 2. เพื่อนสนิทมาก (Goo / Meung)</h4>
+                    <div class="space-y-4">
+                        <div class="content-block">
+                            <p><strong>เพื่อน A:</strong> "มึง หิวหรือยัง? ไปหาอะไรกินกัน" <button class="tts-button" onclick="playTTS('มึง หิวหรือยัง ไปหาอะไรกินกัน', this)">🔊</button></p>
+                            <div class="controls-row">
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                            </div>
+                            <div class="ipa">mʉng, hǐu rʉ̌ʉ yang? bpai hǎa à-rai gin gan</div>
+                            <div class="en">Friend A: You (intimate), hungry? Let's eat.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Situation 3: Respectful -->
+                <div class="bg-green-50 p-6 rounded-2xl border border-green-100">
+                    <h4 class="font-bold text-green-800 mb-3 italic">👵 3. คุยกับป้าข้างบ้าน (Respectful)</h4>
+                    <div class="space-y-4">
+                        <div class="content-block">
+                            <p><strong>นักเรียน:</strong> "ป้าครับ ลุงชัยอยู่ไหมครับ? ผมมีเรื่องจะปรึกษาแกหน่อย" <button class="tts-button" onclick="playTTS('ป้าครับ ลุงชัยอยู่ไหมครับ ผมมีเรื่องจะปรึกษาแกหน่อย', this)">🔊</button></p>
+                            <div class="controls-row">
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                                <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                            </div>
+                            <div class="ipa">bpâa khráp, lung chai yùu mǎi khráp? pǒm mii rʉ̂ʉang jà bprʉ̀k-sǎa gae nɔ̀y</div>
+                            <div class="en">Aunt, is Uncle Chai in? I want to consult him (gae).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. กิจกรรมฝึกพูด -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-pink-500">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 flex items-center">
+                📢 4. กิจกรรมฝึกพูด
+                <button class="tts-button" onclick="playTTS('สี่ กิจกรรมฝึกพูด', this)">🔊</button>
+            </h2>
+
+            <div class="space-y-10">
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3">🎭 A. บทบาทสมมติ: สั่งกาแฟ</h3>
+                    <p class="text-gray-700">คุณไปสั่งกาแฟที่ร้าน และพนักงานดูอายุมากกว่าคุณเล็กน้อย คุณจะใช้คำสรรพนามว่าอะไร? <button class="tts-button" onclick="playTTS('คุณไปสั่งกาแฟที่ร้าน และพนักงานดูอายุมากกว่าคุณเล็กน้อย คุณจะใช้คำสรรพนามว่าอะไร', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa mb-1">khun bpai sàng gaa-faae... khun jà chái kham-sàp-phá-naam wâa à-rai?</div>
+                    <div class="en mb-3 text-sm italic">Ordering coffee from someone older.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. กิจกรรมเพิ่มเติม (Extension) -->
+        <section class="mb-12 bg-slate-100 p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-slate-400">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                🚀 5. กิจกรรมเพิ่มเติม
+                <button class="tts-button" onclick="playTTS('ห้า กิจกรรมเพิ่มเติม', this)">🔊</button>
+            </h2>
+            
+            <div class="space-y-8">
+                <!-- Debate -->
+                <div class="content-block bg-white p-6 rounded-2xl shadow-sm">
+                    <p class="font-bold text-lg">⚖️ C. โต้วาที: ภาษาที่เป็นกันเอง vs ภาษาทางการ <button class="tts-button" onclick="playTTS('โต้วาที ภาษาที่เป็นกันเอง เทียบกับ ภาษาทางการ', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-1">dtôo-waa-thii: phaa-sǎa gan-eeng thîap gàp phaa-sǎa thaang-gaan</div>
+                    <div class="en text-sm mb-3">Casual vs Formal language debate.</div>
+                    
+                    <p class="text-gray-700 italic border-l-4 border-slate-300 pl-4">ฝ่ายหนึ่งเห็นว่า "การใช้คำสรรพนามแบบเพื่อน (แก/เรา) ทำให้ความสัมพันธ์ดีขึ้น" อีกฝ่ายเห็นว่า "ควรใช้คำสุภาพเสมอแม้เป็นเพื่อนกัน" <button class="tts-button" onclick="playTTS('ฝ่ายหนึ่งเห็นว่า การใช้คำสรรพนามแบบเพื่อน ทำให้ความสัมพันธ์ดีขึ้น อีกฝ่ายเห็นว่า ควรใช้คำสุภาพเสมอแม้เป็นเพื่อนกัน', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-xs">fài nʉ̀ng hěn wâa gaan chái kham sàp-phá-naam bàep phʉ̂an tham hâi khwaam sǎm-phan dii khʉ̂n...</div>
+                    <div class="en text-xs">One side believes casual pronouns improve relations, others believe in constant politeness.</div>
+                </div>
+
+                <!-- Interview -->
+                <div class="content-block bg-white p-6 rounded-2xl shadow-sm">
+                    <p class="font-bold text-lg">🎤 D. สัมภาษณ์ครู <button class="tts-button" onclick="playTTS('สัมภาษณ์ครู', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">sǎm-phâat khruu</div>
+                    <div class="en text-sm mb-2">Interview the teacher.</div>
+                    <p class="text-gray-700">สัมภาษณ์ครูว่า "ครูใช้คำสรรพนามว่าอะไรบ้างเมื่อคุยกับเพื่อนร่วมงานและครอบครัว?" <button class="tts-button" onclick="playTTS('สัมภาษณ์ครูว่า ครูใช้คำสรรพนามว่าอะไรบ้างเมื่อคุยกับเพื่อนร่วมงานและครอบครัว', this)">🔊</button></p>
+                    <div class="controls-row">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-xs">khruu chái kham sàp-phá-naam wâa à-rai bâang mʉ̂a khui gàp phʉ̂an rûam ngaan láe khrôop-khruua?</div>
+                    <div class="en text-xs">Ask: What pronouns do you use with coworkers vs family?</div>
+                </div>
+
+                <!-- Presentation -->
+                <div class="content-block bg-white p-6 rounded-2xl shadow-sm text-center">
+                    <p class="font-bold text-lg">📊 นำเสนอ: วัฒนธรรมไทยผ่านการใช้คำสรรพนาม <button class="tts-button" onclick="playTTS('นำเสนอ วัฒนธรรมไทยผ่านการใช้คำสรรพนาม', this)">🔊</button></p>
+                    <div class="controls-row justify-center mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-1">nam-sà-nə̌ə: wát-thá-ná-tham thai phàan gaan chái kham-sàp-phá-naam</div>
+                    <div class="en text-sm mb-3">Presentation: Thai culture through pronouns.</div>
+                    <p class="text-gray-700">พูด 2 นาทีว่า "คำสรรพนามสะท้อนถึงสังคมผู้สูงอายุและระดับขั้นในไทยอย่างไร?" <button class="tts-button" onclick="playTTS('พูดสองนาทีว่า คำสรรพนามสะท้อนถึงสังคมผู้สูงอายุและระดับขั้นในไทยอย่างไร', this)">🔊</button></p>
+                    <div class="controls-row justify-center">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-xs">phûut sɔ̌ɔng naa-thii wâa: kham sàp-phá-naam sà-thɔ́ɔn thʉ̌ng sǎng-khom phûu sǔung aa-yú...</div>
+                    <div class="en text-xs">Speak 2 mins: How pronouns reflect aging society and hierarchy.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. คำศัพท์เพิ่มเติม (Additional Vocabulary) -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                📚 7. คำศัพท์เพิ่มเติม
+                <button class="tts-button" onclick="playTTS('เจ็ด คำศัพท์เพิ่มเติม', this)">🔊</button>
+            </h2>
+            <div id="additional-vocab-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- รายการคำศัพท์เพิ่มเติมจะถูกแสดงที่นี่ผ่าน JavaScript -->
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // รายการคำศัพท์ทบทวน (Review Vocab)
+        const reviewVocab = [
+            {th: "เรียงความ", ipa: "riiang-khwaam", en: "essays"},
+            {th: "เรื่องสั้น", ipa: "rʉ̂ʉang-sân", en: "short stories"},
+            {th: "งานรับปริญญา", ipa: "ngaan-ráp-bpà-rin-yaa", en: "graduation"},
+            {th: "ดนตรีสด", ipa: "don-dtrii-sòt", en: "live music"},
+            {th: "นอกใจ", ipa: "nɔ̂ɔk-jai", en: "cheat on"},
+            {th: "โดดเดี่ยว", ipa: "dòot-dìiao", en: "isolated"},
+            {th: "ภูมิศาสตร์", ipa: "phuum-mí-sàat", en: "geography"},
+            {th: "ปณิธาน", ipa: "bpà-ní-thaan", en: "resolutions"},
+            {th: "ละลาย", ipa: "lá-laai", en: "melt"},
+            {th: "สถานการณ์", ipa: "sà-thǎan-ná-gaan", en: "situations"},
+            {th: "แรงสั่นสะเทือน", ipa: "raeng sàn-sà-thʉʉan", en: "tremors"}
+        ];
+
+        // รายการคำศัพท์เพิ่มเติม (Additional Vocab)
+        const additionalVocab = [
+            {th: "คำสรรพนาม", ipa: "khum-sàp-naam", en: "pronouns", emoji: "🧑‍🤝‍🧑"},
+            {th: "ตัวเอง", ipa: "dtua-eng", en: "self, you (friendly)", emoji: "🫵🙂"},
+            {th: "ข้า", ipa: "kâa", en: "I (more polite than กู)", emoji: "🙋"},
+            {th: "เอ็ง", ipa: "aeng", en: "You (more polite than มึง)", emoji: "👉"},
+            {th: "เรา", ipa: "rao", en: "I (more polite than ข้า); we", emoji: "🙋"},
+            {th: "แก", ipa: "gɛɛ", en: "You / 3rd person", emoji: "🫵"},
+            {th: "สถานการณ์", ipa: "sa-thăan-ná-gaan", en: "situations", emoji: "🌏📌"},
+            {th: "แสดงความเคารพ", ipa: "sà-daeng-kwaam-kâao-róp", en: "show respect", emoji: "🙇‍♂️🙏"},
+            {th: "กันเอง", ipa: "gan-eeng", en: "casual", emoji: "😎🤝"},
+            {th: "ความสัมพันธ์", ipa: "kwaam-sam-pan", en: "relationships; bonds", emoji: "🤝🔗"},
+            {th: "ภาษาบอกความสนิท", ipa: "paa-săa-bòk-kwaam-sà-nìt", en: "Language signals closeness.", emoji: "🤝🗣️"}
+        ];
+
+        window.onload = () => {
+            const container = document.getElementById('additional-vocab-container');
+            additionalVocab.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-indigo-500 transition-all";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-xl text-slate-800">${item.emoji} ${item.th}</span>
+                        <button class="tts-button" onclick="playTTS('${item.th}', this)">🔊</button>
+                    </div>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa font-medium text-amber-600">${item.ipa}</div>
+                    <div class="en text-slate-500">${item.en}</div>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        function randomizeWord() {
+            const displayArea = document.getElementById('word-display-area');
+            const word = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            displayArea.innerHTML = `
+                <div class="text-center w-full pop-in content-block">
+                    <h3 class="text-4xl font-bold text-indigo-700">${word.th}</h3>
+                    <div class="controls-row justify-center mt-3 mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-lg text-amber-600 font-medium mb-1">${word.ipa}</div>
+                    <div class="en text-lg text-slate-500 font-medium">${word.en}</div>
+                    <div class="mt-4">
+                        <button class="tts-button bg-indigo-100 p-2 rounded-full" onclick="playTTS('${word.th}', this)">🔊</button>
+                    </div>
+                    <p class="mt-4 text-sm text-amber-600 font-bold italic">ลองแต่งประโยคเลย!</p>
+                </div>`;
+        }
+
+        function toggleLocal(btn, type) {
+            const block = btn.closest('.content-block');
+            if (block) {
+                const targets = block.querySelectorAll('.' + type);
+                targets.forEach(t => t.classList.toggle('reveal'));
+                btn.classList.toggle('active');
+            }
+        }
+
+        function playTTS(text, btn) {
+            window.speechSynthesis.cancel();
+            if (btn) btn.classList.add('playing');
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH' || voice.lang === 'th_TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+            else utterance.lang = 'th-TH';
+            utterance.rate = 0.95;
+            utterance.onend = () => { if (btn) btn.classList.remove('playing'); };
+            utterance.onerror = () => { if (btn) btn.classList.remove('playing'); };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+    </script>
+</body>
+</html>
