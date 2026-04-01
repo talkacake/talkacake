@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>อดีต + เมนู - Past & Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #fffbeb; /* Light amber/yellow background */
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom Active Button Styles */
+        .btn-active-en-title { background-color: #fef3c7 !important; color: #d97706 !important; border-color: #fde68a !important; }
+        .btn-active-ipa { background-color: #fee2e2 !important; color: #dc2626 !important; border-color: #fecaca !important; }
+        .btn-active-en { background-color: #e0f2fe !important; color: #0284c7 !important; border-color: #bae6fd !important; }
+        
+        /* Smooth Animations */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-reveal {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800 pb-24">
+
+    <div class="max-w-3xl mx-auto px-4 py-8 space-y-8">
+        
+        <!-- Header Section -->
+        <div class="bg-amber-500 text-white p-8 rounded-[2rem] shadow-xl text-center relative overflow-hidden">
+            <div class="absolute -left-2 -bottom-4 text-8xl opacity-20">🍽️</div>
+            <h1 class="text-4xl font-bold mb-5 drop-shadow-md">อดีต + เมนู ⏳🍽️</h1>
+            <div class="flex justify-center gap-3">
+                <button onclick="speakText('อดีต และ เมนู')" class="bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all backdrop-blur-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>
+                </button>
+                <button onclick="toggleView('en-title', 'title')" id="btn-en-title-title" class="px-6 py-2 text-sm font-semibold bg-white/20 hover:bg-white/30 rounded-xl transition-colors border border-transparent backdrop-blur-sm">EN</button>
+                <button onclick="toggleView('ipa', 'title')" id="btn-ipa-title" class="px-6 py-2 text-sm font-semibold bg-white/20 hover:bg-white/30 rounded-xl transition-colors border border-transparent backdrop-blur-sm">IPA</button>
+            </div>
+            <div id="en-title-title" class="hidden mt-4 text-amber-100 font-bold text-3xl bg-black/10 py-2 rounded-xl animate-reveal">Past & Menu</div>
+            <div id="ipa-title" class="hidden mt-4 text-amber-100 font-mono text-xl bg-black/10 py-2 rounded-xl animate-reveal">à-dìit láe mee-nuu</div>
+        </div>
+
+        <!-- Vocab Review (Randomizer) -->
+        <div class="bg-white p-6 rounded-[2rem] shadow-sm border-[3px] border-dashed border-amber-200 text-center relative">
+            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-100 text-amber-700 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wide border border-amber-200">
+                Warm-up
+            </div>
+            <h2 class="text-2xl font-bold text-amber-800 mt-2 mb-2">ทบทวนคำศัพท์ 🧠</h2>
+            <p class="text-gray-500 mb-6 text-sm">Make a sentence using the random word!</p>
+            
+            <div id="vocab-display" class="hidden bg-slate-50 p-6 rounded-2xl mb-6 shadow-inner border border-slate-100">
+                <div id="vocab-th" class="text-3xl font-bold text-slate-800 mb-5"></div>
+                <div class="flex justify-center gap-4 mb-5">
+                    <button onclick="speakText(document.getElementById('vocab-th').innerText)" class="bg-amber-100 text-amber-600 p-4 rounded-full hover:bg-amber-200 transition-colors shadow-sm active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-7 h-7"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>
+                    </button>
+                </div>
+
+                <!-- Toggle buttons for Vocab -->
+                <div class="flex justify-center gap-2 mb-4">
+                    <button onclick="toggleVocab('ipa')" id="btn-vocab-ipa" class="px-5 py-2 text-sm font-semibold bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-colors border border-transparent">IPA</button>
+                    <button onclick="toggleVocab('en')" id="btn-vocab-en" class="px-5 py-2 text-sm font-semibold bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-colors border border-transparent">EN</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                    <div id="vocab-ipa-container" class="hidden bg-red-50 p-3 rounded-xl border border-red-100 animate-reveal">
+                        <div class="text-[10px] text-red-500 font-bold uppercase tracking-wider mb-1">IPA</div>
+                        <div id="vocab-ipa" class="text-red-800 font-mono text-sm"></div>
+                    </div>
+                    <div id="vocab-en-container" class="hidden bg-sky-50 p-3 rounded-xl border border-sky-100 animate-reveal">
+                        <div class="text-[10px] text-sky-500 font-bold uppercase tracking-wider mb-1">English</div>
+                        <div id="vocab-en" class="text-sky-800 text-sm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="drawRandomVocab()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-amber-200 transform active:scale-95 transition-all w-full sm:w-auto text-lg flex items-center justify-center gap-2 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                <span>สุ่มคำศัพท์ (Random Word)</span>
+            </button>
+        </div>
+
+        <!-- Main Lesson Content Container -->
+        <div id="lesson-content" class="space-y-6">
+            <!-- Content gets injected here via JS -->
+        </div>
+
+    </div>
+
+    <script>
+        // Full Vocabulary List 
+        const vocabList = [
+            { th: "🤔💬 ยังไง", ipa: "yang-ngai", en: "how; anyway; what's up?" },
+            { th: "🌶️🙅‍♀️ ไม่กินเผ็ดใช่ไหม", ipa: "mâi gin pèd châi mǎi", en: "You don't eat spicy food, do you?" },
+            { th: "🍽️😋 อะไรอร่อย", ipa: "à-rai à-ròi", en: "What's delicious?" },
+            { th: "🍽️ กินยังไง", ipa: "gin yang-ngai", en: "How to eat?" },
+            { th: "✈️🪽 บิน", ipa: "bin", en: "Fly" },
+            { th: "🚶 เดิน", ipa: "dern", en: "Walk" },
+            { th: "🚆 รถไฟ", ipa: "rót fai", en: "trains" },
+            { th: "🍽️😋 หิว", ipa: "hĭw", en: "hungry" },
+            { th: "🙋‍♂️🗣️ แนะนำตัว", ipa: "náe-nam-dtua", en: "introduce oneself" },
+            { th: "➡️ จาก", ipa: "jàak", en: "from" },
+            { th: "📍🏠 อยู่", ipa: "yùu", en: "to be (at/in/on); to live; to stay" },
+            { th: "📚 เรียน", ipa: "rian", en: "to study; to learn" },
+            { th: "👥 คน", ipa: "kon", en: "People; person" },
+            { th: "🛠️ ทำ", ipa: "tam", en: "to do; to make; to perform" },
+            { th: "💼 ทำงาน", ipa: "tam-ngaan", en: "to work; to do work" },
+            { th: "🏠 บ้าน", ipa: "bâan", en: "home; house" },
+            { th: "📍❓ ที่ไหน", ipa: "têe năi", en: "where (at/place, which)" },
+            { th: "🤔❓ ทำไม", ipa: "tam mai", en: "Why?" },
+            { th: "📍 ใน", ipa: "nai", en: "In" },
+            { th: "👩‍🏫 ครู", ipa: "kruu", en: "teacher" },
+            { th: "👩‍👧🇺🇸 แม่เป็นคนอเมริกัน", ipa: "mâe bpen kon a-may-rí-gan", en: "Mother is American." },
+            { th: "❤️👍 ชอบ", ipa: "châawp", en: "to like; to prefer" },
+            { th: "👥💼 เพื่อนร่วมงาน", ipa: "pʉ̂an rûam ngaan", en: "colleague; co-worker" },
+            { th: "👂 ได้ยิน", ipa: "dâi-yin", en: "to hear" },
+            { th: "🍋😖 เปรี้ยว", ipa: "bprîao", en: "sour" },
+            { th: "🍬 หวาน", ipa: "wǎan", en: "sweet" },
+            { th: "👫 ทั้งคู่", ipa: "táng kôo", en: "both of them; the pair" },
+            { th: "🧂 เค็ม", ipa: "khem", en: "salty" },
+            { th: "😋🍽️ อิ่ม", ipa: "ìm", en: "full (from eating)" },
+            { th: "🤷‍♂️ ไม่รู้", ipa: "mâi rúu", en: "don't know" },
+            { th: "🤏 หน่อย", ipa: "nòi", en: "a little; a bit" },
+            { th: "🍦🍋 โยเกิร์ตเปรี้ยวกับหวานทั้งคู่", ipa: "yoo-gèrt bprîao gàp wǎan táng kôo", en: "Yogurt is both sour and sweet." },
+            { th: "🪪 เป็น", ipa: "bpen", en: "to be; is, am, are" },
+            { th: "🧑‍⚕️ พยาบาล", ipa: "pá-yaa-baan", en: "nurse" },
+            { th: "🏥 โรงพยาบาล", ipa: "roong-pá-yaa-baan", en: "hospital" },
+            { th: "🏫 โรงเรียน", ipa: "roong-riian", en: "school" },
+            { th: "👨‍👩‍👧‍👦 ครอบครัว", ipa: "krôop krua", en: "family" },
+            { th: "❓ ใคร", ipa: "krai", en: "who" },
+            { th: "👨‍👦 พี่ชาย", ipa: "pîi-chaai", en: "older brother" },
+            { th: "🧑‍🔧📐 วิศวกร", ipa: "wít-sà-wá-gon", en: "engineer" },
+            { th: "🎂📅 อายุ", ipa: "aa-yú", en: "age" },
+            { th: "💰❓ เท่าไร", ipa: "tâo-rài", en: "how much?; how many?; how old?" },
+            { th: "🔢 ยี่สิบเจ็ด", ipa: "yîi sìp jèt", en: "twenty-seven" },
+            { th: "🔢 กี่", ipa: "gìi", en: "how many" },
+            { th: "📅 ปี", ipa: "bpii", en: "year" },
+            { th: "🧪⚗️ เคมี", ipa: "kee-mii", en: "chemistry" },
+            { th: "➖ น้อยกว่า", ipa: "nóoi gwàa", en: "less than" },
+            { th: "📅 เดือน", ipa: "dʉ̄an", en: "month" },
+            { th: "👫 อายุเท่ากัน", ipa: "aa-yú-tâo-gan", en: "same age" },
+            { th: "📚👩‍🏫 บรรณารักษ์", ipa: "ban-naa-rák", en: "librarian" },
+            { th: "🤝🧑‍⚕️ นักสังคมสงเคราะห์", ipa: "nák-sǎng-kom-sǒng-khrɔ́", en: "social worker" },
+            { th: "❤️🧑‍🤝‍🧑 แฟน", ipa: "faen", en: "boyfriend; girlfriend; partner" },
+            { th: "⚡🔌 ไฟฟ้า", ipa: "fai-fáa", en: "electricity" },
+            { th: "👨‍👦 เหมือนพ่อ", ipa: "mʉ̌an pɔ̂ɔ", en: "like father" },
+            { th: "🧑‍🎓 นักเรียน", ipa: "nák-riiian", en: "student" },
+            { th: "🚆🏦 นั่งรถไฟไปแบงค์", ipa: "nâng rót fai bpai báeng", en: "take the train to the bank" },
+            { th: "✅ ปกติ", ipa: "bpòk-gà-dtì", en: "normal; usual" },
+            { th: "📛🗣️ เรียกว่า", ipa: "rîiak-wâa", en: "called; named" },
+            { th: "🫵 ตัวเอง", ipa: "dtua-eeng", en: "oneself; You (informal)" },
+            { th: "🧑 เขา", ipa: "kăo / káo", en: "3rd person pronoun (he/she/they)" },
+            { th: "👥 เรา", ipa: "rao", en: "we / I" },
+            { th: "🫵 คุณ", ipa: "kun", en: "you / title (Mr/Ms)" },
+            { th: "👧 หนู", ipa: "nǔu", en: "I (used by children) / You" },
+            { th: "🆕 ใหม่", ipa: "mài", en: "new" },
+            { th: "⏳🔮 จะ", ipa: "jà", en: "will" },
+            { th: "👋😊 ทักทาย", ipa: "ták-taai", en: "To greet" },
+            { th: "👌🚶 ไปสิ", ipa: "bpai sì", en: "Of course I'll go" },
+            { th: "🙏 อยาก", ipa: "yàak", en: "want to" },
+            { th: "❓🗣️ ถาม", ipa: "tǎam", en: "ask questions" },
+            { th: "🔎 เช่น", ipa: "chên", en: "such as" },
+            { th: "👫 พี่น้อง", ipa: "pîi-nɔ́ɔng", en: "siblings" },
+            { th: "🤝 เหมือนกัน", ipa: "mǔeuan-gan", en: "the same; similar" },
+            { th: "🟰 เดียวกัน", ipa: "diao-gan", en: "the exact same" },
+            { th: "🛠️ ใช้", ipa: "chái", en: "to use" },
+            { th: "🥄 ช้อน", ipa: "chɔ́ɔn", en: "spoon" },
+            { th: "🍴 ส้อม", ipa: "sɔ̂m", en: "fork" },
+            { th: "🍴🥄 ช้อนส้อม", ipa: "chɔ́ɔn-sɔ̂m", en: "cutlery" },
+            { th: "🤝 ช่วย", ipa: "chûai", en: "to help" },
+            { th: "🔢📈 เยอะ", ipa: "yə́", en: "a lot; many; much" },
+            { th: "💯 พัน", ipa: "pan", en: "thousand" },
+            { th: "🎨📚🎮 งานอดิเรก", ipa: "ngaan à-dì-rèk", en: "hobby" },
+            { th: "👀📺 ดู", ipa: "duu", en: "watch" },
+            { th: "🎬 หนัง", ipa: "nǎng", en: "movies" },
+            { th: "🏖️😌 วันหยุด", ipa: "wan-yùt", en: "holiday; day off" },
+            { th: "🏛️ พิพิธภัณฑ์", ipa: "pí-pít-tá-pan", en: "museum" },
+            { th: "🎮🎲 เล่น", ipa: "lên", en: "to play" },
+            { th: "🍰🍨 ของหวาน", ipa: "kɔ̌ɔng wǎan", en: "dessert; sweets" },
+            { th: "🌳🏡 สวน", ipa: "sǔan", en: "garden; park" },
+            { th: "👂 ฟัง", ipa: "fang", en: "to listen; to hear" },
+            { th: "🎵 เพลง", ipa: "pleeng", en: "song" },
+            { th: "🎧🎵 ฟังเพลง", ipa: "fang pleeng", en: "to listen to music" },
+            { th: "🏅⚽️ กีฬา", ipa: "gii laa", en: "sports" },
+            { th: "🔗 และ", ipa: "láe", en: "and" },
+            { th: "📦 ของ", ipa: "kɔ̌ɔng", en: "of; thing" },
+            { th: "➕ ด้วย", ipa: "dûai", en: "with; too" },
+            { th: "👀 เห็น", ipa: "hěn", en: "to see; seeing" },
+            { th: "🤔 อาจจะ", ipa: "àat-jà", en: "maybe; might; possibly" },
+            { th: "⏰❓ เมื่อไร", ipa: "mʉ̂a-rài", en: "when" },
+            { th: "📚✍️ การบ้าน", ipa: "gaan-bâan", en: "homework" },
+            { th: "🎵🎶 เล่นเพลง", ipa: "lên pleeng", en: "play music/song" },
+            { th: "🎶🎸 เล่นดนตรี", ipa: "lên don-dtree", en: "play music(al instrument)" },
+            { th: "🔁 เคย", ipa: "kooie", en: "used to; have ever" },
+            { th: "🎮🕹️ ทุกเกม", ipa: "thúk geem", en: "every game" },
+            { th: "🤔 แต่", ipa: "dtàae", en: "but; however" },
+            { th: "⏳ ...ที่แล้ว", ipa: "tîi-láeo", en: "last.. / ...ago" },
+            { th: "🤦‍♂️🧠 ลืม", ipa: "lʉʉm", en: "to forget" },
+            { th: "👥 คน", ipa: "kon", en: "People; person" },
+            { th: "✅⏱️ แล้ว", ipa: "láeo", en: "already" },
+            { th: "🔀 หรือ", ipa: "rʉ̌ʉ", en: "or" },
+            { th: "⏳ ยัง", ipa: "yang", en: "(not) yet" },
+            { th: "⏳ ...ก่อน", ipa: "...gɔ̀ɔn", en: "before; first" },
+            { th: "🗓️ วันก่อน", ipa: "wan-kɔ̀ɔn", en: "the other day" },
+            { th: "⏪ ...มา", ipa: "...maa", en: "indicating the past tense" },
+            { th: "⏭️ แล้วก็", ipa: "láeo gɔ̂", en: "and then" },
+            { th: "👉 ที่นั่น", ipa: "tîi nân", en: "there" },
+            { th: "🏪🛍️ ร้าน", ipa: "ráan", en: "shop; store" },
+            { th: "🍽️ ร้านอาหาร", ipa: "ráan-aa-hǎan", en: "restaurant" },
+            { th: "🍽️ ร้านอาหารเป็นยังไง", ipa: "ráan-aa-hǎan bpen yang-ngai", en: "How was the restaurant?" },
+            { th: "🛑✋ หยุด", ipa: "yùt", en: "stop" }
+        ];
+
+        // Lesson Flow (Tasks & Dialogues)
+        const lessonData = [
+            {
+                type: 'header',
+                th: "คำถามก่อนเรียน ❓", ipa: "kam-tǎam gɔ̀ɔn rian", en: "Lead-in Questions"
+            },
+            {
+                type: 'normal',
+                th: "เมื่อวาน คุณกินอะไรมา? 🍚", ipa: "mʉ̂a-waan kun gin à-rai maa?", en: "What did you eat yesterday?"
+            },
+            {
+                type: 'normal',
+                th: "คุณ เคย ไปร้านอาหารไทยไหม? ร้านอาหารเป็นยังไง? 🍽️🇹🇭", ipa: "kun kooie bpai ráan-aa-hǎan tai mǎi? ráan-aa-hǎan bpen yang-ngai?", en: "Have you ever been to a Thai restaurant? How was the restaurant?"
+            },
+            {
+                type: 'header',
+                th: "คำบอกเวลาอดีต ⏳", ipa: "kam bòok wee-laa à-dìit", en: "Phrases indicating the Past"
+            },
+            {
+                type: 'vocab',
+                th: "เคย... 🌟", ipa: "kooie...", en: "used to / have ever (e.g. เคยไป = have been to)"
+            },
+            {
+                type: 'vocab',
+                th: "...มา 🏃‍♂️", ipa: "...maa", en: "have been / came from (e.g. ไปร้านอาหารมา = went to a restaurant)"
+            },
+            {
+                type: 'vocab',
+                th: "...แล้ว ✅", ipa: "...láeo", en: "already (e.g. กินแล้ว = ate already)"
+            },
+            {
+                type: 'header',
+                th: "บทสนทนา: ร้านอาหาร 💬", ipa: "bòt sǒn-tá-naa: ráan-aa-hǎan", en: "Dialogue: The Restaurant"
+            },
+            {
+                type: 'dialogue',
+                th: "A: วันก่อน คุณไปร้านอาหารไทย มา ร้านอาหารเป็นยังไง? 🍽️", ipa: "A: wan-kɔ̀ɔn kun bpai ráan-aa-hǎan tai maa. ráan-aa-hǎan bpen yang-ngai?", en: "A: The other day you went to a Thai restaurant. How was the restaurant?"
+            },
+            {
+                type: 'dialogue',
+                th: "B: อร่อยมาก! 😋 คน เยอะ มาก เราสั่งผัดไทย มา", ipa: "B: à-ròi mâak! kon yə́ mâak. rao sǎng pàt-tai maa.", en: "B: Very delicious! A lot of people. I ordered Pad Thai."
+            },
+            {
+                type: 'dialogue',
+                th: "A: คุณ เคย กินต้มยำกุ้ง ไหม? 🦐", ipa: "A: kun kooie gin dtôm-yam-gûng mǎi?", en: "A: Have you ever eaten Tom Yum Goong?"
+            },
+            {
+                type: 'dialogue',
+                th: "B: เคยกิน แล้ว! ✅ แต่มันเผ็ดมาก 🌶️", ipa: "B: kooie gin láeo! dtàae man pèt mâak", en: "B: I have eaten it already! But it's very spicy."
+            },
+            {
+                type: 'dialogue',
+                th: "A: แล้วคุณกินของหวานหรือ ยัง? 🍰", ipa: "A: láeo kun gin kɔ̌ɔng-wǎan rʉ̌ʉ yang?", en: "A: And have you eaten dessert yet?"
+            },
+            {
+                type: 'dialogue',
+                th: "B: กิน แล้ว! เรากินข้าวเหนียวมะม่วง 🥭", ipa: "B: gin láeo! rao gin kâao-nǐao má-mûang", en: "B: Eaten already! I ate Mango Sticky Rice."
+            },
+            {
+                type: 'header',
+                th: "คำถามความเข้าใจ 🧠", ipa: "kam-tǎam kwaam-kâo-jai", en: "Comprehension Questions"
+            },
+            {
+                type: 'normal',
+                th: "B ไปร้านอาหารเป็นยังไง? 🍽️", ipa: "B bpai ráan-aa-hǎan bpen yang-ngai?", en: "How was the restaurant B went to?"
+            },
+            {
+                type: 'normal',
+                th: "ต้มยำกุ้งอร่อยไหม? 🦐", ipa: "dtôm-yam-gûng à-ròi mǎi?", en: "Was the Tom Yum Goong delicious?"
+            },
+            {
+                type: 'normal',
+                th: "B กินของหวานแล้วหรือยัง? 🍰", ipa: "B gin kɔ̌ɔng-wǎan láeo rʉ̌ʉ yang?", en: "Has B eaten dessert yet?"
+            },
+            {
+                type: 'header',
+                th: "ภารกิจในชีวิตจริง 🎬", ipa: "paa-rá-gìt nai chii-wít jing", en: "Real-life Tasks"
+            },
+            {
+                type: 'task',
+                th: "บทบาทสมมติ 🎭: คุณเป็นพนักงานร้านอาหาร ถามลูกค้าว่า 'เคย มากินที่นี่ไหม?' และ 'อยากสั่งอะไร?'", ipa: "bòt-bàat sǒm-mút: kun bpen pá-nák-ngaan ráan-aa-hǎan. tǎam lûuk-kâa wâa 'kooie maa gin tîi-nîi mǎi?' láe 'yàak sǎng à-rai?'", en: "Role-play: You are a restaurant staff. Ask the customer 'Have you ever eaten here?' and 'What do you want to order?'"
+            },
+            {
+                type: 'task',
+                th: "เกมการพูด 🎲: ทายเมนู! บอก 2 เมนูที่คุณเคย กิน แล้ว และ 1 เมนูที่ยังไม่ เคย กิน ให้ครูทาย", ipa: "geem gaan pûut: taai mee-nuu! bòok 2 mee-nuu tîi kun kooie gin láeo láe 1 mee-nuu tîi yang mâi kooie gin. hâi kruu taai", en: "Speaking Game: Guess the menu! Say 2 menus you have already eaten and 1 menu you haven't eaten yet. Let the teacher guess."
+            },
+            {
+                type: 'task',
+                th: "สัมภาษณ์ 🎤: ถามครูว่า ร้านอาหารที่ครูไปวันก่อนเป็นยังไง? ครูสั่งอะไร มา?", ipa: "sǎm-pâat: tǎam kruu wâa ráan-aa-hǎan tîi kruu bpai wan-kɔ̀ɔn bpen yang-ngai? kruu sǎng à-rai maa?", en: "Interview: Ask the teacher how the restaurant they went to the other day was. What did they order?"
+            },
+            {
+                type: 'task',
+                th: "สนทนา 💬: คุณชอบไปร้านอาหาร หรือ ทำอาหารที่บ้าน? ทำไม? อาหารอะไรอร่อย?", ipa: "sǒn-tá-naa: kun chôop bpai ráan-aa-hǎan rʉ̌ʉ tam aa-hǎan tîi bâan? tam-mai? aa-hǎan à-rai à-ròi?", en: "Discussion: Do you like going to restaurants or cooking at home? Why? What food is delicious?"
+            },
+            {
+                type: 'task',
+                th: "โต้วาที ⚖️: อาหารเผ็ด 🌶️ vs อาหารหวาน 🍰 คุณชอบอะไรมากกว่ากัน? ทำไม?", ipa: "dtôo-waa-tii: aa-hǎan pèt vs aa-hǎan wǎan. kun chôop à-rai mâak gwàa gan? tam-mai?", en: "Debate: Spicy food vs Sweet food. What do you like more? Why?"
+            },
+            {
+                type: 'header',
+                th: "กิจกรรมเพิ่มเติม 🚀", ipa: "gìt-jà-gam pə̂əm-dtəəm", en: "Extension Activities"
+            },
+            {
+                type: 'task',
+                th: "เล่าเรื่อง 📚: เล่าเรื่องร้านอาหารที่คุณไป มา เมื่อเดือนที่แล้ว ร้านเป็นยังไง อาหารอร่อยไหม", ipa: "lâo rʉ̂ang: lâo rʉ̂ang ráan-aa-hǎan tîi kun bpai maa mʉ̂a dʉan tîi-láeo. ráan bpen yang-ngai aa-hǎan à-ròi mǎi", en: "Story-telling: Tell a story about a restaurant you went to last month. How was the restaurant? Was the food delicious?"
+            },
+            {
+                type: 'task',
+                th: "นำเสนอ 📊: พรีเซนต์เมนูโปรดของคุณ คุณ เคย กินที่ไหน? ทำไมถึงชอบ?", ipa: "nam-sà-nə̌ə: pree-sén mee-nuu bpròot kɔ̌ɔng kun. kun kooie gin tîi-nǎi? tam-mai tʉ̌ng chôop?", en: "Presentation: Present your favorite menu. Where have you eaten it? Why do you like it?"
+            }
+        ];
+
+        // Core Functions
+        function drawRandomVocab() {
+            const displayDiv = document.getElementById('vocab-display');
+            displayDiv.classList.remove('hidden');
+            
+            // Re-trigger CSS animation
+            displayDiv.classList.remove('animate-pop');
+            void displayDiv.offsetWidth; 
+            displayDiv.classList.add('animate-pop');
+
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const word = vocabList[randomIndex];
+
+            document.getElementById('vocab-th').innerText = word.th;
+            document.getElementById('vocab-ipa').innerText = word.ipa;
+            document.getElementById('vocab-en').innerText = word.en;
+
+            // Reset Vocab Toggles to Hidden
+            document.getElementById('vocab-ipa-container').classList.add('hidden');
+            document.getElementById('vocab-en-container').classList.add('hidden');
+            
+            const btnIpa = document.getElementById('btn-vocab-ipa');
+            btnIpa.classList.remove('btn-active-ipa');
+            btnIpa.classList.add('bg-slate-200', 'text-slate-600');
+            
+            const btnEn = document.getElementById('btn-vocab-en');
+            btnEn.classList.remove('btn-active-en');
+            btnEn.classList.add('bg-slate-200', 'text-slate-600');
+        }
+
+        // Vocab Toggle Logic
+        function toggleVocab(type) {
+            const container = document.getElementById(`vocab-${type}-container`);
+            const btn = document.getElementById(`btn-vocab-${type}`);
+            
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                btn.classList.add(`btn-active-${type}`);
+                btn.classList.remove('bg-slate-200', 'text-slate-600');
+            } else {
+                container.classList.add('hidden');
+                btn.classList.remove(`btn-active-${type}`);
+                btn.classList.add('bg-slate-200', 'text-slate-600');
+            }
+        }
+
+        // Render Main Lesson
+        function renderApp() {
+            const container = document.getElementById('lesson-content');
+            let htmlString = '';
+
+            lessonData.forEach((item, index) => {
+                let cardClass = "bg-white p-5 rounded-3xl shadow-sm border border-slate-200 transition-all hover:shadow-md hover:border-amber-300";
+                let textClass = "text-xl font-medium text-slate-800";
+                
+                // Styling by block type
+                if (item.type === 'header') {
+                    cardClass = "bg-amber-600 p-6 rounded-3xl mt-10 shadow-md text-white border-none";
+                    textClass = "text-2xl font-bold text-white";
+                } else if (item.type === 'vocab') {
+                    cardClass = "bg-white p-5 rounded-3xl shadow-sm border-2 border-red-100 flex items-center gap-4 ml-0 sm:ml-4";
+                    textClass = "text-xl font-bold text-red-700";
+                } else if (item.type === 'dialogue') {
+                    cardClass = "bg-orange-50 p-5 rounded-3xl border-l-[6px] border-l-orange-400 ml-2 sm:ml-6";
+                    textClass = "text-[1.15rem] text-orange-900 font-medium";
+                } else if (item.type === 'task') {
+                    cardClass = "bg-yellow-50 p-5 rounded-3xl border border-yellow-200 shadow-sm";
+                    textClass = "text-[1.15rem] text-yellow-900 font-medium";
+                }
+
+                const isHeader = item.type === 'header';
+                const audioBtnColor = isHeader 
+                    ? "bg-white/20 text-white hover:bg-white/30 border-transparent backdrop-blur-sm" 
+                    : "bg-slate-100 border-slate-200 text-amber-600 hover:bg-amber-100 hover:border-amber-300";
+                
+                const toggleBg = isHeader 
+                    ? "bg-white/20 text-white hover:bg-white/30 border-transparent backdrop-blur-sm" 
+                    : "bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-200";
+
+                // Audio Button SVG
+                const audioIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>`;
+
+                htmlString += `
+                <div class="${cardClass}">
+                    <div class="${item.type === 'vocab' ? 'flex items-center w-full' : 'flex items-start justify-between gap-4'}">
+                        
+                        <div class="${textClass} flex-1 leading-relaxed ${item.type === 'vocab' ? 'mb-0' : 'mb-2'}">${item.th}</div>
+                        
+                        <button onclick="speakText('${item.th.replace(/'/g, "\\'")}')" class="flex-shrink-0 border p-3 rounded-full active:scale-95 transition-all flex items-center justify-center ${audioBtnColor}">
+                            ${audioIcon}
+                        </button>
+                    </div>
+
+                    <div class="flex gap-2 ${item.type === 'vocab' ? 'mt-0' : 'mt-4'} ${item.type === 'vocab' ? 'w-full mt-3' : ''}">
+                        <button onclick="toggleView('ipa', ${index})" id="btn-ipa-${index}" class="px-5 py-2 text-sm font-semibold rounded-xl transition-colors border ${toggleBg}">IPA</button>
+                        <button onclick="toggleView('en', ${index})" id="btn-en-${index}" class="px-5 py-2 text-sm font-semibold rounded-xl transition-colors border ${toggleBg}">EN</button>
+                    </div>
+
+                    <div id="ipa-${index}" class="hidden mt-4 p-4 bg-red-50 text-red-800 rounded-2xl font-mono text-base border border-red-200 shadow-inner animate-reveal">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-red-500 block mb-1">Pronunciation</span>
+                        ${item.ipa}
+                    </div>
+                    <div id="en-${index}" class="hidden mt-3 p-4 bg-sky-50 text-sky-800 rounded-2xl text-base border border-sky-200 shadow-inner animate-reveal">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-500 block mb-1">Translation</span>
+                        ${item.en}
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlString;
+        }
+
+        // View Toggler (EN-title / IPA / EN)
+        function toggleView(type, index) {
+            const contentDiv = document.getElementById(`${type}-${index}`);
+            const btn = document.getElementById(`btn-${type}-${index}`);
+            
+            if (contentDiv.classList.contains('hidden')) {
+                // Show
+                contentDiv.classList.remove('hidden');
+                btn.classList.add(`btn-active-${type}`);
+                
+                // Remove default inactive classes
+                btn.classList.remove('bg-slate-50', 'text-slate-500', 'border-slate-200', 'bg-white/20', 'text-white', 'border-transparent');
+            } else {
+                // Hide
+                contentDiv.classList.add('hidden');
+                btn.classList.remove(`btn-active-${type}`);
+                
+                // Restore default classes depending on header or normal block
+                if (btn.id.includes('title') || btn.closest('.bg-amber-600')) {
+                    btn.classList.add('bg-white/20', 'text-white', 'border-transparent');
+                } else {
+                    btn.classList.add('bg-slate-50', 'text-slate-500', 'border-slate-200');
+                }
+            }
+        }
+
+        // Text-to-Speech (TTS)
+        function speakText(text) {
+            // Remove Emojis, English alphabet markers (A:, B:), and dots
+            let textToSpeak = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+            textToSpeak = textToSpeak.replace(/A:|B:/g, '');
+            textToSpeak = textToSpeak.replace(/\.\.\./g, '');
+            
+            window.speechSynthesis.cancel(); // Stop any currently playing audio
+            
+            const utterance = new SpeechSynthesisUtterance(textToSpeak.trim());
+            utterance.lang = 'th-TH'; // Thai Voice
+            utterance.rate = 0.8;     // Slower speed for A1 student
+            utterance.pitch = 1.0;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Initialize App on load
+        window.onload = renderApp;
+    </script>
+</body>
+</html>
