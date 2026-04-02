@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สื่อสารผิด ชีวิตเปลี่ยน - Thai Speaking Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdfa; /* Light teal background */
+            color: #1f2937;
+        }
+        
+        .ipa-text {
+            color: #9333ea; /* Purple for phonetics */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        .en-text {
+            color: #2563eb; /* Blue for English */
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .btn-toggle {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            background: white;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .btn-toggle:hover {
+            background-color: #f3f4f6;
+        }
+        .btn-toggle.active-ipa {
+            background-color: #faf5ff;
+            border-color: #9333ea;
+            color: #9333ea;
+            font-weight: 600;
+        }
+        .btn-toggle.active-en {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .ig-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 16px;
+            background: white;
+        }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-teal-100">
+        <div class="max-w-3xl mx-auto px-4 py-4 text-center">
+            <h1 class="text-2xl font-bold text-teal-600 flex items-center justify-center gap-2">
+                <i class="fas fa-comments text-teal-400"></i>
+                <span>สื่อสารผิด ชีวิตเปลี่ยน</span>
+                <i class="fas fa-ear-deaf text-teal-400"></i>
+            </h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-3xl mx-auto px-4 mt-8 space-y-12">
+
+        <!-- 1. Review Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 text-2xl shadow-sm">🎲</div>
+                <div id="heading-review" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-indigo-50 text-center">
+                <div id="instruction-review" class="mb-6"></div>
+                
+                <div id="vocab-card" class="bg-gradient-to-br from-indigo-50 to-blue-50 p-8 rounded-2xl min-h-[180px] flex flex-col items-center justify-center mb-8 border border-indigo-100 shadow-inner">
+                    <p class="text-indigo-300 italic text-lg"><i class="fas fa-hand-pointer mr-2 animate-bounce"></i>กดปุ่มเพื่อสุ่มคำศัพท์...</p>
+                </div>
+
+                <button onclick="spinRoulette()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 px-10 rounded-full shadow-lg transform active:scale-95 transition-all flex items-center gap-2 mx-auto text-lg">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>สุ่มคำศัพท์</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Lead-in Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-500 text-2xl shadow-sm">🤔</div>
+                <div id="heading-leadin" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-l-8 border-cyan-400">
+                <ul id="leadin-questions" class="space-y-6">
+                    <!-- Questions injected via JS -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- 3. Video Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-2xl shadow-sm">🎬</div>
+                <div id="heading-video" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-rose-50">
+                <!-- Instagram Embed -->
+                <div class="ig-container mb-6">
+                    <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DU2LYE5DUwZ/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
+                        <div style="padding:16px;"> 
+                            <a href="https://www.instagram.com/p/DU2LYE5DUwZ/?utm_source=ig_embed&amp;utm_campaign=loading" style=" background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"> 
+                                <div style=" display: flex; flex-direction: row; align-items: center;"> 
+                                    <div style="background-color: #F4F4F4; border-radius: 50%; height: 40px; margin-right: 14px; width: 40px;"></div> 
+                                    <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;"> 
+                                        <div style=" background-color: #F4F4F4; border-radius: 4px; height: 14px; margin-bottom: 6px; width: 100px;"></div> 
+                                        <div style=" background-color: #F4F4F4; border-radius: 4px; height: 14px; width: 60px;"></div>
+                                    </div>
+                                </div>
+                                <div style="padding: 19% 0;"></div> 
+                                <div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div>
+                                <div style="padding-top: 8px;"> <div style=" color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;"> View this post on Instagram</div></div>
+                            </a> 
+                        </div>
+                    </blockquote>
+                    <script async src="//www.instagram.com/embed.js"></script>
+                </div>
+                
+                <!-- Fallback link -->
+                <div class="text-center mb-8">
+                    <a href="https://www.instagram.com/p/DU2LYE5DUwZ/" target="_blank" class="inline-flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium py-2 px-6 rounded-full transition-colors border border-rose-200">
+                        <i class="fab fa-instagram"></i>
+                        <span>ดูวิดีโอบน Instagram</span>
+                    </a>
+                </div>
+
+                <div class="bg-gradient-to-b from-rose-50 to-white p-6 rounded-2xl border border-rose-100 shadow-inner">
+                    <div id="heading-script" class="mb-5 pb-3 border-b-2 border-rose-200 text-rose-800"></div>
+                    <div id="script-content" class="space-y-4">
+                        <!-- Script injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Comprehension Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-500 text-2xl shadow-sm">❓</div>
+                <div id="heading-comprehension" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-amber-400">
+                <ul id="comprehension-questions" class="space-y-6">
+                    <!-- Questions injected via JS -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- 5. Target Vocab Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-500 text-2xl shadow-sm">📚</div>
+                <div id="heading-vocab" class="flex-1"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="target-vocab-list">
+                <!-- Vocab injected via JS -->
+            </div>
+        </section>
+
+        <!-- 6. Real-life Speaking Game -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-2xl shadow-sm">🗣️</div>
+                <div id="heading-game" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-blue-50 text-center">
+                <div class="text-5xl mb-4">🤫💬👂</div>
+                <div id="game-instruction" class="mb-4"></div>
+                <div id="game-desc" class="p-4 bg-blue-50 rounded-xl inline-block"></div>
+            </div>
+        </section>
+
+        <!-- 7. Real-life Role-Play -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-fuchsia-100 flex items-center justify-center text-fuchsia-500 text-2xl shadow-sm">🎭</div>
+                <div id="heading-roleplay" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-fuchsia-50">
+                <div id="rp-scenario" class="mb-6 p-5 bg-fuchsia-50 rounded-xl text-center border border-fuchsia-100"></div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border-2 border-gray-100 p-6 rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-4xl bg-white px-2">🎧🎶</div>
+                        <div id="rp-role-a" class="mt-4"></div>
+                    </div>
+                    <div class="border-2 border-gray-100 p-6 rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-4xl bg-white px-2">😵‍💫❓</div>
+                        <div id="rp-role-b" class="mt-4"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Real-life Debate -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-2xl shadow-sm">⚖️</div>
+                <div id="heading-debate" class="flex-1"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-orange-400">
+                <div id="debate-topic" class="mb-8 text-center bg-orange-50 p-6 rounded-2xl border border-orange-100 shadow-sm"></div>
+
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1 border-2 border-green-200 p-6 rounded-2xl text-center bg-green-50 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-green-400"></div>
+                        <div class="text-4xl mb-3">🎫🤑</div>
+                        <div id="debate-side-a"></div>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-300 font-black text-2xl">VS</div>
+                    <div class="flex-1 border-2 border-red-200 p-6 rounded-2xl text-center bg-red-50 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-red-400"></div>
+                        <div class="text-4xl mb-3">🏦📈</div>
+                        <div id="debate-side-b"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. Extension Activities -->
+        <section class="space-y-4 pt-12 border-t-2 border-dashed border-teal-200">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-2xl shadow-sm">⏱️</div>
+                <div id="heading-extension" class="flex-1"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Interview -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-l-8 border-gray-300">
+                    <div class="text-4xl mb-4">🎤🎉</div>
+                    <div id="ext-interview-title" class="mb-3"></div>
+                    <div id="ext-interview-desc" class="p-3 bg-gray-50 rounded-lg"></div>
+                </div>
+                <!-- Story telling -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-l-8 border-gray-300">
+                    <div class="text-4xl mb-4">📖🥲</div>
+                    <div id="ext-story-title" class="mb-3"></div>
+                    <div id="ext-story-desc" class="p-3 bg-gray-50 rounded-lg"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 py-8 text-center bg-teal-50 border-t border-teal-100">
+        <p class="text-teal-600 text-sm font-medium"><i class="fas fa-heart text-rose-400"></i> Have fun practicing Thai! <i class="fas fa-heart text-rose-400"></i></p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- DATA STORE ---
+        const content = {
+            headings: {
+                review: { t: "ทบทวนคำศัพท์เก่า 🎲", i: "tóp-tuan kăm-sàp gào", e: "Review Old Vocabulary" },
+                leadin: { t: "ก่อนดูวิดีโอ... มาคุยกันหน่อย 🤔", i: "gɔ̀ɔn duu wí-dii-oo... maa kui gan nɔ̀ɔi", e: "Before watching... let's chat" },
+                video: { t: "ดูวิดีโอและบทสนทนา 🎬", i: "duu wí-dii-oo lɛ́ bòt-sŏn-tá-naa", e: "Watch Video & Dialogue" },
+                script: { t: "บทสนทนา 💬", i: "bòt-sŏn-tá-naa", e: "Dialogue / Script" },
+                comprehension: { t: "คำถามจากวิดีโอ ❓", i: "kăm-tăam jàak wí-dii-oo", e: "Questions from the video" },
+                vocab: { t: "คำศัพท์ใหม่ 📚", i: "kăm-sàp mài", e: "New Vocabulary" },
+                game: { t: "เกมอ่านปาก 🗣️", i: "geem àan bpàak", e: "Lip Reading Game" },
+                roleplay: { t: "บทบาทสมมติในชีวิตจริง 🎭", i: "bòt-bàat sŏm-mút nai chii-wít jing", e: "Real-life Role-Play" },
+                debate: { t: "โต้วาทีในชีวิตจริง ⚖️", i: "dtôo-waa-tii nai chii-wít jing", e: "Real-life Debate" },
+                extension: { t: "กิจกรรมเสริม (ถ้ามีเวลาเหลือ) ⏱️", i: "gìt-jà-gam sěrm", e: "Extension Activities (If extra time)" }
+            },
+            review: {
+                instruction: { t: "กดปุ่มเพื่อสุ่มคำศัพท์ แล้วแต่งประโยคในชีวิตจริงให้ครูฟัง 🗣️", i: "gòt bpùm pʉ̂a sùm kăm-sàp lɛ́ɛo dtɛ̀ng bprà-yòok nai chii-wít jing", e: "Press the button to spin a word, then make a real-life sentence." }
+            },
+            leadin: [
+                { t: "1. คุณเคยฟังเพื่อนพูดผิด แล้วความหมายเปลี่ยนไปเลยไหม? 🤷‍♀️", i: "kun kəəi fang pʉ̂an pûut pìt, lɛ́ɛo kwaam-mǎai bplìan bpai ləəi mǎi?", e: "1. Have you ever misheard a friend and the meaning completely changed?" },
+                { t: "2. เวลาไปที่ที่มี 'แสงสี' และ 'เสียงดัง' คุณสื่อสารกับเพื่อนยังไง? 🌃🔊", i: "wee-laa bpai tîi tîi mii 'sɛ̌ɛng-sǐi' lɛ́ 'sǐang dang', kun sʉ̀ʉ-sǎan gàp pʉ̂an yang-ngai?", e: "2. When you go to a place with 'lights/colors' and 'loud noises', how do you communicate with friends?" }
+            ],
+            scriptLines: [
+                { t: "คน1: เป็ด 🦆", i: "kon nʉ̀ng: bpèt", e: "Person 1: Duck" },
+                { t: "คน2: คันหี 😳", i: "kon sɔ̌ɔng: kan-hǐi", e: "Person 2: Itchy vagina (Vulgar slang)" },
+                { t: "คน3: ปีใหม่ 🎇", i: "kon saam: bpii mài", e: "Person 3: New Year" },
+                { t: "คน4: อุ๊ย อันนี้ไม่ได้จริงๆ อะไรอ่ะ... แหวก อุ๊ยไม่ได้ 🙅‍♀️", i: "kon sìi: úi, an-níi mâi dâai jing-jing, à-rai à... wɛ̀ɛk, úi mâi dâai", e: "Person 4: Oops, this one I really can't... What is it? Spread... Oops, I can't." },
+                { t: "คน5: คำว่า สวย ค่า ✨", i: "kon hâa: kam wâa sǔai kâ", e: "Person 5: The word is 'beautiful'." },
+                { t: "คน1: เผ็ดดี 🌶️", i: "kon nʉ̀ng: pèt dii", e: "Person 1: Spicy good" },
+                { t: "คน2: แสงสี 🌃", i: "kon sɔ̌ɔng: sɛ̌ɛng sǐi", e: "Person 2: Lights and colors (Nightlife)" },
+                { t: "คน3: ถูกสวย 💅", i: "kon saam: tùuk sǔai", e: "Person 3: Cheap (and) beautiful" },
+                { t: "คน4: หูควาย 🐃", i: "kon sìi: hǔu kwaai", e: "Person 4: Buffalo ears" },
+                { t: "คน5: ถูกหวย 🎉", i: "kon hâa: tùuk hǔai", e: "Person 5: Win the lottery" },
+                { t: "คน6: อ๋อ คมคาย 🧠", i: "kon hòk: ɔ̌ɔ, kom-kaai", e: "Person 6: Oh, witty/sharp" },
+                { t: "คน1: หวยแดก 💸", i: "kon nʉ̀ng: hǔai dɛ̀ɛk", e: "Person 1: Lose the lottery (Slang)" }
+            ],
+            questions: [
+                { t: "1. เกมที่พวกเขาเล่นคือเกมอะไร และมีกติกา(rules) ยังไง? 🎧", i: "geem tîi pûak-kǎo lên khʉʉ geem à-rai lɛ́ mii gà-dtì-gaa yang-ngai?", e: "1. What game are they playing and what are the rules?" },
+                { t: "2. คำแรกคือคำว่าอะไร และคำสุดท้ายคือคำว่าอะไร? 🔄", i: "kam rɛ̂ɛk khʉʉ kam wâa à-rai lɛ́ kam sùt-táai khʉʉ kam wâa à-rai?", e: "2. What was the first word, and what was the last word?" },
+                { t: "3. ทำไมคนที่ 4 ถึงบอกว่า 'อันนี้ไม่ได้จริงๆ'? 😅", i: "tam-mai kon tîi sìi tʉ̌ng bɔ̀ɔk wâa 'an-níi mâi dâai jing-jing'?", e: "3. Why did the 4th person say 'This one I really can't'?" }
+            ],
+            targetVocab: [
+                { t: "🙅‍♀️ ไม่ได้จริงๆ", i: "mâi dâai jing-jing", e: "Really cannot / No way" },
+                { t: "🌃 แสงสี", i: "sɛ̌ɛng-sǐi", e: "Lights and colors (Nightlife / City lights)" },
+                { t: "🎉 ถูกหวย", i: "tùuk hǔai", e: "To win the lottery" },
+                { t: "🗣️ คมคาย", i: "kom-kaai", e: "Witty / Sharp (words)" },
+                { t: "💸 หวยแดก", i: "hǔai dɛ̀ɛk", e: "To lose the lottery (Slang)" }
+            ],
+            game: {
+                instruction: { t: "กติกา: ปิดเสียงไมค์ของคุณ แล้วพูดคำศัพท์ 1 คำ ให้ครูทายว่าคุณพูดคำว่าอะไร! 🤫", i: "gà-dtì-gaa: bpìt sǐang maik kɔ̌ɔng kun lɛ́ɛo pûut kam-sàp 1 kam, hâi kruu taai...", e: "Rules: Mute your microphone and say 1 vocabulary word. Let the teacher guess what you said!" },
+                desc: { t: "Tip: คุณสามารถใช้คำศัพท์จากในวิดีโอ หรือคำศัพท์ที่เรียนไปแล้วก็ได้ 💡", i: "Tip: kun sǎa-mâat chái kam-sàp jàak nai wí-dii-oo rʉ̌ʉ kam-sàp tîi rian bpai lɛ́ɛo gɔ̂ɔ dâai", e: "Tip: You can use vocabulary from the video or words you've already learned." }
+            },
+            roleplay: {
+                scenario: { t: "สถานการณ์: คืนวันศุกร์ ในผับที่เสียงดังมาก มี 'แสงสี' เต็มไปหมด 🍻🌃", i: "sà-tǎa-ná-gaan: kʉʉn wan sùk nai pàp tîi sǐang dang mâak, mii 'sɛ̌ɛng-sǐi' dtem bpai mòt", e: "Scenario: Friday night in a very loud pub full of 'lights and colors'." },
+                roleA: { t: "บทบาท A: คุณเพิ่ง 'ถูกหวย' รางวัลใหญ่ คุณพยายามตะโกนบอกเพื่อนว่าวันนี้คุณจะเป็นคน 'จ่าย' เอง! 🎉💰", i: "bòt-bàat A: kun pə̂ng 'tùuk hǔai' raang-wan yài, kun pá-yaa-yaam dtà-goon bɔ̀ɔk pʉ̂an...", e: "Role A: You just 'won the lottery' big time. You try to yell to your friend that you will 'pay' today!" },
+                roleB: { t: "บทบาท B: คุณใส่หูฟังและไม่ได้ยินเพื่อน คุณฟังผิดและเข้าใจว่าเพื่อน 'หวยแดก' และไม่มีเงินจ่าย 💸😵‍💫", i: "bòt-bàat B: kun sài hǔu-fang lɛ́ mâi dâi-yin pʉ̂an, kun fang pìt lɛ́ kâo-jai wâa pʉ̂an 'hǔai dɛ̀ɛk'...", e: "Role B: You are wearing earphones and can't hear your friend. You mishear and think your friend 'lost the lottery' and has no money to pay." }
+            },
+            debate: {
+                topic: { t: "หัวข้อโต้วาที: ซื้อหวยทุกงวด (หวังรวย) ดีกว่า เก็บเงินไว้ในธนาคาร จริงไหม? 🤔", i: "hǔa-kɔ̂ɔ dtôo-waa-tii: sʉ́ʉ hǔai túk ngûat dii gwàa gèp ngən wái nai tá-naa-kaan jing mǎi?", e: "Debate Topic: Buying lottery tickets every round (hoping to be rich) is better than saving money in the bank. True?" },
+                sideA: { t: "ทีม A: ซื้อหวยสิดี! ชีวิตต้องมีความหวัง ถ้า 'ถูกหวย' ก็สบายไปเลย 🎫✨", i: "tiim A: sʉ́ʉ hǔai sì dii! chii-wít dtɔ̂ng mii kwaam-wǎng, tâa 'tùuk hǔai' gɔ̂ɔ sà-baai bpai ləəi", e: "Team A: Buying lottery is good! Life needs hope. If you 'win the lottery', you are set." },
+                sideB: { t: "ทีม B: เก็บเงินสิดี! ซื้อหวยก็มีแต่ 'หวยแดก' เสียเงินฟรีๆ 🏦🚫", i: "tiim B: gèp ngən sì dii! sʉ́ʉ hǔai gɔ̂ɔ mii dtɛ̀ɛ 'hǔai dɛ̀ɛk' sǐa ngən frii-frii", e: "Team B: Saving money is good! Buying lottery only results in 'losing', wasting money for nothing." }
+            },
+            extension: {
+                interviewTitle: { t: "สัมภาษณ์: ชีวิตเศรษฐีใหม่ 🎤", i: "sǎm-pâat: chii-wít sèet-tǐi mài", e: "Interview: Life of a New Millionaire" },
+                interviewDesc: { t: "คุณคือคนที่เพิ่ง 'ถูกหวย' 30 ล้านบาท! ครูจะเป็นนักข่าวมาสัมภาษณ์คุณว่าคุณจะเอาเงินไปทำอะไร 🤑", i: "kun khʉʉ kon tîi pə̂ng 'tùuk hǔai' 30 láan bàat! kruu jà bpen nák-kàao maa sǎm-pâat...", e: "You just 'won the lottery' 30 million baht! The teacher will be a reporter interviewing you on what you will do with the money." },
+                storyTitle: { t: "เล่าเรื่อง: วันที่โชคร้ายกลายเป็นโชคดี 📖", i: "lâo rʉ̂ang: wan tîi chôok-ráai glaai bpen chôok-dii", e: "Story-telling: The unlucky day that became lucky" },
+                storyDesc: { t: "เล่าเรื่องวันที่คุณ 'หวยแดก' และเสียใจมาก แต่จู่ๆ ก็มีเรื่องดีๆ เข้ามาในชีวิต 🥲➡️🥰", i: "lâo rʉ̂ang wan tîi kun 'hǔai dɛ̀ɛk' lɛ́ sǐa-jai mâak, dtɛ̀ɛ jùu-jùu gɔ̂ɔ mii rʉ̂ang dii-dii kâo maa", e: "Tell a story about a day you 'lost the lottery' and were very sad, but suddenly something good came into your life." }
+            }
+        };
+
+        // Massive Vocab List Processed from Prompt
+        const vocabPool = [
+            { t: "📖 การอ่าน", i: "gaan àan", e: "reading" },
+            { t: "🧠 ทักษะการคิควิเคราะห์", i: "ták-sà gaan kít wí-krɔ́", e: "critical thinking skills" },
+            { t: "🎵 เพลงเพราะ", i: "pleeng prɔ́", e: "Beautiful songs" },
+            { t: "😊 เป็นกันเอง", i: "bpen gan eeng", e: "friendly / casual" },
+            { t: "🗣️ จ้ะ", i: "jâ", e: "ending particle (younger)" },
+            { t: "🫁 อก", i: "òk", e: "chest" },
+            { t: "✅ ใช้ได้จริง", i: "chái dâai jing", e: "practical" },
+            { t: "🔪 ฆาตกรต่อเนื่อง", i: "kâat-dtà-gɔɔn dtɔ̀ɔ-nʉ̂ʉang", e: "Serial killer" },
+            { t: "😔 เสียใจ", i: "sǐia-jai", e: "Regret / Sorry" },
+            { t: "👕 เสื้อเชิ้ต", i: "sʉ̂ʉa-chə́ət", e: "Shirts" },
+            { t: "🔄 แลก", i: "lɛ̂ɛk", e: "exchange" },
+            { t: "📱 โทรศัพท์", i: "too-rá-sàp", e: "phone" },
+            { t: "📅 น่าจะแบบสิ้นปีนี้", i: "nâa jà bàɛp sîn-bpii-níi", e: "Likely towards end of this year" },
+            { t: "⏳ ไม่ก็ปีหน้าเลย", i: "mâi gɔ̂ɔ bpii-nâa ləəi", e: "or else next year" },
+            { t: "🍜 เส้นเล็ก", i: "sên-lék", e: "Thin noodles" },
+            { t: "🥣 น้ำใส", i: "nám-sǎi", e: "Clear soup" },
+            { t: "🥬 ผักบุ้ง", i: "pàk-bûng", e: "Morning glory" },
+            { t: "🪑 นั่งตรงไหนดี", i: "nâng dtrong nǎi dii", e: "Where's good to sit?" },
+            { t: "❄️ หิมะตก", i: "hì-má-dtòk", e: "Snow falls" },
+            { t: "🍽️ ทานให้อร่อยนะคะ", i: "taan hâi à-rɔ̀i ná ká", e: "Enjoy your meal!" },
+            { t: "📚 การบ้าน", i: "gaan bâan", e: "homework" },
+            { t: "📦 เก็บ", i: "gèp", e: "keep / collect" },
+            { t: "✍️ เขียน", i: "kǐan", e: "write" },
+            { t: "🗣️ คนพูดเยอะที่สุด", i: "kon pûut yə́ tîi sùt", e: "People speak a lot the most" },
+            { t: "👩‍🏫 ครู", i: "kruu", e: "Teacher" },
+            { t: "↩️ คืน", i: "kʉʉn", e: "Return" },
+            { t: "🧠 โครงสร้างประโยค", i: "kroong sâang bprà yòok", e: "Sentence structure" },
+            { t: "🙌 ชู", i: "chuu", e: "hold sth up" },
+            { t: "🏠 ฐานะทางบ้าน", i: "tǎa ná taang bâan", e: "Social economic status" },
+            { t: "🔢 ตัวเลข", i: "dtua lêek", e: "Numbers" },
+            { t: "🔤 ตัวอักษร", i: "dtua àk sɔ̌ɔn", e: "Characters / Alphabet" },
+            { t: "🔔 เตือนความจำ", i: "dtʉan kwaam jam", e: "To remind" },
+            { t: "🎓 นักเรียน", i: "nák rian", e: "Student" },
+            { t: "🪭 พัดลม", i: "pát lom", e: "fan" },
+            { t: "🤫 พูดในใจ", i: "pûut nai jai", e: "Speak silently" },
+            { t: "👂 ฟังช่วยให้เข้าใจ", i: "fang chûai hâi kâo jai", e: "Listen helps understand" },
+            { t: "🖼️ รูป", i: "rûup", e: "Pictures" },
+            { t: "🎓 เรียนจบ", i: "rian jòp", e: "Graduate" },
+            { t: "🏫 โรงเรียน", i: "roong rian", e: "school" },
+            { t: "🎨 วาดรูป", i: "wâat rûup", e: "draw" },
+            { t: "🏫 วิทยาลัย", i: "wít tá yaa lai", e: "College" },
+            { t: "🎨 ศิลปะ", i: "sǐn lá bpà", e: "art" },
+            { t: "🔤 สระ", i: "sà rà", e: "Vowels" },
+            { t: "👩‍🏫 สอน", i: "sɔ̌ɔn", e: "Teach" },
+            { t: "✍️ สะกด", i: "sà gòt", e: "Spell" },
+            { t: "🗣️ สำเนียง", i: "sǎm niang", e: "accent" },
+            { t: "🥊 สู้", i: "sûu", e: "battle / fight" },
+            { t: "📚 หนังสือ", i: "nǎng sʉ̌ʉ", e: "Books" },
+            { t: "🤫 อ่านในใจ", i: "àan nai jai", e: "Read silently" },
+            { t: "📣 อ่านออกเสียง", i: "àan ɔ̀ɔk sǐang", e: "Read aloud" },
+            { t: "👥 คน", i: "kon", e: "People" },
+            { t: "🧑‍💼 จัดการ", i: "jàt gaan", e: "Manage" },
+            { t: "🆘 ช่วย", i: "chûai", e: "Help" },
+            { t: "🚶 เดิน", i: "dəən", e: "Walk" },
+            { t: "🥾 เดินป่า", i: "dəən bpàa", e: "Hike" },
+            { t: "👂 ได้ยิน", i: "dâi yin", e: "Hear" },
+            { t: "🌙 กลางคืน", i: "glaang kʉʉn", e: "nighttime" },
+            { t: "🎭 ตัวเอก", i: "dtua èek", e: "Main character" },
+            { t: "⏰ ตื่น", i: "dtʉ̀ʉn", e: "Wake up" },
+            { t: "💃 เต้น", i: "dtên", e: "Dance" },
+            { t: "🧽 ถู", i: "tǔu", e: "rub" },
+            { t: "🛠️ ทำ", i: "tam", e: "do/make" },
+            { t: "🔁 ทุก", i: "túk", e: "Every" },
+            { t: "📱 โทรศัพท์มือถือ", i: "too rá sàp mʉʉ tʉ̌ʉ", e: "mobile phone" },
+            { t: "😴 นอน", i: "nɔɔn", e: "Sleep" },
+            { t: "🤔 น่าสนใจ", i: "nâa sǒn jai", e: "Interesting" },
+            { t: "🎵 บางเพลง", i: "baang pleeng", e: "Some songs" },
+            { t: "🌱 ปลูกต้นไม้", i: "bplùuk dtôn mái", e: "grow plants" },
+            { t: "👥 ผู้นำ", i: "pûu nam", e: "Leaders" },
+            { t: "👯 ฝาแฝด", i: "fǎa fɛ̀ɛt", e: "Twins" },
+            { t: "👂 ฟัง", i: "fang", e: "Listen" },
+            { t: "🙈 มองไม่เห็น", i: "mɔɔng mâi hěn", e: "Cannot see" },
+            { t: "✅ มีประโยชน์", i: "mii bprà yòot", e: "Useful" },
+            { t: "🗣️ เม้ามอย", i: "máao mɔɔi", e: "to chit-chat" },
+            { t: "😓 ยาก", i: "yâak", e: "Difficult" },
+            { t: "🎤 ร้องเพลง", i: "rɔ́ɔng pleeng", e: "Sing songs" },
+            { t: "↔️ ระหว่าง", i: "rá wàang", e: "between" },
+            { t: "🆕 ล่าสุด", i: "lâa sùt", e: "Latest" },
+            { t: "🎮 เล่น", i: "lên", e: "Play" },
+            { t: "🎢 เล่นเครื่องเล่น", i: "lên krʉ̂ang lên", e: "get on rides" },
+            { t: "🎸 วงเก่า", i: "wong gào", e: "Old bands" },
+            { t: "🧴 สระผม", i: "sà pǒm", e: "Wash hair" },
+            { t: "🔊 เสียง", i: "sǐang", e: "Voice / Sound" },
+            { t: "🔊 เสียงดัง", i: "sǐang dang", e: "Noisy" },
+            { t: "🤜 ไส", i: "sǎi", e: "Push" },
+            { t: "🐶 หมา", i: "mǎa", e: "dog" },
+            { t: "🎶 หลายเพลง", i: "lǎai pleeng", e: "Many songs" },
+            { t: "🔎 หา", i: "hǎa", e: "Search" },
+            { t: "🏋️‍♂️ ออกกำลังกาย", i: "ɔ̀ɔk gam lang gaai", e: "To do exercise" },
+            { t: "📖 อ่าน", i: "àan", e: "Read" },
+            { t: "🥊 กระสอบทราย", i: "grà sɔ̀ɔp saai", e: "punchbag" },
+            { t: "🏅 กีฬา", i: "gii laa", e: "Sports" },
+            { t: "🏁 แข่ง", i: "kɛ̀ng", e: "Compete" },
+            { t: "😣 ทรมาน", i: "tɔɔ rá maan", e: "It's a torture." },
+            { t: "🥊 นวม", i: "nuam", e: "boxing gloves" },
+            { t: "🏄‍♂️ นักเซิร์ฟ", i: "nák sə́əf", e: "Surfer" },
+            { t: "🏆 รางวัล", i: "raang wan", e: "Prize" },
+            { t: "⚡ เร็ว", i: "reo", e: "Fast" },
+            { t: "🏃‍♂️ วิ่ง", i: "wîng", e: "Run" },
+            { t: "🪙 เหรียญ", i: "rǐan", e: "Medal / Coin" },
+            { t: "🏋️‍♀️ อยากให้แม่สมัครฟิตเนส", i: "yàak hây mɛ̂ɛ samàk fít nêet", e: "Want mum to sign up for gym" },
+            { t: "🥊 อุปกรณ์มวย", i: "ù bpà gɔɔn muai", e: "Boxing equipment" },
+            { t: "📦 ก่อนย้ายบ้าน", i: "gɔ̀ɔn yáai bâan", e: "Before moving house" },
+            { t: "🌱 การเติบโต", i: "gaan dtə̀əp dtoo", e: "Growing up" },
+            { t: "🔑 กุญแจรถ", i: "gun jɛɛ rót", e: "Car key" },
+            { t: "🧸 ของเล่น", i: "kɔ̌ɔng lên", e: "Toys" },
+            { t: "💸 ขอยืมเงินหน่อยนะ", i: "kɔ̌ɔ yʉʉm ngən nɔ̀ɔi ná", e: "Can I borrow some money?" },
+            { t: "👨‍👩‍👧‍👦 เขย", i: "kə̌əi", e: "in-law (masc)" },
+            { t: "👨‍👩‍👧‍👦 ครอบครัว", i: "krɔ̂ɔp krua", e: "Family" },
+            { t: "⚰️ งานศพ", i: "ngaan sòp", e: "Funeral" },
+            { t: "🏢 ชั้น", i: "chán", e: "Floor" },
+            { t: "👀 ตา", i: "dtaa", e: "eyes/grandpa" },
+            { t: "👊 ตี", i: "dtii", e: "Hit" },
+            { t: "💍 แต่งงาน", i: "dtɛ̀ng ngaan", e: "get married" },
+            { t: "💢 ทะเลาะกัน", i: "tá lɔ́ gan", e: "quarrel" },
+            { t: "✊ บังคับ", i: "bang káp", e: "To force" },
+            { t: "⛪ โบสถ์", i: "bòot", e: "church" },
+            { t: "🏠 ปัญหาครอบครัว", i: "bpan hǎa krɔ̂ɔp krua", e: "family problems" },
+            { t: "🤾 ปา", i: "bpaa", e: "Throw" },
+            { t: "🚪 เปิดประตู", i: "bpə̀ət bprà dtuu", e: "open the door" },
+            { t: "👨‍🦳 ผมหงอก", i: "pǒm ngɔ̀ɔk", e: "grey hair" },
+            { t: "🙏 พระเจ้า", i: "prá jâo", e: "Gods" },
+            { t: "☸️ พุทธ", i: "pút", e: "Buddhism" },
+            { t: "🤝 เพื่อนรัก", i: "pʉ̂an rák", e: "best friend" },
+            { t: "💔 แฟนเก่า", i: "fɛɛn gào", e: "Ex" },
+            { t: "👵 มาดาม", i: "maa daam", e: "Madam" },
+            { t: "👋 มาหา", i: "maa hǎa", e: "come visit" },
+            { t: "❤️ มีใจ", i: "mii jai", e: "Like" },
+            { t: "👨‍👩‍👧‍👦 ลูกครึ่ง", i: "lûuk krʉ̂ng", e: "Half / Mixed race" },
+            { t: "👨‍👩‍👧‍👦 ลูกพี่ลูกน้อง", i: "lûuk pîi lûuk nɔ́ɔng", e: "Cousin" },
+            { t: "🛐 ศาสนา", i: "sàat sà nǎa", e: "Religion" },
+            { t: "👰 สะใภ้", i: "sà pái", e: "in-law (fem)" },
+            { t: "🏘️ หมู่บ้าน", i: "mùu bâan", e: "Village" },
+            { t: "🚿 ห้องอาบน้ำ", i: "hɔ̂ɔng àap náam", e: "Shower room" },
+            { t: "🤝 ให้ยืม", i: "hâi yʉʉm", e: "Lend" },
+            { t: "👩‍👧‍👦 อา", i: "aa", e: "Aunt/Uncle" },
+            { t: "🛁 อ่าง", i: "àang", e: "bathtub" },
+            { t: "🥰 เอ็นดู", i: "en duu", e: "adore" },
+            { t: "😱 กรีดร้อง", i: "grìit rɔ́ɔng", e: "scream" },
+            { t: "📝 กลอนสั้น", i: "glɔɔn sân", e: "short poem" },
+            { t: "🔄 กลายเป็น", i: "glaai bpen", e: "become" },
+            { t: "🔪 การฆาตกรรม", i: "gaan kâat dtà gam", e: "Murder" },
+            { t: "⭐️ คนดัง", i: "kon dang", e: "famous people" },
+            { t: "🕵️‍♂️ ความลึกลับ", i: "kwaam lʉ́k láp", e: "Mystery" },
+            { t: "🔪 ฆาตกรรม", i: "kâat dtà gam", e: "Crimes" },
+            { t: "🌑 เงา", i: "ngao", e: "shadow" },
+            { t: "🏆 เงินรางวัล", i: "ngən raang wan", e: "Cash prize" },
+            { t: "💸 จน", i: "jon", e: "Poor" },
+            { t: "👩‍👧 จอร์เจียเป็นแม่ที่ดี", i: "jɔɔ jia bpen mɛ̂ɛ tîi dii", e: "Georgia is a good mum." },
+            { t: "📍 จุด", i: "jùt", e: "Point" },
+            { t: "🤝 เจอ", i: "jəə", e: "found / meet" },
+            { t: "🏆 ชนะ", i: "chá ná", e: "Win" },
+            { t: "🧩 ซับซ้อน", i: "sáp sɔ́ɔn", e: "Complex" },
+            { t: "🏠 ดาดฟ้า", i: "dàat fáa", e: "Rooftop" },
+            { t: "🎬 ดารา", i: "daa raa", e: "movie stars" },
+            { t: "🔮 เดาได้", i: "dao dâi", e: "predictable" },
+            { t: "💡 ได้รับแรงบันดาลใจจาก", i: "dâi ráp rɛɛng ban daan jai jàak", e: "Get inspiration from" },
+            { t: "😈 ตัวร้าย", i: "dtua ráai", e: "villain" },
+            { t: "🎵 แต่งเพลง", i: "dtɛ̀ng pleeng", e: "compose songs" },
+            { t: "💀 ถูกฆ่า", i: "tùuk kâa", e: "Get killed" },
+            { t: "🎬 ทำซีรีส์ไม่เหมือนกัน", i: "tam sii rîi mâi mʉ̌an gan", e: "Film making is not same." },
+            { t: "👨‍👩‍👧‍👦 ทำทุกอย่างเพื่อลูก", i: "tam túk yàang pʉ̂a lûuk", e: "Do everything for children" },
+            { t: "💥 ทำลาย", i: "tam laai", e: "Destroy" },
+            { t: "🔪 นักฆ่า", i: "nák kâa", e: "Killer" },
+            { t: "🎤 นักร้อง", i: "nák rɔ́ɔng", e: "Singer" },
+            { t: "🎭 นักแสดง", i: "nák sà dɛɛng", e: "actor" },
+            { t: "🪑 นั่งตัก", i: "nâng dtàk", e: "Sit on lap" },
+            { t: "💡 เป็นแรงบันดาลใจ", i: "bpen rɛɛng ban daan jai", e: "To be an inspiration" },
+            { t: "🎙️ พากย์", i: "pâak", e: "To dub" },
+            { t: "🧱 พื้น", i: "pʉ́ʉn", e: "ground/floor" },
+            { t: "🎬 ภาค", i: "pâak", e: "season (sequel)" },
+            { t: "💬 มีความหมายดี", i: "mîik waam mǎai dii", e: "Meaningful" },
+            { t: "🤝 มีอะไรให้ช่วยครับ", i: "mii à rai hâi chûai kráp", e: "How can I help?" },
+            { t: "🙅‍♂️ ไม่หันมา", i: "mâi hǎn maa", e: "Didn't turn around" },
+            { t: "💔 เลิกกัน", i: "lə̂ək gan", e: "Break up" },
+            { t: "0️⃣ ศูนย์", i: "sǔun", e: "Zero" },
+            { t: "👾 สัตว์ประหลาด", i: "sàt bprà làat", e: "Monster" },
+            { t: "🎬 หนัง", i: "nǎng", e: "movie" },
+            { t: "💸 หนี้", i: "nîi", e: "Debts" },
+            { t: "👂 หูดี", i: "hǔu dii", e: "good ears" },
+            { t: "🎧 หูฟัง", i: "hǔu fang", e: "Headphones" },
+            { t: "💦 เหงื่อออก", i: "ngʉ̀a ɔ̀ɔk", e: "To sweat" },
+            { t: "😒 เอาเปรียบ", i: "ao bprìap", e: "Take advantage of someone" },
+            { t: "😠 โกรธ", i: "gròot", e: "angry" },
+            { t: "😰 เครียด", i: "krîat", e: "stressed" },
+            { t: "😴 ง่วง", i: "ngûang", e: "Sleepy" },
+            { t: "😄 ดีใจ", i: "dii jai", e: "happy" },
+            { t: "🤩 ตื่นเต้น", i: "dtʉ̀ʉn dtên", e: "Excited" },
+            { t: "😱 น่ากลัว", i: "nâa glua", e: "scary" },
+            { t: "🤢 น่ารังเกียจ", i: "nâa rang gìat", e: "Disgusting" },
+            { t: "😄 มีความสุข", i: "mii kwaam sùk", e: "Happy" },
+            { t: "👴 เกษียณ", i: "gà sǐan", e: "Retired" },
+            { t: "❤️ รัก", i: "rák", e: "Love" },
+            { t: "😌 สบายใจ", i: "sà baai jai", e: "Comfortable" },
+            { t: "😊 อบอุ่น", i: "òp un", e: "Warm" },
+            { t: "➡️ ก็", i: "gɔ̂ɔ", e: "then" },
+            { t: "➡️ ก็เลย", i: "gɔ̂ɔ ləəi", e: "so" },
+            { t: "📈 กว่า", i: "gwàa", e: "comparative" },
+            { t: "⏳ กว่าจะถึง", i: "gwàa jà tʉ̌ng", e: "By the time we arrive" },
+            { t: "⏮️ ก่อน", i: "gɔ̀ɔn", e: "Before" },
+            { t: "🤝 กัน", i: "gan", e: "together" },
+            { t: "🤝 กับ", i: "gàp", e: "and/with" },
+            { t: "🚶‍♂️ กำลังไป", i: "gam lang bpai", e: "on the way" },
+            { t: "🧭 กำลังไปไหน", i: "gam lang bpai nǎi", e: "Where are you on the way to?" },
+            { t: "🚶‍♂️ กำลังมา", i: "gam lang maa", e: "coming" },
+            { t: "🍽️ กินสิ", i: "gin sì", e: "Eat!" },
+            { t: "🕰️ เก่า", i: "gào", e: "old" },
+            { t: "🔗 เกี่ยวกับ", i: "gìao gàp", e: "about" },
+            { t: "📍 ใกล้", i: "glâi", e: "Near" },
+            { t: "🔗 ของ", i: "kɔ̌ɔng", e: "of (possessive)" },
+            { t: "🚪 เข้า", i: "kâo", e: "Enter" },
+            { t: "🤝 เข้ากับ", i: "kâo gàp", e: "get along with" },
+            { t: "🧍‍♂️ คนเดียว", i: "kon diao", e: "alone" },
+            { t: "🔗 คล้าย", i: "kláai", e: "similar" },
+            { t: "✅ ควร", i: "kuan", e: "should" },
+            { t: "👫 คู่", i: "kûu", e: "pairs" },
+            { t: "🔁 เคย", i: "kəəi", e: "Ever / Used to" },
+            { t: "👌 แค่", i: "kɛ̂ɛ", e: "Just / only" },
+            { t: "🤔 จริงๆแล้ว", i: "jing jing lɛ́ɛo", e: "Actually" },
+            { t: "⏳ จะ", i: "jà", e: "will" },
+            { t: "👀 ดู", i: "duu", e: "Look / watch" },
+            { t: "🔁 เดิม", i: "dəəm", e: "Same old / usual" },
+            { t: "❓ ใด", i: "dai", e: "any / which" },
+            { t: "🍽️ ได้กินเลย", i: "dâi gin ləəi", e: "Get to eat immediately" },
+            { t: "➡️ ต่อ", i: "dtɔ̀ɔ", e: "Continue / Next" },
+            { t: "✅ ต้อง", i: "dtɔ̂ng", e: "Have to / Must" },
+            { t: "🙏 ต้องการ", i: "dtɔ̂ng gaan", e: "want / need" },
+            { t: "📅 จอง", i: "jɔɔng", e: "Reserve / book" },
+            { t: "🔀 แต่", i: "dtɛ̀ɛ", e: "but" },
+            { t: "📅 แต่ละวันทำอะไรบ้าง", i: "dtɛ̀ɛ lá wan tam à rai bâang", e: "What do you do each day?" },
+            { t: "🤔 ถ้า", i: "tâa", e: "If" },
+            { t: "➡️ ถึง", i: "tʉ̌ng", e: "To / Until" },
+            { t: "✅ ถูก", i: "tùuk", e: "cheap / correct / get(passive)" },
+            { t: "😣 ถูกรังแก", i: "tǔu grang gɛɛ", e: "Get bullied" },
+            { t: "🧩 ทั้งหมด", i: "táng mòt", e: "All / Total" },
+            { t: "🛠️ ทำให้", i: "tam hâi", e: "to make sb adj" },
+            { t: "📍 ที่", i: "tîi", e: "at/which/that/who" },
+            { t: "🏆 ที่สุด", i: "tîi sùt", e: "The most" },
+            { t: "📍 ที่ไหนก็ได้", i: "tîi nǎi gɔ̂ɔ dâi", e: "Wherever" },
+            { t: "🟰 เท่ากับ", i: "tâo gàp", e: "equal" },
+            { t: "🔒 เท่านั้น", i: "tâo nán", e: "only" },
+            { t: "🪑 นั่งสิ", i: "nâng sì", e: "Sit!" },
+            { t: "✅ แน่ใจ", i: "nɛ̂ɛ jai", e: "Sure" },
+            { t: "📍 ใน", i: "nai", e: "In" },
+            { t: "🏢 ในอาคาร", i: "nai aa kaan", e: "Within the building" },
+            { t: "✨ บางอย่าง", i: "baang yàang", e: "Something" },
+            { t: "🧩 ปกติ", i: "bpà gà dtì", e: "Normally" },
+            { t: "📝 ประโยค", i: "bprà yòok", e: "sentence" },
+            { t: "🟰 เป็น", i: "bpen", e: "Be (is/am/are)" },
+            { t: "👋 เป็นยังไงบ้าง", i: "bpen yang ngai bâang", e: "How's ...?" },
+            { t: "🍚 ไปกินข้าวมา", i: "bpai gin kâao maa", e: "I went to eat." },
+            { t: "🧭 ไปไหนมา", i: "bpai nǎi maa", e: "Where did you go?" },
+            { t: "❌ ผิด", i: "pìt", e: "wrong" },
+            { t: "💪 พยายาม", i: "pá yaa yaam", e: "try / attempt" },
+            { t: "✅ พร้อม", i: "phrɔ́ɔm", e: "ready / together with" },
+            { t: "🚶‍♂️ พา", i: "paa", e: "Take" },
+            { t: "🔗 เพราะ", i: "prɔ́", e: "Because" },
+            { t: "🕒 เพิ่ง", i: "pə̂əng", e: "just / recently" },
+            { t: "➕ เพิ่ม", i: "pə̂əm", e: "Additional" },
+            { t: "🔗 เพื่อ", i: "pʉ̂a", e: "for / in order to" },
+            { t: "👫 เพื่อนคนละคน", i: "pʉ̂an kon lá kon", e: "different friends" },
+            { t: "🔁 มักจะ", i: "mák jà", e: "tend to" },
+            { t: "🚶 มา", i: "maa", e: "come" },
+            { t: "➕ มากกว่า", i: "mâak gwàa", e: "More than" },
+            { t: "🫴 มี", i: "mii", e: "Have" },
+            { t: "⏰ เมื่อไร", i: "mʉ̂a rài", e: "When?" },
+            { t: "🤷‍♂️ ไม่รู้ทำไม", i: "mâi rúu tam mai", e: "Don't know why" },
+            { t: "➕ รวม", i: "ruam", e: "include" },
+            { t: "🧠 รู้", i: "rúu", e: "know" },
+            { t: "🚀 เริ่ม", i: "rə̂əm", e: "start" },
+            { t: "📞 เรียก", i: "rîak", e: "Call (names)" },
+            { t: "📚 เรียนสิ", i: "rian sì", e: "Study!" },
+            { t: "📖 เรื่อง", i: "rʉ̂ang", e: "story" },
+            { t: "🧪 ลอง", i: "lɔɔng", e: "try" },
+            { t: "✅ เลือก", i: "lʉ̂ak", e: "Choose" },
+            { t: "🤷‍♂️ แล้วแต่", i: "lɛ́ɛo dtɛ̀ɛ", e: "It depends" },
+            { t: "🚫 เว้นแต่ว่า", i: "wén dtɛ̀ɛ wâa", e: "Unless" },
+            { t: "📊 ส่วนใหญ่", i: "sùan yài", e: "mostly" },
+            { t: "➡️ สำหรับ", i: "sǎm ràp", e: "for" },
+            { t: "🔀 หรือ", i: "rʉ̌ʉ", e: "or" },
+            { t: "🔙 หลัง", i: "lǎng", e: "After / behind" },
+            { t: "🔢 หลาย", i: "lǎai", e: "many" },
+            { t: "👀 เห็น", i: "hěn", e: "think / see" },
+            { t: "✅ เหมาะกับ", i: "mɔ̀ gàp", e: "To suit" },
+            { t: "🔁 เหมือนเดิม", i: "mʉ̌an dəəm", e: "Same as usual" },
+            { t: "🤔 เหรอ", i: "rə̌ə", e: "Really?" },
+            { t: "🎁 ให้", i: "hâi", e: "give / allow" },
+            { t: "📏 ใหญ่", i: "yài", e: "Big" },
+            { t: "❓ ไหน", i: "nǎi", e: "Which" },
+            { t: "🙏 อยาก", i: "yàak", e: "Want to" },
+            { t: "✅ อย่างน้อย", i: "yàang nɔ́ɔi", e: "At least" },
+            { t: "📍 อยู่", i: "yùu", e: "at / -ing" },
+            { t: "🧍‍♂️ อยู่คนเดียวตลอด", i: "yùu kon diao dtà lɔ̀ɔt", e: "always be alone" },
+            { t: "➕ อีก", i: "ìik", e: "More" },
+            { t: "🔀 อื่น", i: "ʉ̀ʉn", e: "Other" },
+            { t: "❓ ใคร", i: "krai", e: "Who?" },
+            { t: "🍚 จะกินข้าวแล้วเหรอ", i: "jà gin kâao lɛ́ɛo rə̌ə", e: "Will you eat already?" },
+            { t: "🍚 จะกินข้าวหรือเปล่าล่ะ", i: "cà kinkhâaw rʉ̌ʉplàaw lâ", e: "So, will you eat or not?" },
+            { t: "🍚 จะกินข้าวหรือยัง", i: "cà kinkhâaw rʉ̌ʉyaŋ", e: "Will you eat or not yet?" },
+            { t: "❓ แปลว่าอะไรนะ", i: "bplɛɛ wâa à rai ná", e: "What does that mean?" },
+            { t: "💼 เริ่มงานหรือยัง", i: "rə̂əm ŋaan rʉ̌ʉyaŋ", e: "Have you started working?" },
+            { t: "🤔 แล้วคุณล่ะ", i: "lɛ́ɛw khun lâ", e: "What about you?" },
+            { t: "🏗️ ก่อสร้าง", i: "gɔ̀ɔ sâang", e: "contruct" },
+            { t: "💪 แข็งแรง", i: "kɛ̌ng rɛɛng", e: "strong" },
+            { t: "🪑 เก้าอี้", i: "gâo îi", e: "chair" },
+            { t: "💪 ขยัน", i: "kà yǎn", e: "Hardworking" },
+            { t: "💬 ข้อความ", i: "kɔ̂ɔ kwaam", e: "Message" },
+            { t: "🧑‍⚕️ เข้าเวร", i: "kâo ween", e: "On shift" },
+            { t: "🧑‍⚕️ คนไข้", i: "kon kâi", e: "Patients" },
+            { t: "💬 คำตอบ", i: "kam dtɔ̀ɔp", e: "answer" },
+            { t: "🔤 คำย่อ", i: "kam yɔ̂ɔ", e: "Abbreviation" },
+            { t: "💬 คุย", i: "kui", e: "talk" },
+            { t: "🏢 เครือเดียวกัน", i: "krʉa diao gan", e: "Under the same umbrella" },
+            { t: "🤝 จริงใจ", i: "jing jai", e: "Sincere" },
+            { t: "🎟️ จับฉลาก", i: "jàp chà làak", e: "Lucky draw" },
+            { t: "🤝 ซื่อสัตย์", i: "sʉ̂ʉ sàt", e: "Honest" },
+            { t: "🆕 เด็กใหม่", i: "dèk mài", e: "Newbies" },
+            { t: "👔 ต้องบอกบอส", i: "dtɔ̂ɔng bɔ̀ɔk bɔ́ɔt", e: "Have to tell boss" },
+            { t: "💰 ตังค์", i: "dtang", e: "money" },
+            { t: "🎯 ตั้งใจ", i: "dtâng jai", e: "intentionally" },
+            { t: "🤔 ตัดสินใจ", i: "dtàt sǐn jai", e: "Decide" },
+            { t: "👆 ติ๊ด", i: "dtít", e: "Tap" },
+            { t: "🛠️ เตรียม", i: "dtriam", e: "Prepare" },
+            { t: "🗣️ เถียง", i: "tǐang", e: "argue" },
+            { t: "🧑‍💼 ทางการ", i: "taang gaan", e: "Formal" },
+            { t: "🧑‍⚕️ นักกายภาพบำบัด", i: "nák gaai yá pâap bam bàt", e: "physiotherapist" },
+            { t: "🧠 นักจิตวิทยา", i: "nák jìt dtà wít tá yaa", e: "psychologist" },
+            { t: "🥱 น่าเบื่อ", i: "nâa bʉ̀a", e: "Boring" },
+            { t: "🏢 บริษัท", i: "bɔɔ rí sàt", e: "Company" },
+            { t: "⏰ บ่อย", i: "bɔ̀ɔi", e: "Often" },
+            { t: "🔎 ประมาณ", i: "bprà maan", e: "Approximately" },
+            { t: "📊 ประเมิน", i: "bprà məən", e: "Appraise" },
+            { t: "❓ ปัญหา", i: "bpan hǎa", e: "problems" },
+            { t: "🔄 เปลี่ยน", i: "bplìan", e: "Change" },
+            { t: "✅ ผ่าน", i: "pàan", e: "pass" },
+            { t: "👥 เพื่อนร่วมงาน", i: "pʉ̂an rûam ngaan", e: "Co-workers" },
+            { t: "💼 มีประสบการณ์", i: "mii bprà sòp gaan", e: "To experience" },
+            { t: "🛡️ ยาม", i: "yaam", e: "Security guard" },
+            { t: "⏳ ยุ่ง", i: "yûng", e: "busy" },
+            { t: "🙇‍♂️ รบกวน", i: "róp guan", e: "Disturb" },
+            { t: "🛡️ รปภ.", i: "rɔɔ bpɔɔ pɔɔ", e: "Security guard" },
+            { t: "🛡️ รักษาความปลอดภัย", i: "rák sǎa kwaam bplɔ̀ɔt pai", e: "Protect safety" },
+            { t: "📚 เรียนรู้", i: "rian rúu", e: "gain knowledge" },
+            { t: "🏖️ ลา", i: "laa", e: "Take a leave" },
+            { t: "🏖️ ลาพักร้อน", i: "laa pák rɔ́ɔn", e: "vacation leave" },
+            { t: "👥 ลูกน้อง", i: "lûuk nɔ́ɔng", e: "Subordinates" },
+            { t: "🛠️ วันแรงงาน", i: "wan rɛɛng ngaan", e: "Labour Day" },
+            { t: "🏖️ วันหยุด", i: "wan yùt", e: "holiday" },
+            { t: "💰 สตางค์", i: "sà dtaang", e: "cents" },
+            { t: "👏 สมควรแล้ว", i: "sǒm kuan lɛ́ɛo", e: "You deserve it." },
+            { t: "📝 สมัคร", i: "sà màk", e: "Apply" },
+            { t: "🧑‍💼 สวัสดิการ", i: "sà wàt dì gaan", e: "Welfare & benefits" },
+            { t: "🕰️ ตลอด", i: "talɔ̀ɔt", e: "always" },
+            { t: "🌿 สาขา", i: "sǎa kǎa", e: "Branches" },
+            { t: "🛑 หยุด", i: "yùt", e: "stop" },
+            { t: "🤝 หวังดี", i: "wǎng dii", e: "They mean well." },
+            { t: "✅ อนุมัติ", i: "à nú mát", e: "approve" },
+            { t: "🏢 อสังหา", i: "à sǎng hǎa", e: "real estate" },
+            { t: "✨ อะไรใหม่ๆ", i: "à rai mài mài", e: "New things" },
+            { t: "🎂 อายุ", i: "aa yú", e: "age" },
+            { t: "👜 กระเป๋า", i: "grà bpǎo", e: "Bags" },
+            { t: "🎭 แกล้งทำตัว", i: "glɛ̂ɛng tam dtua", e: "pretend to act" },
+            { t: "🍾 ขวด", i: "kùat", e: "Bottle" },
+            { t: "🎁 ของฝาก", i: "kɔ̌ɔng fàak", e: "souvenirs" },
+            { t: "💰 ขาย", i: "kǎai", e: "Sell" },
+            { t: "🚪 เข้าไปเลย", i: "kâo bpai ləəi", e: "Go in now." },
+            { t: "👕 แขนสั้น", i: "kɛ̌ɛn sân", e: "Short-sleeved" },
+            { t: "🛒 คนขาย", i: "kon kǎai", e: "Seller" },
+            { t: "☕️ เครื่องทำกาแฟ", i: "krʉ̂ang tam gaa fɛɛ", e: "Coffee machine" },
+            { t: "💄 เครื่องสำอาง", i: "krʉ̂ang sǎm aang", e: "cosmetics" },
+            { t: "💰 เงิน", i: "ngən", e: "Money" },
+            { t: "🛒 ซื้อ", i: "sʉ́ʉ", e: "Buy" },
+            { t: "🌸 ดอกไม้", i: "dɔ̀ɔk mái", e: "Flowers" },
+            { t: "👋 เดี๋ยวไปส่งนะครับ", i: "dǐao bpai sòng ná kráp", e: "I'll send you off." },
+            { t: "💰 ต่อราคา", i: "dtɔ̀ɔ raa kaa", e: "negotiate the price" },
+            { t: "👕 ถอด", i: "tɔ̀ɔt", e: "take off" },
+            { t: "🧴 น้ำหอม", i: "nám hɔ̌ɔm", e: "Perfume" },
+            { t: "🎨 เปลี่ยนสี", i: "bplìan sǐi", e: "change colour" },
+            { t: "🛍️ พอดี", i: "pɔɔ dii", e: "Fit" },
+            { t: "✨ พิเศษ", i: "pí sèet", e: "Special" },
+            { t: "💸 แพง", i: "pɛɛng", e: "Expensive" },
+            { t: "👟 รองเท้า", i: "rɔɔng táao", e: "shoes" },
+            { t: "👕 ลองได้นะครับ", i: "lɔɔng dâi ná kráp", e: "You can try it on." },
+            { t: "🛍️ ลูกค้า", i: "lûuk káa", e: "Customer" },
+            { t: "📚 เล่ม", i: "lêm", e: "Classifier for books" },
+            { t: "👓 แว่น", i: "wɛ̂ɛn", e: "Glasses" },
+            { t: "🕶️ แว่นกันแดด", i: "wɛ̂ɛn gan dɛ̀ɛt", e: "sunglasses" },
+            { t: "💎 สร้อยข้อมือ", i: "sɔ̂ɔi kɔ̂ɔ mʉʉ", e: "bracelet" },
+            { t: "💔 เสีย", i: "sǐa", e: "broken" },
+            { t: "👗 เสื้อผ้า", i: "sʉ̂a pâa", e: "Clothes" },
+            { t: "👕 ใส่", i: "sài", e: "Put on" },
+            { t: "🔩 เหล็ก", i: "lèk", e: "Metal" },
+            { t: "🆕 ใหม่", i: "mài", e: "New" },
+            { t: "➡️ ขวา", i: "kwǎa", e: "Right" },
+            { t: "⬆️ ข้างบน", i: "kâang bon", e: "Upstairs" },
+            { t: "⬇️ ข้างล่าง", i: "kâang lâang", e: "Downstairs" },
+            { t: "➡️ ข้างหน้า", i: "kâang nâa", e: "In front" },
+            { t: "⬅️ ข้างหลัง", i: "kâang lǎng", e: "Behind" },
+            { t: "🛗 ขึ้นบันไดเลื่อน", i: "kʉ̂n ban dai lʉ̂an", e: "Go up escalator" },
+            { t: "⬆️ ชั้นบน", i: "chán bon", e: "Upstairs" },
+            { t: "🔗 เชื่อมกัน", i: "chʉ̂am gan", e: "Connected" },
+            { t: "⬅️ ซ้าย", i: "sáai", e: "Left" },
+            { t: "📍 ตรงนี้", i: "dtrong níi", e: "Right here" },
+            { t: "👉 ตรงนู้น", i: "dtrong núun", e: "Right over there" },
+            { t: "🧭 ตรงไป", i: "dtrong bpai", e: "Go straight" },
+            { t: "📍 ตรงไหน", i: "dtrong nǎi", e: "Where?" },
+            { t: "❓ ถาม", i: "tǎam", e: "To ask" },
+            { t: "🚪 ทางออก", i: "taang ɔ̀ɔk", e: "Exit" },
+            { t: "🗣️ บอก", i: "bɔ̀ɔk", e: "Tell" },
+            { t: "👮 ตำรวจ", i: "dtam rùat", e: "Police" },
+            { t: "⬇️ ลง", i: "long", e: "Down" },
+            { t: "🛒 ล็อก", i: "lɔ́k", e: "Aisle" },
+            { t: "👤 หันหน้า", i: "hǎn nâa", e: "To face" },
+            { t: "🔁 อีกรอบนึง", i: "ìik rɔ̂ɔp nʉng", e: "One more time" },
+            { t: "🚠 กระเช้า", i: "grà cháo", e: "Cable car" },
+            { t: "🧭 กลาง", i: "glaang", e: "central" },
+            { t: "🏝️ เกาะ", i: "gɔ̀", e: "island" },
+            { t: "🧳 ไกด์", i: "gái", e: "Tour guide" },
+            { t: "🏞️ ข้างนอก", i: "kâang nɔ̂ɔk", e: "Outside" },
+            { t: "🚴 ขี่", i: "kìi", e: "ride" },
+            { t: "🧑‍🤝‍🧑 แขก", i: "kɛ̀ɛk", e: "Guest" },
+            { t: "🛣️ ครึ่งทาง", i: "krʉ̂ng taang", e: "Half way" },
+            { t: "✈️ เครื่องบิน", i: "krʉ̂ang bin", e: "plane" },
+            { t: "🤔 งง", i: "ngong", e: "confused" },
+            { t: "💇‍♂️ ตัดผม", i: "dtàt pǒm", e: "Cut hair" },
+            { t: "🦀 จับปู", i: "jàp bpuu", e: "Catch crabs" },
+            { t: "⛰️ ชัน", i: "chan", e: "steep" },
+            { t: "🛂 ชายแดน", i: "chaai dɛɛn", e: "border" },
+            { t: "🏖️ ชายหาด", i: "chaai hàat", e: "beach" },
+            { t: "💸 ใช้เงิน", i: "chái ngən", e: "spend money" },
+            { t: "🌟 ดัง", i: "dang", e: "Famous" },
+            { t: "✈️ เดินทางปลอดภัย", i: "dəən taang bplɔ̀ɔt pai", e: "Safe travels!" },
+            { t: "🌳 ต้นไม้", i: "dtôn mái", e: "trees" },
+            { t: "🎟️ ตั๋ว", i: "dtǔa", e: "Tickets" },
+            { t: "🧭 ใต้", i: "dtâi", e: "south" },
+            { t: "📸 ถ่ายรูป", i: "tàai rûup", e: "Take photos" },
+            { t: "🌊 ทะเล", i: "tá lee", e: "the sea" },
+            { t: "👫 ทั้งคู่", i: "táng kûu", e: "Both" },
+            { t: "🗺️ ที่อื่น", i: "tîi ʉ̀ʉn", e: "Other places" },
+            { t: "⛵️ นั่งเรือ", i: "nâng rʉa", e: "Take the boat" },
+            { t: "🔓 เปิด", i: "bpə̀ət", e: "Open" },
+            { t: "👉 ผลัก", i: "plàk", e: "push" },
+            { t: "🤦‍♂️ เผลอ", i: "plə̌ə", e: "accidentally" },
+            { t: "⛰️ ภูเขา", i: "puu kǎo", e: "Mountain" },
+            { t: "🏍️ มอเตอร์ไซค์", i: "mɔɔ dtəə sai", e: "motorcycle" },
+            { t: "📛 มีชื่อ", i: "mii chʉ̂ʉ", e: "well-known" },
+            { t: "🤷 ไม่มีอะไรทำ", i: "mâi mii à rai tam", e: "Nothing to do" },
+            { t: "🗿 รูปปั้น", i: "rûup bpân", e: "statues" },
+            { t: "🏨 โรงแรม", i: "roong rɛɛm", e: "Hotel" },
+            { t: "🧳 ลืมเอามา", i: "lʉʉm ao maa", e: "Forgot to bring" },
+            { t: "🛕 วัด", i: "wát", e: "Temples" },
+            { t: "🧘‍♂️ สงบ", i: "sà ngòp", e: "peaceful" },
+            { t: "📩 ส่งมาให้ฉัน", i: "sòng maa hâi chǎn", e: "Send them to me" },
+            { t: "🏊‍♂️ สระว่ายน้ำ", i: "sà wâai náam", e: "Swimming pool" },
+            { t: "🎢 สวนสนุก", i: "sǔan sà nùk", e: "amusement park" },
+            { t: "🧳 สะดวก", i: "sà dùak", e: "Convenient" },
+            { t: "🏬 สาขาอื่น", i: "sǎa kǎa ʉ̀ʉn", e: "Other branches" },
+            { t: "✈️ สายการบิน", i: "sǎai gaan bin", e: "airline" },
+            { t: "🎲 สุ่ม", i: "sùm", e: "random" },
+            { t: "🙄 หยาบคาย", i: "yàap kaai", e: "rude" },
+            { t: "🏨 ห้อง", i: "hɔ̂ɔng", e: "rooms" },
+            { t: "🧭 เหนือ", i: "nʉ̌a", e: "north" },
+            { t: "🛥️ อยู่บนเรือ", i: "yùu bon rʉa", e: "Stay on the boat" },
+            { t: "🌞 อาบแดด", i: "àap dɛ̀ɛt", e: "sunbathe" },
+            { t: "💪 กล้า", i: "glâa", e: "dare / brave" },
+            { t: "😴 ขี้เกียจ", i: "kîi gìat", e: "lazy" },
+            { t: "😊 ใจดี", i: "jai dii", e: "Kind" },
+            { t: "🧠 ฉลาด", i: "chà làat", e: "Smart" },
+            { t: "😈 ซน", i: "son", e: "naughty" },
+            { t: "😤 ดื้อ", i: "dʉ̂ʉ", e: "stubborn" },
+            { t: "😆 ตลก", i: "dtà lòk", e: "funny" },
+            { t: "🧠 นิสัย", i: "ní sǎi", e: "personality" },
+            { t: "🌿 เป็นธรรมชาติ", i: "bpen tam má châat", e: "Natural" },
+            { t: "😡 โมโห", i: "moo hǒo", e: "Furious" },
+            { t: "⚡ ไว", i: "wai", e: "Fast" },
+            { t: "🇰🇷 เกาหลี", i: "gao lǐi", e: "Korea" },
+            { t: "🇹🇼 ไต้หวัน", i: "dtâi wǎn", e: "Taiwan" },
+            { t: "🌍 ประเทศ", i: "bprà têet", e: "Country" },
+            { t: "🇫🇷 ฝรั่งเศส", i: "fà ràng sèet", e: "France" },
+            { t: "🇲🇲 พม่า", i: "pá mâa", e: "Myanmar" },
+            { t: "🇬🇧 อังกฤษ", i: "ang grìt", e: "the UK" },
+            { t: "📅 วันจันทร์", i: "wan can", e: "Monday" },
+            { t: "📅 วันอังคาร", i: "wan ang kaan", e: "Tuesday" },
+            { t: "📅 วันพุธ", i: "wan pút", e: "Wednesday" },
+            { t: "📅 วันพฤหัส", i: "wan prí hàt", e: "Thursday" },
+            { t: "📅 วันศุกร์", i: "wan sùk", e: "Friday" },
+            { t: "📅 วันเสาร์", i: "wan sǎo", e: "Saturday" },
+            { t: "☀️ วันอาทิตย์", i: "wan aa tít", e: "Sunday" },
+            { t: "👣 ตาม", i: "dtaam", e: "Follow" },
+            { t: "📅 กลางปี", i: "glaang bpii", e: "midyear" },
+            { t: "⏰ กี่โมง", i: "gìi moong", e: "What time?" },
+            { t: "⏮️ ครั้งที่แล้ว", i: "khráŋ thîilɛ́ɛw", e: "Last time" },
+            { t: "½ ครึ่ง", i: "krʉ̂ng", e: "Half" },
+            { t: "🌙 คืนนี้", i: "kʉʉn níi", e: "Tonight" },
+            { t: "⏳ ช่วงนี้", i: "chûang níi", e: "Lately" },
+            { t: "⏳ ชั่วโมง", i: "chûa moong", e: "Hours" },
+            { t: "⏳ ใช้เวลา", i: "chái wee laa", e: "take time" },
+            { t: "🌙 ดึก", i: "dʉ̀k", e: "late night" },
+            { t: "🌙 เที่ยงคืน", i: "thîang-kʉʉn", e: "midnight" },
+            { t: "🗓️ เดือน", i: "dʉan", e: "month" },
+            { t: "⏰ ตอน", i: "dtɔɔn", e: "When" },
+            { t: "⏭️ ต่อมา", i: "dtɔ̀ɔ maa", e: "Next ..." },
+            { t: "⏳ แต่ก่อน", i: "dtɛ̀ɛ gɔ̀ɔn", e: "Before this" },
+            { t: "📅 ทั้งปี", i: "táng bpii", e: "The whole year" },
+            { t: "🗓️ ทั้งอาทิตย์", i: "táng aa tít", e: "the whole week" },
+            { t: "⏱️ ที", i: "tii", e: "Times" },
+            { t: "🕛 เที่ยง", i: "tîang", e: "noon" },
+            { t: "⏱️ นาที", i: "naa tii", e: "Minutes" },
+            { t: "⏳ นาน", i: "naan", e: "Long time" },
+            { t: "⏳ บางครั้ง", i: "baang kráng", e: "Sometimes" },
+            { t: "🕒 บางที", i: "baang tii", e: "Sometimes" },
+            { t: "📅 ปีหน้า", i: "bpii nâa", e: "next year" },
+            { t: "⏱️ ปุ๊บปั๊บ", i: "bpúp bpáp", e: "Last minute" },
+            { t: "📅 เมื่อวาน", i: "mʉ̂a waan", e: "Yesterday" },
+            { t: "📏 ยาว", i: "yaaw", e: "long" },
+            { t: "⏳ รอ", i: "rɔɔ", e: "wait" },
+            { t: "🏁 สุดท้าย", i: "sùt táai", e: "Final" },
+            { t: "📅 เสาร์อาทิตย์", i: "sǎo aa tít", e: "Saturday&Sunday" },
+            { t: "🗓️ อาทิตย์ที่แล้ว", i: "aa tít tîi lɛ́ɛo", e: "Last week" },
+            { t: "📅 อาทิตย์หน้า", i: "aa tít nâa", e: "Next week" },
+            { t: "🌾 นา", i: "naa", e: "rice field" },
+            { t: "🏞️ สวน", i: "sǔan", e: "Park" },
+            { t: "🏬 ห้าง", i: "hâang", e: "Mall" },
+            { t: "⏳ ...ไว้", i: "wái", e: "finished action" },
+            { t: "🪜 ขั้นตอน", i: "kân dtɔɔn", e: "process" },
+            { t: "⚖️ ชั่งน้ำหนัก", i: "châng nám nàk", e: "To weigh" },
+            { t: "🎯 ตรงกลาง", i: "dtrong glaang", e: "Middle" },
+            { t: "💺 ที่นั่ง", i: "tîi nâng", e: "seats" },
+            { t: "🛫 บิน", i: "bin", e: "Fly" },
+            { t: "✅ เรียบร้อยค่ะ", i: "rîap rɔ́ɔi kâ", e: "All set." },
+            { t: "✈️ สนามบิน", i: "sà nǎam bin", e: "Airport" },
+            { t: "🏋️ หนักไป", i: "nàk bpai", e: "Too heavy" },
+            { t: "👉 มัน", i: "man", e: "It" },
+            { t: "📄 กระดาษ", i: "grà dàat", e: "Paper" },
+            { t: "💵 เงินสด", i: "ngən sòt", e: "Cash" },
+            { t: "🪣 ถัง", i: "tǎng", e: "Bucket" },
+            { t: "🛍️ ถุง", i: "tǔng", e: "Bags" },
+            { t: "💸 ถูกกว่า", i: "tùuk gwàa", e: "Cheaper" },
+            { t: "🥛 นม", i: "nom", e: "Milk" },
+            { t: "💳 บัตร", i: "bàt", e: "Card" },
+            { t: "🥫 ฝา", i: "fǎa", e: "Lid" },
+            { t: "📏 เล็ก", i: "lék", e: "Small" },
+            { t: "🥤 หลอด", i: "lɔ̀ɔt", e: "straw" },
+            { t: "📍 นี่", i: "nîi", e: "Here." },
+            { t: "🙋‍♂️ พี่ครับๆ", i: "pîi kráp pîi kráp", e: "Brother/Sister!" },
+            { t: "🥤 สไปรท์", i: "sà bprai", e: "Sprite" },
+            { t: "🍽️ สั่งอาหารหน่อยครับ", i: "sàng aa hǎan nɔ̀ɔi kráp", e: "Order food, please." },
+            { t: "🍽️ เอา", i: "ao", e: "I want ..." },
+            { t: "🐦‍⬛ กา", i: "gaa", e: "Crow" },
+            { t: "🦈 ฉลาม", i: "chà lǎam", e: "sharks" },
+            { t: "🐘 ช้าง", i: "cháang", e: "Elephant" },
+            { t: "🦀 ปูนา", i: "bpuu naa", e: "Rice field crab" },
+            { t: "🕳️ รู", i: "ruu", e: "Hole" },
+            { t: "🐄 วัว", i: "wua", e: "cow" },
+            { t: "🦁 สิงโต", i: "sǐng dtoo", e: "lions" },
+            { t: "🐅 เสือ", i: "sʉ̌a", e: "Tigers" },
+            { t: "📎 หนีบ", i: "nìip", e: "Tweak / Pin" },
+            { t: "🍼 ให้นม", i: "hâi nom", e: "breastfeed" },
+            { t: "🟫 กากี", i: "gaa gii", e: "khaki" },
+            { t: "⚪️ ขาว", i: "kǎao", e: "White" },
+            { t: "🟩 เขียว", i: "kǐao", e: "green" },
+            { t: "⚫ ดำ", i: "dam", e: "Black" },
+            { t: "🩶 เทา", i: "tao", e: "grey" },
+            { t: "🟤 น้ำตาล", i: "nám dtaan", e: "Brown" },
+            { t: "🟣 ม่วง", i: "mûang", e: "purple" },
+            { t: "🍊 ส้ม", i: "sôm", e: "orange" },
+            { t: "🎨 สี", i: "sǐi", e: "Colour" },
+            { t: "😴 กรน", i: "gron", e: "snore" },
+            { t: "🦴 กระดูก", i: "grà dùuk", e: "bones" },
+            { t: "🦷 กราม", i: "graam", e: "jaws" },
+            { t: "🖐️ เกา", i: "gao", e: "Scratch" },
+            { t: "😵 เกือบตาย", i: "gʉ̀ap dtaai", e: "almost die" },
+            { t: "🤒 แกล้งป่วย", i: "glɛ̂ɛng bpùai", e: "Pretend to be sick" },
+            { t: "🦵 เข่า", i: "kào", e: "Knees" },
+            { t: "🚌 นั่ง", i: "nâng", e: "sit / get on" },
+            { t: "🧍‍♂️ คอ", i: "kɔɔ", e: "neck" },
+            { t: "🤕 เคล็ด", i: "klét", e: "sprain" },
+            { t: "🧵 ฉีก", i: "chìik", e: "Torn / Ripped" },
+            { t: "🩹 ช้ำ", i: "chám", e: "have bruises" },
+            { t: "🛠️ ใช้", i: "chái", e: "Use" },
+            { t: "🛌 ดิ้น", i: "dîn", e: "toss and turn" },
+            { t: "😣 ตะคริว", i: "dtà kriu", e: "Cramps" },
+            { t: "🫀 ตับ", i: "dtàp", e: "Liver" },
+            { t: "🧍 ตัว", i: "dtua", e: "body" },
+            { t: "💀 ตาย", i: "dtaai", e: "Die" },
+            { t: "🤧 ติดหวัด", i: "dtìt wàt", e: "Catch a cold" },
+            { t: "🛏️ เตียง", i: "dtiang", e: "Beds" },
+            { t: "💔 แตก", i: "dtɛ̀ɛk", e: "broken" },
+            { t: "🫘 ไต", i: "dtai", e: "kidney" },
+            { t: "🧹 ถูพื้น", i: "tǔu pʉ́ʉn", e: "mop" },
+            { t: "🤰 ท้อง", i: "tɔ́ɔng", e: "Pregnant / Stomach" },
+            { t: "🚽 ท้องเสีย", i: "tɔ́ɔng sǐa", e: "Diarrhea" },
+            { t: "💊 ทา", i: "taa", e: "Apply (med)" },
+            { t: "⚖️ น้ำหนัก", i: "nám nàk", e: "weight" },
+            { t: "🤕 บวม", i: "buam", e: "swell" },
+            { t: "🤕 บาดเจ็บ", i: "bàat jèp", e: "Get injured" },
+            { t: "🩺 เบาหวาน", i: "bawwǎan", e: "diabetes" },
+            { t: "🧠 ประสาท", i: "bprà sàat", e: "nerve" },
+            { t: "🤕 ปวด", i: "bpùat", e: "ache" },
+            { t: "🧗 ปีนผา", i: "bpiin pǎa", e: "Climbing" },
+            { t: "🩸 เป็นเม็น", i: "bpen men", e: "Have a period" },
+            { t: "🤧 เป็นหวัด", i: "bpen wàt", e: "have a cold" },
+            { t: "🤒 เป็นอะไร", i: "bpen à rai", e: "What's wrong?" },
+            { t: "🩺 ไปหาหมอ", i: "bpai hǎa mɔ̌ɔ", e: "visit doctor" },
+            { t: "🏥 ผ่าตัด", i: "pàa dtàt", e: "Surgery" },
+            { t: "🧴 ผิว", i: "pǐu", e: "skin" },
+            { t: "😴 พัก", i: "pák", e: "rest" },
+            { t: "🦠 แพร่", i: "prɛ̂ɛ", e: "spread" },
+            { t: "🤧 ภูมิแพ้", i: "puum pɛ́ɛ", e: "allergies" },
+            { t: "💊 ยา", i: "yaa", e: "medicine" },
+            { t: "🦠 โรค", i: "rôok", e: "Disease" },
+            { t: "🏥 โรงพยาบาล", i: "rooŋphayaabaan", e: "Hospital" },
+            { t: "🤕 ล้ม", i: "lóm", e: "fall down" },
+            { t: "🧼 ลื่น", i: "lʉ̂ʉn", e: "slippery" },
+            { t: "🤧 สะอึก", i: "sà ʉ̀k", e: "hiccup" },
+            { t: "💥 เสียหาย", i: "sǐa hǎai", e: "damaged" },
+            { t: "🙂 หน้า", i: "nâa", e: "Face / Page" },
+            { t: "💪 หาย", i: "hǎai", e: "Recover" },
+            { t: "🦨 เหม็น", i: "měn", e: "Smelly" },
+            { t: "⚖️ อ้วน", i: "ûan", e: "fat" },
+            { t: "🚑 อุบัติเหตุ", i: "ù bàt dtì hèet", e: "accident" },
+            { t: "😷 ไอ", i: "ai", e: "cough" },
+            { t: "👀 ตาโต", i: "dtaa dtoo", e: "Big eyes" },
+            { t: "🦴 ผอม", i: "pɔ̌ɔm", e: "Skinny" },
+            { t: "👄 ปาก", i: "bpàak", e: "mouth" },
+            { t: "✋ มือ", i: "mue", e: "hands" },
+            { t: "👂 หู", i: "hǔu", e: "ears" },
+            { t: "💪 ไหล่", i: "lài", e: "Shoulders" },
+            { t: "☁️ มีเมฆ", i: "mii mêek", e: "Cloudy" },
+            { t: "☁️ เมฆ", i: "mêek", e: "Clouds" },
+            { t: "🍂 ฤดู", i: "rʉ́ duu", e: "season" },
+            { t: "🥶 หนาว", i: "nǎao", e: "cold" },
+            { t: "❄️ หิมะ", i: "hì má", e: "snow" },
+            { t: "🌦️ อากาศ", i: "aa gàat", e: "Weather" },
+            { t: "🥥 กะทิ", i: "gà tí", e: "coconut milk" },
+            { t: "🍛 แกง", i: "gɛɛng", e: "Curry" },
+            { t: "🍪 ขนม", i: "kà nǒm", e: "snacks" },
+            { t: "🍞 ขนมปัง", i: "kà nǒm bpang", e: "Bread" },
+            { t: "🍳 ไข่คน", i: "kài kon", e: "scrambled eggs" },
+            { t: "😐 จืด", i: "jʉ̀ʉt", e: "bland" },
+            { t: "🥄 ช้อน", i: "chɔ́ɔn", e: "Spoon" },
+            { t: "🥩 ดิบ", i: "dìp", e: "Raw" },
+            { t: "🍲 ต้ม", i: "dtôm", e: "boil" },
+            { t: "🧊 ตู้เย็น", i: "dtûu yen", e: "fridge" },
+            { t: "🍟 ทอด", i: "tɔ̂ɔt", e: "Fry" },
+            { t: "🛠️ ทำเอง", i: "tam eeng", e: "DIY" },
+            { t: "🍶 เท", i: "tay", e: "Pour" },
+            { t: "🧊 น้ำแข็ง", i: "nám kɛ̌ng", e: "ice" },
+            { t: "💧 น้ำเปล่า", i: "náam bplàao", e: "Plain water" },
+            { t: "🧈 เนย", i: "nəəi", e: "butter" },
+            { t: "🥩 เนื้อสัตว์", i: "nʉ́a sàt", e: "meat" },
+            { t: "💡 เบา", i: "bao", e: "light" },
+            { t: "🐟 ปลา", i: "bplaa", e: "fish" },
+            { t: "🤢 ปวดท้อง", i: "bpùat tɔ́ɔng", e: "stomachache" },
+            { t: "🍞 ปิ้ง", i: "pîŋ", e: "Toast" },
+            { t: "🍋 เปรี้ยว", i: "bprîao", e: "sour" },
+            { t: "🍎 ผลไม้", i: "pǒn lá mái", e: "Fruit" },
+            { t: "🥬 ผัก", i: "pàk", e: "Veggies" },
+            { t: "🤧 แพ้", i: "pɛ́ɛ", e: "allergic to" },
+            { t: "🍋 มะนาว", i: "má naao", e: "Lemon/Lime" },
+            { t: "🌱 เมล็ด", i: "má lét", e: "Seeds" },
+            { t: "🔥 ย่าง", i: "yâang", e: "grill" },
+            { t: "📈 เยอะ", i: "yə́", e: "A lot" },
+            { t: "😋 รสชาติ", i: "rót châat", e: "Tastes" },
+            { t: "🍽️ ร้านอาหาร", i: "ráan aa hǎan", e: "Restaurant" },
+            { t: "🥬 สด", i: "sòt", e: "Fresh" },
+            { t: "🍴 ส้อม", i: "sɔ̂ɔm", e: "Fork" },
+            { t: "🍽️ สั่ง", i: "sàŋ", e: "Order" },
+            { t: "✨ ใส", i: "sǎi", e: "Clear" },
+            { t: "🍶 เหล้า", i: "lâo", e: "Liquor" },
+            { t: "😋 อิ่ม", i: "ìm", e: "Full (stomach)" },
+            { t: "🥥 มะพร้าว", i: "má práao", e: "Coconut" },
+            { t: "🏙️ เมือง", i: "muang", e: "City" },
+            { t: "🍻 เมา", i: "mao", e: "drunk" },
+            { t: "🥚 ไข่ต้ม", i: "kài dtôm", e: "Boiled eggs" },
+            { t: "🐜 มด", i: "mót", e: "ants" },
+            { t: "🎯 โดน", i: "doon", e: "get (passive)" },
+            { t: "🦷 กัด", i: "gàt", e: "bite" },
+            { t: "💪 กล้ามเนื้อ", i: "glâam nʉ́a", e: "muscles" },
+            { t: "🚆 รถไฟ", i: "rót fai", e: "Train" },
+            { t: "✅ พอ", i: "pɔɔ", e: "enough" },
+            { t: "⚙️ เครื่อง", i: "krʉ̂ang", e: "machine" },
+            { t: "🚶‍➡️ ข้าม", i: "kâam", e: "cross" },
+            { t: "😢 ร้องไห้", i: "rɔ́ɔng hâi", e: "Cry" },
+            { t: "⛵️ เรือ", i: "rʉa", e: "Boat" },
+            { t: "🕳️ ใต้ดิน", i: "dtâi din", e: "Underground" },
+            { t: "🚇 แน่น", i: "nɛ̂ɛn", e: "packed / crowded" },
+            { t: "🤫 เงียบ", i: "ngîap", e: "quiet" },
+            { t: "🌳 ป่า", i: "bpàa", e: "Forest" },
+            { t: "🧵 ผ้า", i: "pâa", e: "Cloth" },
+            { t: "😊 อารมณ์", i: "aa rom", e: "Emotions" },
+            { t: "💡 คิดได้", i: "kít dâi", e: "Realise" },
+            { t: "😞 น่าผิดหวัง", i: "nâa pìt wǎng", e: "Disappointing" },
+            { t: "👟 รองเท้าผ้าใบ", i: "rɔɔng táao pâa bai", e: "Sneakers" },
+            { t: "📏 สูง", i: "sǔung", e: "Tall" },
+            { t: "🚦 ไฟแดง", i: "fai dɛɛng", e: "Traffic lights" },
+            { t: "🚶‍♂️ ข้ามถนน", i: "kâam tà nǒn", e: "Cross road" },
+            { t: "↔️ ตรงข้าม", i: "dtrong kâam", e: "Opposite" },
+            { t: "🙏 หน่อย", i: "nɔ̀ɔi", e: "Please" },
+            { t: "💊 ร้านขายยา", i: "ráan kǎai yaa", e: "Pharmacy" },
+            { t: "➡️ ตรง", i: "dtrong", e: "Direct" },
+            { t: "👖 กางเกงยีนส์", i: "gaang geeng yiin", e: "Jeans" },
+            { t: "💰 ราคา", i: "raa kaa", e: "price" },
+            { t: "⬆️ ขึ้น", i: "kʉ̂n", e: "go up" },
+            { t: "📰 บทความ", i: "bòt-kwaam", e: "article" },
+            { t: "🌍 โลก", i: "lôok", e: "world" },
+            { t: "⬇️ ตก", i: "dtòk", e: "fall / drop" },
+            { t: "🧳 นักท่องเที่ยว", i: "nák tɔ̂ɔng tîao", e: "Tourist" },
+            { t: "🔵 น้ำเงิน", i: "nám-ngən", e: "Dark blue" },
+            { t: "🚪 ออก", i: "ɔ̀ɔk", e: "exit" },
+            { t: "👉 เนี่ย", i: "nîa", e: "นี่ + อ่ะ" },
+            { t: "🧦 ถุงเท้า", i: "tǔng-táao", e: "socks" },
+            { t: "🥛 แก้ว", i: "gâaeo", e: "glass / cup" },
+            { t: "🤒 ไข้", i: "kâi", e: "fever" },
+            { t: "🍞 อบ", i: "òp", e: "To bake" },
+            { t: "👖 กางเกง", i: "gaang-geeng", e: "pants" },
+            { t: "🧭 หลงทาง", i: "lǒng taang", e: "lost" },
+            { t: "↔️ ฝั่ง", i: "fàng", e: "side" },
+            { t: "👉 นู้น", i: "núun", e: "that" },
+            { t: "🐢 ช้า", i: "cháa", e: "slow" },
+            { t: "➡️ เลย", i: "ləəi", e: "go past" },
+            { t: "👥 คนอื่น", i: "kon èun", e: "other people" },
+            { t: "🧢 หมวก", i: "mùuak", e: "hat" },
+            { t: "⏳ หลังจาก", i: "lăng-jàak", e: "after" },
+            { t: "🥤 เครื่องดื่ม", i: "krêuang-deùm", e: "beverages" },
+            { t: "👥 พนักงาน", i: "pá-nák-ngaan", e: "Staff" },
+            { t: "💪 แขน", i: "kǎen", e: "arms" },
+            { t: "👋 ทักทาย", i: "ták-taai", e: "To greet" },
+            { t: "🌞 กลางวัน", i: "glaang-wan", e: "during day" },
+            { t: "🔌 สาย", i: "sǎai", e: "string / cable" },
+            { t: "💛 เหลือง", i: "lʉ̌ʉang", e: "yellow" },
+            { t: "😖 คัน", i: "kan", e: "itchy" },
+            { t: "🛣️ ทาง", i: "taang", e: "Way" },
+            { t: "🤝 รับ", i: "ráp", e: "accept / hire" },
+            { t: "🙏 เชิญ", i: "chəən", e: "invite" },
+            { t: "💯 แสน", i: "sɛ̌ɛn", e: "hundred thousand" },
+            { t: "🔢 ล้าน", i: "láan", e: "million" },
+            { t: "🪞 กระจก", i: "grà-jòk", e: "mirror" },
+            { t: "💨 แห้ง", i: "hɛ̂ɛng", e: "Dry" },
+            { t: "😴 พักผ่อน", i: "pák-pɔ̀n", e: "To rest" },
+            { t: "🔥 อุ่น", i: "ùn", e: "warm" },
+            { t: "🧾 ใบเสร็จ", i: "bai-sèt", e: "receipt" },
+            { t: "ไม้", i: "mái", e: "sticks" },
+            { t: "📦 กล่อง", i: "glàwng", e: "box" },
+            { t: "⚖️ กรัม", i: "gram", e: "gram" },
+            { t: "🏖️ ทราย", i: "saai", e: "sand" },
+            { t: "🍲 ตุ๋น", i: "dtǔn", e: "braise" },
+            { t: "🤩 ประทับใจ", i: "bprà-tháp-jai", e: "impressed" },
+            { t: "🕰️ นาฬิกา", i: "naa-lí-gaa", e: "clock" },
+            { t: "⭐️ ...โปรด", i: "bpròot", e: "Favourite" },
+            { t: "👃 ยาดม", i: "yaa-dom", e: "inhaler" },
+            { t: "🏛️ วัฒนธรรม", i: "wát-thá-na-tham", e: "culture" },
+            { t: "🎣 ตกปลา", i: "dtòk-bplaa", e: "To fish" },
+            { t: "🚫 โดยไม่", i: "dooi mâi", e: "without" },
+            { t: "🥜 ถั่ว", i: "thùa", e: "nuts" },
+            { t: "🎁 ของขวัญ", i: "kŏng-kwăn", e: "gifts" },
+            { t: "👀 มุมมอง", i: "mum maawng", e: "perspective" },
+            { t: "🔤 การ", i: "gaan", e: "prefix (noun)" },
+            { t: "🧐 ผิดปกติ", i: "pìt bpà-gà-dtì", e: "unusual" },
+            { t: "👀 สังเกตเห็น", i: "sǎng-gèet hěn", e: "Notice" },
+            { t: "🥳 ฉลอง", i: "chà-lǒng", e: "celebrate" },
+            { t: "🎑 ประเพณี", i: "bprà-pay-nee", e: "tradition" },
+            { t: "🛏️ หมอน", i: "mɔ̌ɔn", e: "pillows" },
+            { t: "📓 สมุด", i: "sà-mùt", e: "notebook" },
+            { t: "📔 ปก", i: "bpòk", e: "cover" },
+            { t: "🩳 สั้น", i: "sân", e: "short" },
+            { t: "🎬 โรงหนัง", i: "rohng-nǎng", e: "movies" },
+            { t: "🐰 กระต่าย", i: "grà-dtàai", e: "rabbit" },
+            { t: "🦊 จิ้งจอก", i: "jîng-jɔ̀ɔk", e: "fox" },
+            { t: "🗣️ สื่อสาร", i: "sʉ̀ʉ-sǎan", e: "communicate" },
+            { t: "🚨 จับ", i: "jàp", e: "catch" },
+            { t: "🟰 เท่ากัน", i: "tâo-gan", e: "equal" },
+            { t: "🧘‍♂️ ความ", i: "kwaam", e: "Prefix (noun)" },
+            { t: "🏞️ ยัง", i: "yang", e: "still" },
+            { t: "🎓 งานรับปริญญา", i: "ngaan ráp bpà-rin-yaa", e: "graduation" },
+            { t: "👶 หลานสาว", i: "lǎan-sǎao", e: "niece" },
+            { t: "🍄 เห็ด", i: "hèt", e: "mushrooms" },
+            { t: "🃏 เล่นไพ่", i: "lên-pâi", e: "play cards" },
+            { t: "💳 จ่าย", i: "jàai", e: "pay" },
+            { t: "🙏 ไหว้", i: "wâai", e: "worship" },
+            { t: "🕵️‍♂️ ไขคดี", i: "kăi-ká-dee", e: "solve crime" },
+            { t: "🧠 สมอง", i: "sà-mŏng", e: "brain" },
+            { t: "☠️ พิษ", i: "pít", e: "poison" },
+            { t: "🙏 สุภาพ", i: "sùu-phâap", e: "polite" },
+            { t: "🕵️ สืบสวน", i: "sèup-sŭan", e: "investigate" },
+            { t: "🎒 แบก", i: "bàek", e: "carry" },
+            { t: "🤫 ความลับ", i: "khwaam-làp", e: "secret" },
+            { t: "💰 รวย", i: "ruuay", e: "rich" },
+            { t: "😂 หัวเราะ", i: "hŭa-ró", e: "laugh" },
+            { t: "🔒 ส่วนตัว", i: "sùan-tua", e: "private" },
+            { t: "🤗 กอด", i: "gòt", e: "hug" },
+            { t: "🛌 ผ้าห่ม", i: "pâa-hòhm", e: "blanket" },
+            { t: "🤮 บ้วน", i: "bûan", e: "spit out" },
+            { t: "🗣️ สัมภาษณ์", i: "sǎm-phâat", e: "interview" },
+            { t: "👽 มนุษย์ต่างดาว", i: "ma-nút-dtàang-daao", e: "alien" },
+            { t: "🚀 ยานอวกาศ", i: "yaan-aa-wá-gàat", e: "spaceship" },
+            { t: "🧴 ผิวหนัง", i: "pìw-nǎng", e: "skin" },
+            { t: "🤝 เชื่อ", i: "chêua", e: "trust/believe" },
+            { t: "❓ เกิดอะไรขึ้น", i: "gə̀ət à rai kʉ̂n", e: "What happened?" },
+            { t: "🥺 อ้อน", i: "âawn", e: "act cute / plead" },
+            { t: "🛠️ ฟื้นฟู", i: "fʉ́ʉn-fuu", e: "restore" },
+            { t: "🤔 เหตุผล", i: "hèet-fŏn", e: "reasons" },
+            { t: "🔎 เช่น", i: "chên", e: "such as" },
+            { t: "🤔 อาจจะ", i: "àat jà", e: "maybe" },
+            { t: "📎 ติด", i: "dtìt", e: "attach / addicted" },
+            { t: "➕ เกินไป", i: "gəən bpai", e: "too + adj/adv" },
+            { t: "🔍 ชัด", i: "chát", e: "clear" },
+            { t: "🤔 คง", i: "kong", e: "probably" },
+            { t: "😍 หลง", i: "lŏng", e: "be infatuated / lost" },
+            { t: "↩️ ตอบ", i: "dtàwp", e: "reply" },
+            { t: "🤜 การเผชิญหน้า", i: "gaan-pà-chəən-nâa", e: "confrontation" },
+            { t: "😤 บ่น", i: "bòn", e: "Complain" },
+            { t: "💬 การสื่อสาร", i: "gaan-sʉ̀ʉ-sǎan", e: "communication" },
+            { t: "📣 การสื่อสารผิดพลาด", i: "gaan-sùue-săan-pìt-plâat", e: "miscommunication" },
+            { t: "😒 น่ารำคาญ", i: "nâa ram kaan", e: "annoying" },
+            { t: "😠 ใจร้าย", i: "jai-ráai", e: "mean" }
+        ];
+
+        // --- CORE FUNCTIONS ---
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            // Regex to remove all emojis before speaking
+            const cleanText = text.replace(/[\u{1F600}-\u{1F6FF}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText.trim());
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Component Generator
+        function createSmartText(data, classes = "text-lg") {
+            const id = Math.random().toString(36).substr(2, 9);
+            const thai = data.thai || data.t;
+            const ipa = data.ipa || data.i;
+            const en = data.en || data.e;
+
+            return `
+                <div class="inline-block w-full text-left" id="${id}">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span class="font-medium ${classes} text-gray-800 cursor-pointer hover:text-teal-500 transition-colors" onclick="speak('${thai}')">
+                            ${thai}
+                        </span>
+                        
+                        <div class="inline-flex gap-1 ml-1">
+                            <button onclick="speak('${thai}')" class="w-6 h-6 rounded-full bg-teal-50 hover:bg-teal-100 text-teal-500 hover:text-teal-700 flex items-center justify-center transition-all shadow-sm">
+                                <i class="fas fa-volume-up text-xs"></i>
+                            </button>
+                            <button onclick="toggleVisibility('${id}', 'ipa', this)" class="btn-toggle shadow-sm">IPA</button>
+                            <button onclick="toggleVisibility('${id}', 'en', this)" class="btn-toggle shadow-sm">EN</button>
+                        </div>
+                    </div>
+
+                    <div class="ipa-content hidden mt-1 ml-2 pl-3 border-l-2 border-purple-300" data-target="ipa">
+                        <span class="ipa-text">/${ipa}/</span>
+                    </div>
+                    <div class="en-content hidden mt-1 ml-2 pl-3 border-l-2 border-blue-300" data-target="en">
+                        <span class="en-text">${en}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleVisibility(containerId, type, btn) {
+            const container = document.getElementById(containerId);
+            const content = container.querySelector(`[data-target="${type}"]`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                if (type === 'ipa') btn.classList.add('active-ipa');
+                else btn.classList.add('active-en');
+            } else {
+                content.classList.add('hidden');
+                if (type === 'ipa') btn.classList.remove('active-ipa');
+                else btn.classList.remove('active-en');
+            }
+        }
+
+        function spinRoulette() {
+            const card = document.getElementById('vocab-card');
+            card.innerHTML = `<i class="fas fa-spinner fa-spin text-5xl text-indigo-300"></i>`;
+            
+            setTimeout(() => {
+                const word = vocabPool[Math.floor(Math.random() * vocabPool.length)];
+                card.innerHTML = `
+                    <div class="animate-pop w-full text-center">
+                        ${createSmartText(word, "text-3xl md:text-4xl text-indigo-900")}
+                    </div>
+                `;
+                speak(word.t);
+            }, 500);
+        }
+
+        // Initialize Page
+        window.onload = function() {
+            // Headings
+            document.getElementById('heading-review').innerHTML = createSmartText(content.headings.review, "text-xl font-bold text-indigo-700");
+            document.getElementById('heading-leadin').innerHTML = createSmartText(content.headings.leadin, "text-xl font-bold text-cyan-700");
+            document.getElementById('heading-video').innerHTML = createSmartText(content.headings.video, "text-xl font-bold text-rose-700");
+            document.getElementById('heading-script').innerHTML = createSmartText(content.headings.script, "text-lg font-bold text-rose-800");
+            document.getElementById('heading-comprehension').innerHTML = createSmartText(content.headings.comprehension, "text-xl font-bold text-amber-700");
+            document.getElementById('heading-vocab').innerHTML = createSmartText(content.headings.vocab, "text-xl font-bold text-emerald-700");
+            document.getElementById('heading-game').innerHTML = createSmartText(content.headings.game, "text-xl font-bold text-blue-700");
+            document.getElementById('heading-roleplay').innerHTML = createSmartText(content.headings.roleplay, "text-xl font-bold text-fuchsia-700");
+            document.getElementById('heading-debate').innerHTML = createSmartText(content.headings.debate, "text-xl font-bold text-orange-700");
+            document.getElementById('heading-extension').innerHTML = createSmartText(content.headings.extension, "text-lg font-bold text-gray-600");
+
+            // Review
+            document.getElementById('instruction-review').innerHTML = createSmartText(content.review.instruction);
+
+            // Lead-in
+            const leadinContainer = document.getElementById('leadin-questions');
+            leadinContainer.innerHTML = content.leadin.map(q => 
+                `<li class="bg-cyan-50 p-4 rounded-xl border border-cyan-100">${createSmartText(q, "text-base")}</li>`
+            ).join('');
+
+            // Script
+            const scriptContainer = document.getElementById('script-content');
+            scriptContainer.innerHTML = content.scriptLines.map(line => 
+                `<div class="p-3 bg-white rounded-xl shadow-sm border border-gray-50">${createSmartText(line, "text-base")}</div>`
+            ).join('');
+
+            // Comprehension
+            const compContainer = document.getElementById('comprehension-questions');
+            compContainer.innerHTML = content.questions.map(q => 
+                `<li class="bg-amber-50 p-4 rounded-xl border border-amber-100">${createSmartText(q, "text-base")}</li>`
+            ).join('');
+
+            // Target Vocab
+            const vocabListContainer = document.getElementById('target-vocab-list');
+            vocabListContainer.innerHTML = content.targetVocab.map(v => 
+                `<div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 shadow-sm hover:shadow-md transition-shadow">${createSmartText(v, "text-xl font-bold text-emerald-800")}</div>`
+            ).join('');
+
+            // Game
+            document.getElementById('game-instruction').innerHTML = createSmartText(content.game.instruction, "text-lg font-bold text-blue-800");
+            document.getElementById('game-desc').innerHTML = createSmartText(content.game.desc, "text-sm text-blue-600");
+
+            // Roleplay
+            document.getElementById('rp-scenario').innerHTML = createSmartText(content.roleplay.scenario, "text-lg font-bold text-fuchsia-800");
+            document.getElementById('rp-role-a').innerHTML = createSmartText(content.roleplay.roleA, "text-base");
+            document.getElementById('rp-role-b').innerHTML = createSmartText(content.roleplay.roleB, "text-base");
+
+            // Debate
+            document.getElementById('debate-topic').innerHTML = createSmartText(content.debate.topic, "text-lg font-bold text-orange-800");
+            document.getElementById('debate-side-a').innerHTML = createSmartText(content.debate.sideA, "text-base");
+            document.getElementById('debate-side-b').innerHTML = createSmartText(content.debate.sideB, "text-base");
+
+            // Extension
+            document.getElementById('ext-interview-title').innerHTML = createSmartText(content.extension.interviewTitle, "text-lg font-bold text-gray-800");
+            document.getElementById('ext-interview-desc').innerHTML = createSmartText(content.extension.interviewDesc, "text-sm text-gray-600");
+            document.getElementById('ext-story-title').innerHTML = createSmartText(content.extension.storyTitle, "text-lg font-bold text-gray-800");
+            document.getElementById('ext-story-desc').innerHTML = createSmartText(content.extension.storyDesc, "text-sm text-gray-600");
+            
+            // Trigger Instgrm embed if loaded after script
+            if(window.instgrm) { window.instgrm.Embeds.process(); }
+        };
+    </script>
+</body>
+</html>
