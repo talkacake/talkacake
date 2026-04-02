@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กิติกับมาร์ค</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .thai-font { font-family: 'Sarabun', sans-serif; }
+        .ipa-text { display: none; color: #64748b; font-style: italic; font-size: 0.95rem; margin-top: 8px; line-height: 1.4; }
+        .en-text { display: none; color: #059669; font-size: 0.95rem; font-weight: 500; margin-top: 4px; line-height: 1.4; }
+        .show { display: block !important; }
+        
+        .btn-control {
+            @apply px-3 py-1 rounded-full text-[11px] font-bold transition-all border border-gray-200 inline-flex items-center justify-center bg-white shadow-sm text-gray-600;
+            min-width: 48px;
+        }
+        .btn-speak { @apply text-orange-500 hover:bg-orange-50 border-orange-200; }
+        .btn-ipa { @apply text-blue-500 hover:bg-blue-50 border-blue-200; }
+        .btn-en { @apply text-green-600 hover:bg-green-50 border-green-200; }
+
+        .card { @apply bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 transition-all hover:shadow-md; }
+        .section-title { @apply text-2xl md:text-3xl font-bold text-blue-900 mt-12 mb-6 flex items-center gap-3 px-2; }
+        
+        .bubble-left { @apply bg-blue-50 p-5 rounded-2xl rounded-bl-none max-w-[90%] border border-blue-100; }
+        .bubble-right { @apply bg-emerald-50 p-5 rounded-2xl rounded-br-none max-w-[90%] border border-emerald-100 text-right ml-auto; }
+        
+        hr { @apply border-t-2 border-slate-200 my-12 opacity-60; }
+        
+        .content-group { @apply mb-4; }
+    </style>
+</head>
+<body class="max-w-2xl mx-auto bg-slate-50 pb-32">
+
+    <!-- Header -->
+    <header class="p-6 md:p-8 bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div class="content-group">
+            <h1 class="text-2xl md:text-3xl font-black text-blue-950 flex items-center gap-3">
+                <span>🇹🇭</span> กิติ กับ มาร์ค
+            </h1>
+            <div class="mt-3 flex gap-2">
+                <button onclick="speak('กิติ กับ มาร์ค')" class="btn-control btn-speak">🔊</button>
+                <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+            </div>
+            <p class="ipa-text text-left">Gì-dtì gàp Máak</p>
+            <p class="en-text text-left">Kiti and Mark</p>
+        </div>
+    </header>
+
+    <main class="p-4 md:p-8">
+        
+        <!-- 1. Review Section -->
+        <section id="review">
+            <div class="content-group">
+                <h2 class="section-title">
+                    <span>🔄</span> ทบทวน คำศัพท์
+                </h2>
+                <div class="flex gap-2 px-2">
+                    <button onclick="speak('ทบทวน คำศัพท์')" class="btn-control btn-speak">🔊</button>
+                    <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                    <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                </div>
+                <p class="ipa-text px-2">thóp-thuan kham-sàp</p>
+                <p class="en-text px-2">Vocab Review</p>
+            </div>
+
+            <div class="card text-center bg-gradient-to-br from-white to-blue-50 border-2 border-blue-100">
+                <div class="content-group mb-6">
+                    <span class="text-slate-600 font-bold thai-font text-lg">สุ่ม คำศัพท์ และ แต่ง ประโยค 🎲</span>
+                    <div class="mt-2 flex justify-center gap-2">
+                        <button onclick="speak('สุ่ม คำศัพท์ และ แต่ง ประโยค')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">sùm kham-sàp lɛ́ dtɛ̀ng prà-yòok</p>
+                    <p class="en-text">Randomize vocab and make a sentence</p>
+                </div>
+
+                <div id="random-vocab-display" class="min-h-[160px] flex flex-col justify-center items-center p-4 bg-white rounded-2xl shadow-inner border border-slate-100">
+                    <span id="current-thai" class="thai-font text-4xl md:text-5xl font-bold text-blue-900 mb-4">คลิก เพื่อ เริ่ม</span>
+                    <div id="current-controls" class="hidden flex gap-3 mb-2">
+                        <button onclick="speakCurrent()" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggleElement('current-ipa')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggleElement('current-en')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p id="current-ipa" class="ipa-text text-xl"></p>
+                    <p id="current-en" class="en-text text-xl text-emerald-600"></p>
+                </div>
+                
+                <div class="content-group mt-6">
+                    <button onclick="pickRandomVocab()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-lg shadow-blue-200 active:scale-95 transition-all flex justify-center items-center gap-2">
+                        <span>สุ่ม คำศัพท์</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- 2. Core Dialogue -->
+        <section id="dialogue">
+            <div class="content-group">
+                <h2 class="section-title"><span>💬</span> บทสนทนา</h2>
+                <div class="flex gap-2 px-2">
+                    <button onclick="speak('บทสนทนา')" class="btn-control btn-speak">🔊</button>
+                    <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                    <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                </div>
+                <p class="ipa-text px-2">bòt-sǒn-thá-naa</p>
+                <p class="en-text px-2">Dialogue</p>
+            </div>
+
+            <!-- Lead-in Questions -->
+            <div class="card border-t-8 border-amber-400 content-group mb-8">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-amber-900">คำถาม ก่อน ฟัง 🎧</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('คำถาม ก่อน ฟัง')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">kham-thǎam gɔ̀ɔn fang</p>
+                    <p class="en-text">Questions before listening (Lead-in)</p>
+                </div>
+
+                <div class="bg-amber-50 p-5 rounded-2xl space-y-5">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">1. คุณ รู้จัก วันสงกรานต์ ไหม? 💦</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('คุณ รู้จัก วันสงกรานต์ ไหม?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">khun rúu-jàk wan sǒng-graan mǎi?</p>
+                        <p class="en-text">Do you know Songkran day?</p>
+                    </div>
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">2. คนไทย ทำ อะไร ใน วันสงกรานต์? 🔫</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('คนไทย ทำ อะไร ใน วันสงกรานต์?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">khon-thai tham à-rai nai wan sǒng-graan?</p>
+                        <p class="en-text">What do Thai people do on Songkran day?</p>
+                    </div>
+                    <div class="content-group border-0">
+                        <span class="thai-font font-bold text-lg text-slate-800">3. คุณ เคย ไป วัด ที่ เมืองไทย ไหม? 🏯</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('คุณ เคย ไป วัด ที่ เมืองไทย ไหม?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">khun khoei bpai wát thîi mʉang-thai mǎi?</p>
+                        <p class="en-text">Have you ever been to a temple in Thailand?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Mark 1 -->
+                <div class="content-group">
+                    <div class="bubble-left">
+                        <span class="thai-font text-xl font-bold text-blue-900">มาร์ค: วันนี้ วันสงกรานต์ คุณ จะ ไป เที่ยว ที่ไหน ไหม ครับ? 💦🔫</span>
+                        <div class="mt-3 flex gap-2">
+                            <button onclick="speak('วันนี้ วันสงกรานต์ คุณ จะ ไป เที่ยว ที่ไหน ไหม ครับ')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text text-left">wan-níi wan sǒng-graan, khun jà bpai tîao thîi-nǎi mǎi khráp?</p>
+                        <p class="en-text text-left">Mark: Today is Songkran, are you going anywhere?</p>
+                    </div>
+                </div>
+
+                <!-- Kiti 1 -->
+                <div class="content-group">
+                    <div class="bubble-right">
+                        <span class="thai-font text-xl font-bold text-emerald-900">กิติ: คิดว่า จะ ไป วัด เพราะว่า ปีนี้ ที่ วัด จัดงาน ใหญ่ 🏯🎪</span>
+                        <div class="mt-3 flex gap-2 justify-end">
+                            <button onclick="speak('คิดว่า จะ ไป วัด เพราะว่า ปีนี้ ที่ วัด จัดงาน ใหญ่')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text text-left">khít wâa jà bpai wát prɔ́-wâa bpii-níi thîi wát jàt ngaan yài.</p>
+                        <p class="en-text text-left">Kiti: I think I will go to the temple because this year the temple is hosting a big event.</p>
+                    </div>
+                </div>
+
+                <!-- Mark 2 -->
+                <div class="content-group">
+                    <div class="bubble-left">
+                        <span class="thai-font text-xl font-bold text-blue-900">มาร์ค: ผม ขอ ไป ด้วย ได้ไหม ครับ? 🙋‍♂️</span>
+                        <div class="mt-3 flex gap-2">
+                            <button onclick="speak('ผม ขอ ไป ด้วย ได้ไหม ครับ')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text text-left">phǒm khɔ̌ɔ bpai dûay dâi mǎi khráp?</p>
+                        <p class="en-text text-left">Mark: Can I go with you?</p>
+                    </div>
+                </div>
+
+                <!-- Kiti 2 -->
+                <div class="content-group">
+                    <div class="bubble-right">
+                        <span class="thai-font text-xl font-bold text-emerald-900">กิติ: ได้ ครับ งาน สงกรานต์ ที่ วัด สนุก ทุกปี 🎉</span>
+                        <div class="mt-3 flex gap-2 justify-end">
+                            <button onclick="speak('ได้ ครับ งาน สงกรานต์ ที่ วัด สนุก ทุกปี')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text text-left">dâai khráp. ngaan sǒng-graan thîi wát sà-nùk thùk bpii.</p>
+                        <p class="en-text text-left">Kiti: Yes, the Songkran event at the temple is fun every year.</p>
+                    </div>
+                </div>
+                
+                <!-- Mark 3 -->
+                <div class="content-group">
+                    <div class="bubble-left">
+                        <span class="thai-font text-xl font-bold text-blue-900">มาร์ค: คุณ จะ ไป เมื่อไหร่ ครับ? ⏳</span>
+                        <div class="mt-3 flex gap-2">
+                            <button onclick="speak('คุณ จะ ไป เมื่อไหร่ ครับ')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text text-left">khun jà bpai mʉ̂a-rài khráp?</p>
+                        <p class="en-text text-left">Mark: When will you go?</p>
+                    </div>
+                </div>
+
+                <!-- Kiti 3 -->
+                <div class="content-group">
+                    <div class="bubble-right">
+                        <span class="thai-font text-xl font-bold text-emerald-900">กิติ: วันอาทิตย์ ประมาณ เที่ยง แล้ว ผม จะ มารับ นะครับ 🚗</span>
+                        <div class="mt-3 flex gap-2 justify-end">
+                            <button onclick="speak('วันอาทิตย์ ประมาณ เที่ยง แล้ว ผม จะ มารับ นะครับ')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text text-left">wan-aa-thít bprà-maan thîang. lɛ́ɛo phǒm jà maa ráp ná khráp.</p>
+                        <p class="en-text text-left">Kiti: Sunday around noon. Then I will come pick you up.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comprehension Questions -->
+            <div class="card border-t-8 border-teal-500 content-group mt-8">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-teal-900">ทดสอบ ความเข้าใจ ✅</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('ทดสอบ ความเข้าใจ')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">thót-sɔ̀ɔp khwaam-khâo-jai</p>
+                    <p class="en-text">Comprehension Check</p>
+                </div>
+
+                <div class="bg-teal-50 p-5 rounded-2xl space-y-5">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">1. กิติ จะ ไป เที่ยว ที่ไหน? 🗺️</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('กิติ จะ ไป เที่ยว ที่ไหน?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">Gì-dtì jà bpai tîao thîi-nǎi?</p>
+                        <p class="en-text">Where will Kiti go?</p>
+                    </div>
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">2. ทำไม กิติ อยาก ไป ที่นั่น? 🎪</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ทำไม กิติ อยาก ไป ที่นั่น?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">tham-mai Gì-dtì yàak bpai thîi-nân?</p>
+                        <p class="en-text">Why does Kiti want to go there?</p>
+                    </div>
+                    <div class="content-group border-0">
+                        <span class="thai-font font-bold text-lg text-slate-800">3. พวกเขา จะ ไป เมื่อไหร่? ⏰</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('พวกเขา จะ ไป เมื่อไหร่?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">phûak-khǎo jà bpai mʉ̂a-rài?</p>
+                        <p class="en-text">When will they go?</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- 3. Target Vocab -->
+        <section id="vocab">
+            <div class="content-group">
+                <h2 class="section-title"><span>🌟</span> คำศัพท์ ใหม่</h2>
+                <div class="flex gap-2 px-2">
+                    <button onclick="speak('คำศัพท์ ใหม่')" class="btn-control btn-speak">🔊</button>
+                    <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                    <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                </div>
+                <p class="ipa-text px-2">kham-sàp mài</p>
+                <p class="en-text px-2">New Vocabulary</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <div class="card !p-5 !mb-0 border-l-8 border-orange-400 content-group">
+                    <span class="thai-font text-3xl font-bold">1. วันสงกรานต์ 💦</span>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="speak('วันสงกรานต์')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text text-lg">wan sǒng-graan</p>
+                    <p class="en-text text-lg">Songkran day / Thai New Year</p>
+                </div>
+                
+                <div class="card !p-5 !mb-0 border-l-8 border-orange-400 content-group">
+                    <span class="thai-font text-3xl font-bold">2. วัด 🏯</span>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="speak('วัด')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text text-lg">wát</p>
+                    <p class="en-text text-lg">temple</p>
+                </div>
+                
+                <div class="card !p-5 !mb-0 border-l-8 border-orange-400 content-group">
+                    <span class="thai-font text-3xl font-bold">3. จัดงาน ใหญ่ 🎪</span>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="speak('จัดงาน ใหญ่')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text text-lg">jàt ngaan yài</p>
+                    <p class="en-text text-lg">host a big event</p>
+                </div>
+                
+                <div class="card !p-5 !mb-0 border-l-8 border-orange-400 content-group">
+                    <span class="thai-font text-3xl font-bold">4. เมื่อไหร่ ⏳</span>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="speak('เมื่อไหร่')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text text-lg">mʉ̂a-rài</p>
+                    <p class="en-text text-lg">when</p>
+                </div>
+                
+                <div class="card !p-5 !mb-0 border-l-8 border-orange-400 content-group">
+                    <span class="thai-font text-3xl font-bold">5. มารับ 🚗</span>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="speak('มารับ')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text text-lg">maa ráp</p>
+                    <p class="en-text text-lg">come pick up</p>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- 4. Main Tasks -->
+        <section id="tasks">
+            <div class="content-group">
+                <h2 class="section-title"><span>🎯</span> กิจกรรม หลัก</h2>
+                <div class="flex gap-2 px-2">
+                    <button onclick="speak('กิจกรรม หลัก')" class="btn-control btn-speak">🔊</button>
+                    <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                    <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                </div>
+                <p class="ipa-text px-2">gìt-jà-gam làk</p>
+                <p class="en-text px-2">Main Activities</p>
+            </div>
+            
+            <!-- Task 1: Roleplay -->
+            <div class="card border-t-8 border-blue-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-blue-900">1. บทบาทสมมติ: ชวน เพื่อน ไป เที่ยว 🗣️🤝</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('บทบาทสมมติ ชวน เพื่อน ไป เที่ยว')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">bòt-bàat sǒm-mút: chuan phʉ̂an bpai tîao</p>
+                    <p class="en-text">Role-play: Inviting a friend to hang out.</p>
+                </div>
+
+                <div class="bg-blue-50 p-5 rounded-2xl space-y-5">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"วันเสาร์ คุณ จะ ไป ไหน ไหม? ไป... ด้วยกัน ไหม?"</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('วันเสาร์ คุณ จะ ไป ไหน ไหม? ไป ด้วยกัน ไหม?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">wan-sǎo khun jà bpai nǎi mǎi? bpai... dûay-gan mǎi?</p>
+                        <p class="en-text">Are you going anywhere on Saturday? Want to go to... together?</p>
+                    </div>
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ได้ ครับ คุณ จะ ไป เมื่อไหร่?"</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ได้ ครับ คุณ จะ ไป เมื่อไหร่?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">dâai khráp. khun jà bpai mʉ̂a-rài?</p>
+                        <p class="en-text">Sure. When will you go?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task 2: Interview -->
+            <div class="card border-t-8 border-orange-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-orange-900">2. สัมภาษณ์ ครู: เทศกาล ที่ ชอบ 🎤🎉</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('สัมภาษณ์ ครู เทศกาล ที่ ชอบ')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">sǎm-phâat khruu: thêet-sà-gaan thîi chɔ̂ɔp</p>
+                    <p class="en-text">Interview the teacher: Favorite festival.</p>
+                </div>
+
+                <div class="bg-orange-50 p-5 rounded-2xl space-y-4">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ครู ชอบ วันสงกรานต์ ไหม ครับ?"</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ครู ชอบ วันสงกรานต์ ไหม ครับ?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">khruu chɔ̂ɔp wan sǒng-graan mǎi khráp?</p>
+                        <p class="en-text">Do you like Songkran day?</p>
+                    </div>
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ครู ชอบ ไป เที่ยว ที่ไหน ครับ?"</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ครู ชอบ ไป เที่ยว ที่ไหน ครับ?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">khruu chɔ̂ɔp bpai tîao thîi-nǎi khráp?</p>
+                        <p class="en-text">Where do you like to travel to?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task 3: Presentation -->
+            <div class="card border-t-8 border-green-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-green-900">3. พรีเซนต์: แผน วันหยุด ของ ผม 🗓️🚙</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('พรีเซนต์ แผน วันหยุด ของ ผม')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">pree-sen: phɛ̌ɛn wan-yùt khɔ̌ɔng phǒm</p>
+                    <p class="en-text">Presentation: My weekend plan.</p>
+                </div>
+
+                <div class="bg-green-50 p-5 rounded-2xl">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"วันเสาร์ และ วันอาทิตย์ นี้ ผม จะ... เพราะว่า..."</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('วันเสาร์ และ วันอาทิตย์ นี้ ผม จะ... เพราะว่า')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">wan-sǎo lɛ́ wan-aa-thít níi phǒm jà... prɔ́-wâa...</p>
+                        <p class="en-text">This Saturday and Sunday, I will... because...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- 5. Extensions -->
+        <section id="extensions">
+            <div class="content-group">
+                <h2 class="section-title"><span>🚀</span> กิจกรรม เพิ่มเติม</h2>
+                <div class="flex gap-2 px-2">
+                    <button onclick="speak('กิจกรรม เพิ่มเติม')" class="btn-control btn-speak">🔊</button>
+                    <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                    <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                </div>
+                <p class="ipa-text px-2">gìt-jà-gam phə̂əm-dterm</p>
+                <p class="en-text px-2">Extension Activities</p>
+            </div>
+            
+            <!-- Extension: Speaking Game -->
+            <div class="card border-l-8 border-purple-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-purple-900">เกม พูด: เล่าเรื่อง ต่อกัน 🔗🗣️</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('เกม พูด เล่าเรื่อง ต่อกัน')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">geem phûut: lâo-rʉ̂ang dtɔ̀ɔ gan</p>
+                    <p class="en-text">Speaking Game: Continue the story.</p>
+                </div>
+                
+                <div class="bg-purple-50 p-5 rounded-2xl">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"วันสงกรานต์ ผม ขับรถ ไป วัด แต่ว่า..."</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('วันสงกรานต์ ผม ขับรถ ไป วัด แต่ว่า')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">wan sǒng-graan phǒm khàp-rót bpai wát dtɛ̀ɛ-wâa...</p>
+                        <p class="en-text">On Songkran day, I drove to the temple, but...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extension: Debate -->
+            <div class="card border-l-8 border-red-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-red-900">โต้วาที: ไป วัด VS ไป ห้าง 🏯🆚🛍️</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('โต้วาที ไป วัด หรือ ไป ห้าง')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">dtôo-waa-thii: bpai wát rʉ̌ʉ bpai hâang</p>
+                    <p class="en-text">Debate: Going to the temple VS Going to the mall.</p>
+                </div>
+                
+                <div class="bg-red-50 p-5 rounded-2xl space-y-4">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ผม คิดว่า ไป วัด ดีกว่า เพราะ..."</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ผม คิดว่า ไป วัด ดีกว่า เพราะ')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">phǒm khít-wâa bpai wát dii-gwàa prɔ́...</p>
+                        <p class="en-text">I think going to the temple is better because...</p>
+                    </div>
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ผม คิดว่า ไป ห้าง ดีกว่า เพราะ..."</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ผม คิดว่า ไป ห้าง ดีกว่า เพราะ')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">phǒm khít-wâa bpai hâang dii-gwàa prɔ́...</p>
+                        <p class="en-text">I think going to the mall is better because...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extension: Story-telling -->
+            <div class="card border-l-8 border-yellow-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-yellow-900">เล่าเรื่อง: วันหยุด ที่ สนุก ที่สุด 🏖️🤩</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('เล่าเรื่อง วันหยุด ที่ สนุก ที่สุด')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">lâo rʉ̂ang: wan-yùt thîi sà-nùk thîi-sùt</p>
+                    <p class="en-text">Story-telling: The most fun holiday.</p>
+                </div>
+                
+                <div class="bg-yellow-50 p-5 rounded-2xl">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ตอนนั้น ผม ไป... กับ... เรา ทำ... ด้วยกัน"</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ตอนนั้น ผม ไป... กับ... เรา ทำ... ด้วยกัน')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">dtaawn-nán phǒm bpai... gàp... rao tham... dûay-gan</p>
+                        <p class="en-text">At that time I went to... with... We did... together.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extension: Discussion -->
+            <div class="card border-l-8 border-pink-500 content-group">
+                <div class="mb-4 content-group">
+                    <span class="thai-font text-2xl font-bold text-pink-900">คุยกัน: งาน จัดงาน ใหญ่ ใน ฝัน 💭🎪</span>
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="speak('คุยกัน งาน จัดงาน ใหญ่ ใน ฝัน')" class="btn-control btn-speak">🔊</button>
+                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    </div>
+                    <p class="ipa-text">khui-gan: ngaan jàt ngaan yài nai fǎn</p>
+                    <p class="en-text">Discussion: Your dream big event/festival.</p>
+                </div>
+                
+                <div class="bg-pink-50 p-5 rounded-2xl">
+                    <div class="content-group">
+                        <span class="thai-font font-bold text-lg text-slate-800">"ถ้า คุณ มี เงิน 10 ล้าน คุณ จะ จัดงาน ใหญ่ อะไร? และ ชวน ใคร?"</span>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="speak('ถ้า คุณ มี เงิน สิบ ล้าน คุณ จะ จัดงาน ใหญ่ อะไร? และ ชวน ใคร?')" class="btn-control btn-speak">🔊</button>
+                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
+                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                        </div>
+                        <p class="ipa-text">thâa khun mii ngoen sìp láan, khun jà jàt ngaan yài à-rai? lɛ́ chuan khrai?</p>
+                        <p class="en-text">If you had 10 million, what big event would you host? And who would you invite?</p>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Footer Space -->
+    <div class="h-20"></div>
+
+    <script>
+        // Extensive Vocab List Parsing (Parsed a large subset from prompt to fuel the randomizer)
+        const vocabList = [
+            {t: "แก้วใหญ่ 🥤📏", p: "gɛ̂ɛo yài", e: "Large cup"},
+            {t: "1 ชั่วโมง 🕐⏳", p: "nʉ̀ŋ chûa-moong", e: "1 hour"},
+            {t: "10 นาที ⏱️🔟", p: "sìp naa-tee", e: "10 minutes"},
+            {t: "2 ชั่วโมง 🕑⏳", p: "sŏng chûa-moong", e: "2 hours"},
+            {t: "3 ทุ่ม 🕘🌙", p: "sǎam-tûm", e: "21:00"},
+            {t: "5 ชั่วโมง 🕔⏳", p: "hâa chûa-moong", e: "5 hours"},
+            {t: "6 โมง 🕕⏰", p: "hòk mohng", e: "6 o'clock"},
+            {t: "9 โมง 🕘⏰", p: "gâao moong", e: "09:00"},
+            {t: "กระป๋อง 🥫🥤", p: "grà bpɔ̌ɔng", e: "Cans"},
+            {t: "กระเป๋าเดินทาง 🧳✈️", p: "grà-bpǎo-dern-taang", e: "suitcase; luggage; travel bag"},
+            {t: "กรุงเทพฯ 🏙️🇹🇭", p: "grung têep", e: "Bangkok"},
+            {t: "กลับบ้าน 🏠🔙", p: "glàp bâan", e: "To go back home"},
+            {t: "กลับบ้านกี่คน 🏠❓👥", p: "glàp bâan gìi kon", e: "How many people are going home?"},
+            {t: "กลับบ้านหนึ่งคน 🏠☝️🚶", p: "glàp bâan nʉ̀ng kon", e: "1 person goes home."},
+            {t: "กลัวครั้งที่แล้วเมื่อไร 😨📅❓", p: "glua kráng tîi láaew mêuu-rài", e: "When was the last time you were afraid?"},
+            {t: "กล้า 🦁💪", p: "glâa", e: "Brave"},
+            {t: "กว่า ➕⚖️", p: "gwàa", e: "more than; -er"},
+            {t: "กับ ➕🤝", p: "gàp", e: "With / and"},
+            {t: "กางเกงขาสั้น 🩳👖", p: "gaang geeng kǎa sân", e: "Shorts"},
+            {t: "กางเกงยีนส์ 👖🤠", p: "gaang geeng yiin", e: "Jeans"},
+            {t: "การบ้าน 📝🏠", p: "gaan bâan", e: "Homework"},
+            {t: "การพูด 🗣️💬", p: "gaan pûut", e: "Speaking"},
+            {t: "การฟัง 👂🎧", p: "gaan fang", e: "Listening"},
+            {t: "การอ่าน 📖👓", p: "gaan àan", e: "Reading"},
+            {t: "การเขียน ✍️📝", p: "gaan kǐan", e: "Writing"},
+            {t: "การเมือง 🏛️🗳️", p: "gaan mʉang", e: "Politics"},
+            {t: "การเรียน 🏫📚", p: "gaan rian", e: "Studying"},
+            {t: "กิน 🍽️😋", p: "gin", e: "Eat"},
+            {t: "กินกาแฟเย็น 🧊☕", p: "gin gaa-faae yen", e: "to drink iced coffee"},
+            {t: "กินข้าวมาเมื่อวาน 🍚📅🔙", p: "gin kâao maa mʉ̂a waan", e: "Ate yesterday"},
+            {t: "กินข้าวอะไร 🍚❓🤷", p: "gin kâao à rai", e: "What do you eat?"},
+            {t: "กินที่ร้านอาหาร 🍽️🏪", p: "gin tîi ráan aa hǎan", e: "Eat at restaurant"},
+            {t: "กินนี่ 🍽️👇", p: "gin nîi", e: "Drink/Eat here."},
+            {t: "กินน้ำมาสามสิบนาทีก่อน 💧⏱️🔙", p: "gin náam maa sǎam sìp naa tii gɔ̀ɔn", e: "Drank 30 minutes ago"},
+            {t: "กินน้ำอะไร 🥤❓🍹", p: "gin náam à-rai", e: "What do you want to drink?"},
+            {t: "กินยาหรือยัง 💊❓😷", p: "gin yaa rǔue yang", e: "Have you taken medicine?"},
+            {t: "กินอะไร 🍽️❓🤷", p: "gin à-rai", e: "What to eat?"},
+            {t: "กินอาหารสักครู่ 🍽️⏳✋", p: "gin aa-hăan sàk krôo", e: "Eat for a moment."},
+            {t: "กินอาหารเช้า 🍳🥓🌞", p: "gin aa hǎan cháao", e: "Have breakfast"},
+            {t: "กินอาหารเที่ยง 🍱🕛☀️", p: "gin aa hǎan tîang", e: "Have lunch"},
+            {t: "กินอาหารเย็น 🍽️🌙🍷", p: "gin aa hǎan yen", e: "Have dinner"},
+            {t: "กินเป็ดย่าง 🦆🔥🥢", p: "gin bpèt yâang", e: "to eat roast duck"},
+            {t: "กินเผ็ดได้ไหม 🌶️❓🥵", p: "gin pèt dâi mái", e: "Can you eat spicy?"},
+            {t: "กินไก่ 🍗🍴😋", p: "gin gài", e: "eat chicken"},
+            {t: "กินไหม 🍽️❓🤷", p: "gin mái", e: "Do you want to eat?"},
+            {t: "กี่ชั่วโมง ⏳❓🕰️", p: "gèe chua-moong", e: "How many hours?"},
+            {t: "กี่โมงแล้ว ⌚❓👀", p: "gìi moong lɛ́ɛo", e: "What time is it?"},
+            {t: "ก่อน ⏮️🛑🔙", p: "gɔ̀ɔn", e: "before/first"},
+            {t: "ขยัน 💪🐜📚", p: "kà yǎn", e: "hardworking"},
+            {t: "ของขวัญ 🎁🎀🧸", p: "kɔ̌ɔng kwǎn", e: "Gifts"},
+            {t: "ของฝาก 🛍️✈️🍪", p: "kɔ̌ɔng fàak", e: "Souvenirs"},
+            {t: "ของหวาน 🍰🍩🍧", p: "kɔ̌ɔng wǎan", e: "Desserts"},
+            {t: "ขอเช็คบิล 🧾💸🙏", p: "kɔ̌ɔ chék bin", e: "Please check the bill."},
+            {t: "ขอเมนูภาษาอังกฤษ 📜🇬🇧🙏", p: "kɔ̌ɔ mee-nuu paa-sǎa ang-grìt", e: "May I have the English menu?"},
+            {t: "ขอใบเสร็จ 🧾✅🙏", p: "kɔ̌ɔ bai-sèt", e: "May I have a receipt?"},
+            {t: "ขับรถ 🚗💨🛣️", p: "kàp rót", e: "To drive"},
+            {t: "ขับรถได้ไหม 🚗❓🤷", p: "kàp rót dâi mái", e: "Can you drive?"},
+            {t: "ขับรถไปไหน 🚗❓🗺️", p: "khàp rót bpai nǎi", e: "Where are you driving to?"},
+            {t: "ขายของให้ลูกค้า 🏪🤝💰", p: "kǎai kɔ̌ɔng hâi lûuk-kháa", e: "sell things to customers"},
+            {t: "ขาว ⚪🕊️☁️", p: "kǎao", e: "White"},
+            {t: "ขี่จักรยาน 🚲🚴‍♂️💨", p: "kìi jàk grà yaan", e: "Ride a bicycle"},
+            {t: "ขึ้น ⬆️🧗‍♂️🚌", p: "kʉ̂n", e: "go up"},
+            {t: "ข้อความ 💬📱📩", p: "kɔ̂ɔ kwaam", e: "Messages"},
+            {t: "ข้างหน้า ⬆️👀🛣️", p: "kâang nâa", e: "In front"},
+            {t: "ข้าวผัด 🍛🍳🦐", p: "kâao pàt", e: "fried rice"},
+            {t: "คนทำธุรกิจ 👔💼🤝", p: "kon tam tú rá gìt", e: "People who do business"},
+            {t: "คนไม่เยอะ 👥📉🚫", p: "kon mâi yə́", e: "Not a lot of people"},
+            {t: "ครอบครัว 👨‍👩‍👧‍👦🏠❤️", p: "krɔ̂ɔp krua", e: "Family"},
+            {t: "ครึ่ง 🌗🍰✂️", p: "krʉ̂ng", e: "Half"},
+            {t: "ความอดทน 🧘‍♂️⏳😌", p: "kwaam òt ton", e: "Patience"},
+            {t: "คุณต้องพักผ่อน 🛌💤🏥", p: "kun dtông pák-pòn", e: "You need to rest."},
+            {t: "งานเป็นยังไง 💼❓🤷", p: "ngaan bpen yang ngai", e: "How’s work?"},
+            {t: "ง่วงนอน 😴🥱💤", p: "ngûang-nɔɔn", e: "Sleepy"},
+            {t: "ง่าย 👌👶✅", p: "ngâai", e: "Easy"},
+            {t: "จมูก 👃😤🤧", p: "jà-mùuk", e: "nose"},
+            {t: "จองโรงแรมได้ไหม 🏨🛎️❓", p: "jaawng roong-raem dai mái", e: "Can I book a hotel?"},
+            {t: "จะ 🔮🔜🕒", p: "jà", e: "Will"}
+        ];
+
+        let currentVocab = null;
+
+        function pickRandomVocab() {
+            document.getElementById('review').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            const index = Math.floor(Math.random() * vocabList.length);
+            currentVocab = vocabList[index];
+            
+            document.getElementById('current-thai').innerText = currentVocab.t;
+            document.getElementById('current-ipa').innerText = currentVocab.p;
+            document.getElementById('current-en').innerText = currentVocab.e;
+            
+            document.getElementById('current-ipa').classList.remove('show');
+            document.getElementById('current-en').classList.remove('show');
+            document.getElementById('current-controls').classList.remove('hidden');
+            
+            speak(currentVocab.t);
+        }
+
+        function toggle(btn, className) {
+            const parent = btn.closest('.content-group');
+            const targets = parent.querySelectorAll('.' + className);
+            if(targets.length > 0) {
+                targets.forEach(t => t.classList.toggle('show'));
+            }
+        }
+
+        function toggleElement(id) {
+            document.getElementById(id).classList.toggle('show');
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'th-TH';
+                msg.rate = 0.85; 
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        function speakCurrent() {
+            if (currentVocab) speak(currentVocab.t);
+        }
+
+        document.body.addEventListener('touchstart', function() {
+            if (window.speechSynthesis.speaking) return;
+            const msg = new SpeechSynthesisUtterance('');
+            msg.volume = 0;
+            window.speechSynthesis.speak(msg);
+        }, {once: true});
+
+    </script>
+</body>
+</html>
