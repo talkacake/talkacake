@@ -769,7 +769,7 @@
                 <!-- 1-on-1 Specific Activities -->
                 <div class="mt-8 border-t-2 border-dashed border-teal-200 pt-6">
                     <div class="eng-block mb-4">
-                        <h3 class="font-bold text-teal-900 text-xl">👤 Extra Activities</h3>
+                        <h3 class="font-bold text-teal-900 text-xl">👤 Extra Activities (If only 1 student shows up)</h3>
                         <div class="btn-group">
                             <button onclick="speak('Extra Activities. If only 1 student shows up.')" class="btn-icon bg-teal-100">🔊</button>
                             <button onclick="toggleThai('ext-1on1-th')" class="btn-icon bg-teal-100">🇹🇭</button>
@@ -835,6 +835,22 @@
                     </div>
                 </div>
 
+            </div>
+        </section>
+
+        <!-- PART 7: ADDITIONAL VOCABULARY -->
+        <section class="card p-6 md:p-8 bg-teal-50 border-teal-200">
+            <div class="eng-block mb-6">
+                <h2 class="text-2xl font-bold text-teal-900 flex items-center gap-2">➕ 7. Additional Vocabulary</h2>
+                <div class="btn-group">
+                    <button onclick="speak('7. Additional Vocabulary')" class="btn-icon bg-teal-100">🔊</button>
+                    <button onclick="toggleThai('s7-th')" class="btn-icon bg-teal-100">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s7-th" class="th-text !text-teal-700 !border-teal-300">7. คำศัพท์เพิ่มเติม</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="additional-vocab-grid">
+                <!-- Javascript will populate this -->
             </div>
         </section>
 
@@ -1806,15 +1822,85 @@
             { emoji: "🗓️🎉✨", en: "holiday", th: "วันหยุด" }
         ];
 
+        const additionalVocabList = [
+            { emoji: "💊🧪✨", en: "supplements", th: "อาหารเสริม" },
+            { emoji: "2️⃣🤝✨", en: "both", th: "ทั้งคู่" },
+            { emoji: "🚀📦💨", en: "express", th: "แสดงออก" },
+            { emoji: "🥱🔋🪫", en: "tired", th: "เหนื่อย" },
+            { emoji: "💪🎯✨", en: "tried", th: "พยายาม (อดีต)" },
+            { emoji: "🚗💥🤕", en: "I had an accident.", th: "เคยประสบอุบัติเหตุ" },
+            { emoji: "🦴💢📉", en: "fracture", th: "ร้าว(จากกระดูกแตก)" },
+            { emoji: "💔🥨❌", en: "broken", th: "หัก" },
+            { emoji: "👤🚫🔙", en: "ex", th: "แฟนเก่า" },
+            { emoji: "🤨🔥💢", en: "jealous", th: "หึง / อิจฉา" },
+            { emoji: "🗣️👂🤫", en: "rumor", th: "ข่าวลือ" },
+            { emoji: "🩸🧴🩹", en: "sanitary pads", th: "ผ้าอนามัย" },
+            { emoji: "🏙️🌳👥", en: "public spaces", th: "ที่สาธารณะ" },
+            { emoji: "🩸📈🍭", en: "diabetes", th: "เบาหวาน" },
+            { emoji: "🍔🍔📉", en: "obesity", th: "โรคอ้วน" },
+            { emoji: "🏃‍♂️🏚️🌍", en: "refugee", th: "ผู้ลี้ภัย" },
+            { emoji: "📱📰🤳", en: "I like to watch news on Tiktok.", th: "ชอบดูข่าวในติ๊กต็อก" },
+            { emoji: "📝✂️✨", en: "summary", th: "สรุป" },
+            { emoji: "🚫🛂🛂", en: "illegal immigrants", th: "ผู้อพยพเข้ามาแบบผิดกฎหมาย" },
+            { emoji: "💔👤🔚", en: "Now, I'm an ex.", th: "ตอนนี้ฉันเป็นแฟนเก่า" },
+            { emoji: "🕯️🪔✨", en: "incense sticks", th: "ธูป" },
+            { emoji: "💨🍑💨", en: "fart", th: "ตด" },
+            { emoji: "👻😱🎬", en: "horror movies", th: "หนังผี" },
+            { emoji: "💩🚫😫", en: "constipation", th: "ท้องผูก" },
+            { emoji: "🤩✨🔥", en: "exciting", th: "น่าตื่นเต้น" },
+            { emoji: "🎰🎲💸", en: "gambling", th: "การพนัน" },
+            { emoji: "🚫🗣️❌", en: "I don't like to lie to my friends.", th: "ไม่ชอบโกหกเพื่อน" },
+            { emoji: "🎤📰✍️", en: "journalist", th: "นักข่าว" },
+            { emoji: "✅🔓🤝", en: "allow", th: "อนุญาต" },
+            { emoji: "💰🤝📄", en: "take out a loan", th: "ยืมเงิน / กู้เงิน" },
+            { emoji: "📈🔝💰", en: "maximum amount", th: "จำนวนเงินสูงสุด" },
+            { emoji: "📉📉💰", en: "minimum salary", th: "เงินเดือนขั้นต่ำ" },
+            { emoji: "⛽️⛽️⛽️", en: "petrol", th: "น้ำมันรถ" },
+            { emoji: "🧺🧼🏠", en: "household items", th: "ของใช้ในบ้าน" },
+            { emoji: "🤪🃏✨", en: "prank", th: "แกล้ง" },
+            { emoji: "⛽️🚗💯", en: "fill the tank", th: "เติม(ถัง)น้ำมัน" },
+            { emoji: "🔄📍✨", en: "in place of", th: "แทน" },
+            { emoji: "😫🧺🤢", en: "I have a stomachache.", th: "ปวดท้อง" }
+        ];
+
+        function renderAdditionalVocab() {
+            const container = document.getElementById('additional-vocab-grid');
+            if (!container) return;
+            
+            additionalVocabList.forEach((item, index) => {
+                const thId = `add-vocab-${index}`;
+                const card = document.createElement('div');
+                card.className = "bg-white border-2 border-teal-100 p-4 rounded-xl hover:shadow-md transition-shadow flex items-start justify-between gap-2";
+                
+                const emoji = item.emoji || '✨';
+
+                card.innerHTML = `
+                    <div class="flex-1">
+                        <div class="text-2xl mb-1">${emoji.split('\t')[0]}</div>
+                        <div class="eng-block">
+                            <span class="eng-text font-bold text-gray-800 text-lg leading-tight mb-1">${item.en}</span>
+                        </div>
+                        <div id="${thId}" class="th-text !border-teal-300 !text-teal-600 font-bold text-sm mt-1">${item.th}</div>
+                    </div>
+                    <div class="flex flex-col gap-1 shrink-0">
+                         <button onclick="speak('${item.en.replace(/'/g, "\\'")}')" class="btn-icon text-sm h-8 w-8 bg-teal-50 text-teal-700">🔊</button>
+                         <button onclick="toggleThai('${thId}')" class="btn-icon text-sm h-8 w-8 bg-teal-50 text-teal-700">🇹🇭</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function pickRandomWord() {
             const display = document.getElementById('wordDisplay');
+            const combinedVocab = typeof additionalVocabList !== 'undefined' ? [...vocabData, ...additionalVocabList] : vocabData;
             
             // Animation start
             display.style.opacity = '0';
             
             setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * vocabData.length);
-                const item = vocabData[randomIndex];
+                const randomIndex = Math.floor(Math.random() * combinedVocab.length);
+                const item = combinedVocab[randomIndex];
                 const uniqueId = 'rand-' + Math.random().toString(36).substr(2, 9);
                 const randomEmoji = item.emoji ? item.emoji.split('\t')[0] : '✨';
                 
@@ -1836,6 +1922,9 @@
                 display.style.opacity = '1';
             }, 200);
         }
+
+        // Render additional vocabulary on load
+        renderAdditionalVocab();
     </script>
 
 </body>
