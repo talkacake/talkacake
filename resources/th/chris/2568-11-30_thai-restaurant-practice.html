@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Restaurant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CHANGED: Imported Sarabun Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            /* CHANGED: Applied Sarabun Font */
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fff7ed; /* orange-50 */
+            touch-action: manipulation;
+        }
+        
+        /* --- Visual Cards --- */
+        .food-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .emoji-icon {
+            font-size: 3rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- TTS & Toggles --- */
+        .tts-text {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .tts-text:hover {
+            color: #ea580c; /* orange-600 */
+        }
+        
+        .toggle-container {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .toggle-btn {
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background: #ea580c; /* orange-600 */
+            color: white;
+            border-color: #ea580c;
+        }
+        .helper-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 2px;
+            display: block;
+        }
+        .hidden { display: none; }
+
+        /* --- Chat Styles --- */
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .msg-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .msg-server {
+            background-color: #ffffff;
+            border-top-left-radius: 4px;
+            margin-right: auto;
+            border: 1px solid #fed7aa; /* orange-200 */
+        }
+        .msg-customer {
+            background-color: #ffedd5; /* orange-100 */
+            border-top-right-radius: 4px;
+            margin-left: auto;
+            text-align: right;
+        }
+        /* For customer toggle buttons */
+        .msg-customer .toggle-container {
+            justify-content: flex-end;
+        }
+        
+        /* Avatar */
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+        .server-avatar { background: #fed7aa; }
+        
+        /* Choices */
+        .choice-btn {
+            background: white;
+            border: 2px solid #fb923c; /* orange-400 */
+            color: #c2410c; /* orange-700 */
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .choice-btn:hover {
+            background: #fff7ed;
+            transform: scale(1.02);
+        }
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        /* Quiz Styles */
+        .quiz-option {
+            transition: all 0.2s;
+            font-size: 1.2rem; /* Larger for character recognition */
+        }
+        .quiz-option:hover {
+            background-color: #fff7ed;
+        }
+        .quiz-option.correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .char-highlight {
+            color: #ea580c;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <div class="text-5xl mb-2">🍽️ 👨‍🍳 🥢</div>
+        <h1 class="text-4xl font-bold text-orange-800 mb-2">Thai Restaurant Practice</h1>
+        <p class="text-orange-600 font-medium">Sit-down Dining: Ordering & Paying</p>
+    </header>
+
+    <!-- SECTION 0: GENERAL WARM-UP (NEW) -->
+    <section class="mb-12 bg-orange-50 p-6 rounded-2xl border border-orange-200">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">👋</span>
+            <h2 class="text-2xl font-bold text-gray-800">Warm-Up: General Review</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Topic 1: Greetings & Origin -->
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="font-bold text-orange-700 mb-3 border-b pb-1">Greetings & Origin</h3>
+                <div class="space-y-4">
+                    <div class="interactive-text" data-thai="คุณสบายดีไหมคะ" data-ipa="khun sà baai dii mái khá" data-en="Are you well?"></div>
+                    <div class="interactive-text" data-thai="ผมสบายดีครับ" data-ipa="phǒm sà baai dii kráp" data-en="I am well."></div>
+                    <div class="interactive-text" data-thai="คุณมาจากประเทศอะไรคะ" data-ipa="khun maa jàak prà-thêt à-rai khá" data-en="What country are you from?"></div>
+                    <div class="interactive-text" data-thai="ผมมาจากประเทศอังกฤษ" data-ipa="phǒm maa jàak prà-thêt ang-grìt" data-en="I come from England."></div>
+                </div>
+            </div>
+
+            <!-- Topic 2: Hobbies & Skills -->
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h3 class="font-bold text-orange-700 mb-3 border-b pb-1">Hobbies & Skills</h3>
+                <div class="space-y-4">
+                    <div class="interactive-text" data-thai="คุณชอบทำอะไรคะ" data-ipa="khun chɔ̂ɔp tham à-rai khá" data-en="What do you like to do?"></div>
+                    <div class="interactive-text" data-thai="ผมชอบดูซีรีส์" data-ipa="phǒm chɔ̂ɔp duu sii-rîi" data-en="I like to watch series."></div>
+                    <div class="interactive-text" data-thai="พูดภาษาไทยได้ไหมคะ" data-ipa="pûut paa-sǎa tai dâi mái khá" data-en="Can you speak Thai?"></div>
+                    <div class="interactive-text" data-thai="ได้นิดหน่อยครับ" data-ipa="dâi nít-nòi kráp" data-en="Can (do) a little bit."></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1: VISUAL MENU (Review) -->
+    <section class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">📖</span>
+            <h2 class="text-2xl font-bold text-gray-800">Menu Review (เมนู)</h2>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="menu-grid">
+            <!-- Menu items generated by JS -->
+        </div>
+    </section>
+
+    <!-- SECTION 2: NEW PAYMENT VOCAB -->
+    <section class="mb-12 bg-white p-6 rounded-2xl shadow-md border-2 border-orange-100">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">💳</span>
+            <h2 class="text-2xl font-bold text-gray-800">Payment Phrases (จ่ายเงิน)</h2>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">Restaurant Style</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Phrase 1: Check Bill -->
+            <div class="flex items-start gap-4">
+                <div class="text-4xl bg-orange-50 p-3 rounded-xl">🧾</div>
+                <div>
+                    <div class="interactive-text" data-thai="เช็คบิล" data-ipa="chék-bin" data-en="Check bill / Bill please"></div>
+                    <p class="text-sm text-gray-500 mt-1">Used in restaurants when you finish eating.</p>
+                </div>
+            </div>
+
+            <!-- Phrase 2: How to pay? -->
+            <div class="flex items-start gap-4">
+                <div class="text-4xl bg-orange-50 p-3 rounded-xl">🤔</div>
+                <div>
+                    <div class="interactive-text" data-thai="จ่ายยังไง" data-ipa="jàai yang-ngai" data-en="How do you pay?"></div>
+                    <p class="text-sm text-gray-500 mt-1">Staff will ask this.</p>
+                </div>
+            </div>
+
+            <!-- Phrase 3: Cash -->
+            <div class="flex items-start gap-4">
+                <div class="text-4xl bg-orange-50 p-3 rounded-xl">💵</div>
+                <div>
+                    <div class="interactive-text" data-thai="เงินสด" data-ipa="ngoen-sòt" data-en="Cash"></div>
+                </div>
+            </div>
+
+            <!-- Phrase 4: Card -->
+            <div class="flex items-start gap-4">
+                <div class="text-4xl bg-orange-50 p-3 rounded-xl">💳</div>
+                <div>
+                    <div class="interactive-text" data-thai="บัตร" data-ipa="bàt" data-en="Credit/Debit Card"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 3: ROLE PLAY -->
+    <section class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">🎭</span>
+            <h2 class="text-2xl font-bold text-gray-800">Role-Play: Ordering at a Restaurant</h2>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg border border-orange-200 overflow-hidden">
+            <!-- Chat Window -->
+            <div id="chat-box" class="chat-box bg-orange-50/50 p-6">
+                <!-- Messages will appear here -->
+                <div class="text-center text-gray-400 text-sm my-4">--- Conversation Start ---</div>
+            </div>
+
+            <!-- Interactive Area -->
+            <div class="bg-white p-4 border-t border-orange-100">
+                <p class="text-gray-600 font-medium mb-3 text-center">Your Turn (Customer):</p>
+                <div id="choices-container" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Choices appear here -->
+                    <button onclick="startRolePlay()" class="md:col-span-3 bg-orange-500 text-white py-3 rounded-xl font-bold shadow hover:bg-orange-600 transition">
+                        Start Role-Play
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: EXTENSION - CHARACTER SPOTTING -->
+    <section class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">👀</span>
+            <h2 class="text-2xl font-bold text-gray-800">Activity 4: Character Spotting</h2>
+        </div>
+        
+        <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-orange-100">
+            <p class="text-gray-600 mb-6">Let's start reading! Look for the shapes and find the words that contain them.</p>
+            <div id="char-quiz-container" class="space-y-6">
+                <!-- Quiz items injected here -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // --- DATA & VOCAB ---
+        const menuItems = [
+            { emoji: '🍜', thai: 'ก๋วยเตี๋ยวเรือ', ipa: 'gǔay-dtǐao-rʉa', en: 'Boat Noodles', price: 50 },
+            { emoji: '🐟', thai: 'ปลาทอด', ipa: 'bplaa thâwt', en: 'Fried Fish', price: 80 },
+            { emoji: '🍳', thai: 'ไข่ดาว', ipa: 'kài daao', en: 'Fried Egg (Star)', price: 10 },
+            { emoji: '🌭', thai: 'ไส้กรอก', ipa: 'sâi-gròk', en: 'Sausage', price: 20 },
+            { emoji: '🍖', thai: 'เนื้อวัว', ipa: 'nʉ́a-wuua', en: 'Beef', price: 100 },
+            { emoji: '🍗', thai: 'ไก่', ipa: 'gài', en: 'Chicken', price: 60 },
+            { emoji: '🍲', thai: 'อาหารเช้า', ipa: 'aa-hǎan cháao', en: 'Breakfast', price: 90 },
+            { emoji: '🥣', thai: 'ไข่ดาวน้ำ', ipa: 'kài-daao-náam', en: 'Poached Egg', price: 15 },
+            { emoji: '🥛', thai: 'น้ำ', ipa: 'náam', en: 'Water', price: 10 },
+            { emoji: '🐑', thai: 'เนื้อแกะ', ipa: 'nʉ́a-gɛ̀', en: 'Lamb', price: 120 }
+        ];
+
+        // --- HELPER FUNCTIONS ---
+
+        // TTS Function (Thai)
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            let cleanText = text.replace(/\?/g, '').replace(/!/g, ''); 
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Generate Interactive Text HTML (Thai + Toggles)
+        function createInteractiveText(thai, ipa, en, large = false) {
+            const sizeClass = large ? 'text-xl md:text-2xl' : 'text-lg';
+            const id = Math.random().toString(36).substr(2, 9);
+            
+            return `
+                <div class="inline-block" id="${id}">
+                    <div class="flex items-center gap-2 flex-wrap ${large ? 'justify-center' : ''}">
+                        <span class="tts-text ${sizeClass} font-bold text-gray-800" onclick="speak('${thai}')">${thai} 🔊</span>
+                        <div class="toggle-container">
+                            <button class="toggle-btn" onclick="toggle('${id}', 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggle('${id}', 'en')">EN</button>
+                        </div>
+                    </div>
+                    <div class="helper-text hidden ipa-text text-orange-600 font-mono">${ipa}</div>
+                    <div class="helper-text hidden en-text text-gray-600 italic">${en}</div>
+                </div>
+            `;
+        }
+
+        function toggle(id, type) {
+            const container = document.getElementById(id);
+            const target = container.querySelector(`.${type}-text`);
+            const btn = container.querySelector(`button[onclick*="'${type}'"]`);
+            
+            target.classList.toggle('hidden');
+            btn.classList.toggle('active');
+        }
+
+        // --- INIT MENU ---
+        const menuGrid = document.getElementById('menu-grid');
+        menuItems.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'food-card bg-white p-4 rounded-xl shadow-sm border border-orange-100 flex flex-col items-center text-center';
+            card.innerHTML = `
+                <div class="emoji-icon">${item.emoji}</div>
+                ${createInteractiveText(item.thai, item.ipa, item.en)}
+                <div class="mt-2 font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full text-sm">
+                    ${item.price} บาท
+                </div>
+            `;
+            menuGrid.appendChild(card);
+        });
+
+        // --- INIT NEW VOCAB SECTION & WARM-UP ---
+        document.querySelectorAll('.interactive-text').forEach(el => {
+            const html = createInteractiveText(el.dataset.thai, el.dataset.ipa, el.dataset.en, true);
+            el.innerHTML = html;
+        });
+
+        // --- ROLE PLAY ENGINE ---
+        
+        const chatBox = document.getElementById('chat-box');
+        const choicesContainer = document.getElementById('choices-container');
+        let totalPrice = 0;
+
+        function addMessage(sender, thai, ipa, en) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `msg-bubble flex items-start ${sender === 'server' ? 'msg-server' : 'msg-customer'}`;
+            
+            let avatar = '';
+            if (sender === 'server') {
+                avatar = `<div class="avatar server-avatar">👩‍🍳</div>`;
+            }
+
+            let content = `
+                <div class="w-full">
+                    <div class="font-bold text-xs text-gray-500 mb-1">${sender === 'server' ? 'Staff (พนักงาน)' : 'Customer (ลูกค้า)'}</div>
+                    ${createInteractiveText(thai, ipa, en)}
+                </div>
+            `;
+
+            msgDiv.innerHTML = sender === 'server' ? avatar + content : content; 
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Auto speak server lines
+            if (sender === 'server') {
+                setTimeout(() => speak(thai), 300);
+            }
+        }
+
+        function setChoices(choices) {
+            choicesContainer.innerHTML = '';
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerHTML = `
+                    <span class="text-lg font-bold">${choice.thai}</span>
+                    <span class="text-xs text-gray-500">${choice.en}</span>
+                `;
+                btn.onclick = () => {
+                    // User speaks
+                    addMessage('customer', choice.thai, choice.ipa, choice.en);
+                    // Trigger next step
+                    const allBtns = document.querySelectorAll('.choice-btn');
+                    allBtns.forEach(b => b.disabled = true);
+                    
+                    setTimeout(() => {
+                        choice.nextAction();
+                    }, 1000);
+                };
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        // --- SCENARIO SCRIPT ---
+
+        function startRolePlay() {
+            chatBox.innerHTML = '<div class="text-center text-gray-400 text-sm my-4">--- Start Ordering ---</div>';
+            totalPrice = 0;
+            step1_Welcome();
+        }
+
+        function step1_Welcome() {
+            addMessage('server', 'สวัสดีค่ะ เอาอะไรคะ?', 'sà-wàt-dii kà, ao à-rai ká?', 'Hello, what would you like?');
+            
+            setChoices([
+                { 
+                    thai: 'เอา ก๋วยเตี๋ยวเรือ หนึ่ง ครับ/ค่ะ', 
+                    ipa: 'ao gǔay-dtǐao-rʉa nùeng', 
+                    en: 'I want 1 Boat Noodle.',
+                    nextAction: () => { totalPrice += 50; step2_AnythingElse('ก๋วยเตี๋ยวเรือ'); }
+                },
+                { 
+                    thai: 'เอา อาหารเช้า ครับ/ค่ะ', 
+                    ipa: 'ao aa-hǎan cháao', 
+                    en: 'I want breakfast.',
+                    nextAction: () => { totalPrice += 90; step2_AnythingElse('อาหารเช้า'); }
+                },
+                { 
+                    thai: 'เอา ไส้กรอก สอง ครับ/ค่ะ', 
+                    ipa: 'ao sâi-gròk sǎawng', 
+                    en: 'I want 2 sausages.',
+                    nextAction: () => { totalPrice += 40; step2_AnythingElse('ไส้กรอก'); }
+                }
+            ]);
+        }
+
+        function step2_AnythingElse(prevItem) {
+            // Looping function
+            addMessage('server', 'ได้ค่ะ เอาอะไรอีกไหมคะ?', 'dâi kà, ao à-rai ìik mái ká?', 'Okay. Do you want anything else?');
+
+            setChoices([
+                {
+                    thai: 'เอา น้ำ ครับ/ค่ะ',
+                    ipa: 'ao náam',
+                    en: 'I want water (+10B).',
+                    nextAction: () => { totalPrice += 10; step2_AnythingElse(prevItem); } // Loop back
+                },
+                {
+                    thai: 'เอา ไข่ดาว ครับ/ค่ะ',
+                    ipa: 'ao kài daao',
+                    en: 'I want a fried egg (+10B).',
+                    nextAction: () => { totalPrice += 10; step2_AnythingElse(prevItem); } // Loop back
+                },
+                {
+                    thai: 'ไม่เอา ครับ/ค่ะ',
+                    ipa: 'mâi ao',
+                    en: 'No, thank you.',
+                    nextAction: () => { step3_ServeFood(); } // Proceed
+                }
+            ]);
+        }
+
+        function step3_ServeFood() {
+            addMessage('server', 'รอสักครู่ค่ะ...', 'raw sàk-krûu kà...', 'Wait a moment please...');
+            
+            setTimeout(() => {
+                addMessage('server', 'อาหารมาแล้วค่ะ... อร่อยไหมคะ?', 'aa-hǎan maa láew kà... à-rɔ̀ɔi mái ká?', 'Food is here. Is it delicious?');
+                
+                setChoices([
+                    {
+                        thai: 'อร่อย ครับ/ค่ะ',
+                        ipa: 'à-rɔ̀ɔi',
+                        en: 'It is delicious.',
+                        nextAction: step4_CheckBill
+                    },
+                    {
+                        thai: 'มาก! อิ่มแล้ว ครับ/ค่ะ',
+                        ipa: 'mâak! ìm láew',
+                        en: 'Very! I am full already.',
+                        nextAction: step4_CheckBill
+                    }
+                ]);
+            }, 2000);
+        }
+
+        function step4_CheckBill() {
+            addMessage('server', 'ดีใจค่ะ!', 'dii-jai kà!', 'I am glad!');
+            
+            setTimeout(() => {
+                 setChoices([
+                    {
+                        thai: 'เช็คบิล ครับ/ค่ะ',
+                        ipa: 'chék-bin',
+                        en: 'Check bill please.',
+                        nextAction: () => step5_Total(totalPrice)
+                    },
+                    {
+                        thai: 'เท่าไร ครับ/ค่ะ',
+                        ipa: 'tâo-rài',
+                        en: 'How much?',
+                        nextAction: () => step5_Total(totalPrice)
+                    }
+                ]);
+            }, 1000);
+        }
+
+        function step5_Total(price) {
+            // Staff asks the payment method now
+            addMessage('server', `ทั้งหมด ${price} บาทค่ะ จ่ายยังไงคะ?`, `tháng-mòt ${price} bàat kà. jàai yang-ngai ká?`, `Total ${price} Baht. How do you pay?`);
+            
+            setChoices([
+                {
+                    thai: 'เงินสด ครับ/ค่ะ',
+                    ipa: 'ngoen-sòt',
+                    en: 'Cash please.',
+                    nextAction: step7_End
+                },
+                {
+                    thai: 'บัตร ครับ/ค่ะ',
+                    ipa: 'bàt',
+                    en: 'Card please.',
+                    nextAction: step7_End
+                }
+            ]);
+        }
+
+        function step7_End() {
+            addMessage('server', 'ขอบคุณค่ะ!', 'kàwp-kun kà!', 'Thank you!');
+            choicesContainer.innerHTML = `
+                <div class="col-span-1 md:col-span-3 text-center">
+                    <div class="text-green-600 font-bold text-xl mb-4">Great Job! 🎉</div>
+                    <button onclick="startRolePlay()" class="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600">Play Again</button>
+                </div>
+            `;
+        }
+        
+        // --- ACTIVITY 4: CHARACTER SPOTTING GAME ---
+        const charQuizData = [
+            { 
+                char: 'า', 
+                name: 'Sara Aa', 
+                hint: 'Looks like a walking stick', 
+                instruction: 'Find the word with the "walking stick" (Long A sound).',
+                correct: 'ปลา', 
+                options: ['ปลา', 'ไก่', 'น้ำ'] 
+            },
+            { 
+                char: 'ก', 
+                name: 'Gor Kai', 
+                hint: 'Looks like a chicken head (beak pointing left)', 
+                instruction: 'Find the word starting with the "Chicken" (G sound).',
+                correct: 'กิน', 
+                options: ['กิน', 'ชอบ', 'ดี'] 
+            }
+        ];
+        
+        const charQuizContainer = document.getElementById('char-quiz-container');
+        
+        charQuizData.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = "bg-orange-50 p-5 rounded-xl border border-orange-100";
+            
+            // Header part: Character and Hint
+            div.innerHTML = `
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-orange-200 w-16 h-16 flex items-center justify-center">
+                        <span class="char-highlight text-4xl">${item.char}</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-gray-800">${item.name}</h3>
+                        <p class="text-sm text-gray-600 italic">Hint: ${item.hint}</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 font-medium mb-3">${item.instruction}</p>
+            `;
+            
+            // Options Container
+            const btnContainer = document.createElement('div');
+            btnContainer.className = "flex flex-wrap gap-3";
+            
+            // Feedback div
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = "mt-2 text-sm font-bold h-5";
+            
+            // Shuffle options
+            const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-option border-2 border-orange-200 px-4 py-2 rounded-lg bg-white text-gray-700 font-bold hover:border-orange-400";
+                btn.textContent = opt;
+                btn.onclick = (e) => {
+                    // Disable all buttons in this group
+                    const all = btnContainer.querySelectorAll('button');
+                    all.forEach(b => b.disabled = true);
+                    
+                    if(opt === item.correct) {
+                        btn.classList.add('correct');
+                        feedbackDiv.textContent = "Correct! 🎉";
+                        feedbackDiv.className = "mt-2 text-green-600 font-bold h-5";
+                    } else {
+                        btn.classList.add('incorrect');
+                        // Highlight correct one
+                        all.forEach(b => {
+                             if(b.textContent === item.correct) b.classList.add('correct');
+                        });
+                        feedbackDiv.textContent = "Oops! It was " + item.correct;
+                        feedbackDiv.className = "mt-2 text-red-600 font-bold h-5";
+                    }
+                };
+                btnContainer.appendChild(btn);
+            });
+            
+            div.appendChild(btnContainer);
+            div.appendChild(feedbackDiv);
+            charQuizContainer.appendChild(div);
+        });
+
+    </script>
+</body>
+</html>
