@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            touch-action: manipulation; /* Improves click responsiveness on touch */
+        }
+        /* Custom styles for the sentence builder */
+        #sentence-builder-dropzone {
+            min-height: 4rem; /* Ensure dropzone has height */
+            border-style: dashed;
+        }
+        .word-bank-item, .sentence-item {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .sentence-item {
+            cursor: pointer;
+        }
+        .sentence-item:hover {
+            opacity: 0.7;
+            transform: translateY(-2px);
+        }
+        /* Style for correct/incorrect feedback */
+        #feedback-message.correct {
+            color: #16a34a; /* green-600 */
+        }
+        #feedback-message.incorrect {
+            color: #dc2626; /* red-600 */
+        }
+        
+        /* TTS Icon */
+        .tts-icon {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 0.9em;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .tts-icon:hover {
+            opacity: 1;
+        }
+        .tts-text {
+            cursor: pointer;
+        }
+        .tts-text:hover {
+            background-color: #f0f9ff; /* sky-50 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 shadow-md">
+            <h1 class="text-3xl md:text-4xl font-bold text-white text-center">Sentence Patterns Review</h1>
+            <p class="text-indigo-100 text-center mt-2">Welcome back! Let's review what you've learned so far.</p>
+        </header>
+
+        <main class="p-6 md:p-8 space-y-8">
+
+            <!-- Pro Tip Box -->
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>Pro Tip:</strong> Remember, in Thai, we often drop pronouns like 'I' (ผม / ฉัน) and 'You' (คุณ) when the context is clear. In the examples, these will be in (parentheses).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ACTIVITY 1: Sentence Builder ===== -->
+            <section id="activity-1" class="space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 1: Sentence Builder</h2>
+                
+                <!-- Prompt -->
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <p class="text-lg font-medium text-gray-900" id="prompt-text">Loading question...</p>
+                </div>
+
+                <!-- "Your Sentence" Area (Click-to-Remove) -->
+                <div id="sentence-builder-dropzone" class="bg-gray-100 rounded-lg p-4 border-2 border-gray-300 border-dashed flex flex-wrap gap-2 items-center justify-center min-h-[6rem]">
+                    <!-- Built sentence words will go here -->
+                </div>
+
+                <!-- "Word Bank" Area (Click-to-Add) -->
+                <div id="word-bank-container" class="bg-white rounded-lg p-4 flex flex-wrap gap-3 items-center justify-center border">
+                    <!-- Word bank items will go here -->
+                </div>
+
+                <!-- Feedback and Controls -->
+                <div classs="space-y-4">
+                    <p id="feedback-message" class="text-center h-6 font-semibold"></p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                        <button id="check-answer-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200">Check Answer</button>
+                        <button id="clear-sentence-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg transition duration-200">Clear</button>
+                        <button id="next-question-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200 hidden">Next</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== ACTIVITY 2: Simple Conversation ===== -->
+            <section id="activity-2" class="space-y-6 pt-8 border-t">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 2: Simple Conversation</h2>
+                <p class="text-gray-600">Practice what you've learned in a simple role-play. Click the best response to the bot's message.</p>
+
+                <div id="conversation-container" class="bg-gray-50 rounded-lg shadow-inner p-4 space-y-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+                    <!-- Conversation chat bubbles will go here -->
+                </div>
+
+                <div id="conversation-options" class="flex flex-col gap-3">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // === TTS (Text-to-Speech) Function ===
+        const synth = window.speechSynthesis;
+        function speakThai(text) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            // Remove romanization for cleaner speech
+            let cleanText = text.split('(')[0].trim();
+            
+            // --- NEW FIX ---
+            // Replace formal "ไหม" with colloquial "มั้ย" for pronunciation
+            // This forces the high tone (mái) instead of rising tone (mǎi)
+            cleanText = cleanText.replace(/ไหม/g, 'มั้ย');
+            // --- END FIX ---
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH'; // Set language to Thai
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
+
+        // Add event listener for any dynamically created TTS icons
+        document.body.addEventListener('click', function(e) {
+            if (e.target.classList.contains('tts-icon') || e.target.closest('.tts-icon')) {
+                const text = e.target.closest('[data-tts-text]').dataset.ttsText;
+                speakThai(text);
+            }
+            if (e.target.classList.contains('tts-text')) {
+                const text = e.target.dataset.ttsText;
+                speakThai(text);
+            }
+        });
+
+        // === ACTIVITY 1: Sentence Builder ===
+        (function() {
+            // --- All Data ---
+            const allWords = {
+                'คะ': 'khá', 'ฉัน': 'chǎn', 'ชื่อ': 'chûe', 'คุณ': 'khun', 'อะไร': 'à-rai', 'ผม': 'phǒm', 'มา': 'maa', 'จาก': 'jàak', 'ประเทศ': 'prà-thêt',
+                'ไม่': 'mâi', 'ไหม': 'mái', 'ดี': 'dii', 'สบาย': 'sà baai', 'อร่อย': 'à rɔ̀ɔi', 'ใช่': 'châi', 'ใช่ไหม': 'châi mái', 'พูด': 'pôut', 'ภาษา': 'paa-sǎa',
+                'ได้': 'dâi', 'นิดหน่อย': 'nít-nòi', 'เขียน': 'khǐan', 'สเปน': 'sà bpeen', 'ฝรั่งเศส': 'fà ràng sèet', 'ชอบ': 'chɔ̂ɔp', 'ฟัง': 'fang', 'ดู': 'duu',
+                'ซีรีส์': 'sii rîi', 'อ่าน': 'àan', 'เพลง': 'pleeng', 'ไทย': 'tai', 'อังกฤษ': 'ang grìt', 'คริส': 'krít', 'สบายดี': 'sà baai dii', 'ส้มตำ': 'sôm dtam',
+                'เอ็สเปรสโซ่': 'ès bprèet sôo', 'โซฟา': 'soo faa', 'ว่า': 'wâa', 'ฝันดี': 'fǎn dii', 'เอเลี่ยนเอิร์ธ': 'ee lîan ə́ət',
+                // NEW WORDS ADDED:
+                'ทำ': 'tham',
+                'อาหาร': 'aa-hǎan',
+                'ทำอาหาร': 'tham-aa-hǎan',
+                'ทอด': 'tâwt',
+                'ปลา': 'bplaa',
+                'ไหม้': 'mâi', // Note: Same phonetic as 'ไม่' (not), but different word (burn)
+                'หิว': 'hǐw'
+            };
+
+            const questions = [
+                { 
+                    prompt: "What is your name?", 
+                    answers: [
+                        ['คุณ', 'ชื่อ', 'อะไร'], 
+                        ['ชื่อ', 'อะไร']
+                    ],
+                    words: ['คุณ', 'ชื่อ', 'อะไร', 'ผม', 'สบายดี', 'ไม่']
+                },
+                { 
+                    prompt: "What country do you come from?", 
+                    answers: [
+                        ['คุณ', 'มา', 'จาก', 'ประเทศ', 'อะไร'],
+                        ['มา', 'จาก', 'ประเทศ', 'อะไร']
+                    ],
+                    words: ['คุณ', 'มา', 'จาก', 'ประเทศ', 'อะไร', 'ชื่อ', 'ใช่', 'ไหม']
+                },
+                { 
+                    prompt: "I am well.", 
+                    answers: [
+                        ['ผม', 'สบายดี'],
+                        ['ฉัน', 'สบายดี'],
+                        ['สบายดี']
+                    ],
+                    words: ['ผม', 'ฉัน', 'สบายดี', 'ไม่', 'ดี', 'อร่อย']
+                },
+                { 
+                    prompt: "Are you well?", 
+                    answers: [
+                        ['คุณ', 'สบายดี', 'ไหม'],
+                        ['สบายดี', 'ไหม']
+                    ],
+                    words: ['คุณ', 'สบายดี', 'ไหม', 'ใช่ไหม', 'อะไร', 'ดี']
+                },
+                { 
+                    prompt: "Is it good?", 
+                    answers: [
+                        ['ดี', 'ไหม']
+                    ],
+                    words: ['ดี', 'ไหม', 'ไม่', 'อร่อย', 'สบาย']
+                },
+                { 
+                    prompt: "Is it delicious?", 
+                    answers: [
+                        ['อร่อย', 'ไหม']
+                    ],
+                    words: ['อร่อย', 'ไหม', 'ดี', 'ไม่', 'สบายดี']
+                },
+                { 
+                    prompt: "Som Tum is good, right?", 
+                    answers: [
+                        ['ส้มตำ', 'ดี', 'ใช่ไหม']
+                    ],
+                    words: ['ส้มตำ', 'ดี', 'ใช่ไหม', 'อร่อย', 'ไหม', 'ไม่']
+                },
+                { 
+                    prompt: "I like to speak Thai.", 
+                    answers: [
+                        ['ผม', 'ชอบ', 'พูด', 'ภาษา', 'ไทย'],
+                        ['ฉัน', 'ชอบ', 'พูด', 'ภาษา', 'ไทย'],
+                        ['ชอบ', 'พูด', 'ภาษา', 'ไทย']
+                    ],
+                    words: ['ผม', 'ชอบ', 'พูด', 'ภาษา', 'ไทย', 'ฟัง', 'เขียน', 'ได้']
+                },
+                { 
+                    prompt: "Can you listen to Thai songs?", 
+                    answers: [
+                        ['คุณ', 'ฟัง', 'เพลง', 'ไทย', 'ได้', 'ไหม'],
+                        ['ฟัง', 'เพลง', 'ไทย', 'ได้', 'ไหม']
+                    ],
+                    words: ['คุณ', 'ฟัง', 'เพลง', 'ไทย', 'ได้', 'ไหม', 'ชอบ', 'ภาษา']
+                },
+                { 
+                    prompt: "What do you like to listen to?", 
+                    answers: [
+                        ['คุณ', 'ชอบ', 'ฟัง', 'อะไร'],
+                        ['ชอบ', 'ฟัง', 'อะไร']
+                    ],
+                    words: ['คุณ', 'ชอบ', 'ฟัง', 'อะไร', 'เพลง', 'ดู', 'พูด']
+                },
+                { 
+                    prompt: "What series do you like to watch?", 
+                    answers: [
+                        ['คุณ', 'ชอบ', 'ดู', 'ซีรีส์', 'อะไร'],
+                        ['ชอบ', 'ดู', 'ซีรีส์', 'อะไร']
+                    ],
+                    words: ['คุณ', 'ชอบ', 'ดู', 'ซีรีส์', 'อะไร', 'เพลง', 'เขียน', 'ภาษา']
+                },
+                { 
+                    prompt: "Do you like to read?", 
+                    answers: [
+                        ['คุณ', 'ชอบ', 'อ่าน', 'ไหม'],
+                        ['ชอบ', 'อ่าน', 'ไหม']
+                    ],
+                    words: ['คุณ', 'ชอบ', 'อ่าน', 'ไหม', 'ไม่', 'เขียน', 'ดู', 'เพลง']
+                },
+                { 
+                    prompt: "Espresso isn't delicious, right?", 
+                    answers: [
+                        ['เอ็สเปรสโซ่', 'ไม่', 'อร่อย', 'ใช่ไหม']
+                    ],
+                    words: ['เอ็สเปรสโซ่', 'ไม่', 'อร่อย', 'ใช่ไหม', 'ดี', 'โซฟา', 'ไหม']
+                },
+                { 
+                    prompt: "The sofa isn't comfortable, right?", 
+                    answers: [
+                        ['โซฟา', 'ไม่', 'สบาย', 'ใช่ไหม']
+                    ],
+                    words: ['โซฟา', 'ไม่', 'สบาย', 'ใช่ไหม', 'สบายดี', 'อร่อย', 'ไหม']
+                },
+                { 
+                    prompt: "What do you like to say?", 
+                    answers: [
+                        ['คุณ', 'ชอบ', 'พูด', 'ว่า', 'อะไร'],
+                        ['ชอบ', 'พูด', 'ว่า', 'อะไร']
+                    ],
+                    words: ['คุณ', 'ชอบ', 'พูด', 'ว่า', 'อะไร', 'ฝันดี', 'ฟัง']
+                },
+                { 
+                    prompt: "I like to say 'Good night'.", 
+                    answers: [
+                        ['ผม', 'ชอบ', 'พูด', 'ว่า', 'ฝันดี'],
+                        ['ฉัน', 'ชอบ', 'พูด', 'ว่า', 'ฝันดี'],
+                        ['ชอบ', 'พูด', 'ว่า', 'ฝันดี']
+                    ],
+                    words: ['ผม', 'ชอบ', 'พูด', 'ว่า', 'ฝันดี', 'อะไร', 'ไม่']
+                },
+                { 
+                    prompt: "I like to watch 'Alien Earth'.", 
+                    answers: [
+                        ['ผม', 'ชอบ', 'ดู', 'ซีรีส์', 'เอเลี่ยนเอิร์ธ'],
+                        ['ฉัน', 'ชอบ', 'ดู', 'ซีรีส์', 'เอเลี่ยนเอิร์ธ'],
+                        ['ชอบ', 'ดู', 'ซีรีส์', 'เอเลี่ยนเอิร์ธ']
+                    ],
+                    words: ['ผม', 'ชอบ', 'ดู', 'ซีรีส์', 'เอเลี่ยนเอิร์ธ', 'ฟัง', 'เพลง']
+                },
+                // --- NEW QUESTIONS ADDED ---
+                { 
+                    prompt: "Are you hungry?", 
+                    answers: [
+                        ['คุณ', 'หิว', 'ไหม'],
+                        ['หิว', 'ไหม']
+                    ],
+                    words: ['คุณ', 'หิว', 'ไหม', 'ไม่', 'สบายดี', 'อร่อย']
+                },
+                { 
+                    prompt: "Do you like to cook?", 
+                    answers: [
+                        ['คุณ', 'ชอบ', 'ทำอาหาร', 'ไหม'],
+                        ['ชอบ', 'ทำอาหาร', 'ไหม']
+                    ],
+                    words: ['คุณ', 'ชอบ', 'ทำอาหาร', 'ไหม', 'อาหาร', 'ทำ', 'ไม่']
+                },
+                { 
+                    prompt: "The fish is burnt.", 
+                    answers: [
+                        ['ปลา', 'ไหม้']
+                    ],
+                    words: ['ปลา', 'ไหม้', 'ไม่', 'ไหม', 'ทอด', 'อร่อย']
+                },
+                { 
+                    prompt: "Do you like to deep-fry fish?", 
+                    answers: [
+                        ['คุณ', 'ชอบ', 'ทอด', 'ปลา', 'ไหม'],
+                        ['ชอบ', 'ทอด', 'ปลา', 'ไหม']
+                    ],
+                    words: ['คุณ', 'ชอบ', 'ทอด', 'ปลา', 'ไหม', 'อาหาร', 'ไหม้']
+                },
+                { 
+                    prompt: "The food is not delicious.", 
+                    answers: [
+                        ['อาหาร', 'ไม่', 'อร่อย']
+                    ],
+                    words: ['อาหาร', 'ไม่', 'อร่อย', 'ดี', 'ไหม้', 'หิว']
+                },
+                { 
+                    prompt: "What are you making?",
+                    answers: [
+                        ['คุณ', 'ทำ', 'อะไร'],
+                        ['ทำ', 'อะไร']
+                    ],
+                    words: ['คุณ', 'ทำ', 'อะไร', 'ทำอาหาร', 'ชอบ', 'พูด']
+                }
+                // --- END NEW QUESTIONS ---
+            ];
+            
+            // --- Element References ---
+            const promptText = document.getElementById('prompt-text');
+            const wordBankContainer = document.getElementById('word-bank-container');
+            const dropzone = document.getElementById('sentence-builder-dropzone');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const checkAnswerBtn = document.getElementById('check-answer-btn');
+            const clearSentenceBtn = document.getElementById('clear-sentence-btn');
+            const nextQuestionBtn = document.getElementById('next-question-btn');
+
+            let currentQuestionIndex = 0;
+            let currentWordsInBank = [];
+            let currentWordsInSentence = [];
+
+            // --- Click-to-Add/Remove Logic ---
+
+            // Function to create a word element
+            function createWordElement(word, isBankItem) {
+                const roman = allWords[word];
+                const el = document.createElement('div');
+                el.className = isBankItem ? 'word-bank-item bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-2 px-4 rounded-lg shadow-sm transition' : 'sentence-item bg-white text-gray-800 font-medium py-2 px-4 rounded-lg shadow-sm border border-blue-300';
+                el.dataset.word = word;
+                el.dataset.ttsText = `${word} (${roman})`; // For TTS
+                
+                el.innerHTML = `
+                    <span>${word}</span>
+                    <span class="block text-xs opacity-75">${roman}</span>
+                    <span class="tts-icon">🔊</span>
+                `;
+                
+                if (isBankItem) {
+                    el.addEventListener('click', () => addWordToSentence(word, el));
+                } else {
+                    el.addEventListener('click', () => removeWordFromSentence(word, el));
+                }
+                return el;
+            }
+
+            // Click-to-Add
+            function addWordToSentence(word, bankElement) {
+                // Add to sentence array
+                currentWordsInSentence.push(word);
+                // Create and add element to UI
+                const sentenceElement = createWordElement(word, false);
+                dropzone.appendChild(sentenceElement);
+                // Hide from bank
+                bankElement.style.display = 'none';
+            }
+            
+            // Click-to-Remove
+            function removeWordFromSentence(word, sentenceElement) {
+                // Remove from sentence array (find *last* instance of word)
+                const indexToRemove = currentWordsInSentence.lastIndexOf(word);
+                if (indexToRemove > -1) {
+                    currentWordsInSentence.splice(indexToRemove, 1);
+                }
+                // Remove element from UI
+                sentenceElement.remove();
+                
+                // Show in bank again
+                const bankElement = wordBankContainer.querySelector(`[data-word="${word}"]`);
+                if (bankElement) {
+                    bankElement.style.display = 'inline-block';
+                }
+                
+                // Re-sync sentence array if clicks are out of order
+                // This ensures the internal array matches the UI
+                syncSentenceArrayFromUI();
+            }
+            
+            // Helper to re-sync array with UI (in case of removing middle items)
+            function syncSentenceArrayFromUI() {
+                currentWordsInSentence = [];
+                dropzone.querySelectorAll('.sentence-item').forEach(el => {
+                    currentWordsInSentence.push(el.dataset.word);
+                });
+            }
+
+            // --- Question Loading ---
+            function loadQuestion() {
+                clearSentence();
+                const question = questions[currentQuestionIndex];
+                promptText.textContent = question.prompt;
+                
+                // Create shuffled word bank
+                currentWordsInBank = [...question.words].sort(() => Math.random() - 0.5);
+                
+                wordBankContainer.innerHTML = '';
+                currentWordsInBank.forEach(word => {
+                    const el = createWordElement(word, true);
+                    wordBankContainer.appendChild(el);
+                });
+
+                feedbackMessage.textContent = '';
+                feedbackMessage.className = '';
+                checkAnswerBtn.disabled = false;
+                nextQuestionBtn.classList.add('hidden');
+                checkAnswerBtn.classList.remove('hidden');
+            }
+
+            function clearSentence() {
+                dropzone.innerHTML = '';
+                currentWordsInSentence = [];
+                // Show all words in bank again
+                wordBankContainer.querySelectorAll('.word-bank-item').forEach(el => {
+                    el.style.display = 'inline-block';
+                });
+            }
+
+            // --- Answer Checking ---
+            function checkAnswer() {
+                // Get current sentence from the UI order
+                syncSentenceArrayFromUI();
+                const userSentence = currentWordsInSentence.join(' ');
+                
+                const correctAnswers = questions[currentQuestionIndex].answers.map(ans => ans.join(' '));
+                
+                if (correctAnswers.includes(userSentence)) {
+                    feedbackMessage.textContent = 'ใช่! (Correct!)';
+                    feedbackMessage.className = 'text-center h-6 font-semibold correct';
+                    checkAnswerBtn.disabled = true;
+                    nextQuestionBtn.classList.remove('hidden');
+                    checkAnswerBtn.classList.add('hidden');
+                } else {
+                    feedbackMessage.textContent = 'ไม่ใช่ (Incorrect)';
+                    feedbackMessage.className = 'text-center h-6 font-semibold incorrect';
+                }
+            }
+
+            // --- Event Listeners ---
+            checkAnswerBtn.addEventListener('click', checkAnswer);
+            clearSentenceBtn.addEventListener('click', clearSentence);
+            nextQuestionBtn.addEventListener('click', () => {
+                currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                loadQuestion();
+            });
+
+            // Initial load
+            questions.sort(() => Math.random() - 0.5); // Shuffle questions
+            loadQuestion();
+
+        })();
+
+
+        // === ACTIVITY 2: Simple Conversation ===
+        (function() {
+            const conversationContainer = document.getElementById('conversation-container');
+            const optionsContainer = document.getElementById('conversation-options');
+            let currentStep = 0;
+
+            const conversationScript = [
+                {
+                    bot: "สบายดีไหมคะ",
+                    roman: "sà baai dii mái khá",
+                    options: [
+                        { text: "สบายดี", roman: "sà baai dii", correct: true },
+                        { text: "ไม่สบาย", roman: "mâi sà baai", correct: false },
+                        { text: "ชื่อคริส", roman: "chûe krít", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชื่ออะไรคะ",
+                    roman: "khun chûe à-rai khá",
+                    options: [
+                        { text: "ชื่อคริส", roman: "chûe krít", correct: true },
+                        { text: "ใช่", roman: "châi", correct: false },
+                        { text: "ประเทศอังกฤษ", roman: "prà-thêt ang grìt", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณมาจากประเทศอะไรคะ",
+                    roman: "khun maa jàak prà-thêt à-rai khá",
+                    options: [
+                        { text: "มาจากประเทศอังกฤษ", roman: "maa jàak prà-thêt ang grìt", correct: true },
+                        { text: "มาจากประเทศสเปน", roman: "maa jàak prà-thêt sà bpeen", correct: false },
+                        { text: "มาจากประเทศฝรั่งเศส", roman: "maa jàak prà-thêt fà ràng sèet", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบฟังเพลงไหมคะ",
+                    roman: "khun chɔ̂ɔp fang pleeng mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: false },
+                        { text: "ใช่", roman: "châi", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบพูดภาษาไทยไหมคะ",
+                    roman: "khun chɔ̂ɔp pûut paa-sǎa tai mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: false },
+                        { text: "พูดได้นิดหน่อย", roman: "pûut dâi nít-nòi", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณไม่ชอบเขียนใช่ไหมคะ",
+                    roman: "khun mâi chɔ̂ɔp kǐan châi mái khá",
+                    options: [
+                        { text: "ใช่", roman: "châi", correct: true },
+                        { text: "ไม่ใช่", roman: "mâi châi", correct: false },
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: false }
+                    ]
+                },
+                // --- NEW STEPS ADDED ---
+                {
+                    bot: "คุณหิวไหมคะ",
+                    roman: "khun hǐw mái khá",
+                    options: [
+                        { text: "หิว", roman: "hǐw", correct: true },
+                        { text: "ไม่หิว", roman: "mâi hǐw", correct: false }, // Compound of 'ไม่' + 'หิว'
+                        { text: "สบายดี", roman: "sà baai dii", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบทำอาหารไหมคะ",
+                    roman: "khun chɔ̂ɔp tham aa-hǎan mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: false },
+                        { text: "ปลาไหม้", roman: "bplaa mâi", correct: false } // Using new vocab as distractor
+                    ]
+                },
+                // --- END NEW STEPS ---
+                {
+                    bot: "ดี!",
+                    roman: "dii!",
+                    options: [] // End of conversation
+                }
+            ];
+
+            function addMessage(text, roman, isBot = true) {
+                const bubble = document.createElement('div');
+                const alignClass = isBot ? 'justify-start' : 'justify-end';
+                const colorClass = isBot ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white';
+                
+                bubble.className = `flex ${alignClass}`;
+                bubble.innerHTML = `
+                    <div 
+                        class="${colorClass} rounded-lg py-2 px-4 max-w-[80%] tts-text" 
+                        data-tts-text="${text} (${roman})"
+                    >
+                        <p class="font-medium">${text}</p>
+                        <p class="text-sm opacity-90">${roman}</p>
+                    </div>
+                `;
+                conversationContainer.appendChild(bubble);
+                // Scroll to bottom
+                conversationContainer.scrollTop = conversationContainer.scrollHeight;
+            }
+
+            function loadConversationStep(stepIndex) {
+                if (stepIndex >= conversationScript.length) {
+                    optionsContainer.innerHTML = '<p class="text-center text-gray-500">--- End of Conversation ---</p>';
+                    return;
+                }
+
+                const step = conversationScript[stepIndex];
+                
+                // Add bot message
+                setTimeout(() => {
+                    addMessage(step.bot, step.roman, true);
+                    speakThai(`${step.bot} (${step.roman})`);
+                }, 500); // Small delay for bot response
+
+                // Clear old options and add new ones
+                optionsContainer.innerHTML = '';
+                if (step.options.length > 0) {
+                    step.options.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'w-full text-left bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg shadow-sm transition';
+                        button.innerHTML = `
+                            <span>${option.text}</span>
+                            <span class="text-sm opacity-75 ml-2">(${option.roman})</span>
+                        `;
+                        button.addEventListener('click', () => handleOptionClick(option));
+                        optionsContainer.appendChild(button);
+                    });
+                } else {
+                    // It's the end
+                    setTimeout(() => {
+                         optionsContainer.innerHTML = '<p class="text-center text-gray-500">--- End of Conversation ---</p>';
+                    }, 1000);
+                }
+            }
+
+            function handleOptionClick(option) {
+                // --- FIX: Disable all buttons immediately on click ---
+                const allButtons = optionsContainer.querySelectorAll('button');
+                allButtons.forEach(btn => btn.disabled = true);
+                // --- END FIX ---
+
+                // Add user message
+                addMessage(option.text, option.roman, false);
+
+                if (option.correct) {
+                    currentStep++;
+                    // loadConversationStep will create new, enabled buttons
+                    loadConversationStep(currentStep);
+                } else {
+                    // Shake animation for incorrect
+                    optionsContainer.classList.add('animate-shake');
+                    
+                    // --- FIX: Re-enable buttons after shake so user can try again ---
+                    setTimeout(() => {
+                        optionsContainer.classList.remove('animate-shake');
+                        allButtons.forEach(btn => btn.disabled = false); // Let them try again
+                    }, 500);
+                    // --- END FIX ---
+                }
+            }
+
+            // Define shake animation
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+                .animate-shake {
+                    animation: shake 0.3s ease-in-out;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // Start conversation
+            loadConversationStep(currentStep);
+
+        })();
+
+    </script>
+
+</body>
+</html>
+
