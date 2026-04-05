@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Market (Numbers & Food)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fffbeb; /* amber-50 */
+            touch-action: manipulation;
+        }
+        
+        /* --- TTS & Toggles --- */
+        .tts-text {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .tts-text:hover {
+            color: #d97706; /* amber-600 */
+        }
+        
+        .toggle-container {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .toggle-btn {
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background: #d97706; /* amber-600 */
+            color: white;
+            border-color: #d97706;
+        }
+        .hidden { display: none; }
+        .ipa-text { color: #d97706; font-family: monospace; font-size: 0.9rem; }
+        .en-text { color: #6b7280; font-style: italic; font-size: 0.9rem; }
+
+        /* --- Visual Cards --- */
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+            border: 1px solid #fcd34d; /* amber-300 */
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .price-tag {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ef4444;
+            color: white;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 999px;
+            transform: rotate(5deg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 1.1rem;
+        }
+
+        /* Quiz Buttons */
+        .quiz-btn {
+            transition: all 0.2s;
+        }
+        .quiz-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        .quiz-btn.correct {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            border-color: #16a34a;
+        }
+        .quiz-btn.incorrect {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            border-color: #dc2626;
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <div class="text-5xl mb-3">🔢 🍊 🍗</div>
+        <h1 class="text-4xl font-bold text-amber-800 mb-2">ตลาดนัด (Market Day)</h1>
+        <p class="text-amber-700 font-medium">Practice Numbers & Prices</p>
+    </header>
+
+    <!-- SECTION 0: GENERAL WARM-UP -->
+    <section class="mb-12 bg-white p-6 rounded-2xl shadow-sm border-2 border-amber-100">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">👋</span>
+            <h2 class="text-2xl font-bold text-gray-800">กิจกรรมที่ 0: อุ่นเครื่อง (Warm-Up)</h2>
+        </div>
+        <p class="text-gray-600 mb-4">Let's review some basics before we start shopping.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Greetings -->
+            <div class="bg-amber-50 p-4 rounded-xl">
+                <div class="space-y-4">
+                    <div class="interactive-text" data-thai="คุณสบายดีไหมคะ" data-ipa="khun sà baai dii mái khá" data-en="Are you well?"></div>
+                    <div class="interactive-text" data-thai="ผมสบายดีครับ" data-ipa="phǒm sà baai dii kráp" data-en="I am well."></div>
+                    <div class="interactive-text" data-thai="คุณมาจากประเทศอะไร" data-ipa="khun maa jàak prà-thêt à-rai" data-en="Where are you from?"></div>
+                </div>
+            </div>
+            <!-- Hobbies -->
+            <div class="bg-amber-50 p-4 rounded-xl">
+                <div class="space-y-4">
+                    <div class="interactive-text" data-thai="คุณชอบทำอะไร" data-ipa="khun chɔ̂ɔp tham à-rai" data-en="What do you like to do?"></div>
+                    <div class="interactive-text" data-thai="ผมชอบดูซีรีส์" data-ipa="phǒm chɔ̂ɔp duu sii-rîi" data-en="I like to watch series."></div>
+                    <div class="interactive-text" data-thai="คุณชอบฟังเพลงไหม" data-ipa="khun chɔ̂ɔp fang pleeng mái" data-en="Do you like listening to music?"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1: VOCAB REVIEW (Focus on Numbers & Food) -->
+    <section class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">🧠</span>
+            <h2 class="text-2xl font-bold text-gray-800">กิจกรรมที่ 1: ทบทวนคำศัพท์ (Vocab Review)</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Numbers -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-200">
+                <h3 class="font-bold text-lg text-amber-800 mb-4 border-b pb-2">ตัวเลข (Numbers)</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="interactive-text" data-thai="สี่ (4)" data-ipa="sìi" data-en="Four"></div>
+                    <div class="interactive-text" data-thai="หก (6)" data-ipa="hòk" data-en="Six"></div>
+                    <div class="interactive-text" data-thai="เจ็ด (7)" data-ipa="jèt" data-en="Seven"></div>
+                    <div class="interactive-text" data-thai="แปด (8)" data-ipa="bpɛ̀ɛt" data-en="Eight"></div>
+                    <div class="interactive-text" data-thai="เก้า (9)" data-ipa="gâaw" data-en="Nine"></div>
+                    <div class="interactive-text" data-thai="ยี่สิบ (20)" data-ipa="yîi sìp" data-en="Twenty"></div>
+                    <div class="interactive-text" data-thai="ยี่สิบเอ็ด (21)" data-ipa="yîi sìp èt" data-en="Twenty-one"></div>
+                    <div class="interactive-text" data-thai="ร้อย (100)" data-ipa="rɔ́ɔi" data-en="Hundred"></div>
+                </div>
+            </div>
+
+            <!-- Food -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-200">
+                <h3 class="font-bold text-lg text-amber-800 mb-4 border-b pb-2">อาหาร (Food)</h3>
+                <div class="space-y-3">
+                    <div class="interactive-text" data-thai="น้ำส้ม" data-ipa="náam sôm" data-en="Orange Juice"></div>
+                    <div class="interactive-text" data-thai="ไก่ย่าง" data-ipa="gài yâaŋ" data-en="Grilled Chicken"></div>
+                    <div class="interactive-text" data-thai="ไข่ดาว" data-ipa="kài daao" data-en="Fried Egg"></div>
+                    <div class="interactive-text" data-thai="ก๋วยเตี๋ยวเรือ" data-ipa="gǔay-dtǐao-rʉa" data-en="Boat Noodles"></div>
+                    <div class="interactive-text" data-thai="ไส้กรอก" data-ipa="sâi-gròk" data-en="Sausage"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: PRICE TAG CHALLENGE -->
+    <section class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">🏷️</span>
+            <h2 class="text-2xl font-bold text-gray-800">กิจกรรมที่ 2: ราคาเท่าไหร่ (How much?)</h2>
+        </div>
+        <p class="text-gray-600 mb-6 ml-1">Look at the picture and price tag. Say the price in Thai, then click to check.</p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            
+            <!-- Item 1 -->
+            <div class="card p-4 text-center relative" onclick="speak('น้ำส้ม ยี่สิบ บาท')">
+                <div class="text-6xl mb-2">🍊🥤</div>
+                <div class="price-tag">20</div>
+                <p class="font-bold text-gray-700">น้ำส้ม</p>
+                <div class="mt-4 pt-2 border-t border-gray-100 text-amber-600 font-bold text-sm">
+                    (Click to hear)
+                </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="card p-4 text-center relative" onclick="speak('ไก่ย่าง ร้อย บาท')">
+                <div class="text-6xl mb-2">🍗🔥</div>
+                <div class="price-tag">100</div>
+                <p class="font-bold text-gray-700">ไก่ย่าง</p>
+                <div class="mt-4 pt-2 border-t border-gray-100 text-amber-600 font-bold text-sm">
+                    (Click to hear)
+                </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="card p-4 text-center relative" onclick="speak('ไข่ดาว เจ็ด บาท')">
+                <div class="text-6xl mb-2">🍳</div>
+                <div class="price-tag">7</div>
+                <p class="font-bold text-gray-700">ไข่ดาว</p>
+                <div class="mt-4 pt-2 border-t border-gray-100 text-amber-600 font-bold text-sm">
+                    (Click to hear)
+                </div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="card p-4 text-center relative" onclick="speak('ไส้กรอก ยี่สิบเอ็ด บาท')">
+                <div class="text-6xl mb-2">🌭</div>
+                <div class="price-tag">21</div>
+                <p class="font-bold text-gray-700">ไส้กรอก</p>
+                <div class="mt-4 pt-2 border-t border-gray-100 text-amber-600 font-bold text-sm">
+                    (Click to hear)
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 3: LISTENING GAME (Replaces Role-Play) -->
+    <section class="mb-12 bg-white p-6 rounded-2xl shadow-md border-2 border-amber-100">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">👂</span>
+            <h2 class="text-2xl font-bold text-gray-800">กิจกรรมที่ 3: ฟังราคา (Listen to the Price)</h2>
+        </div>
+        
+        <p class="text-gray-600 mb-6">The seller will tell you the price. Click the correct number!</p>
+
+        <div id="listening-game-container" class="text-center">
+            <button id="play-sound-btn" class="bg-amber-500 text-white text-lg font-bold py-4 px-8 rounded-full shadow-lg hover:bg-amber-600 transition mb-8 flex items-center justify-center gap-2 mx-auto">
+                <span>🔊</span> ฟังเสียง (Listen)
+            </button>
+
+            <div id="options-grid" class="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                <!-- Options will appear here -->
+            </div>
+
+            <div id="feedback-msg" class="h-8 mt-4 font-bold text-lg"></div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: EXTENSION - CHARACTER SPOTTING -->
+    <section class="mb-12">
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-2xl">👀</span>
+            <h2 class="text-2xl font-bold text-gray-800">กิจกรรมที่ 4: ฝึกสังเกตตัวอักษร (Character Spotting)</h2>
+        </div>
+        
+        <div class="bg-white p-6 rounded-2xl shadow-md border-2 border-orange-100">
+            <p class="text-gray-600 mb-6">Find the word that contains the target character.</p>
+            <div id="char-quiz-container" class="space-y-6">
+                <!-- Quiz items injected here -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // === TTS Function ===
+        const synth = window.speechSynthesis;
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            let cleanText = text.replace(/\?/g, '').replace(/!/g, '');
+            cleanText = cleanText.replace(/ไหม/g, 'มั้ย'); 
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            synth.speak(utterance);
+        }
+
+        // === Interactive Text Generator ===
+        function createInteractiveText(thai, ipa, en) {
+            const id = Math.random().toString(36).substr(2, 9);
+            return `
+                <div class="inline-block mb-2" id="${id}">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="tts-text text-lg font-bold text-gray-800" onclick="speak('${thai}')">${thai} 🔊</span>
+                        <div class="toggle-container">
+                            <button class="toggle-btn" onclick="toggle('${id}', 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggle('${id}', 'en')">EN</button>
+                        </div>
+                    </div>
+                    <div class="ipa-text hidden mt-1 ml-2">${ipa}</div>
+                    <div class="en-text hidden ml-2">${en}</div>
+                </div>
+            `;
+        }
+
+        function toggle(id, type) {
+            const container = document.getElementById(id);
+            const btn = container.querySelector(`button[onclick*="'${type}'"]`);
+            const target = container.querySelector(`.${type}-text`);
+            target.classList.toggle('hidden');
+            btn.classList.toggle('active');
+        }
+
+        // Initialize Vocab Sections
+        document.querySelectorAll('.interactive-text').forEach(el => {
+            el.innerHTML = createInteractiveText(el.dataset.thai, el.dataset.ipa, el.dataset.en);
+        });
+
+        // === GAME 3: LISTENING GAME ===
+        const listeningQuestions = [
+            { audio: "น้ำส้ม ยี่สิบ บาท", answer: "20", dist: ["21", "100"] },
+            { audio: "ไก่ย่าง ร้อย บาท", answer: "100", dist: ["10", "20"] },
+            { audio: "ไข่ดาว เจ็ด บาท", answer: "7", dist: ["8", "4"] },
+            { audio: "น้ำ แปด บาท", answer: "8", dist: ["9", "6"] },
+            { audio: "ไส้กรอก ยี่สิบเอ็ด บาท", answer: "21", dist: ["20", "12"] },
+            { audio: "ก๋วยเตี๋ยวเรือ สี่ บาท", answer: "4", dist: ["9", "6"] } // Cheap noodles!
+        ];
+
+        let currentQIndex = 0;
+        const playBtn = document.getElementById('play-sound-btn');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedbackMsg = document.getElementById('feedback-msg');
+
+        function loadListeningQuestion() {
+            const q = listeningQuestions[currentQIndex];
+            feedbackMsg.textContent = "";
+            optionsGrid.innerHTML = "";
+            
+            // Set Play Button
+            playBtn.onclick = () => speak(q.audio);
+            
+            // Create Options (Correct + Distractors)
+            const options = [q.answer, ...q.dist].sort(() => Math.random() - 0.5);
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-btn bg-white border-2 border-amber-300 text-amber-800 font-bold text-xl py-4 rounded-xl shadow-sm";
+                btn.textContent = opt;
+                btn.onclick = () => checkListeningAnswer(btn, opt, q.answer);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkListeningAnswer(btn, selected, correct) {
+            const allBtns = optionsGrid.querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                feedbackMsg.textContent = "ถูกต้อง! (Correct!) 🎉";
+                feedbackMsg.style.color = "#16a34a";
+                setTimeout(() => {
+                    currentQIndex = (currentQIndex + 1) % listeningQuestions.length;
+                    loadListeningQuestion();
+                }, 1500);
+            } else {
+                btn.classList.add('incorrect');
+                feedbackMsg.textContent = "ผิดครับ (Incorrect) - Try again in a moment...";
+                feedbackMsg.style.color = "#dc2626";
+                setTimeout(() => {
+                    allBtns.forEach(b => b.disabled = false);
+                    btn.classList.remove('incorrect');
+                    feedbackMsg.textContent = "";
+                }, 1000);
+            }
+        }
+
+        loadListeningQuestion(); // Start Game 3
+
+        // === GAME 4: CHAR SPOTTING ===
+        const charQuizData = [
+            { 
+                char: 'า', 
+                name: 'สระ อา (Sara Aa)', 
+                hint: 'ไม้เท้า (Walking stick)', 
+                instruction: 'หาคำที่มี "สระ อา" (Find the word with the walking stick)',
+                correct: 'ปลา', 
+                options: ['ปลา', 'ไก่', 'น้ำ'] 
+            },
+            { 
+                char: 'ก', 
+                name: 'ก ไก่ (Gor Kai)', 
+                hint: 'หัวไก่ (Chicken head)', 
+                instruction: 'หาคำที่ขึ้นต้นด้วย "ก ไก่" (Find the word starting with the Chicken)',
+                correct: 'กิน', 
+                options: ['กิน', 'ชอบ', 'ดี'] 
+            }
+        ];
+        
+        const charQuizContainer = document.getElementById('char-quiz-container');
+        
+        charQuizData.forEach((item) => {
+            const div = document.createElement('div');
+            div.className = "bg-orange-50 p-5 rounded-xl border border-orange-100";
+            
+            div.innerHTML = `
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-orange-200 w-16 h-16 flex items-center justify-center">
+                        <span class="text-4xl font-bold text-ea580c text-orange-600">${item.char}</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-gray-800">${item.name}</h3>
+                        <p class="text-sm text-gray-600 italic">Hint: ${item.hint}</p>
+                    </div>
+                </div>
+                <p class="text-gray-700 font-medium mb-3">${item.instruction}</p>
+            `;
+            
+            const btnContainer = document.createElement('div');
+            btnContainer.className = "flex flex-wrap gap-3";
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = "mt-2 text-sm font-bold h-5";
+            
+            const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-btn border-2 border-orange-200 px-4 py-2 rounded-lg bg-white text-gray-700 font-bold hover:border-orange-400";
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    const all = btnContainer.querySelectorAll('button');
+                    all.forEach(b => b.disabled = true);
+                    
+                    if(opt === item.correct) {
+                        btn.classList.add('correct');
+                        feedbackDiv.textContent = "ถูกต้อง! (Correct!) 🎉";
+                        feedbackDiv.style.color = "#16a34a";
+                    } else {
+                        btn.classList.add('incorrect');
+                        all.forEach(b => { if(b.textContent === item.correct) b.classList.add('correct'); });
+                        feedbackDiv.textContent = "ผิดนะ! คำตอบคือ " + item.correct;
+                        feedbackDiv.style.color = "#dc2626";
+                    }
+                };
+                btnContainer.appendChild(btn);
+            });
+            
+            div.appendChild(btnContainer);
+            div.appendChild(feedbackDiv);
+            charQuizContainer.appendChild(div);
+        });
+
+    </script>
+</body>
+</html>
