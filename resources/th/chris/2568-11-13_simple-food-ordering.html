@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            touch-action: manipulation;
+        }
+        /* Style for correct/incorrect feedback */
+        .feedback-message.correct {
+            color: #16a34a; /* green-600 */
+        }
+        .feedback-message.incorrect {
+            color: #dc2626; /* red-600 */
+        }
+        
+        /* TTS & Toggle Button Styles */
+        .tts-text {
+            cursor: pointer;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 500; /* medium */
+        }
+        .tts-text:hover {
+            color: #2563eb; /* blue-600 */
+        }
+
+        .thai-text-container {
+            margin-bottom: 8px;
+        }
+        .toggle-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .toggle-btn {
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 600;
+            padding: 2px 8px;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 9999px; /* rounded-full */
+            background-color: #f9fafb; /* gray-50 */
+            color: #374151; /* gray-700 */
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        .toggle-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            border-color: #3b82f6;
+        }
+        .toggle-content {
+            margin-top: 6px;
+            padding-left: 10px;
+            border-left: 2px solid #e5e7eb; /* gray-200 */
+            font-size: 0.9rem;
+            color: #4b5563; /* gray-600 */
+        }
+        .ipa-content, .en-content {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Error Correction Styles */
+        #error-sentence-container .error-word {
+            font-weight: 700;
+            color: #dc2626; /* red-600 */
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #dc2626;
+        }
+        .error-option-btn {
+            transition: all 0.2s ease;
+        }
+        .error-option-btn.correct {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+            color: #15803d; /* green-700 */
+        }
+        .error-option-btn.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+            color: #b91c1c; /* red-700 */
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Chat bubble styles */
+        .chat-bubble {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .chat-bubble.bot {
+            justify-content: flex-start;
+        }
+        .chat-bubble.user {
+            justify-content: flex-end;
+        }
+        .chat-bubble-content {
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 8px 12px;
+            max-width: 80%;
+        }
+        .chat-bubble.bot .chat-bubble-content {
+            background-color: #e5e7eb; /* gray-200 */
+            color: #1f2937; /* gray-800 */
+        }
+        .chat-bubble.user .chat-bubble-content {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        .chat-bubble.user .toggle-btn {
+            background-color: #2563eb; /* blue-600 */
+            border-color: #1d4ed8; /* blue-700 */
+            color: white;
+        }
+        .chat-bubble.user .toggle-btn.active {
+            background-color: #ffffff; /* white */
+            color: #3b82f6; /* blue-500 */
+            border-color: #ffffff;
+        }
+        .chat-bubble.user .toggle-content {
+            color: #e0e7ff; /* indigo-100 */
+            border-left-color: #60a5fa; /* blue-400 */
+        }
+
+        /* Header Toggle Button Styles */
+        header .toggle-btn {
+            background-color: #2563eb; /* blue-600 */
+            border-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        header .toggle-btn:hover {
+            background-color: #1d4ed8; /* blue-700 */
+        }
+        header .toggle-btn.active {
+            background-color: #ffffff; /* white */
+            color: #3b82f6; /* blue-500 */
+            border-color: #ffffff;
+        }
+        header .toggle-content {
+            color: #c7d2fe; /* indigo-200 */
+            border-left-color: #60a5fa; /* blue-400 */
+        }
+        header .tts-text:hover {
+            color: #d1d5db; /* gray-300 */
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 shadow-md text-white">
+            <div class="text-center">
+                <div class="thai-text-container inline-block">
+                    <!-- Make the title text large and bold -->
+                    <h1 class="tts-text text-3xl md:text-4xl font-bold" data-tts-text="สั่งอาหารง่ายๆ">สั่งอาหารง่ายๆ</h1>
+                    <div class="toggle-buttons justify-center">
+                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                        <button class="toggle-btn" data-type="en">EN</button>
+                    </div>
+                    <div class="toggle-content">
+                        <span class="ipa-content hidden">sàng aa-hǎan ngâai ngâai</span>
+                        <span class="en-content hidden">Simple Food Ordering</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-indigo-100 text-center mt-2">Welcome back! Let's review what you've learned so far.</p>
+        </header>
+
+        <main class="p-6 md:p-8 space-y-8">
+
+            <!-- Pro Tip Box -->
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>Pro Tip:</strong> Remember, in Thai, we often drop pronouns like 'I' (ผม / ฉัน) and 'You' (คุณ) when the context is clear.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ACTIVITY 1: Spot the Error ===== -->
+            <section id="activity-1" class="space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 1: Spot the Error</h2>
+                <p class="text-gray-600">Read the conversation. The user's response has a mistake. Click the correct word to fix it!</p>
+
+                <!-- Context from Bot -->
+                <div id="error-context-container" class="bg-gray-100 rounded-lg p-4">
+                    <p class="font-semibold text-gray-500">Bot:</p>
+                    <div id="error-context-text">
+                        <!-- Bot context (Thai + Toggles) goes here -->
+                    </div>
+                </div>
+
+                <!-- Incorrect Sentence from User -->
+                <div id="error-sentence-container" class="bg-red-50 border-l-4 border-red-400 rounded-lg p-4">
+                    <p class="font-semibold text-red-700">User (Incorrect):</p>
+                    <div id="error-sentence-text">
+                        <!-- Incorrect sentence (Thai + Toggles) goes here -->
+                    </div>
+                </div>
+
+                <!-- Options to fix -->
+                <div class="space-y-2">
+                    <p class="font-medium text-gray-700">Click the correct word to fix the error:</p>
+                    <div id="error-options-container" class="flex flex-wrap gap-3">
+                        <!-- Option buttons go here -->
+                    </div>
+                </div>
+
+                <!-- Feedback and Controls -->
+                <div class="text-center h-12">
+                    <p id="error-feedback-message" class="text-center h-6 font-semibold feedback-message"></p>
+                    <button id="next-error-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200 hidden">Next</button>
+                </div>
+            </section>
+
+
+            <!-- ===== ACTIVITY 2: Simple Conversation ===== -->
+            <section id="activity-2" class="space-y-6 pt-8 border-t">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 2: Simple Conversation</h2>
+                <p class="text-gray-600">Practice what you've learned in a simple role-play. Click the best response to the bot's message.</p>
+
+                <div id="conversation-container" class="bg-gray-50 rounded-lg shadow-inner p-4 space-y-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+                    <!-- Conversation chat bubbles will go here -->
+                </div>
+
+                <div id="conversation-options" class="flex flex-col gap-3">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- ===== ACTIVITY 3: New Topics (Teacher-Led) (NEW) ===== -->
+            <section id="activity-3" class="space-y-6 pt-8 border-t">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 3: Food & Numbers</h2>
+                <p class="text-gray-600">Let's learn new words! Practice these questions with your teacher.</p>
+                
+                <div class="space-y-6 text-gray-700">
+                    <ul class="list-disc list-inside pl-4 space-y-4">
+                        <li>
+                            <div class="thai-text-container">
+                                <span class="tts-text" data-tts-text="คุณชอบกินอะไร"><strong>Food:</strong> "คุณชอบกินอะไร"</span>
+                                <div class="toggle-buttons">
+                                    <button class="toggle-btn" data-type="ipa">IPA</button>
+                                    <button class="toggle-btn" data-type="en">EN</button>
+                                </div>
+                                <div class="toggle-content">
+                                    <span class="ipa-content hidden">khun chɔ̂ɔp gin à-rai</span>
+                                    <span class="en-content hidden">What do you like to eat?</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                             <div class="thai-text-container">
+                                <span class="tts-text" data-tts-text="คุณรู้ชื่ออาหารไทยอะไร"><strong>Thai Food:</strong> "คุณรู้ชื่ออาหารไทยอะไร"</span>
+                                <div class="toggle-buttons">
+                                    <button class="toggle-btn" data-type="ipa">IPA</button>
+                                    <button class="toggle-btn" data-type="en">EN</button>
+                                </div>
+                                <div class="toggle-content">
+                                    <span class="ipa-content hidden">khun róo chûe aa-hǎan tai à-rai</span>
+                                    <span class="en-content hidden">What Thai food names do you know?</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                             <div class="thai-text-container">
+                                <span class="tts-text" data-tts-text="แล้วน้ำล่ะ ชอบกินน้ำอะไร"><strong>Drinks:</strong> "แล้วน้ำล่ะ... ชอบกินน้ำอะไร"</span>
+                                <div class="toggle-buttons">
+                                    <button class="toggle-btn" data-type="ipa">IPA</button>
+                                    <button class="toggle-btn" data-type="en">EN</button>
+                                </div>
+                                <div class="toggle-content">
+                                    <span class="ipa-content hidden">láew náam lâ... chɔ̂ɔp gin náam à-rai</span>
+                                    <span class="en-content hidden">What about drinks... What drinks do you like?</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                             <div class="thai-text-container">
+                                <span class="tts-text" data-tts-text="คุณรู้ตัวเลขภาษาไทยไหม"><strong>Numbers:</strong> "คุณรู้ตัวเลขภาษาไทยไหม"</span>
+                                <div class="toggle-buttons">
+                                    <button class="toggle-btn" data-type="ipa">IPA</button>
+                                    <button class="toggle-btn" data-type="en">EN</button>
+                                </div>
+                                <div class="toggle-content">
+                                    <span class="ipa-content hidden">khun róo dtua-lêk paa-sǎa tai mái</span>
+                                    <span class="en-content hidden">Do you know Thai numbers?</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ===== ACTIVITY 4: Role-Play & Interest-Based Practice (formerly 3) ===== -->
+            <section id="activity-4" class="space-y-6 pt-8 border-t">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 4: Let's Practice!</h2>
+                
+                <div class="space-y-6 text-gray-700">
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold">Idea 1: Role-Play (Ordering Food)</h3>
+                        <p>Let's practice ordering food. Try this simple role-play!</p>
+                        <ul class="list-disc list-inside pl-4 space-y-4 mt-2">
+                            <li>
+                                <strong>Customer:</strong>
+                                <div class="thai-text-container ml-4">
+                                    <span class="tts-text" data-tts-text="ส้มตำ เท่าไหร่คะ">"ส้มตำ เท่าไหร่คะ"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">sôm dtam tâo rài khá</span>
+                                        <span class="en-content hidden">Som Tum, how much?</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong>Server:</strong>
+                                <div class="thai-text-container ml-4">
+                                    <span class="tts-text" data-tts-text="ห้าสิบบาทค่ะ">"(ห้าสิบ) บาทค่ะ"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">(hâa sìp) bàat kà</span>
+                                        <span class="en-content hidden">(50) Baht.</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <br>
+                            <li>
+                                <strong>Server:</strong>
+                                <div class="thai-text-container ml-4">
+                                    <span class="tts-text" data-tts-text="เอาอะไรคะ">"เอาอะไรคะ"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">ao à-rai khá</span>
+                                        <span class="en-content hidden">What would you like?</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <strong>Customer:</strong>
+                                <div class="thai-text-container ml-4">
+                                    <span class="tts-text" data-tts-text="ปลาทอด หนึ่ง">"ปลาทอด หนึ่ง"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">bplaa thâwt nìng</span>
+                                        <span class="en-content hidden">Fried fish, one.</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold">Idea 2: Talk About Interests (Food, Music, Films)</h3>
+                        <p>Let's talk about your interests. Practice with `ชอบ` (chɔ̂ɔp), `ไม่ชอบ` (mâi chɔ̂ɔp), and `...ไหม` (mái).</p>
+                        <ul class="list-disc list-inside pl-4 space-y-2 mt-2">
+                            <li>
+                                <div class="thai-text-container">
+                                    <span class="tts-text" data-tts-text="คุณชอบกินไก่ไหม">"คุณชอบกินไก่ไหม"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">khun chɔ̂ɔp gin gài mái</span>
+                                        <span class="en-content hidden">Do you like to eat chicken?</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="thai-text-container">
+                                    <span class="tts-text" data-tts-text="คุณชอบฟังเพลงอะไร">"คุณชอบฟังเพลงอะไร"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">khun chɔ̂ɔp fang pleeng à-rai</span>
+                                        <span class="en-content hidden">What music do you like to listen to?</span>
+                                    </div>
+                                </div>
+                            </li>
+                             <li>
+                                <div class="thai-text-container">
+                                    <span class="tts-text" data-tts-text="ซีรีส์ 'เอเลี่ยนเอิร์ธ' ดีไหม">"ซีรีส์ 'เอเลี่ยนเอิร์ธ' ดีไหม"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">sii-rîi 'ee lîan ə́ət' dii mái</span>
+                                        <span class="en-content hidden">Is the series 'Alien Earth' good?</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold">Idea 3: Creative (Silly) Sentences</h3>
+                        <p>Check understanding by making funny sentences!</p>
+                        <ul class="list-disc list-inside pl-4 space-y-2 mt-2">
+                            <li>
+                                <div class="thai-text-container">
+                                    <span class="tts-text" data-tts-text="ไก่ไม่สบาย">"ไก่ไม่สบาย"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">gài mâi sà baai</span>
+                                        <span class="en-content hidden">The chicken is not comfortable.</span>
+                                    </div>
+                                </div>
+                            </li>
+                             <li>
+                                <div class="thai-text-container">
+                                    <span class="tts-text" data-tts-text="โซฟาอร่อย">"โซฟาอร่อย"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">soo faa à-rɔ̀ɔi</span>
+                                        <span class="en-content hidden">The sofa is delicious.</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="thai-text-container">
+                                    <span class="tts-text" data-tts-text="ไข่ดาวพูดภาษาอังกฤษ">"ไข่ดาวพูดภาษาอังกฤษ"</span>
+                                    <div class="toggle-buttons">
+                                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                                        <button class="toggle-btn" data-type="en">EN</button>
+                                    </div>
+                                    <div class="toggle-content">
+                                        <span class="ipa-content hidden">kài daao pûut paa-sǎa ang-grìt</span>
+                                        <span class="en-content hidden">The fried egg speaks English.</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // === TTS (Text-to-Speech) Function ===
+        const synth = window.speechSynthesis;
+        function speakThai(text) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            // Text should be clean Thai
+            let cleanText = text.split('(')[0].trim();
+            
+            // Replace formal "ไหม" with colloquial "มั้ย" for pronunciation
+            cleanText = cleanText.replace(/ไหม/g, 'มั้ย');
+            // Replace formal "เท่าไหร่" with colloquial "เท่าไหร่" (often okay, but could be "ท่อไหร่")
+            // For now, let's keep it simple.
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH'; // Set language to Thai
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
+
+        // === Global Click Listener for TTS and Toggles ===
+        document.body.addEventListener('click', function(e) {
+            // TTS Click
+            if (e.target.classList.contains('tts-text')) {
+                const text = e.target.dataset.ttsText;
+                speakThai(text);
+            }
+
+            // Toggle Button Click
+            if (e.target.classList.contains('toggle-btn')) {
+                const btn = e.target;
+                const type = btn.dataset.type; // 'ipa' or 'en'
+                const container = btn.closest('.thai-text-container');
+                if (!container) return;
+
+                const content = container.querySelector(`.${type}-content`);
+                if (content) {
+                    content.classList.toggle('hidden');
+                }
+                btn.classList.toggle('active');
+            }
+        });
+
+        // --- All Vocabulary Data ---
+        const allWords = {
+            'คะ': 'khá', 'ฉัน': 'chǎn', 'ชื่อ': 'chûe', 'คุณ': 'khun', 'อะไร': 'à-rai', 'ผม': 'phǒm', 'มา': 'maa', 'จาก': 'jàak', 'ประเทศ': 'prà-thêt',
+            'ไม่': 'mâi', 'ไหม': 'mái', 'ดี': 'dii', 'สบาย': 'sà baai', 'อร่อย': 'à rɔ̀ɔi', 'ใช่': 'châi', 'ใช่ไหม': 'châi mái', 'พูด': 'pôut', 'ภาษา': 'paa-sǎa',
+            'ได้': 'dâi', 'นิดหน่อย': 'nít-nòi', 'เขียน': 'khǐan', 'สเปน': 'sà bpeen', 'ฝรั่งเศส': 'fà ràng sèet', 'ชอบ': 'chɔ̂ɔp', 'ฟัง': 'fang', 'ดู': 'duu',
+            'ซีรีส์': 'sii rîi', 'อ่าน': 'àan', 'เพลง': 'pleeng', 'ไทย': 'tai', 'อังกฤษ': 'ang grìt', 'คริส': 'krít', 'สบายดี': 'sà baai dii', 'ส้มตำ': 'sôm dtam',
+            'เอ็สเปรสโซ่': 'ès bprèet sôo', 'โซฟา': 'soo faa', 'ว่า': 'wâa', 'ฝันดี': 'fǎn dii', 'เอเลี่ยนเอิร์ธ': 'ee lîan ə́ət',
+            'ทำ': 'tham', 'อาหาร': 'aa-hǎan', 'ทำอาหาร': 'tham-aa-hǎan', 'ทอด': 'tâwt', 'ปลา': 'bplaa', 'ไหม้': 'mâi', 'หิว': 'hǐw', 'ไก่': 'gài', 'สอน': 'sŏon', 'กิน': 'gin',
+            'ข้าวเช้า': 'kâao cháao', 'อาหารเช้า': 'aa-hǎan cháao', 'ที่ไหน': 'têe năi', 'ไข่ทอด': 'kài tôot', 'ไข่ดาว': 'kài daao',
+            'ไม่เคยกิน': 'mâi kooei gin', 'อิ่ม': 'ìm', 'แล้ว': 'láew', 'ปลาทอด': 'bplaa thâwt', 'ทอดปลา': 'tâwt bplaa'
+        };
+
+
+        /**
+         * Helper function to create the new toggleable HTML structure
+         * @param {string} thai - The Thai text
+         * @param {string} ipa - The IPA/phonetic text
+         * @param {string|null} en - The English translation (optional)
+         * @param {string|null} errorWord - The word to highlight as an error (optional)
+         * @returns {string} - The complete HTML string
+         */
+        function createThaiToggleHTML(thai, ipa, en, errorWord = null) {
+            let thaiDisplay = thai;
+            if (errorWord) {
+                // Important: Only replace the *first* instance in case the word appears multiple times
+                thaiDisplay = thai.replace(errorWord, `<span class="error-word">${errorWord}</span>`);
+            }
+
+            const enButton = en ? `<button class="toggle-btn" data-type="en">EN</button>` : '';
+            const enContent = en ? `<span class="en-content hidden">${en}</span>` : '';
+
+            return `
+                <div class="thai-text-container">
+                    <span class="tts-text" data-tts-text="${thai}">${thaiDisplay}</span>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn" data-type="ipa">IPA</button>
+                        ${enButton}
+                    </div>
+                    <div class="toggle-content">
+                        <span class="ipa-content hidden">${ipa}</span>
+                        ${enContent}
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // === ACTIVITY 1: Spot the Error ===
+        (function() {
+            // --- Data for Error Scenarios (UPDATED STRUCTURE) ---
+            const errorScenarios = [
+                {
+                    bot: "คุณหิวไหมคะ",
+                    bot_ipa: "khun hǐw mái khá",
+                    bot_en: "Are you hungry?",
+                    user: "ผม อร่อย",
+                    user_ipa: "phǒm à rɔ̀ɔi",
+                    errorWord: "อร่อย",
+                    correctWord: "หิว",
+                    options: ["หิว", "อร่อย", "สบายดี"] 
+                },
+                {
+                    bot: "คุณอยากกินอะไรคะ",
+                    bot_ipa: "khun yàak gin à-rai khá",
+                    bot_en: "What do you want to eat?",
+                    user: "ผมอยากกิน ทอดปลา",
+                    user_ipa: "phǒm yàak gin tâwt bplaa",
+                    errorWord: "ทอดปลา",
+                    correctWord: "ปลาทอด",
+                    options: ["ปลาทอด", "ทอดปลา", "ปลาไหม้"] 
+                },
+                {
+                    bot: "คุณหิวไหม",
+                    bot_ipa: "khun hǐw mái",
+                    bot_en: "Are you hungry?",
+                    user: "ผม อิ่ม",
+                    user_ipa: "phǒm ìm",
+                    errorWord: "อิ่ม",
+                    correctWord: "หิว",
+                    options: ["หิว", "อิ่ม", "ไม่"]
+                },
+                {
+                    bot: "คุณชอบกินไข่ดาวไหม",
+                    bot_ipa: "khun chɔ̂ɔp gin kài daao mái",
+                    bot_en: "Do you like 'star' eggs?",
+                    user: "ชอบครับ ไข่ทอด อร่อย",
+                    user_ipa: "chɔ̂ɔp kráp kài tôot à-rɔ̀ɔi",
+                    errorWord: "ไข่ทอด",
+                    correctWord: "ไข่ดาว",
+                    options: ["ไข่ดาว", "ไข่ทอด", "ไก่"]
+                },
+                {
+                    bot: "อาหารเป็นยังไงคะ",
+                    bot_ipa: "aa-hǎan bpen yang-ngai khá",
+                    bot_en: "How is the food?",
+                    user: "ปลา ไม่",
+                    user_ipa: "bplaa mâi",
+                    errorWord: "ไม่",
+                    correctWord: "ไหม้",
+                    options: ["ไหม้", "ไม่", "ไหม"]
+                },
+                {
+                    bot: "คุณชอบกินอะไร",
+                    bot_ipa: "khun chɔ̂ɔp gin à-rai",
+                    bot_en: "What do you like to eat?",
+                    user: "(ผม) ชอบ กิน ปลา",
+                    user_ipa: "(phǒm) chɔ̂ɔp gin bplaa",
+                    errorWord: "ปลา",
+                    correctWord: "ไก่",
+                    options: ["ไก่", "ปลา", "ส้มตำ"]
+                },
+                {
+                    bot: "คุณทำอะไร",
+                    bot_ipa: "khun tham à-rai",
+                    bot_en: "What do you do?",
+                    user: "(ผม) สอน ภาษาไทย",
+                    user_ipa: "(phǒm) sŏon paa-sǎa tai",
+                    errorWord: "สอน",
+                    correctWord: "พูด",
+                    options: ["พูด", "สอน", "ทำอาหาร"]
+                }
+            ];
+
+            // --- Element References ---
+            const contextText = document.getElementById('error-context-text');
+            const sentenceText = document.getElementById('error-sentence-text');
+            const optionsContainer = document.getElementById('error-options-container');
+            const feedbackMessage = document.getElementById('error-feedback-message');
+            const nextErrorBtn = document.getElementById('next-error-btn');
+
+            let currentErrorIndex = 0;
+            let currentScenario = {};
+
+            // --- Functions ---
+            function loadErrorScenario(index) {
+                currentScenario = errorScenarios[index];
+
+                // 1. Set Context
+                contextText.innerHTML = createThaiToggleHTML(currentScenario.bot, currentScenario.bot_ipa, currentScenario.bot_en);
+
+                // 2. Set Incorrect Sentence
+                sentenceText.innerHTML = createThaiToggleHTML(currentScenario.user, currentScenario.user_ipa, null, currentScenario.errorWord);
+
+                // 3. Set Options
+                optionsContainer.innerHTML = '';
+                const shuffledOptions = [...currentScenario.options].sort(() => Math.random() - 0.5);
+                
+                shuffledOptions.forEach(word => {
+                    const roman = allWords[word] || '';
+                    const button = document.createElement('button');
+                    button.className = 'error-option-btn bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm';
+                    button.dataset.word = word;
+                    button.innerHTML = `
+                        <span>${word}</span>
+                        <span class="text-sm opacity-75 ml-2">(${roman})</span>
+                    `;
+                    button.addEventListener('click', checkErrorAnswer);
+                    optionsContainer.appendChild(button);
+                });
+
+                // 4. Reset UI state
+                feedbackMessage.textContent = '';
+                feedbackMessage.className = 'text-center h-6 font-semibold feedback-message';
+                nextErrorBtn.classList.add('hidden');
+            }
+
+            function checkErrorAnswer(e) {
+                const clickedButton = e.currentTarget;
+                const selectedWord = clickedButton.dataset.word;
+
+                // Disable all buttons
+                optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+                if (selectedWord === currentScenario.correctWord) {
+                    feedbackMessage.textContent = 'ใช่! (Correct!)';
+                    feedbackMessage.className = 'text-center h-6 font-semibold feedback-message correct';
+                    clickedButton.classList.add('correct');
+                    nextErrorBtn.classList.remove('hidden');
+                } else {
+                    feedbackMessage.textContent = 'ไม่ใช่ (Incorrect, try again)';
+                    feedbackMessage.className = 'text-center h-6 font-semibold feedback-message incorrect';
+                    clickedButton.classList.add('incorrect');
+                    
+                    setTimeout(() => {
+                        optionsContainer.querySelectorAll('button').forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('incorrect');
+                        });
+                        feedbackMessage.textContent = '';
+                    }, 1500);
+                }
+            }
+
+            // --- Event Listeners ---
+            nextErrorBtn.addEventListener('click', () => {
+                currentErrorIndex = (currentErrorIndex + 1) % errorScenarios.length;
+                loadErrorScenario(currentErrorIndex);
+            });
+
+            // Initial load
+            errorScenarios.sort(() => Math.random() - 0.5); // Shuffle scenarios
+            loadErrorScenario(currentErrorIndex);
+
+        })();
+
+
+        // === ACTIVITY 2: Simple Conversation ===
+        (function() {
+            const conversationContainer = document.getElementById('conversation-container');
+            const optionsContainer = document.getElementById('conversation-options');
+            let currentStep = 0;
+            let conversationScript; 
+            let endConversationMessage; 
+
+            // --- UPDATED SCRIPT DATA ---
+            const fullConversationScript = [
+                {
+                    bot: "คุณชอบปลาทอดไหมคะ",
+                    bot_ipa: "khun chɔ̂ɔp bplaa thâwt mái khá",
+                    bot_en: "Do you like fried fish?",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "ไม่เคยกิน", roman: "mâi kooei gin", correct: true }
+                    ]
+                },
+                {
+                    bot: "คุณกินอาหารเช้าไหมคะ",
+                    bot_ipa: "khun gin aa-hǎan cháao mái khá",
+                    bot_en: "Do you eat breakfast?",
+                    options: [
+                        { text: "กิน", roman: "gin", correct: true },
+                        { text: "ไม่กิน", roman: "mâi gin", correct: true },
+                        { text: "อิ่มแล้ว", roman: "ìm láew", correct: true }
+                    ]
+                },
+                {
+                    bot: "สบายดีไหมคะ",
+                    bot_ipa: "sà baai dii mái khá",
+                    bot_en: "Are you well?",
+                    options: [
+                        { text: "สบายดี", roman: "sà baai dii", correct: true },
+                        { text: "ไม่สบาย", roman: "mâi sà baai", correct: true },
+                        { text: "ชื่อคริส", roman: "chûe krít", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชื่ออะไรคะ",
+                    bot_ipa: "khun chûe à-rai khá",
+                    bot_en: "What is your name?",
+                    options: [
+                        { text: "ชื่อคริส", roman: "chûe krít", correct: true },
+                        { text: "ใช่", roman: "châi", correct: false },
+                    ]
+                },
+                {
+                    bot: "คุณมาจากประเทศอะไรคะ",
+                    bot_ipa: "khun maa jàak prà-thêt à-rai khá",
+                    bot_en: "What country are you from?",
+                    options: [
+                        { text: "มาจากประเทศอังกฤษ", roman: "maa jàak prà-thêt ang grìt", correct: true },
+                        { text: "มาจากประเทศสเปน", roman: "maa jàak prà-thêt sà bpeen", correct: false },
+                    ]
+                },
+                {
+                    bot: "คุณชอบฟังเพลงไหมคะ",
+                    bot_ipa: "khun chɔ̂ɔp fang pleeng mái khá",
+                    bot_en: "Do you like listening to music?",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                    ]
+                },
+                {
+                    bot: "คุณชอบพูดภาษาไทยไหมคะ",
+                    bot_ipa: "khun chɔ̂ɔp pûut paa-sǎa tai mái khá",
+                    bot_en: "Do you like to speak Thai?",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "พูดได้นิดหน่อย", roman: "pûut dâi nít-nòi", correct: true }
+                    ]
+                },
+                {
+                    bot: "คุณหิวไหมคะ",
+                    bot_ipa: "khun hǐw mái khá",
+                    bot_en: "Are you hungry?",
+                    options: [
+                        { text: "หิว", roman: "hǐw", correct: true },
+                        { text: "ไม่หิว", roman: "mâi hǐw", correct: true },
+                        { text: "อิ่มแล้ว", roman: "ìm láew", correct: true }
+                    ]
+                },
+                {
+                    bot: "คุณชอบไก่ไหมคะ",
+                    bot_ipa: "khun chɔ̂ɔp gài mái khá",
+                    bot_en: "Do you like chicken?",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                    ]
+                },
+                {
+                    bot: "ส้มตำอร่อยไหมคะ",
+                    bot_ipa: "sôm dtam à-rɔ̀ɔi mái khá",
+                    bot_en: "Is Som Tum delicious?",
+                    options: [
+                        { text: "อร่อย", roman: "à-rɔ̀ɔi", correct: true },
+                        { text: "ไม่อร่อย", roman: "mâi à-rɔ̀ɔi", correct: true },
+                        { text: "ไม่เคยกิน", roman: "mâi kooei gin", correct: true }
+                    ]
+                },
+                {
+                    bot: "ดี!",
+                    bot_ipa: "dii!",
+                    bot_en: "Good!",
+                    options: [] // End of conversation
+                }
+            ];
+
+            /**
+             * Adds a chat bubble to the container
+             * @param {string} thai - The Thai text
+             * @param {string} ipa - The IPA/phonetic text
+             * @param {string|null} en - The English translation (optional)
+             * @param {boolean} isBot - true if the bot said it, false for user
+             */
+            function addMessage(thai, ipa, en, isBot = true) {
+                const bubble = document.createElement('div');
+                bubble.className = isBot ? 'chat-bubble bot' : 'chat-bubble user';
+                
+                const enButton = en ? `<button class="toggle-btn" data-type="en">EN</button>` : '';
+                const enContent = en ? `<span class="en-content hidden">${en}</span>` : '';
+
+                bubble.innerHTML = `
+                    <div class="chat-bubble-content">
+                        <div class="thai-text-container">
+                            <span class="tts-text" data-tts-text="${thai}">${thai}</span>
+                            <div class="toggle-buttons">
+                                <button class="toggle-btn" data-type="ipa">IPA</button>
+                                ${enButton}
+                            </div>
+                            <div class="toggle-content">
+                                <span class="ipa-content hidden">${ipa}</span>
+                                ${enContent}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                conversationContainer.appendChild(bubble);
+                conversationContainer.scrollTop = conversationContainer.scrollHeight;
+            }
+
+            function loadConversationStep(stepIndex) {
+                if (stepIndex >= conversationScript.length) {
+                    const endStep = endConversationMessage;
+                    setTimeout(() => {
+                        addMessage(endStep.bot, endStep.bot_ipa, endStep.bot_en, true);
+                        speakThai(endStep.bot);
+                        optionsContainer.innerHTML = '<p class="text-center text-gray-500">--- End of Conversation ---</p>';
+                    }, 500);
+                    return;
+                }
+
+                const step = conversationScript[stepIndex];
+                
+                // Add bot message
+                setTimeout(() => {
+                    addMessage(step.bot, step.bot_ipa, step.bot_en, true);
+                    speakThai(step.bot);
+                }, 500);
+
+                // Clear old options and add new ones
+                optionsContainer.innerHTML = '';
+                if (step.options.length > 0) {
+                    step.options.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'w-full text-left bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg shadow-sm transition';
+                        button.innerHTML = `
+                            <span>${option.text}</span>
+                            <span class="text-sm opacity-75 ml-2">(${option.roman})</span>
+                        `;
+                        button.addEventListener('click', () => handleOptionClick(option));
+                        optionsContainer.appendChild(button);
+                    });
+                }
+            }
+
+            function handleOptionClick(option) {
+                const allButtons = optionsContainer.querySelectorAll('button');
+                allButtons.forEach(btn => btn.disabled = true);
+
+                // Add user message (no English translation for user responses)
+                addMessage(option.text, option.roman, null, false);
+
+                if (option.correct) { 
+                    currentStep++;
+                    loadConversationStep(currentStep);
+                } else {
+                    // Shake animation for incorrect
+                    optionsContainer.classList.add('animate-shake');
+                    setTimeout(() => {
+                        optionsContainer.classList.remove('animate-shake');
+                        allButtons.forEach(btn => btn.disabled = false); // Let them try again
+                    }, 500);
+                }
+            }
+
+            // Define shake animation
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+                .animate-shake {
+                    animation: shake 0.3s ease-in-out;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // --- FIX for Conversation Shuffle ---
+            endConversationMessage = fullConversationScript.pop();
+            conversationScript = fullConversationScript.sort(() => Math.random() - 0.5);
+            // --- END FIX ---
+
+            // Start conversation
+            loadConversationStep(currentStep);
+
+        })();
+
+    </script>
+
+</body>
+</html>
