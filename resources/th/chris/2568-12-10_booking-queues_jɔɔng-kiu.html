@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: จองคิว</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun for Thai, Inter for English -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F4F6; /* Light gray background */
+        }
+        .thai-font {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .highlight-char {
+            color: #dc2626; /* Red-600 */
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Navbar / Header Area -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-4 py-3">
+            <div class="flex justify-between items-start">
+                
+                <!-- Main Title Section -->
+                <div class="flex-grow">
+                    <div class="flex items-center gap-3 mb-2">
+                        <button onclick="speakText('จองคิว')" class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center hover:bg-teal-200 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        </button>
+                        <h1 class="text-2xl font-bold text-teal-800 thai-font cursor-pointer hover:text-teal-600 transition" onclick="speakText('จองคิว')">
+                            จองคิว
+                        </h1>
+                    </div>
+                    
+                    <!-- Toggle Buttons for Title -->
+                    <div class="flex gap-2">
+                        <button onclick="toggleVisibility('header-ipa')" class="text-xs font-semibold bg-indigo-50 text-indigo-600 px-3 py-1 rounded-md hover:bg-indigo-100 transition">
+                            IPA
+                        </button>
+                        <button onclick="toggleVisibility('header-en')" class="text-xs font-semibold bg-orange-50 text-orange-600 px-3 py-1 rounded-md hover:bg-orange-100 transition">
+                            EN
+                        </button>
+                    </div>
+
+                    <div id="header-ipa" class="hidden mt-2 text-sm text-indigo-800 font-mono bg-indigo-50 p-2 rounded border-l-2 border-indigo-300">
+                        jɔɔng kiu
+                    </div>
+                    <div id="header-en" class="hidden mt-2 text-sm text-orange-800 bg-orange-50 p-2 rounded border-l-2 border-orange-300">
+                        Booking a Queue
+                    </div>
+                </div>
+
+                <!-- Utility Button -->
+                <button onclick="testAudio()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 py-1 px-3 rounded-full transition whitespace-nowrap ml-2 mt-1 thai-font">
+                    🔊 ทดสอบเสียง
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-2xl mx-auto px-4 pt-6 space-y-8">
+
+        <!-- SECTION 1: WARMER -->
+        <section>
+            <div id="header-warmer" class="mb-4"></div>
+            <div id="section-warmer" class="space-y-4"></div>
+        </section>
+
+        <!-- SECTION 2: NEW VOCAB -->
+        <section class="bg-teal-50 rounded-xl p-4 border border-teal-100">
+            <div id="header-newvocab" class="mb-4"></div>
+            <div id="section-newvocab" class="space-y-4"></div>
+        </section>
+
+        <!-- SECTION 3: MENU REVIEW -->
+        <section class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="bg-gray-700 p-4">
+                 <div id="header-menu"></div>
+            </div>
+            <div id="section-menu" class="divide-y divide-gray-100"></div>
+        </section>
+
+        <!-- SECTION 4: ORDERING DRILLS -->
+        <section>
+            <div id="header-drills" class="mb-4"></div>
+            <div id="section-drills" class="space-y-4"></div>
+        </section>
+
+        <!-- SECTION 5: FULL ROLE PLAY -->
+        <section>
+            <div id="header-roleplay" class="mb-4"></div>
+            <div id="section-roleplay" class="space-y-4"></div>
+        </section>
+
+        <!-- SECTION 6: EXTENSION (Letter Hunt) -->
+        <section class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+            <div id="header-quiz" class="mb-4"></div>
+            <div id="section-quiz" class="grid grid-cols-1 gap-4"></div>
+        </section>
+
+    </div>
+
+    <!-- Footer Space -->
+    <div class="h-20"></div>
+
+    <script>
+        // DATA SOURCE
+        
+        const headers = {
+            warmer: {
+                emoji: "🔥",
+                thai: "กิจกรรมอุ่นเครื่อง: อันนี้ หรือ อันนั้น",
+                ipa: "gìt-jà-gam ùn-khrûeang · an-níi rʉ̌ʉ an-nán",
+                en: "Warmer activity: This or That",
+                subThai: "ตอบโดยใช้คำว่า 'ชอบ...'",
+                subIpa: "dtɔ̀ɔp dooi chái kham wâa · chɔ̂ɔp...",
+                subEn: "Answer using 'I like...'"
+            },
+            newvocab: {
+                emoji: "✨",
+                thai: "คำศัพท์ใหม่: คิว",
+                ipa: "kham-sàp mài · kiu",
+                en: "New Vocabulary: Queue",
+                subThai: "", subIpa: "", subEn: ""
+            },
+            menu: {
+                emoji: "📖",
+                thai: "ทบทวนเมนู",
+                ipa: "tóp-tuan mee-nuu",
+                en: "Review Menu",
+                textColor: "text-white"
+            },
+            drills: {
+                emoji: "💬",
+                thai: "ฝึกฝน: การสั่งอาหาร",
+                ipa: "fùek-fǒn · gaan sàng aa-hǎan",
+                en: "Practice: Ordering food",
+                subThai: "ฝึกพูดเร็ว: พูดว่าอย่างไร...",
+                subIpa: "fùek pûut reo · pûut wâa yàang-rai...",
+                subEn: "Quick practice: How do you say..."
+            },
+            roleplay: {
+                emoji: "🎭",
+                thai: "บทบาทสมมติ: มื้อเย็น",
+                ipa: "bòt-bàat sǒm-mút · múe yen",
+                en: "Roleplay: Dinner",
+                subThai: "1. จองคิว -> 2. สั่งอาหาร -> 3. จ่ายเงิน",
+                subIpa: "1. jɔɔng kiu -> 2. sàng aa-hǎan -> 3. jàai ngoen",
+                subEn: "1. Get queue -> 2. Order -> 3. Pay"
+            },
+            quiz: {
+                emoji: "🔎",
+                thai: "กิจกรรมเสริม: หาตัวอักษร",
+                ipa: "gìt-jà-gam sǒoem · hǎa dtua àk-sɔ̌ɔn",
+                en: "Extension activity: Letter hunt",
+                subThai: "หาตัว ก และ า",
+                subIpa: "hǎa dtua gɔɔ · láe · aa",
+                subEn: "Find letters G and A"
+            }
+        };
+
+        const data = {
+            warmer: [
+                {
+                    emoji: "📺",
+                    thai: "ชอบดูซีรีส์ไหม",
+                    ipa: "chɔ̂ɔp duu sii rîi mǎi",
+                    en: "Do you like watching series?",
+                    speaker: "ครู (Teacher)"
+                },
+                {
+                    emoji: "🍳",
+                    thai: "ชอบทำอาหารไหม",
+                    ipa: "chɔ̂ɔp tham-aa-hǎan mǎi",
+                    en: "Do you like cooking?",
+                    speaker: "ครู"
+                },
+                {
+                    emoji: "🐮",
+                    thai: "ชอบเนื้อวัว หรือ เนื้อไก่",
+                    ipa: "chɔ̂ɔp nʉ́a-wuua · rʉ̌ʉ · nʉ́a-gài",
+                    en: "Do you like beef or chicken?",
+                    speaker: "ครู"
+                },
+                {
+                    emoji: "🍺",
+                    thai: "ชอบน้ำ หรือ เบียร์",
+                    ipa: "chɔ̂ɔp náam · rʉ̌ʉ · biia",
+                    en: "Do you like water or beer?",
+                    speaker: "ครู"
+                }
+            ],
+            newvocab: [
+                {
+                    emoji: "🎫",
+                    thai: "คิว",
+                    ipa: "kiu",
+                    en: "Queue (Queue number)",
+                    speaker: "คำศัพท์"
+                },
+                {
+                    emoji: "☝️",
+                    thai: "จองคิวหน่อย",
+                    ipa: "jɔɔng kiu nɔ̀i",
+                    en: "Book a queue, please.",
+                    speaker: "คำศัพท์"
+                },
+                {
+                    emoji: "🙏",
+                    thai: "ขอคิวหน่อย",
+                    ipa: "khɔ̌ɔ kiu nɔ̀i",
+                    en: "Ask for a queue (number), please.",
+                    speaker: "คำศัพท์"
+                },
+                {
+                    emoji: "🔢",
+                    thai: "คิวที่เท่าไร",
+                    ipa: "kiu têe tâo-rài",
+                    en: "What is the queue number?",
+                    speaker: "คำศัพท์"
+                }
+            ],
+            menu: [
+                { emoji: "🍜", thai: "ก๋วยเตี๋ยวเรือ", price: "40", ipa: "gǔay-dtǐao-rʉa", en: "Boat Noodles" },
+                { emoji: "🍗", thai: "ไก่ทอด", price: "50", ipa: "gài tôot", en: "Fried Chicken" },
+                { emoji: "🐟", thai: "ปลาทอด", price: "120", ipa: "bplaa thâwt", en: "Fried Fish" },
+                { emoji: "🍊", thai: "น้ำส้ม", price: "25", ipa: "náam sôm", en: "Orange Juice" },
+                { emoji: "🧊", thai: "น้ำแข็ง", price: "2", ipa: "náam khɛ̌ng", en: "Ice" }
+            ],
+            drills: [
+                {
+                    emoji: "🍗",
+                    thai: "เอาไก่ทอด",
+                    ipa: "ao gài tôot",
+                    en: "I want fried chicken.",
+                    speaker: "ลูกค้า (Customer)"
+                },
+                {
+                    emoji: "🐟",
+                    thai: "เอาปลาทอดสอง",
+                    ipa: "ao bplaa thâwt sɔ̌ɔng",
+                    en: "I want 2 fried fish.",
+                    speaker: "ลูกค้า"
+                },
+                {
+                    emoji: "🧊",
+                    thai: "เอาน้ำแข็งอีก",
+                    ipa: "ao náam khɛ̌ng ìik",
+                    en: "I want more ice.",
+                    speaker: "ลูกค้า"
+                }
+            ],
+            roleplay: [
+                {
+                    emoji: "👋",
+                    thai: "สวัสดีครับ จองคิวหน่อย",
+                    ipa: "sà-wàt-dii kráp · jɔɔng kiu nɔ̀i",
+                    en: "Hello, book a queue please.",
+                    speaker: "ลูกค้า (Customer)"
+                },
+                {
+                    emoji: "👥",
+                    thai: "มากี่คน",
+                    ipa: "maa gìi khon",
+                    en: "How many people?",
+                    speaker: "พนักงาน (Staff)"
+                },
+                {
+                    emoji: "✌️",
+                    thai: "สองคน",
+                    ipa: "sɔ̌ɔng khon",
+                    en: "Two people.",
+                    speaker: "ลูกค้า"
+                },
+                {
+                    emoji: "🎫",
+                    thai: "คิวที่หนึ่ง... เชิญครับ",
+                    ipa: "kiu têe nùeng... chooen kráp",
+                    en: "Queue number 1. Invite (come in).",
+                    speaker: "พนักงาน"
+                },
+                {
+                    emoji: "📖",
+                    thai: "ขอเมนู",
+                    ipa: "khɔ̌ɔ mee-nuu",
+                    en: "Request menu.",
+                    speaker: "ลูกค้า"
+                },
+                {
+                    emoji: "🍜",
+                    thai: "เอาก๋วยเตี๋ยวเรือสอง",
+                    ipa: "ao gǔay-dtǐao-rʉa sɔ̌ɔng",
+                    en: "I want 2 boat noodles.",
+                    speaker: "ลูกค้า"
+                },
+                {
+                    emoji: "🥤",
+                    thai: "เอาน้ำส้มหนึ่ง",
+                    ipa: "ao náam sôm nùeng",
+                    en: "I want 1 orange juice.",
+                    speaker: "ลูกค้า"
+                },
+                {
+                    emoji: "⏳",
+                    thai: "... กินอาหาร ...",
+                    ipa: "gin aa-hǎan",
+                    en: "...Eating...",
+                    speaker: "ผู้บรรยาย (Narrator)"
+                },
+                {
+                    emoji: "🧊",
+                    thai: "ขอน้ำแข็งอีกสอง",
+                    ipa: "khɔ̌ɔ náam khɛ̌ng ìik sɔ̌ɔng",
+                    en: "Request 2 more ice.",
+                    speaker: "ลูกค้า"
+                },
+                {
+                    emoji: "👍",
+                    thai: "อร่อยมาก เช็คบิล",
+                    ipa: "à rɔ̀ɔi mâak · chék bin",
+                    en: "Delicious. Check bill.",
+                    speaker: "ลูกค้า"
+                }
+            ],
+            quiz: [
+                {
+                    emoji: "🐔",
+                    thai: "ไก่",
+                    target: "ก",
+                    highlighted: "ไ<span class='highlight-char'>ก</span>่",
+                    en: "Chicken",
+                    ipa: "gài"
+                },
+                {
+                    emoji: "🛫",
+                    thai: "มาจาก",
+                    target: "ก & า",
+                    highlighted: "ม<span class='highlight-char'>า</span>จา<span class='highlight-char'>ก</span>",
+                    en: "Come from",
+                    ipa: "maa-jàak"
+                },
+                {
+                    emoji: "💬",
+                    thai: "ภาษา",
+                    target: "า",
+                    highlighted: "ภ<span class='highlight-char'>า</span>ษ<span class='highlight-char'>า</span>",
+                    en: "Language",
+                    ipa: "paa-sǎa"
+                },
+                {
+                    emoji: "🐟",
+                    thai: "ปลา",
+                    target: "า",
+                    highlighted: "ปล<span class='highlight-char'>า</span>",
+                    en: "Fish",
+                    ipa: "bplaa"
+                },
+                {
+                    emoji: "🍽️",
+                    thai: "อาหาร",
+                    target: "า",
+                    highlighted: "อ<span class='highlight-char'>า</span>ห<span class='highlight-char'>า</span>ร",
+                    en: "Food",
+                    ipa: "aa-hǎan"
+                },
+                {
+                    emoji: "😋",
+                    thai: "อยาก",
+                    target: "ก",
+                    highlighted: "อยา<span class='highlight-char'>ก</span>",
+                    en: "Want to",
+                    ipa: "yàak"
+                }
+            ]
+        };
+
+        // RENDER LOGIC
+
+        // 1. Interactive Header Renderer
+        function createInteractiveHeader(id, data) {
+            const textColor = data.textColor || "text-gray-800";
+            const subTextColor = data.textColor ? "text-gray-300" : "text-gray-600";
+            
+            let html = `
+            <div class="flex flex-col gap-2">
+                <div class="flex items-start gap-3">
+                    <button onclick="speakText('${data.thai}')" class="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 hover:bg-teal-200 transition active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 class="text-xl font-bold ${textColor} thai-font cursor-pointer hover:opacity-80 transition" onclick="speakText('${data.thai}')">
+                                <span class="mr-2">${data.emoji}</span>${data.thai}
+                            </h2>
+                            <div class="flex gap-1 ml-2">
+                                <button onclick="toggleVisibility('${id}-head-ipa')" class="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition">IPA</button>
+                                <button onclick="toggleVisibility('${id}-head-en')" class="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded bg-orange-100 text-orange-700 hover:bg-orange-200 transition">EN</button>
+                            </div>
+                        </div>
+                        
+                        <div id="${id}-head-ipa" class="hidden mt-1 text-sm font-mono text-indigo-600 bg-indigo-50 p-1 rounded inline-block border-l-2 border-indigo-300">${data.ipa}</div>
+                        <div id="${id}-head-en" class="hidden mt-1 text-sm text-orange-600 bg-orange-50 p-1 rounded inline-block border-l-2 border-orange-300">${data.en}</div>
+                    </div>
+                </div>
+            `;
+
+            // Render Sub-instruction if exists
+            if (data.subThai) {
+                html += `
+                <div class="ml-11 mt-1 border-l-2 border-gray-200 pl-3">
+                    <div class="flex items-center gap-2">
+                        <button onclick="speakText('${data.subThai}')" class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 transition text-[10px]">🔊</button>
+                        <span class="text-sm italic thai-font ${subTextColor}" onclick="speakText('${data.subThai}')">${data.subThai}</span>
+                        <button onclick="toggleVisibility('${id}-sub-ipa')" class="px-1.5 py-0.5 text-[9px] rounded bg-gray-200 text-gray-600 hover:bg-gray-300">IPA</button>
+                        <button onclick="toggleVisibility('${id}-sub-en')" class="px-1.5 py-0.5 text-[9px] rounded bg-gray-200 text-gray-600 hover:bg-gray-300">EN</button>
+                    </div>
+                    <div id="${id}-sub-ipa" class="hidden mt-1 text-xs font-mono text-gray-500">${data.subIpa}</div>
+                    <div id="${id}-sub-en" class="hidden mt-1 text-xs text-gray-500">${data.subEn}</div>
+                </div>
+                `;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        // 2. Card Renderer
+        function createCard(item, index, sectionId) {
+            const cardId = `${sectionId}-${index}`;
+            return `
+            <div class="card bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                
+                <!-- Speaker Label -->
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2 thai-font">${item.speaker || ''}</div>
+                
+                <!-- Main Content Row -->
+                <div class="flex items-start gap-4 mb-4">
+                    <button onclick="speakText('${item.thai}')" class="mt-1 flex-shrink-0 w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 hover:bg-teal-200 transition active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                    <div class="flex-grow">
+                        <div class="text-3xl thai-font text-gray-800 leading-normal cursor-pointer hover:text-teal-700 transition" onclick="speakText('${item.thai}')">
+                            <span class="mr-2">${item.emoji}</span>${item.thai}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toggle Buttons -->
+                <div class="flex gap-2 mb-2">
+                    <button onclick="toggleVisibility('${cardId}-ipa')" class="flex-1 py-2 px-3 rounded-lg bg-indigo-50 text-indigo-600 text-sm font-semibold hover:bg-indigo-100 transition">
+                        IPA
+                    </button>
+                    <button onclick="toggleVisibility('${cardId}-en')" class="flex-1 py-2 px-3 rounded-lg bg-orange-50 text-orange-600 text-sm font-semibold hover:bg-orange-100 transition">
+                        EN
+                    </button>
+                </div>
+
+                <!-- Hidden Content -->
+                <div id="${cardId}-ipa" class="hidden mt-2 p-3 bg-indigo-50 rounded-lg text-indigo-800 font-mono text-sm border-l-4 border-indigo-300">
+                    ${item.ipa}
+                </div>
+                <div id="${cardId}-en" class="hidden mt-2 p-3 bg-orange-50 rounded-lg text-orange-800 text-sm border-l-4 border-orange-300">
+                    ${item.en}
+                </div>
+            </div>
+            `;
+        }
+
+        // 3. Menu Renderer
+        function createMenuRow(item, index, sectionId) {
+            const cardId = `${sectionId}-${index}`;
+            return `
+            <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="flex items-center gap-4 flex-grow cursor-pointer" onclick="speakText('${item.thai}')">
+                    <div class="text-2xl">${item.emoji}</div>
+                    <div>
+                        <div class="text-xl thai-font text-gray-800 font-medium">${item.thai}</div>
+                        
+                        <!-- Toggleable Details -->
+                         <div class="flex gap-2 mt-1">
+                            <button onclick="event.stopPropagation(); toggleVisibility('${cardId}-details')" class="text-xs text-teal-600 font-bold bg-teal-50 px-2 py-0.5 rounded">IPA/EN</button>
+                        </div>
+                        <div id="${cardId}-details" class="hidden mt-1 text-sm text-gray-500 font-mono">
+                            ${item.ipa} <span class="mx-1">•</span> ${item.en}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-lg font-bold text-gray-600 pl-4">
+                    ${item.price}฿
+                </div>
+            </div>
+            `;
+        }
+
+        // 4. Quiz Renderer
+        function createQuizCard(item, index, sectionId) {
+            const cardId = `${sectionId}-${index}`;
+            return `
+            <div class="card bg-white p-4 rounded-xl shadow-sm border border-amber-200">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="text-xs font-bold text-amber-600 uppercase tracking-wide">Find: <span class="text-lg thai-font ml-1">${item.target}</span></div>
+                </div>
+
+                <div class="text-center py-4">
+                     <!-- Question State -->
+                    <div id="${cardId}-question" class="text-4xl thai-font text-gray-800 mb-4 transition-all duration-300">
+                        ${item.thai}
+                    </div>
+                     <!-- Answer State (Hidden by default) -->
+                    <div id="${cardId}-answer" class="hidden text-4xl thai-font text-gray-800 mb-4 transition-all duration-300">
+                        ${item.highlighted}
+                    </div>
+
+                    <button onclick="toggleQuizAnswer('${cardId}')" class="w-full py-2 bg-amber-100 text-amber-800 rounded-lg font-semibold hover:bg-amber-200 transition thai-font">
+                        เฉลย (Reveal)
+                    </button>
+
+                    <div class="mt-4 pt-3 border-t border-amber-100 flex justify-between text-xs text-gray-500">
+                        <span>${item.ipa}</span>
+                        <span>${item.en}</span>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function renderSection(dataArray, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = dataArray.map((item, index) => createCard(item, index, elementId)).join('');
+        }
+
+        function renderMenuSection(dataArray, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = dataArray.map((item, index) => createMenuRow(item, index, elementId)).join('');
+        }
+
+        function renderQuizSection(dataArray, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = dataArray.map((item, index) => createQuizCard(item, index, elementId)).join('');
+        }
+        
+        function renderHeader(headerId, key) {
+             const container = document.getElementById(headerId);
+             if(container && headers[key]) {
+                 container.innerHTML = createInteractiveHeader(headerId, headers[key]);
+             }
+        }
+
+        // INITIALIZE
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Render Headers
+            renderHeader('header-warmer', 'warmer');
+            renderHeader('header-newvocab', 'newvocab');
+            renderHeader('header-menu', 'menu');
+            renderHeader('header-drills', 'drills');
+            renderHeader('header-roleplay', 'roleplay');
+            renderHeader('header-quiz', 'quiz');
+
+            // Render Content
+            renderSection(data.warmer, 'section-warmer');
+            renderSection(data.newvocab, 'section-newvocab');
+            renderMenuSection(data.menu, 'section-menu');
+            renderSection(data.drills, 'section-drills');
+            renderSection(data.roleplay, 'section-roleplay');
+            renderQuizSection(data.quiz, 'section-quiz');
+        });
+
+        // UTILITIES
+        function toggleVisibility(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function toggleQuizAnswer(idPrefix) {
+            const q = document.getElementById(`${idPrefix}-question`);
+            const a = document.getElementById(`${idPrefix}-answer`);
+            
+            if (q.classList.contains('hidden')) {
+                q.classList.remove('hidden');
+                a.classList.add('hidden');
+            } else {
+                q.classList.add('hidden');
+                a.classList.remove('hidden');
+            }
+        }
+
+        function speakText(text) {
+            // Cancel any current speech
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.8; // Slightly slower for A1 student
+            
+            // iOS/Mobile often requires explicit voice selection if default isn't set correctly
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(v => v.lang.includes('th'));
+            if (thaiVoice) utterance.voice = thaiVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Helper to unlock audio context on iOS
+        function testAudio() {
+            speakText("สวัสดีครับ");
+        }
+
+        // Voice loading is async in Chrome
+        window.speechSynthesis.onvoiceschanged = () => {
+            // Voices loaded
+        };
+
+    </script>
+</body>
+</html>
