@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            touch-action: manipulation;
+        }
+        /* Style for correct/incorrect feedback */
+        .feedback-message.correct {
+            color: #16a34a; /* green-600 */
+        }
+        .feedback-message.incorrect {
+            color: #dc2626; /* red-600 */
+        }
+        
+        /* TTS Icon */
+        .tts-icon {
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 0.9em;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .tts-icon:hover {
+            opacity: 1;
+        }
+        .tts-text {
+            cursor: pointer;
+        }
+        .tts-text:hover {
+            background-color: #f0f9ff; /* sky-50 */
+        }
+
+        /* Error Correction Styles */
+        #error-sentence-container .error-word {
+            font-weight: 700;
+            color: #dc2626; /* red-600 */
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #dc2626;
+        }
+        .error-option-btn {
+            transition: all 0.2s ease;
+        }
+        .error-option-btn.correct {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+            color: #15803d; /* green-700 */
+        }
+        .error-option-btn.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+            color: #b91c1c; /* red-700 */
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 shadow-md">
+            <h1 class="text-3xl md:text-4xl font-bold text-white text-center">Sentence Patterns Review</h1>
+            <p class="text-indigo-100 text-center mt-2">Welcome back! Let's review what you've learned so far.</p>
+        </header>
+
+        <main class="p-6 md:p-8 space-y-8">
+
+            <!-- Pro Tip Box -->
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>Pro Tip:</strong> Remember, in Thai, we often drop pronouns like 'I' (ผม / ฉัน) and 'You' (คุณ) when the context is clear.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ACTIVITY 1: Spot the Error ===== -->
+            <section id="activity-1" class="space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 1: Spot the Error</h2>
+                <p class="text-gray-600">Read the conversation. The user's response has a mistake (in <span class="text-red-600 font-semibold">red</span>). Click the correct word to fix it!</p>
+
+                <!-- Context from Bot -->
+                <div id="error-context-container" class="bg-gray-100 rounded-lg p-4">
+                    <p class="font-semibold text-gray-500">Bot:</p>
+                    <div id="error-context-text" class="text-lg text-gray-800 tts-text" data-tts-text="">
+                        <!-- Bot context (Thai + Roman) goes here -->
+                    </div>
+                    <!-- English translation will go here -->
+                    <div id="error-context-eng" class="text-md text-gray-600 italic mt-1">
+                        <!-- English translation goes here -->
+                    </div>
+                </div>
+
+                <!-- Incorrect Sentence from User -->
+                <div id="error-sentence-container" class="bg-red-50 border-l-4 border-red-400 rounded-lg p-4">
+                    <p class="font-semibold text-red-700">User (Incorrect):</p>
+                    <div id="error-sentence-text" class="text-lg text-gray-800 tts-text" data-tts-text="">
+                        <!-- Incorrect sentence goes here -->
+                    </div>
+                </div>
+
+                <!-- Options to fix -->
+                <div class="space-y-2">
+                    <p class="font-medium text-gray-700">Click the correct word to fix the error:</p>
+                    <div id="error-options-container" class="flex flex-wrap gap-3">
+                        <!-- Option buttons go here -->
+                    </div>
+                </div>
+
+                <!-- Feedback and Controls -->
+                <div class="text-center h-12">
+                    <p id="error-feedback-message" class="text-center h-6 font-semibold feedback-message"></p>
+                    <button id="next-error-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200 hidden">Next</button>
+                </div>
+            </section>
+
+
+            <!-- ===== ACTIVITY 2: Simple Conversation ===== -->
+            <section id="activity-2" class="space-y-6 pt-8 border-t">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 2: Simple Conversation</h2>
+                <p class="text-gray-600">Practice what you've learned in a simple role-play. Click the best response to the bot's message.</p>
+
+                <div id="conversation-container" class="bg-gray-50 rounded-lg shadow-inner p-4 space-y-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+                    <!-- Conversation chat bubbles will go here -->
+                </div>
+
+                <div id="conversation-options" class="flex flex-col gap-3">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- ===== ACTIVITY 3: Extension Activities (NEW) ===== -->
+            <section id="activity-3" class="space-y-6 pt-8 border-t">
+                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2">Activity 3: Extension Activities (For Teacher-Led Practice)</h2>
+                
+                <div class="space-y-6 text-gray-700">
+                    <p>Use the vocabulary you've reviewed for more open-ended practice!</p>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold">Idea 1: Role-Play Flip</h3>
+                        <p>You (the teacher) pretend to be the student, and the student becomes the teacher. The student must ask <em>you</em> the questions:</p>
+                        <ul class="list-disc list-inside pl-4 space-y-1 mt-2">
+                            <li class="tts-text" data-tts-text="คุณสบายดีไหม (khun sà baai dii mái)">"คุณสบายดีไหม" (khun sà baai dii mái)</li>
+                            <li class="tts-text" data-tts-text="คุณชื่ออะไร (khun chûe à-rai)">"คุณชื่ออะไร" (khun chûe à-rai)</li>
+                            <li class="tts-text" data-tts-text="คุณชอบ...ไหม (khun chɔ̂ɔp ... mái)">"คุณชอบ...ไหม" (khun chɔ̂ɔp ... mái)</li>
+                            <li class="tts-text" data-tts-text="คุณหิวไหม (khun hǐw mái)">"คุณหิวไหม" (khun hǐw mái)</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold">Idea 2: "My Favorites"</h3>
+                        <p>The student tries to make sentences about their <em>real</em> preferences. You can help them build the sentences.</p>
+                        <ul class="list-disc list-inside pl-4 space-y-2 mt-2">
+                            <li><strong>Prompt:</strong> "What do you like to eat?" (Student might say "ไก่")
+                                <br><strong>Build:</strong> <span class="tts-text" data-tts-text="ผมชอบไก่ (phǒm chɔ̂ɔp gài)">"ผมชอบไก่" (phǒm chɔ̂ɔp gài)</span></li>
+                            <li><strong>Prompt:</strong> "What do you like to watch?" (Student might say "เอเลี่ยนเอิร์ธ")
+                                <br><strong>Build:</strong> <span class="tts-text" data-tts-text="ผมชอบดูซีรีส์เอเลี่ยนเอิร์ธ (phǒm chɔ̂ɔp duu sii-rîi ee lîan ə́ət)">"ผมชอบดูซีรีส์เอเลี่ยนเอิร์ธ" (phǒm chɔ̂ɔp duu sii-rîi ee lîan ə́ət)</span></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold">Idea 3: Creative (Silly) Sentences</h3>
+                        <p>Try to make funny or strange sentences using the words you know. This is a great way to test the limits of the vocabulary!</p>
+                        <ul class="list-disc list-inside pl-4 space-y-1 mt-2">
+                            <li class="tts-text" data-tts-text="ไก่ไม่สบาย (gài mâi sà baai)">"ไก่ไม่สบาย" (gài mâi sà baai) - The chicken is not comfortable.</li>
+                            <li class="tts-text" data-tts-text="โซฟาอร่อย (soo faa à-rɔ̀ɔi)">"โซฟาอร่อย" (soo faa à-rɔ̀ɔi) - The sofa is delicious.</li>
+                            <li class="tts-text" data-tts-text="ผมชอบสอนปลา (phǒm chɔ̂ɔp sŏon bplaa)">"ผมชอบสอนปลา" (phǒm chɔ̂ɔp sŏon bplaa) - I like to teach fish.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // === TTS (Text-to-Speech) Function ===
+        const synth = window.speechSynthesis;
+        function speakThai(text) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            // Remove romanization for cleaner speech
+            let cleanText = text.split('(')[0].trim();
+            
+            // --- FIX ---
+            // Replace formal "ไหม" with colloquial "มั้ย" for pronunciation
+            cleanText = cleanText.replace(/ไหม/g, 'มั้ย');
+            // --- END FIX ---
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH'; // Set language to Thai
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
+
+        // Add event listener for any dynamically created TTS icons
+        document.body.addEventListener('click', function(e) {
+            if (e.target.classList.contains('tts-icon') || e.target.closest('.tts-icon')) {
+                const text = e.target.closest('[data-tts-text]').dataset.ttsText;
+                speakThai(text);
+            }
+            if (e.target.classList.contains('tts-text')) {
+                const text = e.target.dataset.ttsText;
+                speakThai(text);
+            }
+        });
+
+        // --- All Vocabulary Data ---
+        const allWords = {
+            'คะ': 'khá', 'ฉัน': 'chǎn', 'ชื่อ': 'chûe', 'คุณ': 'khun', 'อะไร': 'à-rai', 'ผม': 'phǒm', 'มา': 'maa', 'จาก': 'jàak', 'ประเทศ': 'prà-thêt',
+            'ไม่': 'mâi', 'ไหม': 'mái', 'ดี': 'dii', 'สบาย': 'sà baai', 'อร่อย': 'à rɔ̀ɔi', 'ใช่': 'châi', 'ใช่ไหม': 'châi mái', 'พูด': 'pôut', 'ภาษา': 'paa-sǎa',
+            'ได้': 'dâi', 'นิดหน่อย': 'nít-nòi', 'เขียน': 'khǐan', 'สเปน': 'sà bpeen', 'ฝรั่งเศส': 'fà ràng sèet', 'ชอบ': 'chɔ̂ɔp', 'ฟัง': 'fang', 'ดู': 'duu',
+            'ซีรีส์': 'sii rîi', 'อ่าน': 'àan', 'เพลง': 'pleeng', 'ไทย': 'tai', 'อังกฤษ': 'ang grìt', 'คริส': 'krít', 'สบายดี': 'sà baai dii', 'ส้มตำ': 'sôm dtam',
+            'เอ็สเปรสโซ่': 'ès bprèet sôo', 'โซฟา': 'soo faa', 'ว่า': 'wâa', 'ฝันดี': 'fǎn dii', 'เอเลี่ยนเอิร์ธ': 'ee lîan ə́ət',
+            'ทำ': 'tham', 'อาหาร': 'aa-hǎan', 'ทำอาหาร': 'tham-aa-hǎan', 'ทอด': 'tâwt', 'ปลา': 'bplaa', 'ไหม้': 'mâi',
+            'หิว': 'hǐw',
+            'ไก่': 'gài',
+            'สอน': 'sŏon',
+            'กิน': 'gin' // Added 'gin' as it's used in the new scenario
+        };
+
+
+        // === ACTIVITY 1: Spot the Error ===
+        (function() {
+            // --- Data for Error Scenarios ---
+            const errorScenarios = [
+                {
+                    context: "คุณหิวไหมคะ (Are you hungry?)",
+                    context_tts: "คุณหิวไหมคะ (khun hǐw mái khá)",
+                    incorrectSentence: "ผม อร่อย", // "I am delicious"
+                    incorrect_tts: "ผม อร่อย (phǒm à rɔ̀ɔi)",
+                    errorWord: "อร่อย",
+                    correctWord: "หิว",
+                    options: ["หิว", "อร่อย", "สบายดี"] // hungry, delicious, well
+                },
+                {
+                    context: "อาหารเป็นยังไงคะ (How is the food?)",
+                    context_tts: "อาหารเป็นยังไงคะ (aa-hǎan bpen yang-ngai khá)", 
+                    incorrectSentence: "ปลา ไม่", // "Fish not"
+                    incorrect_tts: "ปลา ไม่ (bplaa mâi)",
+                    errorWord: "ไม่",
+                    correctWord: "ไหม้", // burnt
+                    options: ["ไหม้", "ไม่", "ไหม"] // burnt, not, (question)
+                },
+                {
+                    context: "คุณชอบดูทีวีไหม (Do you like to watch TV?)",
+                    context_tts: "คุณชอบดูทีวีไหม (khun chɔ̂ɔp duu tii-wii mái)",
+                    incorrectSentence: "(ผม) ชอบ อ่าน ซีรีส์", // "I like to read series"
+                    incorrect_tts: "(ผม) ชอบ อ่าน ซีรีส์ (phǒm chɔ̂ɔp àan sii rîi)",
+                    errorWord: "อ่าน",
+                    correctWord: "ดู", // watch
+                    options: ["ดู", "อ่าน", "เขียน"] // watch, read, write
+                },
+                // --- MODIFIED SCENARIO 1 ---
+                {
+                    context: "คุณชอบกินอะไร (What do you like to eat?)",
+                    context_tts: "คุณชอบกินอะไร (khun chɔ̂ɔp gin à-rai)",
+                    incorrectSentence: "(ผม) ชอบ กิน ปลา", // "I like to eat fish"
+                    incorrect_tts: "(ผม) ชอบ กิน ปลา (phǒm chɔ̂ɔp gin bplaa)",
+                    errorWord: "ปลา",
+                    correctWord: "ไก่", // chicken
+                    options: ["ไก่", "ปลา", "ส้มตำ"] // chicken, fish, som tum
+                },
+                // --- MODIFIED SCENARIO 2 ---
+                {
+                    context: "คุณทำอะไร (What do you do?)",
+                    context_tts: "คุณทำอะไร (khun tham à-rai)",
+                    incorrectSentence: "(ผม) สอน ภาษาไทย", // "I teach Thai"
+                    incorrect_tts: "(ผม) สอน ภาษาไทย (phǒm sŏon paa-sǎa tai)",
+                    errorWord: "สอน",
+                    correctWord: "พูด", // speak
+                    options: ["พูด", "สอน", "ทำอาหาร"] // speak, teach, cook
+                },
+                {
+                    context: "โซฟาเป็นยังไงคะ (How is the sofa?)",
+                    context_tts: "โซฟาเป็นยังไงคะ (soo faa bpen yang-ngai khá)",
+                    incorrectSentence: "โซฟา อร่อย", // "The sofa is delicious"
+                    incorrect_tts: "โซฟา อร่อย (soo faa à rɔ̀ɔi)",
+                    errorWord: "อร่อย",
+                    correctWord: "สบาย", // comfortable
+                    options: ["สบาย", "อร่อย", "ไม่ดี"] // comfortable, delicious, not good
+                },
+                 {
+                    context: "คุณมาจากไหน (Where are you from?)",
+                    context_tts: "คุณมาจากไหน (khun maa jàak nǎi)",
+                    incorrectSentence: "ผม มา จาก ภาษา อังกฤษ", // "I come from English language"
+                    incorrect_tts: "ผม มา จาก ภาษา อังกฤษ (phǒm maa jàak paa-sǎa ang grìt)",
+                    errorWord: "ภาษา",
+                    correctWord: "ประเทศ", // country
+                    options: ["ประเทศ", "ภาษา", "สเปน"] // country, language, Spain
+                }
+            ];
+
+            // --- Element References ---
+            const contextText = document.getElementById('error-context-text');
+            const contextEngText = document.getElementById('error-context-eng');
+            // --- BUG FIX: Removed stray 'section' word ---
+            const sentenceText = document.getElementById('error-sentence-text');
+            const optionsContainer = document.getElementById('error-options-container');
+            const feedbackMessage = document.getElementById('error-feedback-message');
+            const nextErrorBtn = document.getElementById('next-error-btn');
+
+            let currentErrorIndex = 0;
+            let currentScenario = {};
+
+            // --- Functions ---
+            function loadErrorScenario(index) {
+                currentScenario = errorScenarios[index];
+
+                // 1. Set Context
+                const match = currentScenario.context.match(/\((.*?)\)/);
+                const engTranslation = match ? `(${match[1]})` : '';
+
+                contextText.textContent = currentScenario.context_tts; 
+                contextEngText.textContent = engTranslation; 
+                contextText.dataset.ttsText = currentScenario.context_tts;
+
+                // 2. Set Incorrect Sentence with highlighted error
+                const tts_string = currentScenario.incorrect_tts;
+                const error = currentScenario.errorWord; 
+                
+                const highlighted_tts_string = tts_string.replace(error, `<span class="error-word">${error}</span>`);
+                
+                sentenceText.innerHTML = highlighted_tts_string;
+                sentenceText.dataset.ttsText = currentScenario.incorrect_tts;
+
+                // 3. Set Options
+                optionsContainer.innerHTML = '';
+                // Shuffle options
+                const shuffledOptions = [...currentScenario.options].sort(() => Math.random() - 0.5);
+                
+                shuffledOptions.forEach(word => {
+                    const roman = allWords[word] || '';
+                    const button = document.createElement('button');
+                    button.className = 'error-option-btn bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm';
+                    button.dataset.word = word;
+                    button.innerHTML = `
+                        <span>${word}</span>
+                        <span class="text-sm opacity-75 ml-2">(${roman})</span>
+                    `;
+                    button.addEventListener('click', checkErrorAnswer);
+                    optionsContainer.appendChild(button);
+                });
+
+                // 4. Reset UI state
+                feedbackMessage.textContent = '';
+                feedbackMessage.className = 'text-center h-6 font-semibold feedback-message';
+                nextErrorBtn.classList.add('hidden');
+            }
+
+            function checkErrorAnswer(e) {
+                const clickedButton = e.currentTarget;
+                const selectedWord = clickedButton.dataset.word;
+
+                // Disable all buttons
+                optionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+                if (selectedWord === currentScenario.correctWord) {
+                    feedbackMessage.textContent = 'ใช่! (Correct!)';
+                    feedbackMessage.className = 'text-center h-6 font-semibold feedback-message correct';
+                    clickedButton.classList.add('correct');
+                    nextErrorBtn.classList.remove('hidden');
+                } else {
+                    feedbackMessage.textContent = 'ไม่ใช่ (Incorrect, try again)';
+                    feedbackMessage.className = 'text-center h-6 font-semibold feedback-message incorrect';
+                    clickedButton.classList.add('incorrect');
+                    
+                    // Re-enable buttons so they can try again
+                    setTimeout(() => {
+                        optionsContainer.querySelectorAll('button').forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('incorrect');
+                        });
+                        feedbackMessage.textContent = '';
+                    }, 1500);
+                }
+            }
+
+            // --- Event Listeners ---
+            nextErrorBtn.addEventListener('click', () => {
+                currentErrorIndex = (currentErrorIndex + 1) % errorScenarios.length;
+                loadErrorScenario(currentErrorIndex);
+            });
+
+            // Initial load
+            errorScenarios.sort(() => Math.random() - 0.5); // Shuffle scenarios
+            loadErrorScenario(currentErrorIndex);
+
+        })();
+
+
+        // === ACTIVITY 2: Simple Conversation ===
+        (function() {
+            const conversationContainer = document.getElementById('conversation-container');
+            const optionsContainer = document.getElementById('conversation-options');
+            let currentStep = 0;
+            let conversationScript; // Will be populated
+            let endConversationMessage; // Will be separated
+
+            const fullConversationScript = [
+                {
+                    bot: "สบายดีไหมคะ",
+                    roman: "sà baai dii mái khá",
+                    options: [
+                        { text: "สบายดี", roman: "sà baai dii", correct: true },
+                        { text: "ไม่สบาย", roman: "mâi sà baai", correct: true },
+                        { text: "ชื่อคริส", roman: "chûe krít", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชื่ออะไรคะ",
+                    roman: "khun chûe à-rai khá",
+                    options: [
+                        { text: "ชื่อคริส", roman: "chûe krít", correct: true },
+                        { text: "ใช่", roman: "châi", correct: false },
+                        { text: "ประเทศอังกฤษ", roman: "prà-thêt ang grìt", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณมาจากประเทศอะไรคะ",
+                    roman: "khun maa jàak prà-thêt à-rai khá",
+                    options: [
+                        { text: "มาจากประเทศอังกฤษ", roman: "maa jàak prà-thêt ang grìt", correct: true },
+                        { text: "มาจากประเทศสเปน", roman: "maa jàak prà-thêt sà bpeen", correct: false },
+                        { text: "มาจากประเทศฝรั่งเศส", roman: "maa jàak prà-thêt fà ràng sèet", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบฟังเพลงไหมคะ",
+                    roman: "khun chɔ̂ɔp fang pleeng mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "ใช่", roman: "châi", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบพูดภาษาไทยไหมคะ",
+                    roman: "khun chɔ̂ɔp pûut paa-sǎa tai mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "พูดได้นิดหน่อย", roman: "pûut dâi nít-nòi", correct: true }
+                    ]
+                },
+                {
+                    bot: "คุณไม่ชอบเขียนใช่ไหมคะ",
+                    roman: "khun mâi chɔ̂ɔp kǐan châi mái khá",
+                    options: [
+                        { text: "ใช่", roman: "châi", correct: true },
+                        { text: "ไม่ใช่", roman: "mâi châi", correct: true },
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: false } 
+                    ]
+                },
+                {
+                    bot: "คุณหิวไหมคะ",
+                    roman: "khun hǐw mái khá",
+                    options: [
+                        { text: "หิว", roman: "hǐw", correct: true },
+                        { text: "ไม่หิว", roman: "mâi hǐw", correct: true },
+                        { text: "สบายดี", roman: "sà baai dii", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบทำอาหารไหมคะ",
+                    roman: "khun chɔ̂ɔp tham aa-hǎan mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "ปลาไหม้", roman: "bplaa mâi", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบไก่ไหมคะ",
+                    roman: "khun chɔ̂ɔp gài mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "ปลา", roman: "bplaa", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบสอนไหมคะ",
+                    roman: "khun chɔ̂ɔp sŏon mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "อ่าน", roman: "àan", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบอ่านไหมคะ",
+                    roman: "khun chɔ̂ɔp àan mái khá",
+                    options: [
+                        { text: "ชอบ", roman: "chɔ̂ɔp", correct: true },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true },
+                        { text: "เขียน", roman: "khǐan", correct: false }
+                    ]
+                },
+                {
+                    bot: "คุณชอบดูซีรีส์อะไรคะ",
+                    roman: "khun chɔ̂ɔp duu sii-rîi à-rai khá",
+                    options: [
+                        { text: "ชอบดูซีตรีส์เอเลี่ยนเอิร์ธ", roman: "chɔ̂ɔp duu sii-rîi ee lîan ə́ət", correct: true },
+                        { text: "ชอบฟังเพลง", roman: "chɔ̂ɔp fang pleeng", correct: false },
+                        { text: "ไม่ชอบ", roman: "mâi chɔ̂ɔp", correct: true }
+                    ]
+                },
+                {
+                    bot: "ส้มตำอร่อยไหมคะ",
+                    roman: "sôm dtam à-rɔ̀ɔi mái khá",
+                    options: [
+                        { text: "อร่อย", roman: "à-rɔ̀ɔi", correct: true },
+                        { text: "ไม่อร่อย", roman: "mâi à-rɔ̀ɔi", correct: true },
+                        { text: "หิว", roman: "hǐw", correct: false }
+                    ]
+                },
+                {
+                    bot: "เอ็สเปรสโซ่ไม่ดีใช่ไหมคะ",
+                    roman: "ès bprèet sôo mâi dii châi mái khá",
+                    options: [
+                        { text: "ใช่", roman: "châi", correct: true }, // "Right, (it's not good)"
+                        { text: "ไม่ใช่", roman: "mâi châi", correct: true }, // "No, (it's good)"
+                        { text: "อร่อย", roman: "à-rɔ̀ɔi", correct: false }
+                    ]
+                },
+                {
+                    bot: "โซฟาสบายไหมคะ",
+                    roman: "soo faa sà baai mái khá",
+                    options: [
+                        { text: "สบาย", roman: "sà baai", correct: true },
+                        { text: "ไม่สบาย", roman: "mâi sà baai", correct: true },
+                        { text: "โซฟาไหม้", roman: "soo faa mâi", correct: false } // "sofa is burnt" (funny distractor)
+                    ]
+                },
+                {
+                    bot: "ดี!",
+                    roman: "dii!",
+                    options: [] // End of conversation
+                }
+            ];
+
+            function addMessage(text, roman, isBot = true) {
+                const bubble = document.createElement('div');
+                const alignClass = isBot ? 'justify-start' : 'justify-end';
+                const colorClass = isBot ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white';
+                
+                bubble.className = `flex ${alignClass}`;
+                bubble.innerHTML = `
+                    <div 
+                        class="${colorClass} rounded-lg py-2 px-4 max-w-[80%] tts-text" 
+                        data-tts-text="${text} (${roman})"
+                    >
+                        <p class="font-medium">${text}</p>
+                        <p class="text-sm opacity-90">${roman}</p>
+                    </div>
+                `;
+                conversationContainer.appendChild(bubble);
+                // Scroll to bottom
+                conversationContainer.scrollTop = conversationContainer.scrollHeight;
+            }
+
+            function loadConversationStep(stepIndex) {
+                if (stepIndex >= conversationScript.length) {
+                    // This is the end, show the final message
+                    const endStep = endConversationMessage;
+                    setTimeout(() => {
+                        addMessage(endStep.bot, endStep.roman, true);
+                        speakThai(`${endStep.bot} (${endStep.roman})`);
+                        optionsContainer.innerHTML = '<p class="text-center text-gray-500">--- End of Conversation ---</p>';
+                    }, 500);
+                    return;
+                }
+
+                const step = conversationScript[stepIndex];
+                
+                // Add bot message
+                setTimeout(() => {
+                    addMessage(step.bot, step.roman, true);
+                    speakThai(`${step.bot} (${step.roman})`);
+                }, 500); // Small delay for bot response
+
+                // Clear old options and add new ones
+                optionsContainer.innerHTML = '';
+                if (step.options.length > 0) {
+                    step.options.forEach(option => {
+                        const button = document.createElement('button');
+                        button.className = 'w-full text-left bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg shadow-sm transition';
+                        button.innerHTML = `
+                            <span>${option.text}</span>
+                            <span class="text-sm opacity-75 ml-2">(${option.roman})</span>
+                        `;
+                        button.addEventListener('click', () => handleOptionClick(option));
+                        optionsContainer.appendChild(button);
+                    });
+                } else {
+                    // This case should not be hit now, but as a fallback
+                    currentStep++;
+                    loadConversationStep(currentStep);
+                }
+            }
+
+            function handleOptionClick(option) {
+                // --- FIX: Disable all buttons immediately on click ---
+                const allButtons = optionsContainer.querySelectorAll('button');
+                allButtons.forEach(btn => btn.disabled = true);
+                // --- END FIX ---
+
+                // Add user message
+                addMessage(option.text, option.roman, false);
+
+                if (option.correct) {
+                    currentStep++;
+                    // loadConversationStep will create new, enabled buttons
+                    loadConversationStep(currentStep);
+                } else {
+                    // Shake animation for incorrect
+                    optionsContainer.classList.add('animate-shake');
+                    
+                    // --- FIX: Re-enable buttons after shake so user can try again ---
+                    setTimeout(() => {
+                        optionsContainer.classList.remove('animate-shake');
+                        allButtons.forEach(btn => btn.disabled = false); // Let them try again
+                    }, 500);
+                    // --- END FIX ---
+                }
+            }
+
+            // Define shake animation
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+                .animate-shake {
+                    animation: shake 0.3s ease-in-out;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // --- FIX for Conversation Shuffle ---
+            // 1. Separate the end message
+            endConversationMessage = fullConversationScript.pop();
+            // 2. Shuffle the rest of the conversation
+            conversationScript = fullConversationScript.sort(() => Math.random() - 0.5);
+            // --- END FIX ---
+
+            // Start conversation
+            loadConversationStep(currentStep);
+
+        })();
+
+    </script>
+
+</body>
+</html>
