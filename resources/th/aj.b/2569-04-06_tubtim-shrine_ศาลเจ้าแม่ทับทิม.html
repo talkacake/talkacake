@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทเรียน: ศาลเจ้าแม่ทับทิม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', 'Noto Sans Thai', sans-serif; }
+        .tts-button {
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #DC2626;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 4px;
+        }
+        .tts-button:active { transform: scale(0.9); }
+        .tts-button.playing { color: #991B1B; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .ipa, .en { display: none; margin-top: 0.25rem; font-weight: normal; }
+        .ipa { color: #D97706; font-style: italic; font-size: 0.9em; } 
+        .en { color: #6B7280; font-size: 0.9em; }
+        .reveal { display: block !important; }
+
+        .hidden-content { display: none; }
+
+        .toggle-btn {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            background-color: #F3F4F6;
+            color: #4B5563;
+            cursor: pointer;
+            margin-right: 4px;
+            font-weight: 700;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .toggle-btn:hover { background-color: #E5E7EB; }
+        .toggle-btn.active {
+            background-color: #FEE2E2;
+            color: #B91C1C;
+            border-color: #FCA5A5;
+        }
+        
+        .controls-row {
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .content-block { margin-bottom: 1.5rem; }
+        .vocab-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="bg-red-50 text-gray-800 pb-20">
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-10 p-8 bg-gradient-to-r from-red-600 to-rose-700 text-white rounded-3xl shadow-xl content-block">
+            <h1 class="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
+                ⛩️ ศาลเจ้าแม่ทับทิม
+                <button class="tts-button text-white" onclick="playTTS('ศาลเจ้าแม่ทับทิม', this)">🔊</button>
+            </h1>
+            <div class="controls-row justify-center">
+                <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+            </div>
+            <div class="ipa text-red-100 text-lg">sǎan jâo-mâe tháp-thim</div>
+            <div class="en text-white opacity-90 text-lg">Chao Mae Tuptim Shrine</div>
+        </header>
+
+        <!-- 1. Review Section -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-amber-400">
+            <div class="content-block text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-2">
+                    🔄 ทบทวนคำศัพท์
+                    <button class="tts-button" onclick="playTTS('ทบทวนคำศัพท์', this)">🔊</button>
+                </h2>
+                <div class="controls-row justify-center mb-4">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">thóp-thuan kham-sàp</div>
+                <div class="en">Vocabulary Review</div>
+
+                <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-100 content-block">
+                    <p class="text-gray-700">
+                        กดปุ่มเพื่อสุ่มคำศัพท์ แล้วลองแต่งประโยคจากคำที่ได้
+                        <button class="tts-button" onclick="playTTS('กดปุ่มเพื่อสุ่มคำศัพท์ แล้วลองแต่งประโยคจากคำที่ได้', this)">🔊</button>
+                    </p>
+                    <div class="controls-row justify-center mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">gòt bpùm phʉ̂ʉa sùm kham-sàp láew lɔɔng dtàeng bprà-yôok jàak kham thîi dâi</div>
+                    <div class="en text-sm">Press the button to randomize a word, then try to make a sentence.</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center mt-6">
+                <div id="word-display-area" class="w-full h-48 flex flex-col justify-center items-center bg-slate-50 rounded-2xl border-2 border-dashed border-amber-300 mb-6 p-4">
+                    <p class="text-slate-400 italic">พร้อมแล้วกดปุ่มด้านล่าง 🎲</p>
+                </div>
+                <button onclick="randomizeWord()" class="bg-amber-500 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:bg-amber-600 transition active:scale-95 text-lg flex items-center gap-2">
+                    🎲 สุ่มคำศัพท์
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Lead-in -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-rose-500">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    🤔 ก่อนเริ่มบทเรียน
+                    <button class="tts-button" onclick="playTTS('ก่อนเริ่มบทเรียน', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">gɔ̀ɔn rə̂əm bòt-rian</div>
+                <div class="en">Before the lesson</div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="p-5 bg-rose-50 rounded-2xl content-block">
+                    <p class="text-lg text-gray-800 font-medium">คุณเคยไปสถานที่ศักดิ์สิทธิ์หรือศาลเจ้าในประเทศไทยไหม? คนไทยมักจะไปทำอะไรที่นั่น? <button class="tts-button" onclick="playTTS('คุณเคยไปสถานที่ศักดิ์สิทธิ์หรือศาลเจ้าในประเทศไทยไหม คนไทยมักจะไปทำอะไรที่นั่น', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">khun khoei bpai sà-thǎan-thîi sàk-sìt rʉ̌ʉ sǎan-jâo nai bprà-thêet thai mǎi? khon thai mák jà bpai tham à-rai thîi nân?</div>
+                    <div class="en text-sm">Have you ever been to a sacred place or a shrine in Thailand? What do Thai people usually do there?</div>
+                </div>
+
+                <div class="p-5 bg-rose-50 rounded-2xl content-block">
+                    <p class="text-lg text-gray-800 font-medium">ถ้ามีศาลเจ้าเก่าแก่อยู่ตรงกลางพื้นที่ที่กำลังจะสร้างห้างสรรพสินค้าใหม่ คุณคิดว่าจะเกิดอะไรขึ้น? <button class="tts-button" onclick="playTTS('ถ้ามีศาลเจ้าเก่าแก่อยู่ตรงกลางพื้นที่ที่กำลังจะสร้างห้างสรรพสินค้าใหม่ คุณคิดว่าจะเกิดอะไรขึ้น', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">thâa mii sǎan-jâo gào-gàe yùu dtrong glaang phʉ́ʉn-thîi thîi gam-lang jà srâang hâang-sàp-phá-sǐn-kháa mài, khun khít wâa jà gə̀ət à-rai khʉ̂n?</div>
+                    <div class="en text-sm">If there is an old shrine in the middle of an area where a new shopping mall is going to be built, what do you think will happen?</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Video & Listening -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-red-600">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    📺 การฟังจากวิดีโอ
+                    <button class="tts-button" onclick="playTTS('การฟังจากวิดีโอ', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">gaan fang jàak wí-dii-oo</div>
+                <div class="en">Listening from Video</div>
+            </div>
+
+            <div class="mb-8 p-6 bg-slate-100 rounded-2xl text-center border border-slate-200">
+                <p class="mb-4 font-bold text-slate-800">ดูวิดีโอจาก TikTok 🎬</p>
+                <a href="https://www.tiktok.com/@garetktpz/video/7450904141410454792" target="_blank" class="inline-block bg-black text-white font-bold px-8 py-3 rounded-full hover:bg-gray-800 transition shadow-lg active:scale-95">
+                    🎵 เปิดวิดีโอใน TikTok
+                </a>
+            </div>
+
+            <div class="bg-red-50 p-6 rounded-2xl border border-red-100 space-y-6">
+                <h3 class="font-bold text-lg text-red-800 mb-4 border-b pb-2">📜 บทอ่านจากวิดีโอ</h3>
+                <div class="content-block">
+                    <p class="text-lg">"เจ้าแม่ทับทิมสะพานเหลือง ซึ่งเป็น <strong class="text-red-700 underline">คดีความ</strong> กับทางจุฬาลงกรณ์มหาวิทยาลัย มีผู้ <strong class="text-red-700 underline">ศรัทธา</strong> มาล่ารายชื่อ ให้ผู้ศรัทธาทั้งหลายมาลงชื่อกัน เพื่อ <strong class="text-red-700 underline">พิทักษ์</strong> ศาลเจ้าแม่ฯ" <button class="tts-button" onclick="playTTS('เจ้าแม่ทับทิมสะพานเหลือง ซึ่งเป็นคดีความกับทางจุฬาลงกรณ์มหาวิทยาลัย มีผู้ศรัทธามาล่ารายชื่อ ให้ผู้ศรัทธาทั้งหลายมาลงชื่อกัน เพื่อพิทักษ์ศาลเจ้าแม่', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mt-1">"jâo-mâe tháp-thim sà-phaan lʉ̌ʉang sʉ̂ng bpen khá-dii khwaam gàp thaang jù-laa-long-gɔɔn má-hǎa-wít-thá-yaa-lai, mii phûu sàt-thaa maa lâa raai-chʉ̂ʉ... phʉ̂ʉa phí-thák sǎan jâo-mâe"</div>
+                    <div class="en text-sm mt-1">"The Chao Mae Tuptim Saphan Luang Shrine, which has a lawsuit with Chulalongkorn University, has faithful people coming to gather signatures... to protect the shrine."</div>
+                </div>
+
+                <div class="content-block border-t border-red-200 pt-4">
+                    <p class="text-lg">"<strong class="text-red-700 underline">ในขณะเดียวกัน</strong> ก็มี <strong class="text-red-700 underline">แบบสำรวจ</strong> ด้วย อันนี้เป็นแบบสำรวจนะ คนละอันกันนะ อันนี้ <strong class="text-red-700 underline">เอาไว้สำหรับ</strong> ลงชื่อ ส่วนอันนี้คือแบบสำรวจคิวอาร์โค้ด สามารถสแกนเข้าไปได้เลย เพื่อเขียนความคิดเห็นของเรา" <button class="tts-button" onclick="playTTS('ในขณะเดียวกันก็มีแบบสำรวจด้วย อันนี้เป็นแบบสำรวจนะ คนละอันกันนะ อันนี้เอาไว้สำหรับลงชื่อ ส่วนอันนี้คือแบบสำรวจคิวอาร์โค้ด สามารถสแกนเข้าไปได้เลย เพื่อเขียนความคิดเห็นของเรา', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mt-1">"nai khà-nà diao-gan gɔ̂ mii bàep-sǎm-rùuat dtuuay... an níi ao wái sǎm-ràp long chʉ̂ʉ... sàa-mâat sà-gaen khâo bpai dâi ləəi phʉ̂ʉa khǐian khwaam khít-hěn kɔ̌ɔng rao"</div>
+                    <div class="en text-sm mt-1">"Meanwhile, there is also a survey... This one is used for signing. As for this QR code survey, you can scan it to write our opinions."</div>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-6" id="video-quiz-container">
+                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
+                    📝 ทดสอบความเข้าใจ 
+                    <button class="tts-button" onclick="playTTS('ทดสอบความเข้าใจ', this)">🔊</button>
+                </h3>
+                
+                <div class="content-block video-quiz-question">
+                    <p class="font-semibold mb-2">1. ทำไมคนถึงมาล่ารายชื่อที่ศาลเจ้าแม่ทับทิม? <button class="tts-button" onclick="playTTS('ทำไมคนถึงมาล่ารายชื่อที่ศาลเจ้าแม่ทับทิม', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-2">tham-mai khon thʉ̌ng maa lâa raai-chʉ̂ʉ thîi sǎan jâo-mâe tháp-thim?</div>
+                    <div class="en text-sm mb-2">Why are people gathering signatures at the Chao Mae Tuptim Shrine?</div>
+                    
+                    <div class="pl-4 space-y-2">
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq1" value="a" class="mr-2"> ก. เพื่อพิทักษ์ศาลเจ้าแม่ฯ ไม่ให้ถูกทำลาย <button class="tts-button" onclick="playTTS('เพื่อพิทักษ์ศาลเจ้าแม่ ไม่ให้ถูกทำลาย', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq1" value="b" class="mr-2"> ข. เพื่อขอพรให้ถูกหวย <button class="tts-button" onclick="playTTS('เพื่อขอพรให้ถูกหวย', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq1" value="c" class="mr-2"> ค. เพื่อบริจาคเงิน <button class="tts-button" onclick="playTTS('เพื่อบริจาคเงิน', this)">🔊</button></label>
+                    </div>
+                </div>
+
+                <div class="content-block border-t border-slate-200 pt-4 video-quiz-question">
+                    <p class="font-semibold mb-2">2. แบบสำรวจ (QR Code) ในวิดีโอ เอาไว้สำหรับทำอะไร? <button class="tts-button" onclick="playTTS('แบบสำรวจคิวอาร์โค้ดในวิดีโอ เอาไว้สำหรับทำอะไร', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-2">bàep-sǎm-rùuat (QR Code) nai wí-dii-oo, ao wái sǎm-ràp tham à-rai?</div>
+                    <div class="en text-sm mb-2">What is the survey (QR Code) in the video used for?</div>
+
+                    <div class="pl-4 space-y-2">
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq2" value="a" class="mr-2"> ก. เอาไว้สแกนเพื่อจ่ายเงิน <button class="tts-button" onclick="playTTS('เอาไว้สแกนเพื่อจ่ายเงิน', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq2" value="b" class="mr-2"> ข. เอาไว้สแกนเพื่อเขียนความคิดเห็น <button class="tts-button" onclick="playTTS('เอาไว้สแกนเพื่อเขียนความคิดเห็น', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq2" value="c" class="mr-2"> ค. เอาไว้เพิ่มเพื่อนใน LINE <button class="tts-button" onclick="playTTS('เอาไว้เพิ่มเพื่อนในไลน์', this)">🔊</button></label>
+                    </div>
+                </div>
+                
+                <button onclick="checkVideoQuiz()" class="mt-4 bg-red-500 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-red-600 transition">✔️ ตรวจคำตอบ</button>
+            </div>
+        </section>
+
+        <!-- 4. Reading -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-indigo-500">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    📖 บทอ่าน: การพัฒนาเมืองกับชุมชนเก่า
+                    <button class="tts-button" onclick="playTTS('บทอ่าน การพัฒนาเมืองกับชุมชนเก่า', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">bòt-àan: gaan pát-tá-naa mʉʉang gàp chum-chon gào</div>
+                <div class="en">Reading: Urban Development and Old Communities</div>
+            </div>
+
+            <div class="bg-indigo-50 p-6 rounded-2xl text-gray-800 space-y-6 leading-relaxed border border-indigo-100">
+                <div class="content-block">
+                    <p class="text-lg">จุฬาลงกรณ์มหาวิทยาลัยมีแผนพัฒนาพื้นที่ในย่านสยามสแควร์และสามย่าน เพื่อสร้างตึกใหม่และห้างสรรพสินค้า การพัฒนานี้ <strong class="text-indigo-700 font-bold underline">ส่งผลกระทบต่อ</strong> ร้านค้าเก่าแก่และศาลเจ้าในชุมชนที่ต้องย้ายออกไป หรือถูก <strong class="text-indigo-700 font-bold underline">รื้อถอน</strong> <button class="tts-button" onclick="playTTS('จุฬาลงกรณ์มหาวิทยาลัยมีแผนพัฒนาพื้นที่ในย่านสยามสแควร์และสามย่าน เพื่อสร้างตึกใหม่และห้างสรรพสินค้า การพัฒนานี้ส่งผลกระทบต่อร้านค้าเก่าแก่และศาลเจ้าในชุมชนที่ต้องย้ายออกไป หรือถูกรื้อถอน', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mt-1">jù-laa-long-gɔɔn má-hǎa-wít-thá-yaa-lai mii phǎen pát-tá-naa phʉ́ʉn-thîi... gaan pát-tá-naa níi sòng phǒn grà-thóp dtɔ̀ɔ ráan-kháa gào-gàe láe sǎan-jâo nai chum-chon thîi dtɔ̂ng yáai ɔ̀ɔk bpai, rʉ̌ʉ thùuk rʉ́ʉ-thɔ̌ɔn</div>
+                    <div class="en text-sm mt-1">Chulalongkorn University has plans to develop the Siam Square and Samyan areas to build new buildings and malls. This development affects old shops and community shrines that must move out or be demolished.</div>
+                </div>
+
+                <div class="content-block border-t border-indigo-200 pt-4">
+                    <p class="text-lg">บางคนเห็นด้วยเพราะเมืองต้องพัฒนาและมีความทันสมัยขึ้น แต่ <strong class="text-indigo-700 font-bold underline">ในขณะเดียวกัน</strong> หลายคนไม่เห็นด้วย เพราะมันทำลายความทรงจำและวิถีชีวิตของคนในชุมชน <button class="tts-button" onclick="playTTS('บางคนเห็นด้วยเพราะเมืองต้องพัฒนาและมีความทันสมัยขึ้น แต่ในขณะเดียวกัน หลายคนไม่เห็นด้วย เพราะมันทำลายความทรงจำและวิถีชีวิตของคนในชุมชน', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mt-1">baang khon hěn dûuay phrɔ́ mʉʉang dtɔ̂ng pát-tá-naa... dtàe nai khà-nà diao-gan, lǎai khon mâi hěn dûuay, phrɔ́ man tham-laai khwaam song-jam láe wí-thǐi chii-wít khɔ̌ɔng khon nai chum-chon</div>
+                    <div class="en text-sm mt-1">Some agree because the city must develop and become modern. But meanwhile, many disagree because it destroys the memories and way of life of the people in the community.</div>
+                </div>
+
+                <div class="content-block border-t border-indigo-200 pt-4">
+                    <p class="text-lg"><strong class="text-indigo-700 font-bold underline">คดีความ</strong> ของศาลเจ้าแม่ทับทิมเป็นตัวอย่างหนึ่งที่แสดงให้เห็นถึงปัญหาและการต่อสู้ของประชาชนที่มี <strong class="text-indigo-700 font-bold underline">ศรัทธา</strong> เพื่อ <strong class="text-indigo-700 font-bold underline">พิทักษ์</strong> พื้นที่ทางวัฒนธรรมของพวกเขา <button class="tts-button" onclick="playTTS('คดีความของศาลเจ้าแม่ทับทิมเป็นตัวอย่างหนึ่งที่แสดงให้เห็นถึงปัญหาและการต่อสู้ของประชาชนที่มีศรัทธา เพื่อพิทักษ์พื้นที่ทางวัฒนธรรมของพวกเขา', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mt-1">khá-dii khwaam khɔ̌ɔng sǎan jâo-mâe tháp-thim bpen dtua-yàang nʉ̀ng thîi sà-daeng hâi hěn thʉ̌ng pan-hǎa... khɔ̌ɔng bprà-chaa-chon thîi mii sàt-thaa phʉ̂ʉa phí-thák phʉ́ʉn-thîi thaang wát-thá-ná-tham</div>
+                    <div class="en text-sm mt-1">The lawsuit of Chao Mae Tuptim Shrine is an example that shows the problem and the struggle of the people who have faith to protect their cultural space.</div>
+                </div>
+            </div>
+
+            <!-- Reading Quiz -->
+            <div class="mt-8 space-y-6" id="reading-quiz-container">
+                <h3 class="text-xl font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
+                    📝 ทดสอบความเข้าใจจากบทอ่าน 
+                    <button class="tts-button" onclick="playTTS('ทดสอบความเข้าใจจากบทอ่าน', this)">🔊</button>
+                </h3>
+                
+                <div class="content-block reading-quiz-question">
+                    <p class="font-semibold mb-2">1. การพัฒนาพื้นที่ของมหาวิทยาลัยส่งผลกระทบต่อสิ่งใด? <button class="tts-button" onclick="playTTS('การพัฒนาพื้นที่ของมหาวิทยาลัยส่งผลกระทบต่อสิ่งใด', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-2">gaan pát-tá-naa phʉ́ʉn-thîi khɔ̌ɔng má-hǎa-wít-thá-yaa-lai sòng phǒn grà-thóp dtɔ̀ɔ sìng dai?</div>
+                    <div class="en text-sm mb-2">What is affected by the university's area development?</div>
+                    
+                    <div class="pl-4 space-y-2">
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq1" value="a" class="mr-2"> ก. รถไฟฟ้าใต้ดิน <button class="tts-button" onclick="playTTS('รถไฟฟ้าใต้ดิน', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq1" value="b" class="mr-2"> ข. ร้านค้าเก่าแก่และศาลเจ้าในชุมชน <button class="tts-button" onclick="playTTS('ร้านค้าเก่าแก่และศาลเจ้าในชุมชน', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq1" value="c" class="mr-2"> ค. ห้างสรรพสินค้าใหม่ <button class="tts-button" onclick="playTTS('ห้างสรรพสินค้าใหม่', this)">🔊</button></label>
+                    </div>
+                </div>
+
+                <div class="content-block border-t border-slate-200 pt-4 reading-quiz-question">
+                    <p class="font-semibold mb-2">2. ทำไมบางคนถึงไม่เห็นด้วยกับการรื้อถอนชุมชนเก่า? <button class="tts-button" onclick="playTTS('ทำไมบางคนถึงไม่เห็นด้วยกับการรื้อถอนชุมชนเก่า', this)">🔊</button></p>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-2">tham-mai baang khon thʉ̌ng mâi hěn dûuay gàp gaan rʉ́ʉ-thɔ̌ɔn chum-chon gào?</div>
+                    <div class="en text-sm mb-2">Why do some people disagree with demolishing old communities?</div>
+
+                    <div class="pl-4 space-y-2">
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq2" value="a" class="mr-2"> ก. เพราะทำลายความทรงจำและวิถีชีวิต <button class="tts-button" onclick="playTTS('เพราะทำลายความทรงจำและวิถีชีวิต', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq2" value="b" class="mr-2"> ข. เพราะทำให้รถติด <button class="tts-button" onclick="playTTS('เพราะทำให้รถติด', this)">🔊</button></label>
+                        <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq2" value="c" class="mr-2"> ค. เพราะห้างสรรพสินค้ามีเยอะแล้ว <button class="tts-button" onclick="playTTS('เพราะห้างสรรพสินค้ามีเยอะแล้ว', this)">🔊</button></label>
+                    </div>
+                </div>
+                
+                <button onclick="checkReadingQuiz()" class="mt-4 bg-indigo-500 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-600 transition">✔️ ตรวจคำตอบ</button>
+            </div>
+        </section>
+
+        <!-- 5. Target Vocab & Grammar -->
+        <section class="mb-12">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    🔑 คำศัพท์และโครงสร้างหลัก
+                    <button class="tts-button" onclick="playTTS('คำศัพท์และโครงสร้างหลัก', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">kham-sàp láe khroong-srâang lǎk</div>
+                <div class="en">Target Vocab & Structures</div>
+            </div>
+            
+            <div id="target-vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"></div>
+            
+            <!-- Grammar Structures -->
+            <div class="space-y-4">
+                <div class="bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-500 content-block">
+                    <p class="font-bold text-lg">1. ในขณะเดียวกัน... <button class="tts-button" onclick="playTTS('ในขณะเดียวกัน', this)">🔊</button></p>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm text-amber-600">nai khà-nà diao-gan</div>
+                    <div class="en text-sm text-slate-500">Meanwhile / At the same time</div>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-500 content-block">
+                    <p class="font-bold text-lg">2. เอาไว้สำหรับ... <button class="tts-button" onclick="playTTS('เอาไว้สำหรับ', this)">🔊</button></p>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm text-amber-600">ao wái sǎm-ràp</div>
+                    <div class="en text-sm text-slate-500">Is used for... / Kept for...</div>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-500 content-block">
+                    <p class="font-bold text-lg">3. ส่งผลกระทบต่อ... <button class="tts-button" onclick="playTTS('ส่งผลกระทบต่อ', this)">🔊</button></p>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm text-amber-600">sòng phǒn grà-thóp dtɔ̀ɔ</div>
+                    <div class="en text-sm text-slate-500">Affects... / Has an impact on...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Speaking Activities -->
+        <section class="mb-12 bg-white p-6 sm:p-8 rounded-3xl shadow-xl border-l-8 border-pink-500">
+            <div class="content-block">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2">
+                    📢 กิจกรรมฝึกพูด
+                    <button class="tts-button" onclick="playTTS('กิจกรรมฝึกพูด', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">gìt-jà-gam fʉ̀k phûut</div>
+                <div class="en">Speaking Activities</div>
+            </div>
+
+            <div class="space-y-10">
+                
+                <!-- A: Interview Teacher -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center gap-2">
+                        🎤 A. สัมภาษณ์ครู: ความทรงจำที่หายไป 
+                        <button class="tts-button" onclick="playTTS('สัมภาษณ์ครู ความทรงจำที่หายไป', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-4">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa mb-1 text-sm">sǎm-phâat khruu: khwaam song-jam thîi hǎai bpai</div>
+                    <div class="en mb-3 text-sm italic">Interview teacher: Lost memories</div>
+
+                    <div class="bg-white p-4 rounded-xl">
+                        <p class="text-gray-800 font-medium">ถามครูว่า "ในประเทศไทย มีสถานที่เก่าแก่ไหนที่ครูเคยชอบไป แต่ตอนนี้ถูก <strong class="text-pink-600">รื้อถอน</strong> ไปแล้วบ้าง? ครูรู้สึกอย่างไร?" <button class="tts-button" onclick="playTTS('ถามครูว่า ในประเทศไทย มีสถานที่เก่าแก่ไหนที่ครูเคยชอบไป แต่ตอนนี้ถูกรื้อถอนไปแล้วบ้าง ครูรู้สึกอย่างไร', this)">🔊</button></p>
+                        <div class="controls-row mt-2 mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-3">thǎam khruu wâa "nai bprà-thêet thai, mii sà-thǎan-thîi gào-gàe nǎi thîi khruu khoei chɔ̂ɔp bpai dtàe dtɔɔn níi thùuk rʉ́ʉ-thɔ̌ɔn bpai láew bâang? khruu rúu-sʉ̀k yàang-rai?"</div>
+                        <div class="en text-sm mb-3">Interview the teacher: "In Thailand, are there any old places you used to like that have now been demolished? How do you feel about it?"</div>
+                    </div>
+                </div>
+
+                <!-- B: Discussion -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center gap-2">
+                        🗣️ B. อภิปราย: การพัฒนาเมือง 
+                        <button class="tts-button" onclick="playTTS('อภิปราย การพัฒนาเมือง', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-4">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa mb-1 text-sm">à-phí-bpraai: gaan pát-tá-naa mʉʉang</div>
+                    <div class="en mb-3 text-sm italic">Discussion: Urban Development</div>
+
+                    <div class="bg-white p-4 rounded-xl">
+                        <p class="text-gray-800 font-medium mb-2">ในประเทศของคุณ มีปัญหาเรื่องการไล่ที่หรือการ <strong class="text-pink-600">รื้อถอน</strong> ชุมชนเก่าเพื่อสร้างตึกใหม่แบบนี้ไหม? การสร้างห้างสรรพสินค้าใหม่ <strong class="text-pink-600">ส่งผลกระทบต่อ</strong> คนในพื้นที่อย่างไรบ้าง? <button class="tts-button" onclick="playTTS('ในประเทศของคุณ มีปัญหาเรื่องการไล่ที่หรือการ รื้อถอน ชุมชนเก่าเพื่อสร้างตึกใหม่แบบนี้ไหม การสร้างห้างสรรพสินค้าใหม่ ส่งผลกระทบต่อ คนในพื้นที่อย่างไรบ้าง', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-2">nai bprà-thêet khɔ̌ɔng khun, mii pan-hǎa rʉ̂ʉang gaan lâi thîi rʉ̌ʉ gaan rʉ́ʉ-thɔ̌ɔn chum-chon gào... gaan srâang hâang sòng phǒn grà-thóp dtɔ̀ɔ khon nai phʉ́ʉn-thîi yàang-rai?</div>
+                        <div class="en text-sm mb-4">In your country, are there issues of eviction or demolition of old communities to build new ones? How does building new malls affect local people?</div>
+                    </div>
+                </div>
+
+                <!-- C: Debate -->
+                <div class="bg-pink-50 p-6 rounded-2xl content-block border border-pink-100 shadow-sm">
+                    <h3 class="font-bold text-xl text-pink-700 mb-3 flex items-center gap-2">
+                        ⚖️ C. โต้วาที: ห้างสรรพสินค้า vs ศาลเจ้า 
+                        <button class="tts-button" onclick="playTTS('โต้วาที ห้างสรรพสินค้า เทียบกับ ศาลเจ้า', this)">🔊</button>
+                    </h3>
+                    <div class="controls-row mb-4">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa mb-1 text-sm">dtôo-waa-thii: hâang sàp-phá-sǐn-kháa tîiap gàp sǎan-jâo</div>
+                    <div class="en mb-3 text-sm italic">Debate: Shopping Mall vs Shrine</div>
+
+                    <div class="bg-white p-4 rounded-xl">
+                        <p class="text-gray-800 font-medium">นักเรียนและครูรับบทบาทสมมติ (สลับกันได้) <button class="tts-button" onclick="playTTS('นักเรียนและครูรับบทบาทสมมติ สลับกันได้', this)">🔊</button></p>
+                        <ul class="list-disc pl-5 mt-2 text-gray-700">
+                            <li><strong>ฝ่าย A:</strong> ต้อง <strong class="text-pink-600">รื้อถอน</strong> ศาลเจ้าเพื่อสร้างห้างสรรพสินค้า เพราะจะนำความเจริญมาให้ <button class="tts-button" onclick="playTTS('ฝ่ายเอ ต้อง รื้อถอน ศาลเจ้าเพื่อสร้างห้างสรรพสินค้า เพราะจะนำความเจริญมาให้', this)">🔊</button></li>
+                            <li><strong>ฝ่าย B:</strong> ต้อง <strong class="text-pink-600">พิทักษ์</strong> ศาลเจ้าไว้ เพราะเป็นสถานที่ที่มีความ <strong class="text-pink-600">ศรัทธา</strong> และประวัติศาสตร์ <button class="tts-button" onclick="playTTS('ฝ่ายบี ต้อง พิทักษ์ ศาลเจ้าไว้ เพราะเป็นสถานที่ที่มีความ ศรัทธา และประวัติศาสตร์', this)">🔊</button></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 7. Extension Activities -->
+        <section class="mb-12 bg-slate-100 p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-slate-400">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    🚀 7. กิจกรรมเพิ่มเติม
+                    <button class="tts-button" onclick="playTTS('กิจกรรมเพิ่มเติม', this)">🔊</button>
+                </h2>
+                <div class="controls-row">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">gìt-jà-gam phə̂əm-dtəəm</div>
+                <div class="en">Extension Activities</div>
+            </div>
+            
+            <div class="space-y-8">
+                <!-- D. Role Play: Signatures -->
+                <div class="content-block bg-white p-6 rounded-2xl shadow-sm">
+                    <p class="font-bold text-lg text-slate-800 flex items-center gap-2">🎭 D. บทบาทสมมติ: ล่ารายชื่อ <button class="tts-button" onclick="playTTS('บทบาทสมมติ ล่ารายชื่อ', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mb-2 mt-1">bòt-bàat sǒm-mút: lâa raai-chʉ̂ʉ</div>
+                    <div class="en text-sm mb-3 text-gray-500 italic">Role-play: Gathering signatures</div>
+                    
+                    <p class="text-gray-700 mt-2">เพื่อนของคุณไม่เข้าใจว่าทำไมต้องเก็บศาลเจ้าเก่าๆ ไว้ ให้คุณอธิบายให้เพื่อนฟัง และโน้มน้าวให้เพื่อนทำ <strong class="text-slate-800">แบบสอบถาม</strong> เพื่อ <strong class="text-slate-800">พิทักษ์</strong> สถานที่นั้นเอาไว้ <button class="tts-button" onclick="playTTS('เพื่อนของคุณไม่เข้าใจว่าทำไมต้องเก็บศาลเจ้าเก่าๆ ไว้ ให้คุณอธิบายให้เพื่อนฟัง และโน้มน้าวให้เพื่อนทำ แบบสอบถาม เพื่อ พิทักษ์ สถานที่นั้นเอาไว้', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm mt-1">phʉ̂ʉan khɔ̌ɔng khun mâi khâo-jai wâa tham-mai dtɔ̂ng gèp sǎan-jâo gào gào wái. hâi khun à-thí-baai... láe nôom-náao hâi phʉ̂ʉan tham bàep-sɔ̀ɔp-thǎam phʉ̂ʉa phí-thák sà-thǎan-thîi nán</div>
+                    <div class="en text-sm mt-1">Your friend doesn't understand why old shrines should be kept. Explain to them and persuade them to do the survey to protect the place.</div>
+                </div>
+
+                <!-- E. Presentation -->
+                <div class="content-block bg-white p-6 rounded-2xl shadow-sm">
+                    <p class="font-bold text-lg text-slate-800 flex items-center gap-2">📊 E. การนำเสนอ: สถานที่ที่ฉันอยากพิทักษ์ <button class="tts-button" onclick="playTTS('การนำเสนอ สถานที่ที่ฉันอยากพิทักษ์', this)">🔊</button></p>
+                    <p class="text-gray-700 mt-2">ให้เวลาพูด 1-2 นาที เกี่ยวกับสถานที่ในเมืองไทย (หรือประเทศของคุณ) ที่เก่าแก่และคุณคิดว่าควร <strong class="text-slate-800">พิทักษ์</strong> เอาไว้ ไม่ให้กลายเป็นห้างสรรพสินค้า <button class="tts-button" onclick="playTTS('ให้เวลาพูด 1 ถึง 2 นาที เกี่ยวกับสถานที่ในเมืองไทย ที่เก่าแก่และคุณคิดว่าควร พิทักษ์ เอาไว้ ไม่ให้กลายเป็นห้างสรรพสินค้า', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">hâi wee-laa phûut nʉ̀ng thʉ̌ng sɔ̌ɔng naa-thii gìiao-gàp sà-thǎan-thîi nai mʉʉang thai... thîi gào-gàe láe khun khít wâa khuaan phí-thák ao wái...</div>
+                    <div class="en text-sm">Speak for 1-2 minutes about an old place in Thailand (or your country) that you think should be protected and not turned into a mall.</div>
+                </div>
+
+                <!-- F. Game -->
+                <div class="content-block bg-white p-6 rounded-2xl shadow-sm">
+                    <p class="font-bold text-lg text-slate-800 flex items-center gap-2">🎲 F. เกมใบ้คำ (Taboo) <button class="tts-button" onclick="playTTS('เกมใบ้คำ', this)">🔊</button></p>
+                    <p class="text-gray-700 mt-2">พยายามอธิบายคำศัพท์หลัก (เช่น ศรัทธา, คดีความ) โดยห้ามพูดคำนั้นออกมาตรงๆ ให้ครูทาย! <button class="tts-button" onclick="playTTS('พยายามอธิบายคำศัพท์หลัก โดยห้ามพูดคำนั้นออกมาตรงๆ ให้ครูทาย', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm">phà-yaa-yaam à-thí-baai kham-sàp lǎk dooi hâam phûut kham nán ɔ̀ɔk maa dtrong dtong. hâi khruu thaai!</div>
+                    <div class="en text-sm">Try to describe the target vocabulary without saying the word itself. Let the teacher guess!</div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Parsed Vocab List
+        const rawVocabData = `📝📄	เรียงความ	riiang-kwaam	essays
+📚📝	เรื่องสั้น	rʉ̂ʉang-sân	short stories
+📏🧱	หนา	nǎa	thick
+🎓📸	งานรับปริญญา	ngaan-ráp-bpà-rin-yaa	graduation
+🎭🎬	การแสดง	gaan-sà-dɛɛng	performance
+🎶🎤	ดนตรีสด	don-dtrii-sòt	live music
+👔	มืออาชีพ	mʉʉ-aa-chîip	professional
+🗂️🧹	จัด	jàt	arrange / organise / hold
+🔰📘	ระดับเริ่มต้น	rá-dàp-rə̂əm-dtôn	beginner level
+🏙️🏠	ระเบียง	rá-biiang	balcony
+⭕🎺	วง	wong	circle / band
+💵	เงินเดือน	ŋən dʉan	salary
+🍀🚪✨	โอกาส 	ʔoo-gàat	Opportunity
+👕	เสื้อยืด	sʉ̂a-yʉ̂ʉt	t-shirt
+🤵	เจ้าบ่าว	jâo-bàao	groom
+👰💍	เจ้าสาว	jâo-saao	bride
+💍	คู่หมั้น	khûu-màn	fiance
+💔🤫	นอกใจ	nɔ̂ɔk-jai	cheat on
+🎭🃏	หลอก	lɔ̀ɔk	To trick
+👕	สวม	sŭuam	Wear / put on
+🦌📯	เขา	khǎo	horns
+🚫	อย่า	yàa	Don't
+🌱	หญ้า	yâa	grass
+🔁	แทน	thaaen	instead of
+👋💥	ตบ	dtòp	slap
+🤗💛	ปลอบใจ	plàawp-jai	to comfort
+🎲✨	บังเอิญ	bang-ʉʉan	coincident
+🎲✨	โดยบังเอิญ	dooi-bang-ʉʉan	coincidentally
+🕵️‍♂️🧩	ปริศนา	prìt-sà-nǎa	Mystery
+💥🌪️	หายนะ	hǎai-yá-ná	Disaster
+❓🔍	สาเหตุ	sǎa-hèet	Cause
+📝	บรรณาธิการ	ban-naa-tí-gaan	editor
+📚🔬	วิธีการวิจัย	wí-tii gan wí-jai	research methods
+🗂️	หัวข้อ	hŭua-kâw	Topics
+🤝🙋	การมีส่วนร่วม	gaan mii-sùan-rûam	participation
+🕵️‍♂️🎭	โกง	goong	cheat
+😔🏝️	โดดเดี่ยว	dòht-dìao	isolated
+✅	คุณภาพ	kun-ná-pâap	 Quality
+🚌🚆🚇	การขนส่งสาธารณะ	gaan kǒn-sòhng sǎa-taa-rá-ná	public transportation
+🏘️👥	ชุมชน	chum-chon	communities
+👵👴	สังคมผู้สูงอายุ	sǎng-kom pûu sǔung-aa-yú	aging society
+🎉💍	วันครบรอบ	wan-króp-râawp	Anniversary
+🎵🎸	วงดนตรี	wong don-dtrii	(music) band
+🏆🎯	การแข่งขัน	gaan kàeng-kǎn	competition
+⚙️🏃	ดำเนินการ	dam-nəən-gaan	facilitate / proceed / run
+💎🪙	สมบัติ	sǒm-bàt	treasure
+🌊🫧	จม	jom	To sink / drown
+💎	อัญมณี	an-yá-má-nii	gems
+⚙️	กลไก	gon-gai	mechanism
+🕯️🖤	ไว้อาลัย	wái-aa-lai	mourning
+📢📰	การประกาศ	gaan bprà-gàat	announcement
+👥💼	เพื่อนร่วมงาน	pêuan-rûam-ngaan	co-worker
+📝⏳	มีอะไรให้ทำเยอะ	mii-à-rai-hâi-tam-yóe	There are lots to do.
+🌊🚧🛣️	น้ำท่วมถนนหลายเส้น/สาย	náam-tûam-tá-nŏn-lăai-sên/sǎai	Many roads were flooded. 
+🧾💰	ค่าดำเนินการสอบ	khâa-dam-nern-gaan-sòob	Test processing fees
+🗺️🌍	ภูมิศาสตร์	puum-mí-sàat	Geography
+🏗️🛣️	โครงสร้าง(พื้นฐาน)	kroong-sâang-pěun-thăan	Infrastructure
+💰📈	มูลค่า	muun-láa-kaâ	value (assets / stuff)
+🪜	บันได	ban-dai	stairs
+🌍	เส้นศูนย์สูตร	sên-sŭun-sùut	equator
+⚡🔋	พลังงาน	pá lang-ŋaan	energy
+👑💪	อำนาจ	am-nâat	power (influence)
+🏞️🌾	ที่ราบ	têe-râap	plains
+😇	ปณิธาน	bpà-ní-taan	resolutions
+🧐	ตั้งใจ	dtâng-jai	determined/focused
+🥅	เป้าหมาย	bpâo-mǎai	goals
+🙆	ยืดหยุ่น	yʉ̂ʉt-yùn	flexible
+💉	จำเป็น / บังคับ	jam-bpen / bang-káp	obligatory
+🙏	ปรารถนา	bpràat-tà-nǎa	desire / wish
+💾💸	ประหยัด	bprà-yàt	frugal / To save
+👍⏰	มีวินัย	mii wí-nai	disciplined
+💯	เด็ดขาด	dèt-kàat	definitive
+🧑‍🎨	มีความคิดสร้างสรรค์	mii kwaam-kít sâang-sǎn	creative
+💧➕🧪	เจือจาง	jʉʉa-jaang	dilute
+🌡️📉📈	อุณหภูมิ	un-hà-pum	temperature
+🧱📦⚖️	ความหนาแน่น	kwaam-nǎa-nɛ̂ɛn	density
+🎈🌊🆙	ลอย	lɔɔi	float
+💎⛰️🧪	แร่ธาตุ	rɛ̂ɛ-tâat	mineral
+🌋⛏️🗺️	ธรณีวิทยา	tɔɔ-rá-nii-wít-tá-yaa	Geology
+💎⚛️🧊	โครงสร้างผลึก	kroong-sâang pà lùek	Crystal structure
+🎯🔍📍	เฉพาะ	chà-pɔ́	specific
+🧪🧊💧	สถานะ	sà-tǎa-ná	status; state
+✨📝🧬	ลักษณะเฉพาะ	lák-sà-nà chà-pɔ́	characteristic
+🌨️🧊☄️	ลูกเห็บ	lûuk-hèp	hail (n)
+🪵🪚🍂	ขี้เลื่อย	kîi-lʉ̂ai	sawdust
+🏠🔥🛡️	ฉนวนกันความร้อน	chà-nǔuan gan kwaam rɔ́ɔn	insulation
+🧊🫠🔥	ละลาย	lá-laai	melt
+🤔❓🧐	สงสัย	sǒng-sǎi	wonder; be curious about sth
+🔨⚠️❌	ทำให้...เสียหาย	tam-hâi...sǐa-hǎai	make...damaged
+🕊️🤝🌐	ทูต	tûut	ambassador
+🏛️🏢👑	เมืองหลวง	mʉʉang-lǔang	capital city
+🏭🏗️💨	โรงงาน	roong-ngaan	factory
+🚢📦🌎	ส่งออก	sòng-ɔ̀ɔk	export
+🪨🧊🧱	ก้อน	gɔ̂n	bar; lump
+📐📏📦	ขนาด	kà-nàat	size
+⛸️🍌💦	ลื่น	lʉ̂ʉn	slippery
+🎓📚	วิชาการ	wí-chaa-gaan	academic
+🧑‍💻🛠️	วิศวกร	wí-sà-wá-gawn	engineer
+✅	ยืนยัน	yeun-yan	confirm
+🌋📳	แรงสั่นสะเทือน	raeng-sàn-sa-thʉ̄an	tremors
+🎯💥	กระทบ	grà-thóp	affect
+🪨⚠️	รอยเลื่อน	rooi-lʉ̂an	fault
+🏢🤝	หน่วยงานที่เกี่ยวข้อง	nùay-ngaan-têe-gìeow-khâawng	relevant agencies
+📉💥	ส่งผลกระทบต่อ	sòng-pŏn-gra-thóp-dtòr	send effect -> have an impact on
+🛡️🏛️	ความมั่นคง	kwaam-mân-khong	stability
+🏞️🌊	เขื่อน	kèuuan	dam
+👣👀	ติดตาม	dtìt-dtaam	follow
+🔍📌	ลักษณะ	lák-sà-nà	characteristic 
+🏚️💥	ถล่ม	tà-lòhm	collapse
+🧑‍🤝‍🧑	คำสรรพนาม	kum-sàp-naam	pronouns
+🫵🙂	ตัวเอง	dtua-eng	self, you (friendly)
+🙋	ข้า	kâa	I (more polite than กู)
+👉	เอ็ง	aeng	You (more polite than มึง)
+🙋	เรา	rao	I (more polite than ข้า); we
+🫵	แก	gɛɛ	You (more polite than เอ็ง), 3rd person
+🌏📌	สถานการณ์	sa-thăan-ná-gaan	situations
+🙇‍♂️🙏	แสดงความเคารพ	sà-daeng-kwaam-kâao-róp	show respect
+😎🤝	กันเอง	gan-eeng	casual
+🤝🔗	ความสัมพันธ์	kwaam-sam-pan	relationships; bonds
+🤝🗣️	ภาษาบอกความสนิท	paa-săa-bòk-kwaam-sà-nìt	Language signals closeness
+⚛️🔬	ฟิสิกส์อนุภาค	fí-sìk-à-nú-pâak	Particle Physics
+🚇🕳️	อุโมงค์	ù-mohng	tunnel
+⚛️🔬	เครื่องเร่งอนุภาค	krʉ̂ang-rêeng-à-nú-phâak	Particle Accelerator
+🧠📚	ทฤษฎี	trít-sà-dee	theory
+👥🏃‍♂️	แห่	hàae	To flock
+💥📉	ผลกระทบ	pŏn-grà-tóp	effects
+🚚🚛	ขนส่ง	kŏn-sòng	transport
+🌊🗺️	ช่องแคบ	chɔ̂ng-khàep	strait
+🥅	เป้าหมาย	bpâo-mǎai	goals
+⛏️🪨	ถ่านหิน	tàan-hĭn	coal
+⚙️🚀	มีประสิทธิภาพ	mii-bprà-sìt-tí-pâap	efficient
+🛠️🧠	วิธี	wí-thee	ways; methods
+🧱📦⚖️	ความหนาแน่น	kwaam-nǎa-nɛ̂ɛn	density
+📈🌱	การขยายตัว	gaan-kà-yǎai-dtua	expansion
+🛠️✏️	แก้	gâe	fix; edit
+💸🧾	ค่าดำเนินการ	kâa-dam-neern-gaan	processing fees
+🌨️🧊	ลูกเห็บ	lôok-hèp	hail (n)
+⚖️	มวล	muan	mass
+❌	ยกเลิก	yók-lə̂erk	cancel
+🌧️🌬️	มรสุม	mon-rá-sùm	monsoon
+📦🛒	ตุน	dtun	stock up
+🔮📈	พยากรณ์	phá-yaa-gawn	forecast
+🧑‍💼📋	คนจัดงาน	kon-jàt-ngaan	organizer
+🎨📚🎮	งานอดิเรก	ngaan-à-dì-rèek	hobbies
+📝	สรุป	sà-rùp	summarize
+🧠📚	จิตวิทยา	jìt-wít-thá-yaa	psychology
+🏛️📐	สถาปัตย์	sà-thăa-bpàt	architecture
+🏙️⚖️	ปัญหาสังคม	bpan-hăa-săng-khom	social issues
+📝	คำนาม	kam-nahm	noun
+🖼️🎟️	นิทรรศการ	nít-tát-sà-gǎan	exhibition
+💪🎯	ความมุ่งมั่น	kwaam-mûng-màn	determination
+✨🧘	ความเรียบง่าย	kwaam-rîap-ngâai	simplicity
+🖱️📜	เลื่อน	lêuuaen	scroll / slide
+🪏📜	ไถ	tăi	scroll / plow
+🎯🧠💪	ชำนาญ	cham-naan	skilled; proficient
+🗣️⚖️	โต้วาที	dtôh-waa-tii	debate
+🗂️	หัวข้อ	hŭa-khôr	topics
+🏛️🙏	ศาล	săan	shrine; court
+👥🏘️	ชุมชน	choom-chohn	communities
+🛠️🌱	พัฒนา	pát-tá-naa	develop`;
+
+        const reviewVocab = rawVocabData.split('\n').filter(line => line.trim() !== '').map(line => {
+            const parts = line.split('\t');
+            return {
+                emoji: parts[0] ? parts[0].trim() : "✨",
+                th: parts[1] ? parts[1].trim() : "",
+                ipa: parts[2] ? parts[2].trim() : "",
+                en: parts[3] ? parts[3].trim() : ""
+            };
+        });
+
+        // Target Vocab
+        const targetVocabList = [
+            { emoji: "🙏", th: "ศรัทธา", ipa: "sàt-thaa", en: "Faith / Belief" },
+            { emoji: "🛡️", th: "พิทักษ์", ipa: "phí-thák", en: "To protect / guard" },
+            { emoji: "⚖️", th: "คดีความ", ipa: "khá-dii khwaam", en: "Lawsuit / Legal case" },
+            { emoji: "📋", th: "แบบสอบถาม / แบบสำรวจ", ipa: "bàep-sɔ̀ɔp-thǎam", en: "Survey / Questionnaire" },
+            { emoji: "🏗️", th: "รื้อถอน", ipa: "rʉ́ʉ-thɔ̌ɔn", en: "To demolish / tear down" }
+        ];
+
+        window.onload = () => {
+            const vocabContainer = document.getElementById('target-vocab-container');
+            targetVocabList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-red-500 transition-all";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-xl text-slate-800">${item.emoji} ${item.th}</span>
+                        <button class="tts-button" onclick="playTTS('${item.th}', this)">🔊</button>
+                    </div>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa font-medium text-amber-600">${item.ipa}</div>
+                    <div class="en text-slate-500">${item.en}</div>
+                `;
+                vocabContainer.appendChild(div);
+            });
+        };
+
+        function randomizeWord() {
+            const displayArea = document.getElementById('word-display-area');
+            const word = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            displayArea.innerHTML = `
+                <div class="text-center w-full pop-in content-block">
+                    <h3 class="text-4xl font-bold text-amber-600">${word.emoji} ${word.th}</h3>
+                    <div class="controls-row justify-center mt-3 mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-lg text-amber-700 font-medium mb-1">${word.ipa}</div>
+                    <div class="en text-lg text-slate-600 font-medium">${word.en}</div>
+                    <div class="mt-4 flex justify-center">
+                        <button class="tts-button bg-amber-100 p-2 rounded-full hover:bg-amber-200" onclick="playTTS('${word.th}', this)">🔊 ฟังเสียง</button>
+                    </div>
+                </div>`;
+        }
+
+        function checkVideoQuiz() {
+            const correctAnswers = { vq1: 'a', vq2: 'b' };
+            const questions = document.querySelectorAll('.video-quiz-question');
+            questions.forEach(question => {
+                const radios = question.querySelectorAll('input[type="radio"]');
+                if (radios.length === 0) return;
+                const questionName = radios[0].name;
+                
+                radios.forEach(radio => {
+                    const label = radio.parentElement;
+                    label.classList.remove('bg-green-200', 'bg-red-200');
+                    const selectedValue = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedValue) {
+                        if (selectedValue.value === correctAnswers[questionName]) {
+                            if (radio.checked) label.classList.add('bg-green-200');
+                        } else {
+                            if (radio.checked) label.classList.add('bg-red-200');
+                        }
+                    }
+                });
+            });
+        }
+        
+        function checkReadingQuiz() {
+            const correctAnswers = { rq1: 'b', rq2: 'a' };
+            const questions = document.querySelectorAll('.reading-quiz-question');
+            questions.forEach(question => {
+                const radios = question.querySelectorAll('input[type="radio"]');
+                if (radios.length === 0) return;
+                const questionName = radios[0].name;
+                
+                radios.forEach(radio => {
+                    const label = radio.parentElement;
+                    label.classList.remove('bg-green-200', 'bg-red-200');
+                    const selectedValue = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedValue) {
+                        if (selectedValue.value === correctAnswers[questionName]) {
+                            if (radio.checked) label.classList.add('bg-green-200');
+                        } else {
+                            if (radio.checked) label.classList.add('bg-red-200');
+                        }
+                    }
+                });
+            });
+        }
+
+        function toggleId(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden-content');
+        }
+
+        function toggleLocal(btn, type) {
+            const block = btn.closest('.content-block');
+            if (block) {
+                const targets = block.querySelectorAll('.' + type);
+                targets.forEach(t => t.classList.toggle('reveal'));
+                btn.classList.toggle('active');
+            }
+        }
+
+        function playTTS(text, btn) {
+            window.speechSynthesis.cancel();
+            if (btn) btn.classList.add('playing');
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH' || voice.lang === 'th_TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+            else utterance.lang = 'th-TH';
+            utterance.rate = 0.9;
+            utterance.onend = () => { if (btn) btn.classList.remove('playing'); };
+            utterance.onerror = () => { if (btn) btn.classList.remove('playing'); };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+    </script>
+</body>
+</html>
