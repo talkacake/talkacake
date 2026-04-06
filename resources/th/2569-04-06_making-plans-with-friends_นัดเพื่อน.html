@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>นัดเพื่อน</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun for Thai -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc; /* Slate 50 for a clean, modern look */
+        }
+        .thai-text {
+            font-size: 1.5rem;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .ipa-text {
+            color: #d97706; /* Amber for phonetics */
+            font-style: italic;
+            font-family: sans-serif;
+        }
+        .en-text {
+            color: #475569; /* Slate for English */
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle:active {
+            transform: scale(0.95);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto pb-24">
+
+    <!-- Header -->
+    <header class="text-center mb-8" id="main-header"></header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex justify-start md:justify-center space-x-2 mb-8 sticky top-2 z-50 bg-white/90 p-2 rounded-xl backdrop-blur-sm shadow-sm border border-slate-200 overflow-x-auto no-scrollbar">
+        <a href="#leadin" class="px-3 py-2 bg-slate-100 rounded-lg text-sm shadow-sm text-slate-700 font-bold hover:bg-slate-200 whitespace-nowrap">เกริ่นนำ (Intro)</a>
+        <a href="#game" class="px-3 py-2 bg-emerald-50 rounded-lg text-sm shadow-sm text-emerald-800 font-bold hover:bg-emerald-100 whitespace-nowrap">เกม (Game)</a>
+        <a href="#roleplay1" class="px-3 py-2 bg-sky-50 rounded-lg text-sm shadow-sm text-sky-800 font-bold hover:bg-sky-100 whitespace-nowrap">RP 1: ดูหนัง</a>
+        <a href="#roleplay2" class="px-3 py-2 bg-indigo-50 rounded-lg text-sm shadow-sm text-indigo-800 font-bold hover:bg-indigo-100 whitespace-nowrap">RP 2: เมืองเก่า</a>
+        <a href="#roleplay3" class="px-3 py-2 bg-purple-50 rounded-lg text-sm shadow-sm text-purple-800 font-bold hover:bg-purple-100 whitespace-nowrap">RP 3: ทำขนม</a>
+        <a href="#roleplay4" class="px-3 py-2 bg-rose-50 rounded-lg text-sm shadow-sm text-rose-800 font-bold hover:bg-rose-100 whitespace-nowrap">RP 4: หาของกิน</a>
+        <a href="#roleplay5" class="px-3 py-2 bg-orange-50 rounded-lg text-sm shadow-sm text-orange-800 font-bold hover:bg-orange-100 whitespace-nowrap">RP 5: งานแต่ง</a>
+        <a href="#roleplay6" class="px-3 py-2 bg-amber-50 rounded-lg text-sm shadow-sm text-amber-800 font-bold hover:bg-amber-100 whitespace-nowrap">RP 6: เลิกงาน</a>
+    </div>
+
+    <!-- 1. LEAD IN -->
+    <section id="leadin" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-slate-400">
+            <div id="h-leadin"></div>
+            <div id="i-leadin" class="mb-6 bg-slate-50 p-3 rounded-lg"></div>
+            <div id="c-leadin" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 2. GAME -->
+    <section id="game" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-emerald-400">
+            <div id="h-game"></div>
+            <div id="i-game" class="mb-6 bg-emerald-50 p-3 rounded-lg"></div>
+            
+            <div id="random-card-display" class="min-h-[200px] flex items-center justify-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 mb-4 p-6">
+                <p class="text-slate-400 text-lg">กดปุ่มเพื่อเริ่มเกม</p>
+            </div>
+
+            <button onclick="generateRandomWord()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-transform active:scale-95 text-xl flex items-center justify-center gap-3">
+                <i class="fa-solid fa-shuffle"></i>
+                <span>สุ่มคำศัพท์ (Next Word)</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 3. ROLE PLAY 1 -->
+    <section id="roleplay1" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-sky-400">
+            <div id="h-roleplay1"></div>
+            <div id="i-roleplay1" class="mb-6 bg-sky-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay1" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 4. ROLE PLAY 2 -->
+    <section id="roleplay2" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-indigo-400">
+            <div id="h-roleplay2"></div>
+            <div id="i-roleplay2" class="mb-6 bg-indigo-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay2" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 5. ROLE PLAY 3 -->
+    <section id="roleplay3" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-purple-400">
+            <div id="h-roleplay3"></div>
+            <div id="i-roleplay3" class="mb-6 bg-purple-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay3" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 6. ROLE PLAY 4 -->
+    <section id="roleplay4" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-rose-400">
+            <div id="h-roleplay4"></div>
+            <div id="i-roleplay4" class="mb-6 bg-rose-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay4" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 7. ROLE PLAY 5 -->
+    <section id="roleplay5" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-orange-400">
+            <div id="h-roleplay5"></div>
+            <div id="i-roleplay5" class="mb-6 bg-orange-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay5" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 8. ROLE PLAY 6 -->
+    <section id="roleplay6" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-amber-400">
+            <div id="h-roleplay6"></div>
+            <div id="i-roleplay6" class="mb-6 bg-amber-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay6" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <footer class="text-center text-slate-400 text-xs mb-8 pb-8">
+        Interactive Thai Review Lesson ✨
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 0. UI TEXT DATA ---
+        const uiData = {
+            mainTitle: { thai: "นัดเพื่อน 🏙️", ipa: "nát phʉ̂an", en: "Making Plans with Friends" },
+            
+            leadIn: {
+                h: { thai: "คำถามนำก่อนเริ่ม 🎤", ipa: "kham-thǎam nam gɔ̀ɔn rə̂əm", en: "Lead-in Questions" },
+                i: { thai: "คุยกันสบายๆ ด้วยคำศัพท์ที่เรียนมา", ipa: "khui gan sà-baai sà-baai dûay kham-sàp thîi rian maa", en: "Let's chat casually using the vocabulary learned." }
+            },
+            game: {
+                h: { thai: "เกมแต่งประโยค 🎲", ipa: "geem dtɛ̀ng bprà-yòok", en: "Make a Sentence Game" },
+                i: { thai: "สุ่มคำศัพท์ แล้วแต่งประโยคเร็วๆ!", ipa: "sǔm kham-sàp láew dtɛ̀ng bprà-yòok reo-reo!", en: "Randomize a word and make a sentence quickly!" }
+            },
+            rp1: {
+                h: { thai: "สถานการณ์ 1: นัดดูหนัง 🎬", ipa: "sà-thǎa-ná-gaan tîi nʉ̀ng: nát duu nǎng", en: "Role Play 1: Movie Plan" },
+                i: { thai: "โทรหาเพื่อนรักที่ชอบโลเล", ipa: "tho: hǎa phʉ̂an rák thîi chɔ̂ɔp lo:-le:", en: "Call a best friend who is flaky." }
+            },
+            rp2: {
+                h: { thai: "สถานการณ์ 2: เที่ยวเมืองเก่า 🚲", ipa: "sà-thǎa-ná-gaan tîi sɔ̌ɔng: thîao mʉang gào", en: "Role Play 2: Old Town Trip" },
+                i: { thai: "วางแผนเที่ยวในวันหยุด", ipa: "waang phɛ̌ɛn thîao nai wan yùt", en: "Plan a trip on a holiday." }
+            },
+            rp3: {
+                h: { thai: "สถานการณ์ 3: ชวนทำขนม 🧁", ipa: "sà-thǎa-ná-gaan tîi sǎam: chuan tham khà-nǒm", en: "Role Play 3: Baking Together" },
+                i: { thai: "ชวนเพื่อนมาทำกิจกรรมที่บ้าน", ipa: "chuan phʉ̂an maa tham gìt-jà-gam thîi bâan", en: "Invite a friend to do an activity at home." }
+            },
+            rp4: {
+                h: { thai: "สถานการณ์ 4: หาของกิน 🤤", ipa: "sà-thǎa-ná-gaan tîi sìi: hǎa khɔ̌ng gin", en: "Role Play 4: Finding Food" },
+                i: { thai: "ตัดสินใจว่าจะกินอะไรดี", ipa: "dtàt-sǐn-jai wâa jà gin à-rai dii", en: "Decide what to eat." }
+            },
+            rp5: {
+                h: { thai: "สถานการณ์ 5: ไปงานแต่ง 💒", ipa: "sà-thǎa-ná-gaan tîi hâa: bpai ngaan dtɛ̀ng", en: "Role Play 5: Going to a Wedding" },
+                i: { thai: "คุยเรื่องเตรียมตัวไปงาน", ipa: "khui rʉ̂ang dtriam dtua bpai ngaan", en: "Talk about preparing to go to an event." }
+            },
+            rp6: {
+                h: { thai: "สถานการณ์ 6: พักผ่อนหลังประชุม 💼", ipa: "sà-thǎa-ná-gaan tîi hòk: phák-phɔ̀ɔn lǎng bprà-chum", en: "Role Play 6: Relaxing after Meeting" },
+                i: { thai: "หาอะไรทำหลังเลิกงาน", ipa: "hǎa à-rai tham lǎng lə̂ək ngaan", en: "Find something to do after work." }
+            }
+        };
+
+        // --- FULL VOCAB ARRAY FOR THE GAME ---
+        const fullVocabList = [
+            {thai: "คุณภาพชีวิต", ipa: "khoon-ná-pâap chii-wít", en: "quality of life"}, {thai: "หลังจากนั้น", ipa: "lăng-jàak-nán", en: "after that"}, {thai: "ความยืดหยุ่น", ipa: "kwaam yeût-yùn", en: "flexibility"}, {thai: "ประชุม", ipa: "bprà-choom", en: "meetings / have meetings"}, {thai: "ถึง", ipa: "teǔng", en: "to / until"}, {thai: "การบ้าน", ipa: "gaan-bâan", en: "homework"}, {thai: "งานบ้าน", ipa: "ngaan-bâan", en: "housework"}, {thai: "ซักผ้า", ipa: "sák pâa", en: "do laundry / wash clothes"}, {thai: "ล้างจาน", ipa: "láang jaan", en: "wash dishes"}, {thai: "ทำขนม", ipa: "tam kà-nǒm", en: "To bake"}, {thai: "แล้วแต่", ipa: "láaeo dtàae", en: "It depends"}, {thai: "ปกติ", ipa: "bpa-gà-dtì", en: "usually / normally"}, {thai: "เช่น", ipa: "chêhn", en: "such as / like"}, {thai: "ไม่รู้ว่า ทำอาหารไทยยังไง", ipa: "mâi róo wâa tam aa-hăan tai yang-ngai", en: "I don't know how to cook Thai food."}, {thai: "ตีหนึ่ง", ipa: "dtii nʉ̀ng", en: "1am"}, {thai: "ตอนไดอาน่าต้องทำงาน นอนเลยไม่ได้", ipa: "dtɔɔn dai-aa-nâa dtɔ̂ng tam-ngaan nɔɔn loei mâi dâi", en: "When I have to work, I can't sleep immediately."}, {thai: "ก่อน", ipa: "gɔ̀ɔn", en: "before"}, {thai: "นั่งสมาธิ", ipa: "nâng sà-maa-tí", en: "To meditate (sit)"}, {thai: "ไถมือถือ", ipa: "tǎi mʉʉ-tʉ̌ʉ", en: "scrolling (the phone)"}, {thai: "เร็ว", ipa: "reo", en: "fast / quick"}, {thai: "ทำอะไรได้เยอะกว่านี้", ipa: "tam à-rai dâai yér gwàa níi", en: "I can do (a lot) more (things) than this."}, {thai: "อาจจะ", ipa: "àat jà", en: "Maybe"}, {thai: "บ่อย", ipa: "bòi", en: "often"}, {thai: "พฤหัส", ipa: "pá-rʉ́-hàt", en: "Thursday"}, {thai: "ให้", ipa: "hâi", en: "To give / for"}, {thai: "เมื่อวาน", ipa: "mʉ̂a-waan", en: "Yesterday"}, {thai: "ยากกว่าทำอย่างอื่น", ipa: "yâak gwàa tam yàang-ʉ̀ʉn", en: "More difficult than doing other things"}, {thai: "ทำขนมหลายอย่าง", ipa: "tam kà-nǒm lǎai yàang", en: "Make many kinds of snacks/desserts"}, {thai: "บ้าง", ipa: "bâang", en: "question particle (expecting multiple answers)"}, {thai: "ทำขนมอะไรบ้าง", ipa: "tam kà-nǒm à-rai bâang", en: "What desserts/snacks do you make (list more than 1)?"}, {thai: "วันหยุด", ipa: "wan-yùt", en: "holidays"}, {thai: "บางครั้ง", ipa: "baang khráng", en: "Sometimes"}, {thai: "ลอง", ipa: "long", en: "try / experiment"}, {thai: "แต่งตัว", ipa: "dtɛ̀ng-dtua", en: "get dressed (Decorate body)"}, {thai: "เสร็จ", ipa: "sèt", en: "finish"}, {thai: "เลิกงาน", ipa: "lə̂ək-ngaan", en: "get off work"}, {thai: "นอนหลับไหม", ipa: "nɔɔn-làp-mái", en: "Did you sleep well?"}, {thai: "ชัวร์", ipa: "chua", en: "sure / certain"}, {thai: "รดน้ำต้นไม้", ipa: "rót-nám-dtôn-mái", en: "To water plants"}, {thai: "ดูแล", ipa: "duu-lɛɛ", en: "Take care"}, {thai: "ต้องการ", ipa: "dtɔ̂ng-gaan", en: "want/need"}, {thai: "จริงๆแล้ว", ipa: "jing-jing-lɛ́ɛo", en: "Actually"}, {thai: "ขนมปังปิ้ง", ipa: "kà-nǒm-bpang-bpîng", en: "toasts"}, {thai: "พิเศษ", ipa: "pí-sèet", en: "special"}, {thai: "เม็ด", ipa: "mét", en: "classifier for chillies and seeds"}, {thai: "แค่นี้", ipa: "kɛ̂ɛ-níi", en: "That's all. (Just this)"}, {thai: "จืด", ipa: "jʉ̀ʉt", en: "bland"}, {thai: "จ่ายยังไง", ipa: "jàai yang-ngai", en: "How do you want to pay?"}, {thai: "เงินสด", ipa: "ngəən-sòt", en: "Cash"}, {thai: "บัตร", ipa: "bàt", en: "Card"}, {thai: "น้ำเก๊กฮวย", ipa: "náam-gék-huay", en: "Chrysanthemum tea"}, {thai: "กินส้มตำใส่พริก 2 เม็ด", ipa: "gin-sôm-dtam-sài-prík-sɔ̌ɔng-mét", en: "eat papaya salad with 2 chillies added"}, {thai: "เดินเล่น", ipa: "dern-lên", en: "walk around / stroll"}, {thai: "ตอนแรก", ipa: "dton-râaek", en: "at first"}, {thai: "แป้ง", ipa: "bpâaeng", en: "flour / powder"}, {thai: "เกลือ", ipa: "gleua", en: "salt"}, {thai: "ผงฟู", ipa: "pǒng-foo", en: "baking powder"}, {thai: "กระทะ", ipa: "grà-tá", en: "pan"}, {thai: "อบ", ipa: "òp", en: "To bake"}, {thai: "เมืองเก่า", ipa: "meuang-gào", en: "Old town"}, {thai: "เลือก", ipa: "lêuuak", en: "choose"}, {thai: "มั้ง", ipa: "máng", en: "probably"}, {thai: "เพื่อนคนอื่น", ipa: "peûuan-kon-eùun", en: "another friend"}, {thai: "สะดวกไปดูหนังกี่โมง", ipa: "sà-dùuak-bpai-doo-nǎng-gèe-mohng", en: "What time would be convenient for you to go see a movie?"}, {thai: "เดี๋ยวจะไปกินข้าวเย็น ไปด้วยกันไหม", ipa: "dǐeow-jà-bpai-gin-kâao-yen-bpai-dûuay-gan-mái", en: "In a bit, we'll go for dinner. Will you come with us?"}, {thai: "เหรอ", ipa: "rěu", en: "Really?"}, {thai: "เรื่อง", ipa: "rêuuang", en: "Story / Classifier for movies"}, {thai: "ได้ยิน", ipa: "dâai-yin", en: "Hear"}, {thai: "งั้น", ipa: "ngán", en: "then / so"}, {thai: "เปลี่ยน", ipa: "bplìan", en: "change"},
+            {thai: "ผม 👨✨👔", ipa: "phǒm", en: "hair / I (male)"}, {thai: "หมูอบ 🐷🔥🥘", ipa: "mǒo-òp", en: "roasted pork"}, {thai: "เปาะเปี๊ยะสด 🌯🥬🥢", ipa: "bpò-bpía-sòt", en: "fresh spring roll"}, {thai: "ข้าวเหนียว 🍚🌾🤲", ipa: "khâao-nǐeow", en: "sticky rice"}, {thai: "ไส้กรอก 🌭🍢🥨", ipa: "sâi-gròk", en: "sausage"}, {thai: "ซีอิ๊วขาว 🧪🌑🍲", ipa: "see-íu-khăao", en: "soy sauce"}, {thai: "ด้วย ➕🤝✨", ipa: "dûay", en: "also (put at the end)"}, {thai: "แตงกวาดอง 🥒🧪🍶", ipa: "dtaeng-gwaa-dong", en: "pickles (cucumbers)"}, {thai: "ของเหลือ 🍲🍱♻️", ipa: "khǒng-lǔea", en: "leftovers"}, {thai: "คิดว่า 🤔💡💭", ipa: "khít-wâa", en: "think (that)"}, {thai: "ช่วย 🤝🆘✨", ipa: "chûay", en: "help"}, {thai: "รับผิดชอบ 🛡️✅👔", ipa: "ráp-phìt-châawp", en: "responsible"}, {thai: "เพิ่ง 🆕🕒⚡", ipa: "phôerng", en: "just/recently"}, {thai: "หมั้น 💍👩‍❤️‍👨✨", ipa: "mân", en: "get engaged"}, {thai: "แต่งงาน 👰🤵💒", ipa: "dtàeng-ngaan", en: "get married"}, {thai: "เชื้อสาย 🧬🩸🏳️", ipa: "chʉ́ea-sǎai", en: "roots / descent"}, {thai: "เพื่อนรัก 🤝💖👫", ipa: "phʉ̂ean-rák", en: "best friend"}, {thai: "ครั้งแรก 1️⃣✨🆕", ipa: "khráng-râek", en: "First time"}, {thai: "บอก 🗣️📢📝", ipa: "bòk", en: "tell"}, {thai: "ลูกพี่ลูกน้อง 🧑‍🤝‍🧑🏠🏠", ipa: "lôok-phêe-lôok-nɔ́ɔng", en: "cousins"}, {thai: "ส่วนใหญ่ 📊📈🌐", ipa: "sùan-yài", en: "mostly"}, {thai: "เหมือน ⚖️👯‍♂️✨", ipa: "mʉ̌ean", en: "like; resemble"}, {thai: "เห็ด 🍄🌲🥘", ipa: "hèt", en: "mushrooms"}, {thai: "ง่าย ✅👌✨", ipa: "ngâai", en: "easy / simple"}, {thai: "รีบ 🏃‍♂️💨⚡", ipa: "rîip", en: "rush"}, {thai: "โทร 📞📲🗣️", ipa: "tho:", en: "To phone"}, {thai: "โลเล ⚖️❓🌀", ipa: "lo:h-le:h", en: "flaky"}
+        ];
+
+        // --- SECTIONS DATA ---
+        
+        const leadinData = [
+            { thai: "เมื่อวาน คุณเพิ่งทำอะไรเสร็จ? 🤔", ipa: "mʉ̂a-waan khun phôerng tham à-rai sèt?", en: "Yesterday, what did you just finish doing?" },
+            { thai: "ปกติ ก่อนนอน คุณชอบนั่งสมาธิ หรือ ไถมือถือบ่อยกว่ากัน? 📱🧘‍♀️", ipa: "bpa-gà-dtì gɔ̀ɔn nɔɔn khun chɔ̂ɔp nâng sà-maa-tí rʉ̌ʉ tǎi mʉʉ-tʉ̌ʉ bɔ̀i gwàa gan?", en: "Usually, before sleep, do you like to meditate or scroll your phone more often?" },
+            { thai: "เมื่อคืน นอนหลับไหม? 😴", ipa: "mʉ̂a-khʉʉn nɔɔn-làp-mái?", en: "Did you sleep well last night?" }
+        ];
+
+        const rp1Data = [
+            { speaker: "A", thai: "โทรหาเพื่อนรัก... ฮัลโหล! สะดวกไปดูหนังกี่โมง? 📞🎬", ipa: "tho: hǎa phʉ̂an rák... han-lǒo! sà-dùak bpai duu nǎng gìi moong?", en: "Calling best friend... Hello! What time is convenient to go watch a movie?" },
+            { speaker: "B", thai: "อืม... อาจจะ ตีหนึ่ง มั้ง ตอนนี้ต้องทำงานบ้าน 🧹", ipa: "uem... àat-jà dtii nʉ̀ng máng. dtawn-níi dtɔ̂ng tham ngaan-bâan.", en: "Umm... maybe 1am probably. Right now I have to do housework." },
+            { speaker: "A", thai: "โลเล! งั้นเปลี่ยน! เดี๋ยวจะไปกินข้าวเย็น ไปด้วยกันไหม? ชัวร์ไหม? ⚖️❓", ipa: "lo:h-le:h! ngán bplìan! dǐeow jà bpai gin khâao yen, bpai dûay gan mái? chua mái?", en: "Flaky! So let's change! I'll go eat dinner soon, wanna go together? Are you sure?" },
+            { speaker: "B", thai: "โอเค เสร็จแล้ว! กินหมูอบ ซีอิ๊วขาว ด้วยนะ! 🐷🍲", ipa: "oo-kee sèt lέεo! gin mǒo-òp see-íu khǎao dûay ná!", en: "Okay, finished! Let's eat roasted pork with soy sauce too!" }
+        ];
+
+        const rp2Data = [
+            { speaker: "A", thai: "วันหยุด ไป เดินเล่น ที่ เมืองเก่า ไหม? 🚲", ipa: "wan-yùt bpai dern-lên thîi meuang-gào mái?", en: "On the holiday, go walk around at the Old town?" },
+            { speaker: "B", thai: "ไปสิ! แต่ ปกติ ฉันต้องการ ความยืดหยุ่น นะ 🧘‍♀️", ipa: "bpai sì! dtɛ̀ɛ bpa-gà-dtì chǎn dtɔ̂ng-gaan kwaam yeût-yùn ná", en: "Sure! But usually I need flexibility." },
+            { speaker: "A", thai: "ได้เลย งั้น เจอกันตอนไหน? ⏰", ipa: "dâai loei, ngán jəə gan dtawn nǎi?", en: "Okay, then meet when?" },
+            { speaker: "B", thai: "เลิกงาน แล้วค่อยเจอไหม? ฉันต้อง รดน้ำต้นไม้ ก่อน 🪴", ipa: "lə̂ək-ngaan lɛ́ɛw khɔ̂y jəə mái? chǎn dtɔ̂ng rót-nám-dtôn-mái gɔ̀ɔn", en: "Get off work then meet? I have to water plants before." }
+        ];
+
+        const rp3Data = [
+            { speaker: "A", thai: "พฤหัส นี้ ลอง ทำขนม ไหม? 🧁", ipa: "pá-rʉ́-hàt níi long tam kà-nǒm mái?", en: "This Thursday, try to bake?" },
+            { speaker: "B", thai: "ฉัน ทำขนมหลายอย่าง ไม่เป็น... ยากกว่าทำอย่างอื่น 😅", ipa: "chǎn tam kà-nǒm lǎai yàang mâi bpen... yâak gwàa tam yàang-ʉ̀ʉn", en: "I don't know how to make many kinds of snacks... harder than doing other things." },
+            { speaker: "A", thai: "ง่ายนิดเดียวเอง! ใช้แค่ แป้ง เกลือ ผงฟู แล้วก็ อบ 🥣", ipa: "ngâai nít-diao eeng! chái khɛ̂ɛ bpâaeng, gleua, pǒng-foo lɛ́ɛw gɔ̂ òp", en: "So easy! Use just flour, salt, baking powder, and then bake." },
+            { speaker: "B", thai: "อ๋อ อ่าว ตอนแรก คิดว่า จะทำอาหารไทย... แต่ ไม่รู้ว่า ทำอาหารไทยยังไง 🍲", ipa: "ɔ̌ɔ àao dton-râaek khít-wâa jà tham aa-hăan tai... dtɛ̀ɛ mâi róo wâa tam aa-hăan tai yang-ngai", en: "Oh, well, at first, thought about making Thai food... but don't know how to cook Thai food." }
+        ];
+
+        const rp4Data = [
+            { speaker: "A", thai: "รีบ ไหม? กินส้มตำใส่พริก 2 เม็ด กัน! 🌶️🏃‍♂️", ipa: "rîip mái? gin-sôm-dtam-sài-prík-sɔ̌ɔng-mét gan!", en: "Rushing? Let's eat papaya salad with 2 chillies!" },
+            { speaker: "B", thai: "กินบ่อย แล้ว... เปลี่ยน เป็น เปาะเปี๊ยะสด กับ ไส้กรอก ดีกว่า 🌯🌭", ipa: "gin bòi lɛ́ɛw... bplìan bpen bpò-bpía-sòt gàp sâi-gròk dii gwàa", en: "Eat often already... change to fresh spring roll and sausage is better." },
+            { speaker: "A", thai: "ได้เลย! จ่ายยังไง? เงินสด หรือ บัตร? 💳💵", ipa: "dâai loei! jàai yang-ngai? ngəən-sòt rʉ̌ʉ bàt?", en: "Sure! How to pay? Cash or card?" },
+            { speaker: "B", thai: "เงินสด แค่นี้ แหละ ซื้อ น้ำเก๊กฮวย ด้วย! 🌼", ipa: "ngəən-sòt, kɛ̂ɛ-níi lɛ̀, sʉ́ʉ náam-gék-huay dûay!", en: "Cash, that's all. Buy Chrysanthemum tea also!" }
+        ];
+
+        const rp5Data = [
+            { speaker: "A", thai: "เพิ่ง ได้ยิน ว่า ลูกพี่ลูกน้อง แต่งงาน! ไปด้วยกันไหม? 💒", ipa: "phôerng dâai-yin wâa lôok-phêe-lôok-nɔ́ɔng dtàeng-ngaan! bpai dûay gan mái?", en: "Just heard that cousin getting married! Go together?" },
+            { speaker: "B", thai: "ไปสิ! ต้อง แต่งตัว ยังไง? พิเศษ ไหม? 👗👔", ipa: "bpai sì! dtɔ̂ng dtɛ̀ng-dtua yang-ngai? pí-sèet mái?", en: "Sure! Must get dressed how? Special?" },
+            { speaker: "A", thai: "ส่วนใหญ่ ก็แต่งตัว ง่ายๆ... แล้วแต่ เลย ✨", ipa: "sùan-yài gɔ̂ dtɛ̀ng-dtua ngâai ngâai... láaeo dtàae loei", en: "Mostly dress simple... it depends." },
+            { speaker: "B", thai: "จริงๆแล้ว ฉันต้อง ซักผ้า ก่อน เดี๋ยวมานะ 🧺", ipa: "jing-jing-lɛ́ɛo chǎn dtɔ̂ng sák pâa gɔ̀ɔn, dǐeow maa ná", en: "Actually, I need to wash clothes first, be right back." }
+        ];
+
+        const rp6Data = [
+            { speaker: "A", thai: "วันนี้ ประชุม เสร็จ กี่โมง? 💼", ipa: "wan-níi bprà-choom sèt gìi moong?", en: "Today meeting finish what time?" },
+            { speaker: "B", thai: "ไม่ ชัวร์เลยอ่ะ... คุณภาพชีวิต ช่วงนี้ไม่ค่อยดีเลย 📉", ipa: "mâi chua loei à... khoon-ná-pâap chii-wít chûang níi mâi khɔ̂y dii loei", en: "Not sure at all... quality of life lately isn't very good at all." },
+            { speaker: "A", thai: "งั้น เลิกงาน แล้วไป นั่งสมาธิ ไหม? 🧘‍♀️", ipa: "ngán lə̂ək-ngaan lɛ́ɛw bpai nâng sà-maa-tí mái?", en: "So get off work then go meditate?" },
+            { speaker: "B", thai: "จะดีเหรอ ฉันจะไถมือถือเร็วๆไม่ได้นะ 📱", ipa: "jà dii rěu chǎn jà tǎi mʉʉ-tʉ̌ʉ reo reo mâi dâai ná", en: "Would that be good? I wouldn't be able to scroll my phone fast." },
+            { speaker: "A", thai: "จริงๆ เราทำอะไรได้เยอะกว่านี้นะ! ชวน เพื่อนคนอื่น ไปกิน ข้าวเหนียว แทนไหม? 🍚🤝", ipa: "jing-jing rao tam à-rai dâai yér gwàa níi ná! chuan peûuan-kon-eùun bpai gin khâao-nǐeow thaen mái?", en: "Actually, we can do more than this! Invite another friend to go eat sticky rice instead?" }
+        ];
+
+        // --- COMPONENT FACTORY ---
+
+        function createHeader(dataObj, id) {
+            return `
+            <div class="flex flex-col md:flex-row items-center gap-3 border-b border-slate-200 pb-3 mb-4">
+                <button onclick="speakText('${dataObj.h.thai.replace(/'/g, "\\'")}')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <div class="text-center md:text-left flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-800">${dataObj.h.thai}</h2>
+                    <div id="ipa-${id}-h" class="hidden"><p class="ipa-text text-sm">${dataObj.h.ipa}</p></div>
+                    <div id="en-${id}-h" class="hidden"><p class="en-text text-sm">${dataObj.h.en}</p></div>
+                </div>
+                <div class="flex gap-2 text-xs">
+                     <button onclick="toggleVisibility('ipa-${id}-h', this)" class="text-slate-400 hover:text-slate-600 font-bold border border-slate-200 px-2 py-1 rounded">IPA</button>
+                     <button onclick="toggleVisibility('en-${id}-h', this)" class="text-slate-400 hover:text-slate-600 font-bold border border-slate-200 px-2 py-1 rounded">EN</button>
+                </div>
+            </div>`;
+        }
+
+        function createInstr(dataObj, id) {
+            return `
+            <div class="flex flex-col md:flex-row items-center gap-3">
+                <button onclick="speakText('${dataObj.i.thai.replace(/'/g, "\\'")}')" class="text-slate-400 hover:text-slate-600 flex-shrink-0">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <div class="text-center md:text-left flex-grow">
+                    <p class="text-lg text-slate-700 font-medium">${dataObj.i.thai}</p>
+                    <div id="ipa-${id}-i" class="hidden"><p class="ipa-text text-sm">${dataObj.i.ipa}</p></div>
+                    <div id="en-${id}-i" class="hidden"><p class="en-text text-sm italic">${dataObj.i.en}</p></div>
+                </div>
+                <div class="flex gap-2 text-[10px]">
+                     <button onclick="toggleVisibility('ipa-${id}-i', this)" class="text-slate-400 hover:bg-slate-200 px-2 py-1 rounded border border-transparent">IPA</button>
+                     <button onclick="toggleVisibility('en-${id}-i', this)" class="text-slate-400 hover:bg-slate-200 px-2 py-1 rounded border border-transparent">EN</button>
+                </div>
+            </div>`;
+        }
+
+        function createCard(item, id, showSpeaker = false) {
+            const speakerLabel = showSpeaker && item.speaker ? `<span class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1 block">${item.speaker}</span>` : '';
+            return `
+            <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-slate-100 animate-fade-in">
+                ${speakerLabel}
+                <div class="flex items-start gap-3">
+                    <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="mt-1 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <div class="flex-grow">
+                        <p class="thai-text font-bold mb-2">${item.thai}</p>
+                        <div id="ipa-${id}" class="hidden mb-1"><p class="ipa-text text-lg">${item.ipa}</p></div>
+                        <div id="en-${id}" class="hidden"><p class="en-text text-sm border-t border-slate-100 pt-1 mt-1">${item.en}</p></div>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="toggleVisibility('ipa-${id}', this)" class="btn-toggle text-xs px-3 py-1 rounded-md border border-amber-200 text-amber-700 font-bold bg-amber-50 hover:bg-amber-100">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}', this)" class="btn-toggle text-xs px-3 py-1 rounded-md border border-slate-200 text-slate-600 font-bold bg-slate-50 hover:bg-slate-100">EN</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function createRandomCard(item, id) {
+            return `
+            <div class="flex flex-col items-center animate-fade-in w-full bg-white p-6 rounded-xl shadow-sm border border-emerald-100">
+                <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="mb-4 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-full w-16 h-16 flex items-center justify-center transition-colors text-2xl">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <p class="text-3xl font-bold text-emerald-700 text-center mb-4">${item.thai}</p>
+                <div id="ipa-${id}" class="hidden mb-2 text-center"><p class="ipa-text text-xl">${item.ipa}</p></div>
+                <div id="en-${id}" class="hidden text-center mb-4"><p class="en-text text-lg border-t border-slate-200 pt-2">${item.en}</p></div>
+                <div class="flex gap-3">
+                    <button onclick="toggleVisibility('ipa-${id}', this)" class="btn-toggle px-4 py-2 rounded-lg border border-amber-200 text-amber-700 font-bold bg-amber-50 hover:bg-amber-100">IPA</button>
+                    <button onclick="toggleVisibility('en-${id}', this)" class="btn-toggle px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-bold bg-slate-50 hover:bg-slate-100">EN</button>
+                </div>
+            </div>`;
+        }
+
+        // --- LOGIC ---
+
+        function toggleVisibility(elementId, btn) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                btn.classList.add('ring-2', 'ring-offset-1');
+            } else {
+                el.classList.add('hidden');
+                btn.classList.remove('ring-2', 'ring-offset-1');
+            }
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.8;
+            
+            // iOS Safari preference for Thai Voice
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function generateRandomWord() {
+            const randomIndex = Math.floor(Math.random() * fullVocabList.length);
+            const item = fullVocabList[randomIndex];
+            const html = createRandomCard(item, `rand-${Date.now()}`);
+            document.getElementById('random-card-display').innerHTML = html;
+        }
+
+        function renderContent() {
+            // Main Title (using custom header layout)
+            document.getElementById('main-header').innerHTML = `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <button onclick="speakText('${uiData.mainTitle.thai.replace(/'/g, "\\'")}')" class="bg-slate-200 text-slate-700 hover:bg-slate-300 rounded-full w-12 h-12 flex items-center justify-center transition-colors mb-2">
+                        <i class="fa-solid fa-volume-high text-xl"></i>
+                    </button>
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-800 text-center">${uiData.mainTitle.thai}</h1>
+                    <div class="flex gap-2 text-xs mt-2">
+                         <button onclick="toggleVisibility('ipa-main', this)" class="text-slate-500 hover:bg-slate-200 px-3 py-1 rounded-full border border-slate-300 font-bold">IPA</button>
+                         <button onclick="toggleVisibility('en-main', this)" class="text-slate-500 hover:bg-slate-200 px-3 py-1 rounded-full border border-slate-300 font-bold">EN</button>
+                    </div>
+                    <div id="ipa-main" class="hidden mt-2"><p class="ipa-text text-xl">${uiData.mainTitle.ipa}</p></div>
+                    <div id="en-main" class="hidden"><p class="en-text text-lg">${uiData.mainTitle.en}</p></div>
+                </div>
+            `;
+
+            const sections = [
+                { id: 'leadin', ui: uiData.leadIn, data: leadinData, hasSpeaker: false },
+                { id: 'game', ui: uiData.game, data: [], hasSpeaker: false }, // Game content handled separately
+                { id: 'roleplay1', ui: uiData.rp1, data: rp1Data, hasSpeaker: true },
+                { id: 'roleplay2', ui: uiData.rp2, data: rp2Data, hasSpeaker: true },
+                { id: 'roleplay3', ui: uiData.rp3, data: rp3Data, hasSpeaker: true },
+                { id: 'roleplay4', ui: uiData.rp4, data: rp4Data, hasSpeaker: true },
+                { id: 'roleplay5', ui: uiData.rp5, data: rp5Data, hasSpeaker: true },
+                { id: 'roleplay6', ui: uiData.rp6, data: rp6Data, hasSpeaker: true }
+            ];
+
+            sections.forEach(sec => {
+                document.getElementById(`h-${sec.id}`).innerHTML = createHeader(sec.ui, sec.id);
+                document.getElementById(`i-${sec.id}`).innerHTML = createInstr(sec.ui, sec.id);
+                
+                if (sec.id !== 'game') {
+                    document.getElementById(`c-${sec.id}`).innerHTML = sec.data.map((item, idx) => createCard(item, `${sec.id}-${idx}`, sec.hasSpeaker)).join('');
+                }
+            });
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            renderContent();
+            // Preload voices
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => {};
+            }
+        });
+    </script>
+</body>
+</html>
