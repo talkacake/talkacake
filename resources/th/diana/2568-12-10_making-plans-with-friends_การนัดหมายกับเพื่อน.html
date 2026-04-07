@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: Making Plans</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun for Thai -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdfa; /* Light Teal background for fresh/friendly vibe */
+        }
+        .thai-text {
+            font-size: 1.5rem;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+        .thai-header {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0f766e; /* Teal theme */
+        }
+        .ipa-text {
+            color: #d97706;
+            font-style: italic;
+            font-family: sans-serif;
+        }
+        .en-text {
+            color: #4b5563;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle:active {
+            transform: scale(0.95);
+        }
+        /* Animation for random word appearance */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-3xl mx-auto pb-20">
+
+    <!-- Header -->
+    <header class="text-center mb-8" id="main-header-container">
+        <!-- Main Title injected by JS -->
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex justify-center space-x-2 mb-8 sticky top-2 z-50 bg-teal-50/90 p-2 rounded-lg backdrop-blur-sm shadow-sm border border-teal-100 overflow-x-auto no-scrollbar">
+        <a href="#review" class="px-4 py-2 bg-white rounded-full text-sm shadow text-teal-800 font-bold hover:bg-teal-100 whitespace-nowrap">เกมสุ่มคำ (Random Word)</a>
+        <a href="#vocab" class="px-4 py-2 bg-white rounded-full text-sm shadow text-teal-800 font-bold hover:bg-teal-100 whitespace-nowrap">คำศัพท์ (Vocab)</a>
+        <a href="#roleplay" class="px-4 py-2 bg-white rounded-full text-sm shadow text-teal-800 font-bold hover:bg-teal-100 whitespace-nowrap">บทบาทสมมติ (Role Play)</a>
+        <a href="#extension" class="px-4 py-2 bg-white rounded-full text-sm shadow text-teal-800 font-bold hover:bg-teal-100 whitespace-nowrap">กิจกรรมเสริม (Extension)</a>
+    </div>
+
+    <!-- SECTION 1: RANDOM WORD REVIEW -->
+    <section id="review" class="mb-12">
+        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-teal-500">
+            <div class="mb-4 text-center">
+                <div id="header-review" class="justify-center mb-2"></div>
+                <div id="instr-review" class="justify-center text-center"></div>
+            </div>
+
+            <!-- Random Word Display Area -->
+            <div id="random-word-display" class="min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 mb-6 p-4">
+                <p class="text-gray-400 text-lg">กดปุ่มเพื่อเริ่มเกม</p>
+            </div>
+
+            <!-- Control Button -->
+            <button onclick="generateRandomWord()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-transform active:scale-95 text-xl flex items-center justify-center gap-3">
+                <i class="fa-solid fa-shuffle"></i>
+                <span>สุ่มคำศัพท์ (Next Word)</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- SECTION 2: NEW VOCAB -->
+    <section id="vocab" class="mb-12">
+        <div class="mb-6 border-b border-teal-200 pb-4">
+            <div id="header-vocab" class="mb-2"></div>
+            <div id="instr-vocab"></div>
+        </div>
+        <div id="vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Content injected by JS -->
+        </div>
+    </section>
+
+    <!-- SECTION 3: ROLE PLAY -->
+    <section id="roleplay" class="mb-12">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500 mb-8">
+            <div id="header-roleplay" class="mb-4"></div>
+            <div id="instr-roleplay" class="mb-4 bg-indigo-50 p-3 rounded-lg"></div>
+            
+            <div id="roleplay-container" class="space-y-4">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: EXTENSION ACTIVITIES -->
+    <section id="extension" class="mb-12">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500 mb-8">
+            <div id="header-extension" class="mb-4"></div>
+            <div id="instr-extension" class="mb-4 bg-purple-50 p-3 rounded-lg"></div>
+            
+            <div id="extension-container" class="space-y-4">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-gray-400 text-xs mt-12 mb-8">
+        Designed for Online Learning
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA STORE ---
+
+        // 0. UI Elements
+        const uiData = {
+            mainTitle: { thai: "การนัดหมายกับเพื่อน 📅", ipa: "gaan nát-mǎai gàp phêuan", en: "Making Plans with Friends" },
+            headerReview: { thai: "เกม: แต่งประโยค", ipa: "game: dtèng bprà-yòok", en: "Game: Make a Sentence" },
+            instrReview: { thai: "กดปุ่มเพื่อสุ่มคำ แล้วแต่งประโยคจากคำนั้น", ipa: "gòt bpùm phêuua sùm kham, láaeo dtèng bprà-yòok jàak kham nán", en: "Press the button to get a random word, then make a sentence." },
+            headerVocab: { thai: "คำศัพท์การนัดหมาย", ipa: "kham-sàp gaan nát-mǎai", en: "Making Plans Vocabulary" },
+            instrVocab: { thai: "เรียนรู้คำศัพท์ใหม่", ipa: "riian-rúu kham-sàp mài", en: "Learn new vocabulary." },
+            headerRoleplay: { thai: "บทบาทสมมติ: ชวนเพื่อนเที่ยว", ipa: "bòt-bàat sǒm-mút: chuan phêuan thîiao", en: "Role Play: Inviting a friend out" },
+            instrRoleplay: { thai: "ลองชวนเพื่อนไปดูหนัง", ipa: "long chuan phêuan bpai duu nǎng", en: "Try inviting a friend to see a movie." },
+            headerExtension: { thai: "กิจกรรมเสริม: ฝึกพูด", ipa: "gìt-jà-gam sěuhm: fèuk phûut", en: "Extension: Speaking Practice" },
+            instrExtension: { thai: "เกม, โต้วาที และ คำถามชวนคุย", ipa: "game, dtôo-waa-thii láe kham-thǎam chuan khui", en: "Game, Debate and Discussion Questions" }
+        };
+        
+        // 1. Random Review Data (Full List from Prompt)
+        const randomReviewData = [
+            { thai: "คุณภาพชีวิต", ipa: "khoon-ná-pâap chii-wít", en: "quality of life" },
+            { thai: "หลังจากนั้น", ipa: "lăng-jàak-nán", en: "after that" },
+            { thai: "ความยืดหยุ่น", ipa: "kwaam yeût-yùn", en: "flexibility" },
+            { thai: "ประชุม", ipa: "bprà-choom", en: "meetings / have meetings" },
+            { thai: "ถึง", ipa: "teǔng", en: "to / until" },
+            { thai: "การบ้าน", ipa: "gaan-bâan", en: "homework" },
+            { thai: "งานบ้าน", ipa: "ngaan-bâan", en: "housework" },
+            { thai: "ซักผ้า", ipa: "sák pâa", en: "do laundry" },
+            { thai: "ล้างจาน", ipa: "láang jaan", en: "wash dishes" },
+            { thai: "ทำขนม", ipa: "tam kà-nǒm", en: "To bake" },
+            { thai: "แล้วแต่", ipa: "láaeo dtàae", en: "It depends" },
+            { thai: "ปกติ", ipa: "bpa-gà-dtì", en: "usually / normally" },
+            { thai: "เช่น", ipa: "chêhn", en: "such as / like" },
+            { thai: "ไม่รู้ว่า ทำอาหารไทยยังไง", ipa: "mâi róo wâa tam aa-hăan tai yang-ngai", en: "I don't know how to cook Thai food." },
+            { thai: "ตีหนึ่ง", ipa: "dtii nʉ̀ng", en: "1am" },
+            { thai: "ตอนไดอาน่าต้องทำงาน นอนเลยไม่ได้", ipa: "dtɔɔn dai-aa-nâa dtɔ̂ng tam-ngaan nɔɔn loei mâi dâi", en: "When I have to work, I can't sleep immediately." },
+            { thai: "ก่อน", ipa: "gɔ̀ɔn", en: "before" },
+            { thai: "นั่งสมาธิ", ipa: "nâng sà-maa-tí", en: "To meditate" },
+            { thai: "ไถมือถือ", ipa: "tǎi mʉʉ-tʉ̌ʉ", en: "scrolling (the phone)" },
+            { thai: "เร็ว", ipa: "reo", en: "fast / quick" },
+            { thai: "ทำอะไรได้เยอะกว่านี้", ipa: "tam à-rai dâai yér gwàa níi", en: "I can do more than this." },
+            { thai: "อาจจะ", ipa: "àat jà", en: "Maybe" },
+            { thai: "บ่อย", ipa: "bòi", en: "often" },
+            { thai: "พฤหัส", ipa: "pá-rʉ́-hàt", en: "Thursday" },
+            { thai: "ให้", ipa: "hâi", en: "To give / for" },
+            { thai: "เมื่อวาน", ipa: "mʉ̂a-waan", en: "Yesterday" },
+            { thai: "ยากกว่าทำอย่างอื่น", ipa: "yâak gwàa tam yàang-ʉ̀ʉn", en: "More difficult than doing other things" },
+            { thai: "ทำขนมหลายอย่าง", ipa: "tam kà-nǒm lǎai yàang", en: "Make many kinds of snacks" },
+            { thai: "บ้าง", ipa: "bâang", en: "(question particle)" },
+            { thai: "ทำขนมอะไรบ้าง", ipa: "tam kà-nǒm à-rai bâang", en: "What snacks do you make?" },
+            { thai: "วันหยุด", ipa: "wan-yùt", en: "holidays" },
+            { thai: "บางครั้ง", ipa: "baang khráng", en: "Sometimes" },
+            { thai: "ลอง", ipa: "long", en: "try" },
+            { thai: "แต่งตัว", ipa: "dtɛ̀ng-dtua", en: "get dressed" },
+            { thai: "ง่าย", ipa: "ngâai", en: "easy" },
+            { thai: "เสร็จ", ipa: "sèt", en: "finish" },
+            { thai: "เลิกงาน", ipa: "lə̂ək-ngaan", en: "get off work" },
+            { thai: "นอนหลับไหม", ipa: "nɔɔn-làp-mái", en: "Did you sleep well?" },
+            { thai: "ชัวร์", ipa: "chua", en: "sure / certain" },
+            { thai: "รดน้ำต้นไม้", ipa: "rót-nám-dtôn-mái", en: "To water plants" },
+            { thai: "ดูแล", ipa: "duu-lɛɛ", en: "Take care" },
+            { thai: "ต้องการ", ipa: "dtɔ̂ng-gaan", en: "want/need" },
+            { thai: "จริงๆแล้ว", ipa: "jing-jing-lɛ́ɛo", en: "Actually" },
+            { thai: "ขนมปังปิ้ง", ipa: "kà-nǒm-bpang-bpîng", en: "toasts" },
+            { thai: "บอก", ipa: "bɔ̀k", en: "tell" },
+            { thai: "พิเศษ", ipa: "pí-sèet", en: "special" },
+            { thai: "เม็ด", ipa: "mét", en: "(classifier for seeds)" },
+            { thai: "แค่นี้", ipa: "kɛ̂ɛ-níi", en: "That's all" },
+            { thai: "จืด", ipa: "jʉ̀ʉt", en: "bland" },
+            { thai: "จ่ายยังไง", ipa: "jàai yang-ngai", en: "How to pay?" },
+            { thai: "เงินสด", ipa: "ngəən-sòt", en: "Cash" },
+            { thai: "บัตร", ipa: "bàt", en: "Card" },
+            { thai: "น้ำเก๊กฮวย", ipa: "náam-gék-huay", en: "Chrysanthemum tea" }
+        ];
+
+        // 2. Vocabulary Data (Making Plans)
+        const vocabData = [
+            { thai: "ว่าง 🟢", ipa: "wâang", en: "Free / Available" },
+            { thai: "ไม่ว่าง 🔴", ipa: "mâi wâang", en: "Busy / Not free" },
+            { thai: "เสาร์นี้ 🗓️", ipa: "sǎo níi", en: "This Saturday" },
+            { thai: "เจอกัน 🤝", ipa: "juh gan", en: "Meet each other" },
+            { thai: "ที่ไหน 📍", ipa: "thîi nǎi", en: "Where?" },
+            { thai: "กี่โมง ⏰", ipa: "gìi moong", en: "What time?" },
+            { thai: "ดูหนัง 🍿", ipa: "duu nǎng", en: "Watch a movie" },
+            { thai: "กินข้าว 🍚", ipa: "gin khâao", en: "Eat rice (Eat a meal)" },
+            { thai: "สะดวก 👌", ipa: "sà-dùak", en: "Convenient" },
+            { thai: "ไปด้วย 🙋‍♂️", ipa: "bpai dûai", en: "Go together / I'll go too" }
+        ];
+
+        // 3. Roleplay Data (Making Plans)
+        const roleplayData = [
+            { speaker: "A", thai: "ฮัลโหล เสาร์นี้ว่างไหม? 📞", ipa: "han-lǒo, sǎo níi wâang mái?", en: "Hello, are you free this Saturday?" },
+            { speaker: "B", thai: "ว่าง ทำไมเหรอ? 🟢", ipa: "wâang, tham-mai rěuh?", en: "I'm free. Why?" },
+            { speaker: "A", thai: "ไปดูหนัง แล้วก็กินข้าวกันไหม? 🍿🍚", ipa: "bpai duu nǎng láaeo-gâaw gin khâao gan mái?", en: "Shall we go watch a movie and eat?" },
+            { speaker: "B", thai: "ไปสิ! อยากดูหนังเรื่องอะไร? 🎬", ipa: "bpai sì! yàak duu nǎng rêuuang à-rai?", en: "Sure! What movie do you want to see?" },
+            { speaker: "A", thai: "เรื่องอะไรก็ได้ แล้วแต่เลย 🤷‍♂️", ipa: "rêuuang à-rai gâaw dâai, láaeo dtàae loei", en: "Any movie is fine. It's up to you." },
+            { speaker: "B", thai: "โอเค งั้นเจอกันที่พารากอน 11 โมงนะ 🏢", ipa: "oo-khe, ngán juh gan thîi paa-raa-gon sìp-èt moong ná", en: "Okay, then see you at Paragon at 11am." }
+        ];
+
+        // 4. Extension Data
+        const extensionData = [
+            { 
+                type: "Game", 
+                thai: "เกม: เพื่อนขี้บ่น 🙅‍♂️\n(สร้างข้ออ้างโดยใช้คำศัพท์! เช่น 'ไปไม่ได้ ฉันต้องนั่งสมาธิถึงตีหนึ่ง')", 
+                ipa: "game: phêuan khîi-bòn. (sâang khâaw-âang dooi chái kham-sàp! chêhn 'bpai mâi dâi, chǎn dtɔ̂ng nâng sà-maa-tí thěung dtii nʉ̀ng')", 
+                en: "Game: The Busy Friend. (Create an excuse using a vocab word! e.g. 'I can't go, I have to meditate until 1am')",
+                speaker: "Game"
+            },
+            { 
+                type: "Debate", 
+                thai: "โต้วาที: 'อยู่บ้านไถมือถือ' vs 'ออกไปเจอเพื่อน' 📱🗣️", 
+                ipa: "dtôo-waa-thii: 'yùu bâan tǎi mʉʉ-tʉ̌ʉ' vs 'ɔ̀ɔk bpai juh phêuan'", 
+                en: "Debate: 'Staying home scrolling phone' vs 'Going out to meet friends'. Which gives better Quality of Life?",
+                speaker: "Debate"
+            },
+            { 
+                type: "Q1", 
+                thai: "1. การไถมือถือทั้งวัน ดีต่อ 'คุณภาพชีวิต' ไหม? 🤔", 
+                ipa: "gaan tǎi mʉʉ-tʉ̌ʉ tháng wan dii dtàaw 'khoon-ná-pâap chii-wít' mái?", 
+                en: "Is scrolling on your phone all day good for your 'quality of life'?" 
+            },
+            { 
+                type: "Q2", 
+                thai: "2. ถ้าเพื่อนมาสาย 1 ชั่วโมง คุณจะทำอะไร? (นั่งสมาธิ? หรือ ไถมือถือ?) ⏳", 
+                ipa: "thâa phêuan maa sǎai nèung chûua-moong khun jà tham à-rai? (nâng sà-maa-tí? rěuu tǎi mʉʉ-tʉ̌ʉ?)", 
+                en: "If a friend is 1 hour late, what will you do? (Meditate? or Scroll phone?)" 
+            },
+            { 
+                type: "Q3", 
+                thai: "3. ถ้าต้อง 'ทำงานบ้าน' (ซักผ้า/ล้างจาน) คุณจะยกเลิกนัดเพื่อนไหม? 🧺", 
+                ipa: "thâa dtɔ̂ng 'tham ngaan-bâan' (sák pâa / láang jaan) khun jà yók-lêuhk nát phêuan mái?", 
+                en: "If you have to do 'housework' (laundry/dishes), will you cancel plans with friends?" 
+            },
+            { 
+                type: "Q4", 
+                thai: "4. คุณชอบนัดแบบ 'มีความยืดหยุ่น' ไหม? หรือชอบแบบ 'เป๊ะๆ'? 📏", 
+                ipa: "khun châwp nát bàep 'mii kwaam yeût-yùn' mái? rěuu châwp bàep 'bpé-bpé'?", 
+                en: "Do you like plans with 'flexibility'? Or do you like 'exact/strict' plans?" 
+            },
+            { 
+                type: "Q5", 
+                thai: "5. คุณเคยคุยกับเพื่อนถึง 'ตีหนึ่ง' ไหม? 🌙", 
+                ipa: "khun khoei khui gàp phêuan thěung 'dtii nʉ̀ng' mái?", 
+                en: "Have you ever talked to a friend until '1am'?" 
+            }
+        ];
+
+        // --- FUNCTIONS ---
+
+        function createInteractiveElement(item, id, type = 'card', showSpeaker = false) {
+            let containerClass = "";
+            let textClass = "";
+            let btnSize = "";
+            let iconSize = "";
+            
+            // Styling logic based on Type
+            if (type === 'title') {
+                containerClass = "flex flex-col items-center justify-center";
+                textClass = "text-4xl font-bold text-teal-800 text-center";
+                btnSize = "px-2 py-0.5 text-[10px]";
+                iconSize = "w-8 h-8 text-lg";
+            } else if (type === 'header') {
+                containerClass = "flex flex-wrap items-center gap-3";
+                textClass = "text-2xl font-bold text-teal-900";
+                btnSize = "px-2 py-1 text-xs";
+                iconSize = "w-8 h-8 text-sm";
+            } else if (type === 'instruction') {
+                containerClass = "flex flex-wrap items-center gap-2";
+                textClass = "text-lg text-gray-600";
+                btnSize = "px-2 py-0.5 text-[10px]";
+                iconSize = "w-6 h-6 text-xs";
+            } else if (type === 'random-card') {
+                // Large Card for the Review Game
+                containerClass = "w-full bg-white animate-fade-in";
+                textClass = "thai-text text-3xl font-bold mb-4 text-center";
+                btnSize = "px-4 py-2 text-sm";
+                iconSize = "w-16 h-16 text-2xl mx-auto mb-4";
+            } else if (type === 'extension-card') {
+                // Purple Card for Extension
+                containerClass = "bg-purple-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border-b border-purple-200";
+                textClass = "thai-text font-semibold mb-2 text-purple-900 whitespace-pre-line"; /* Added whitespace-pre-line */
+                btnSize = "px-3 py-1 text-xs";
+                iconSize = "w-10 h-10";
+            } else {
+                // Default Card
+                containerClass = "bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border-b border-teal-100";
+                textClass = "thai-text font-semibold mb-2";
+                btnSize = "px-3 py-1 text-xs";
+                iconSize = "w-10 h-10";
+            }
+
+            const speakerLabel = showSpeaker && item.speaker ? `<span class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">${item.speaker}</span>` : '';
+            
+            // Special Layout for Random Card Game
+            if (type === 'random-card') {
+                return `
+                <div class="${containerClass}">
+                    <div class="flex flex-col items-center">
+                        <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="bg-teal-100 text-teal-700 hover:bg-teal-200 rounded-full ${iconSize} flex items-center justify-center transition-colors shadow-sm">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <p class="${textClass}">${item.thai}</p>
+                        
+                        <div id="ipa-${id}" class="hidden mb-2 text-center"><p class="ipa-text text-2xl">${item.ipa}</p></div>
+                        <div id="en-${id}" class="hidden text-center mb-2"><p class="en-text text-lg border-t pt-2">${item.en}</p></div>
+
+                        <div class="flex gap-3 mt-2">
+                            <button onclick="toggleVisibility('ipa-${id}', this)" class="btn-toggle font-bold ${btnSize} rounded border-2 border-orange-200 text-orange-600 hover:bg-orange-50 bg-white">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}', this)" class="btn-toggle font-bold ${btnSize} rounded border-2 border-gray-300 text-gray-500 hover:bg-gray-50 bg-white">EN</button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // Standard Layouts (and Extension)
+            if (type === 'card' || type === 'extension-card') {
+                const btnColor = type === 'extension-card' ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' : `bg-teal-100 text-teal-700 hover:bg-teal-200`;
+                
+                return `
+                <div class="${containerClass}">
+                    ${speakerLabel}
+                    <div class="flex items-start gap-3">
+                        <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="mt-1 ${btnColor} rounded-full ${iconSize} flex-shrink-0 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <div class="flex-grow">
+                            <p class="${textClass}">${item.thai}</p>
+                            <div id="ipa-${id}" class="hidden mb-1"><p class="ipa-text text-lg">${item.ipa}</p></div>
+                            <div id="en-${id}" class="hidden"><p class="en-text text-sm border-t pt-1 mt-1 border-purple-200">${item.en}</p></div>
+                            <div class="flex gap-2 mt-3">
+                                <button onclick="toggleVisibility('ipa-${id}', this)" class="btn-toggle font-bold ${btnSize} rounded border border-orange-200 text-orange-600 hover:bg-orange-50 bg-white">IPA</button>
+                                <button onclick="toggleVisibility('en-${id}', this)" class="btn-toggle font-bold ${btnSize} rounded border border-gray-300 text-gray-500 hover:bg-gray-50 bg-white">EN</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } else {
+                // Header/Instruction Inline Layout
+                return `
+                <div class="${containerClass}">
+                    <div class="flex items-center gap-2 justify-center w-full">
+                        <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="bg-teal-100 text-teal-700 hover:bg-teal-200 rounded-full ${iconSize} flex-shrink-0 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <p class="${textClass}">${item.thai}</p>
+                    </div>
+                    <!-- Controls for Header/Inst hidden by default unless we want them interactive -->
+                     <div class="flex justify-center gap-2 mt-1 w-full">
+                         <button onclick="toggleVisibility('ipa-${id}', this)" class="text-xs text-orange-400 hover:text-orange-600">IPA</button>
+                         <button onclick="toggleVisibility('en-${id}', this)" class="text-xs text-gray-400 hover:text-gray-600">EN</button>
+                     </div>
+                     <div class="w-full text-center">
+                        <div id="ipa-${id}" class="hidden"><p class="ipa-text text-base">${item.ipa}</p></div>
+                        <div id="en-${id}" class="hidden"><p class="en-text text-sm italic text-gray-400 mt-1">${item.en}</p></div>
+                     </div>
+                </div>`;
+            }
+        }
+
+        // Logic for Random Word
+        function generateRandomWord() {
+            const randomIndex = Math.floor(Math.random() * randomReviewData.length);
+            const item = randomReviewData[randomIndex];
+            const html = createInteractiveElement(item, `rand-${Date.now()}`, 'random-card'); // Use timestamp for unique ID on re-render
+            document.getElementById('random-word-display').innerHTML = html;
+        }
+
+        // Render Loop
+        function renderContent() {
+            // UI
+            document.getElementById('main-header-container').innerHTML = createInteractiveElement(uiData.mainTitle, 'ui-main', 'title');
+            
+            document.getElementById('header-review').innerHTML = createInteractiveElement(uiData.headerReview, 'ui-h-review', 'header');
+            document.getElementById('instr-review').innerHTML = createInteractiveElement(uiData.instrReview, 'ui-i-review', 'instruction');
+            
+            document.getElementById('header-vocab').innerHTML = createInteractiveElement(uiData.headerVocab, 'ui-h-vocab', 'header');
+            document.getElementById('instr-vocab').innerHTML = createInteractiveElement(uiData.instrVocab, 'ui-i-vocab', 'instruction');
+            
+            document.getElementById('header-roleplay').innerHTML = createInteractiveElement(uiData.headerRoleplay, 'ui-h-role', 'header');
+            document.getElementById('instr-roleplay').innerHTML = createInteractiveElement(uiData.instrRoleplay, 'ui-i-role', 'instruction');
+            
+            // Extension Headers
+            document.getElementById('header-extension').innerHTML = createInteractiveElement(uiData.headerExtension, 'ui-h-ext', 'header');
+            document.getElementById('instr-extension').innerHTML = createInteractiveElement(uiData.instrExtension, 'ui-i-ext', 'instruction');
+
+            // Sections
+            document.getElementById('vocab-container').innerHTML = vocabData.map((item, idx) => createInteractiveElement(item, `vocab-${idx}`, 'card')).join('');
+            document.getElementById('roleplay-container').innerHTML = roleplayData.map((item, idx) => createInteractiveElement(item, `role-${idx}`, 'card', true)).join('');
+            document.getElementById('extension-container').innerHTML = extensionData.map((item, idx) => createInteractiveElement(item, `ext-${idx}`, 'extension-card', true)).join('');
+        }
+
+        // Interactions
+        function toggleVisibility(elementId, btn) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                if(btn.classList.contains('btn-toggle')) {
+                    btn.classList.add('bg-gray-100', 'ring-2', 'ring-offset-1', 'ring-gray-200');
+                }
+            } else {
+                el.classList.add('hidden');
+                if(btn.classList.contains('btn-toggle')) {
+                    btn.classList.remove('bg-gray-100', 'ring-2', 'ring-offset-1', 'ring-gray-200');
+                }
+            }
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.8;
+            
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderContent();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => {};
+            }
+        });
+
+    </script>
+</body>
+</html>
