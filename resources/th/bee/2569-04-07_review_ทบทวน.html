@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Review: Role-Play Scenarios</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { background-color: #f8fafc; font-family: 'Sarabun', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap');
+        
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Interactive Card Hover */
+        .scenario-card { transition: all 0.2s ease; cursor: pointer; }
+        .scenario-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        .bg-pattern {
+            background-color: #f8fafc;
+            background-image:  linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen pb-20">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- DATA ---
+
+        const pageTitle = {
+            thai: "ทบทวนคำศัพท์: บทบาทสมมติ",
+            ipa: "tóp-tuuan kam-sàp: bòt-bàat sǒm-mút",
+            en: "Vocabulary Review: Role-Play",
+            emoji: "🎬"
+        };
+
+        const uiText = {
+            instruction: { thai: "เลือกสถานการณ์เพื่อเริ่มฝึกพูด", ipa: "lʉ̂uak sà-tǎan-ná-gaan pʉ̂ua rôem fʉ̀k pûut", en: "Choose a scenario to start practicing speaking", emoji: "👇" },
+            situation: { thai: "สถานการณ์", ipa: "sà-tǎan-ná-gaan", en: "Situation", emoji: "📍" },
+            goal: { thai: "เป้าหมาย", ipa: "bpâo-mǎai", en: "Goal", emoji: "🎯" },
+            vocabToUse: { thai: "คำศัพท์ที่ต้องใช้", ipa: "kam-sàp tîi dtɔ̂ng chái", en: "Vocabulary to use", emoji: "📝" },
+            back: { thai: "กลับ", ipa: "glàp", en: "Back", emoji: "🔙" }
+        };
+
+        // All scenarios strictly use the provided vocabulary list.
+        const roleplays = [
+            {
+                id: 1,
+                title: { thai: "เพื่อนรักประสบอุบัติเหตุ", ipa: "pʉ̂uan rák bprà-sòp ù-bàt-dtì-hèet", en: "Best Friend's Accident" },
+                emoji: "🤕🏍️",
+                color: "rose",
+                situation: { thai: "เพื่อนรักขี่มอเตอร์ไซค์ มีอุบัติเหตุ และเจ็บเข่า", ipa: "pʉ̂uan rák kìi mɔɔ-dtəə-sai, mii ù-bàt-dtì-hèet láe jèp kào", en: "Your best friend rode a motorcycle, had an accident, and hurt their knee." },
+                task: { thai: "โทรหาเพื่อน ถามปัญหา และบอกว่า หายเร็วๆ", ipa: "too hǎa pʉ̂uan, tǎam bpan-hǎa, láe bàawk wâa hǎai reo reo", en: "Call your friend, ask about the problem, and say get well soon." },
+                words: [
+                    { thai: "เพื่อนรัก", ipa: "pêuan rák", en: "best friend" },
+                    { thai: "โทรหา", ipa: "too-hăa", en: "To phone" },
+                    { thai: "ขี่มอเตอร์ไซค์", ipa: "kìi maw-dtee-sái", en: "ride a motorcycle" },
+                    { thai: "อุบัติเหตุ", ipa: "ù-bàt-dtì-hèet", en: "accident" },
+                    { thai: "เจ็บ", ipa: "jèp", en: "hurt" },
+                    { thai: "เข่า", ipa: "kào", en: "knee" },
+                    { thai: "หายเร็วๆ", ipa: "hǎai reo reo", en: "Get well soon" }
+                ]
+            },
+            {
+                id: 2,
+                title: { thai: "ปัญหาในบ้านตอนตีสี่", ipa: "bpan-hǎa nai bâan dtɔɔn dtii sìi", en: "House Problems at 4 AM" },
+                emoji: "💦🔌",
+                color: "blue",
+                situation: { thai: "ตอนตีสี่ ท่อแตก ก๊อกน้ำรั่ว และไฟดับในห้องนอน คุณนอนไม่หลับ", ipa: "dtɔɔn dtii sìi, tɔ̂ɔ dtàek, gɔ́ɔk náam rûua, láe fai dàp nai hɔ̂ɔng nɔɔn. kun nɔɔn mâi làp", en: "At 4 AM, a pipe broke, faucet is leaking, and power outage in the bedroom. You can't sleep." },
+                task: { thai: "โทรหาช่างประปาหรือช่างไฟฟ้า บอกว่าเป็นเรื่องด่วน", ipa: "too hǎa châang bprà-bpaa rʉ̌ʉ châang-fai-fáa, bàawk wâa bpen rʉ̂uang dùuan", en: "Call a plumber or electrician, tell them it's an urgent matter." },
+                words: [
+                    { thai: "ตีสี่", ipa: "dtii sìi", en: "04:00" },
+                    { thai: "ท่อแตก", ipa: "tôr tàaek", en: "broken pipe" },
+                    { thai: "ก๊อกน้ำรั่ว", ipa: "gɔ́ɔk náam rûa", en: "leaking faucet" },
+                    { thai: "ไฟดับ", ipa: "fai-dàp", en: "Power outage" },
+                    { thai: "นอนไม่หลับ", ipa: "non mâi làp", en: "can't sleep well" },
+                    { thai: "ด่วน", ipa: "dùuan", en: "urgent" },
+                    { thai: "ช่างประปา", ipa: "châang bprà-bpaa", en: "plumber" }
+                ]
+            },
+            {
+                id: 3,
+                title: { thai: "สั่งอาหารแบบเรื่องเยอะ", ipa: "sàng aa-hǎan bàep rʉ̂uang yér", en: "Ordering Food with Many Demands" },
+                emoji: "🍜🥚",
+                color: "amber",
+                situation: { thai: "คุณไปร้านอาหาร อยากกินก๋วยเตี๋ยวปลาน้ำและไข่ทอด แต่ไม่กินถั่วงอก", ipa: "kun bpai ráan aa-hǎan, yàak gin gǔay-dtǐao bplaa nám láe khài thɔ̂ɔt, dtàe mâi gin tùa ngɔ̂ɔk", en: "You go to a restaurant, want to eat fish noodle soup and fried egg, but don't eat bean sprouts." },
+                task: { thai: "สั่งอาหาร บอกรสชาติที่ชอบ และขอน้ำเปล่าไม่เย็น", ipa: "sàng aa-hǎan, bàawk rót-châat tîi chɔ̂ɔp, láe kɔ̌ɔ náam bplàao mâi yen", en: "Order food, tell the taste you like, and ask for room temp water." },
+                words: [
+                    { thai: "ก๋วยเตี๋ยวปลาน้ำ", ipa: "gǔay-dtǐao-bplaa-nám", en: "fish noodle soup" },
+                    { thai: "ไข่ทอด", ipa: "khài thɔ̂ɔt", en: "fried egg" },
+                    { thai: "ถั่วงอก", ipa: "tùa ngɔ̂ɔk", en: "bean sprouts" },
+                    { thai: "รสชาติ", ipa: "rót châat", en: "Tastes" },
+                    { thai: "จืด", ipa: "jèut", en: "bland" },
+                    { thai: "น้ำเปล่า", ipa: "náam bplàao", en: "plain water" },
+                    { thai: "ไม่เย็น", ipa: "mâi yen", en: "Room temp" }
+                ]
+            },
+            {
+                id: 4,
+                title: { thai: "เล่าเรื่องเสาร์อาทิตย์", ipa: "lâo rʉ̂uang sǎo aa-tít", en: "Talking About the Weekend" },
+                emoji: "🎸🌇",
+                color: "emerald",
+                situation: { thai: "เสาร์อาทิตย์ที่แล้ว คุณดูซีรี่ส์เกาหลีจบ และไปดูวงดนตรีสดที่ดาดฟ้า", ipa: "sǎo aa-tít tîi lɛ́ɛo, kun duu sii-rîi gao-lǐi jòp, láe bpai duu wong don-dtrii sòt tîi daàt-fáa", en: "Last weekend, you finished a Korean series and went to see a live music band at the rooftop." },
+                task: { thai: "เล่าเรื่องให้ครูฟัง และถามครูว่าเสาร์อาทิตย์ทำอะไร", ipa: "lâo rʉ̂uang hâi kruu fang, láe tǎam kruu wâa sǎo aa-tít tam à-rai", en: "Tell the story to the teacher, and ask the teacher what they did on the weekend." },
+                words: [
+                    { thai: "เสาร์อาทิตย์ที่แล้ว", ipa: "sǎo aa-tít tîi lɛ́ɛo", en: "Last weekend" },
+                    { thai: "ดูซีรี่ส์จบ", ipa: "duu sii-rîi jòp", en: "finish watching series" },
+                    { thai: "เกาหลี", ipa: "gao lǐi", en: "Korea" },
+                    { thai: "วงดนตรี", ipa: "wong don-dtrii", en: "music band" },
+                    { thai: "สด", ipa: "sòt", en: "live (music)" },
+                    { thai: "ดาดฟ้า", ipa: "daàt-fáa", en: "rooftop" },
+                    { thai: "ทำอะไรกับครู", ipa: "tam à rai gàp kruu", en: "Do things with the teacher" }
+                ]
+            }
+        ];
+
+        // --- COMPONENTS ---
+
+        const TTSButton = ({ text, size = "md", colorClass = "text-slate-400 hover:text-indigo-600 hover:bg-indigo-50" }) => {
+            const speak = (e) => {
+                e.stopPropagation();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'th-TH';
+                window.speechSynthesis.speak(u);
+            };
+            return (
+                <button 
+                    onClick={speak} 
+                    className={`transition-colors flex items-center justify-center rounded-full ${size === "lg" ? "p-2" : "p-1.5"} ${colorClass}`}
+                >
+                    <i data-lucide="volume-2" width={size === "lg" ? 24 : 16}></i>
+                </button>
+            );
+        };
+
+        const ToggleBtn = ({ text, active, onClick, color, size = "md" }) => (
+            <button 
+                onClick={(e) => { e.stopPropagation(); onClick(e); }}
+                className={`font-bold rounded-full border transition-colors shadow-sm flex items-center justify-center ${
+                    active 
+                    ? (color === 'indigo' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-emerald-600 text-white border-emerald-600') 
+                    : 'bg-white text-slate-400 hover:bg-slate-50 border-slate-200'
+                } ${size === "sm" ? "text-[9px] h-5 px-1.5" : "text-[10px] h-6 px-2"}`}
+            >
+                {text}
+            </button>
+        );
+
+        // Core interactive text component
+        const InteractiveText = ({ data, variant = "normal", align = "start", className = "" }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            let textSize = "text-base font-medium";
+            if (variant === "header") textSize = "text-xl md:text-2xl font-bold";
+            if (variant === "sub") textSize = "text-lg font-bold";
+            if (variant === "small") textSize = "text-sm";
+
+            return (
+                <div className={`flex flex-col ${align === "center" ? "items-center text-center" : "items-start text-left"} gap-1 ${className}`}>
+                    <div className={`flex items-center gap-2 flex-wrap justify-${align}`}>
+                        {data.emoji && <span className={variant === "header" ? "text-3xl" : "text-xl"}>{data.emoji}</span>}
+                        <span className={`${textSize} text-slate-800`}>{data.thai}</span>
+                        
+                        <div className="flex gap-1 items-center ml-1">
+                            <TTSButton text={data.thai} size={variant === "header" ? "md" : "sm"} />
+                            <ToggleBtn text="IPA" active={showIPA} onClick={() => setShowIPA(!showIPA)} color="indigo" size="sm" />
+                            <ToggleBtn text="EN" active={showEN} onClick={() => setShowEN(!showEN)} color="emerald" size="sm" />
+                        </div>
+                    </div>
+
+                    {(showIPA || showEN) && (
+                        <div className={`text-xs animate-pop bg-white px-2 py-1.5 rounded-lg border border-slate-100 shadow-sm mt-1 w-fit max-w-full`}>
+                            {showIPA && <div className="text-indigo-600 font-mono mb-0.5">/{data.ipa}/</div>}
+                            {showEN && <div className="text-slate-600 italic">"{data.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const VocabChip = ({ data }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className="inline-flex flex-col items-start bg-white border border-slate-200 rounded-lg p-2 shadow-sm animate-pop">
+                     <div className="flex items-center gap-2">
+                        <span className="text-slate-800 font-bold text-sm">{data.thai}</span>
+                        <div className="flex gap-1">
+                            <TTSButton text={data.thai} size="sm" />
+                            <ToggleBtn text="IPA" active={showIPA} onClick={() => setShowIPA(!showIPA)} color="indigo" size="sm" />
+                            <ToggleBtn text="EN" active={showEN} onClick={() => setShowEN(!showEN)} color="emerald" size="sm" />
+                        </div>
+                     </div>
+                     {(showIPA || showEN) && (
+                         <div className="mt-1.5 pt-1.5 border-t border-slate-100 w-full">
+                            {showIPA && <div className="text-indigo-600 font-mono text-[10px] mb-0.5">/{data.ipa}/</div>}
+                            {showEN && <div className="text-slate-500 italic text-[10px]">"{data.en}"</div>}
+                         </div>
+                     )}
+                </div>
+            );
+        }
+
+        const App = () => {
+            const [activeCard, setActiveCard] = useState(null);
+
+            useEffect(() => {
+                lucide.createIcons();
+                window.speechSynthesis.getVoices();
+            }, [activeCard]);
+
+            // Colors mapping for tailwind classes (since dynamic interpolation can be tricky in Tailwind)
+            const getBorderColor = (color) => {
+                const map = { rose: 'border-rose-300', blue: 'border-blue-300', amber: 'border-amber-300', emerald: 'border-emerald-300' };
+                return map[color] || 'border-slate-300';
+            };
+            const getBgColor = (color) => {
+                const map = { rose: 'bg-rose-50', blue: 'bg-blue-50', amber: 'bg-amber-50', emerald: 'bg-emerald-50' };
+                return map[color] || 'bg-slate-50';
+            };
+
+            return (
+                <div className="max-w-3xl mx-auto px-4 pt-8">
+                    {/* Header */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8 text-center">
+                        <InteractiveText data={pageTitle} variant="header" align="center" className="mb-2" />
+                        {!activeCard && (
+                            <InteractiveText data={uiText.instruction} variant="small" align="center" className="text-slate-500" />
+                        )}
+                    </div>
+
+                    {/* Main Content Area */}
+                    {!activeCard ? (
+                        /* Scenario Selection Grid */
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {roleplays.map((rp) => (
+                                <div 
+                                    key={rp.id} 
+                                    onClick={() => setActiveCard(rp)}
+                                    className={`scenario-card bg-white rounded-2xl p-5 border-2 ${getBorderColor(rp.color)} flex flex-col items-center justify-center text-center relative group`}
+                                >
+                                    <div className="absolute top-2 right-2">
+                                        <TTSButton text={rp.title.thai} size="sm" />
+                                    </div>
+                                    <div className="text-5xl mb-3">{rp.emoji}</div>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-1">{rp.title.thai}</h3>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        /* Active Scenario Detail View */
+                        <div className="animate-pop">
+                            <div 
+                                onClick={() => setActiveCard(null)} 
+                                className="mb-4 inline-flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200 cursor-pointer w-fit"
+                                role="button"
+                                tabIndex={0}
+                            >
+                                <i data-lucide="arrow-left" width="18"></i> 
+                                <InteractiveText data={uiText.back} variant="small" />
+                            </div>
+
+                            <div className={`bg-white rounded-2xl shadow-lg border-t-8 ${getBorderColor(activeCard.color)} overflow-hidden`}>
+                                {/* Header */}
+                                <div className={`${getBgColor(activeCard.color)} p-6 text-center border-b border-slate-100`}>
+                                    <div className="text-5xl mb-3">{activeCard.emoji}</div>
+                                    <InteractiveText data={activeCard.title} variant="header" align="center" />
+                                </div>
+
+                                {/* Body */}
+                                <div className="p-6 space-y-6">
+                                    
+                                    {/* Situation */}
+                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                        <InteractiveText data={uiText.situation} variant="small" className="mb-2 text-slate-400 uppercase" />
+                                        <InteractiveText data={activeCard.situation} variant="normal" />
+                                    </div>
+
+                                    {/* Task/Goal */}
+                                    <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
+                                        <InteractiveText data={uiText.goal} variant="small" className="mb-2 text-indigo-500 uppercase" />
+                                        <InteractiveText data={activeCard.task} variant="normal" />
+                                    </div>
+
+                                    {/* Vocab Bank */}
+                                    <div>
+                                        <div className="mb-3 border-b pb-2">
+                                            <InteractiveText data={uiText.vocabToUse} variant="sub" />
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {activeCard.words.map((word, index) => (
+                                                <VocabChip key={index} data={word} />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
