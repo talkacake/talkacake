@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Review Mission - Communicative</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .success-pulse { animation: successPulse 1.5s infinite; }
+        @keyframes successPulse { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .hint-reveal { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-sm font-black text-slate-400 uppercase tracking-widest">Interactive Speaking Review</h1>
+                <p class="text-slate-800 font-bold">Student: Jatinder (Masc)</p>
+            </div>
+            <div id="score-badge" class="bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100 font-bold text-blue-600">
+                0 pts
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-bar" class="flex gap-1.5 mb-8"></div>
+
+        <!-- Feedback Toast -->
+        <div id="feedback" class="fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-2xl z-50 hidden text-white font-bold transition-all transform duration-300"></div>
+
+        <!-- Task Container -->
+        <div id="app-container" class="bg-white/80 backdrop-blur rounded-3xl p-6 md:p-10 border border-white shadow-xl min-h-[500px] flex flex-col justify-center relative overflow-hidden"></div>
+    </div>
+
+    <script>
+        const state = {
+            currentTask: 'welcome',
+            score: 0,
+            completed: [],
+            foodChecked: [],
+            dirHintsVisible: [false, false, false]
+        };
+
+        const tasks = ['intro', 'food', 'shopping', 'weather', 'directions'];
+
+        function playAudio(text, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any ongoing speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH'; // Use Thai voice
+                utterance.rate = 0.85; // Slightly slower for language learners
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Text-to-speech is not supported in this browser.");
+            }
+        }
+
+        const ttsBtn = (thai) => `<button type="button" onclick="playAudio('${thai}', event)" title="Listen to pronunciation" class="inline-flex items-center justify-center p-1.5 ml-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition-colors focus:outline-none cursor-pointer shrink-0"><i data-lucide="volume-2" class="w-4 h-4"></i></button>`;
+
+        function updateUI() {
+            renderProgressBar();
+            document.getElementById('score-badge').innerText = `${state.score} pts`;
+
+            switch (state.currentTask) {
+                case 'welcome': renderWelcome(); break;
+                case 'intro': renderIntro(); break;
+                case 'food': renderFood(); break;
+                case 'shopping': renderShopping(); break;
+                case 'weather': renderWeather(); break;
+                case 'directions': renderDirections(); break;
+                case 'finish': renderFinish(); break;
+            }
+            lucide.createIcons();
+        }
+
+        function showFeedback(message, type) {
+            const fb = document.getElementById('feedback');
+            fb.innerText = message;
+            fb.className = `fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-2xl z-50 block text-white font-bold transition-all ${type === 'correct' ? 'bg-green-600' : 'bg-blue-600'}`;
+            setTimeout(() => fb.classList.add('hidden'), 2000);
+        }
+
+        function handleComplete(taskName, pts) {
+            state.score += pts;
+            state.completed.push(taskName);
+            showFeedback('Yîam mâak! (Awesome!) + ' + pts, 'correct');
+        }
+
+        function renderProgressBar() {
+            const bar = document.getElementById('progress-bar');
+            bar.innerHTML = tasks.map(t => {
+                const isComp = state.completed.includes(t);
+                const isCurrent = state.currentTask === t;
+                return `<div class="h-1.5 flex-1 rounded-full ${isComp ? 'bg-green-500' : isCurrent ? 'bg-blue-500' : 'bg-slate-200'}"></div>`;
+            }).join('');
+        }
+
+        function renderWelcome() {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="text-center space-y-6 fade-in">
+                    <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto"><i data-lucide="mic" class="text-yellow-600 w-10 h-10"></i></div>
+                    <h1 class="text-3xl font-black text-slate-800 flex items-center justify-center">Yin-dee dton-ráp! ${ttsBtn('ยินดีต้อนรับ')}</h1>
+                    <p class="text-slate-600 leading-relaxed">Today is a <b>speaking mission</b>. You will roleplay different situations in Bangkok with your teacher.</p>
+                    <button onclick="state.currentTask = 'intro'; updateUI();" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                        Start Mission <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        // TASK 1: Roleplay Intro
+        function renderIntro() {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800"><i data-lucide="users" class="text-blue-500"></i> Scene 1: The Airport Guide</h2>
+                    
+                    <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl">
+                        <p class="font-bold text-blue-800 mb-2">🗣️ Speaking Goal:</p>
+                        <p class="text-sm text-slate-700">Your teacher is your tour guide. Listen to their questions and introduce yourself.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <details class="bg-white border border-slate-200 p-4 rounded-xl cursor-pointer group">
+                            <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                Hint: What's your name? <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="mt-3 text-green-600 font-medium bg-green-50 p-3 rounded-lg border border-green-100 flex items-center justify-between">
+                                <span>"Phǒm chûe Jatinder khráp."</span>
+                                ${ttsBtn('ผมชื่อจาทินเดอร์ครับ')}
+                            </div>
+                        </details>
+                        <details class="bg-white border border-slate-200 p-4 rounded-xl cursor-pointer group">
+                            <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                Hint: Where are you from? <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <div class="mt-3 text-green-600 font-medium bg-green-50 p-3 rounded-lg border border-green-100 flex items-center justify-between">
+                                <span>"Phǒm maa jàak prà-thêt Singapore khráp."</span>
+                                ${ttsBtn('ผมมาจากประเทศสิงคโปร์ครับ')}
+                            </div>
+                        </details>
+                    </div>
+
+                    <button onclick="handleComplete('intro', 10); state.currentTask = 'food'; updateUI();" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-4">
+                        Did it! Go to Restaurant <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        // TASK 2: Verbal Menu Order
+        function renderFood() {
+            const container = document.getElementById('app-container');
+            const items = [
+                { id: 'rice', eng: "Fried Rice", thai: "Khâaw-pàt", phrase: "Phǒm yàak sàng khâaw-pàt", realThai: "ข้าวผัด" },
+                { id: 'egg', eng: "3 Boiled Eggs", thai: "Khài-tôm sǎam jaan", phrase: "Ao khài-tôm sǎam jaan khráp", realThai: "ไข่ต้มสามจาน" },
+                { id: 'water', eng: "Plain Water", thai: "Nám-bplàao", phrase: "Ao nám-bplàao dûay khráp", realThai: "น้ำเปล่า" }
+            ];
+
+            const allChecked = state.foodChecked.length === items.length;
+
+            container.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800"><i data-lucide="utensils" class="text-orange-500"></i> Scene 2: Street Food</h2>
+                    
+                    <div class="bg-orange-50 border border-orange-200 p-5 rounded-2xl mb-4">
+                        <p class="font-bold text-orange-800 mb-2">🗣️ Speaking Goal:</p>
+                        <p class="text-sm text-slate-700">Say your order to the waiter (Teacher). Click the items below <b>only after you successfully say them!</b></p>
+                    </div>
+
+                    <div class="space-y-3">
+                        ${items.map(item => `
+                            <div onclick="toggleFood('${item.id}')" class="p-4 rounded-xl border-2 transition-all cursor-pointer flex justify-between items-center ${state.foodChecked.includes(item.id) ? 'bg-green-100 border-green-500 text-green-800' : 'bg-white border-slate-200 hover:border-orange-300'}">
+                                <div>
+                                    <p class="font-bold text-lg">${item.eng}</p>
+                                    <div class="flex items-center mt-1">
+                                        <p class="text-sm opacity-70">${item.thai}</p>
+                                        ${ttsBtn(item.realThai)}
+                                    </div>
+                                </div>
+                                <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center ${state.foodChecked.includes(item.id) ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 text-transparent'}">
+                                    <i data-lucide="check" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${allChecked ? `
+                        <button onclick="handleComplete('food', 15); state.currentTask = 'shopping'; updateUI();" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold success-pulse flex justify-center gap-2">
+                            Check Bill & Go Shopping <i data-lucide="arrow-right"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleFood(id) {
+            if (state.foodChecked.includes(id)) {
+                state.foodChecked = state.foodChecked.filter(i => i !== id);
+            } else {
+                state.foodChecked.push(id);
+                showFeedback("Order placed!", "neutral");
+            }
+            updateUI();
+        }
+
+        // TASK 3: Bargaining Roleplay
+        function renderShopping() {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800"><i data-lucide="shopping-bag" class="text-pink-500"></i> Scene 3: MBK Market</h2>
+                    
+                    <div class="bg-pink-50 border border-pink-200 p-5 rounded-2xl">
+                        <p class="font-bold text-pink-800 mb-2">🗣️ Speaking Goal:</p>
+                        <p class="text-sm text-slate-700">You want to buy 3 black shirts. The teacher says they are 1,000 Baht. <b>Convince them to lower the price to 888 Baht.</b></p>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <p class="text-xs uppercase font-bold text-slate-400 mb-3 tracking-wider">Useful Phrases</p>
+                        <div class="space-y-2">
+                            <div class="p-3 bg-white border border-slate-100 rounded-lg shadow-sm flex items-center justify-between">
+                                <div><span class="font-bold text-blue-600">Pɛɛng mâak!</span> <span class="text-slate-500 text-sm ml-1">(Too expensive)</span></div>
+                                ${ttsBtn('แพงมาก')}
+                            </div>
+                            <div class="p-3 bg-white border border-slate-100 rounded-lg shadow-sm flex items-center justify-between">
+                                <div><span class="font-bold text-blue-600">Lót nít-nòi dâi mǎi khráp?</span> <span class="text-slate-500 text-sm ml-1">(Can you lower a bit?)</span></div>
+                                ${ttsBtn('ลดนิดหน่อยได้ไหมครับ')}
+                            </div>
+                            <div class="p-3 bg-white border border-slate-100 rounded-lg shadow-sm flex items-center justify-between">
+                                <div><span class="font-bold text-blue-600">Lót lʉ̌a 888 bàat dâi mǎi?</span> <span class="text-slate-500 text-sm ml-1">(Lower to 888 Baht?)</span></div>
+                                ${ttsBtn('ลดเหลือ 888 บาทได้ไหม')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="handleComplete('shopping', 20); state.currentTask = 'weather'; updateUI();" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-4">
+                        Deal! Next Task <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        // TASK 4: Listen and React (Weather)
+        function renderWeather() {
+            const container = document.getElementById('app-container');
+            const choices = [
+                { id: "nǎao", icon: "snowflake", color: "text-blue-500", label: "Nǎao", eng: "Cold", realThai: "หนาว" },
+                { id: "rɔ́ɔn", icon: "sun", color: "text-orange-500", label: "Rɔ́ɔn", eng: "Hot", realThai: "ร้อน" },
+                { id: "fǒn-dtòk", icon: "cloud-rain", color: "text-blue-600", label: "Fǒn-dtòk", eng: "Rain", realThai: "ฝนตก" },
+                { id: "yen", icon: "wind", color: "text-teal-500", label: "Yen", eng: "Cool", realThai: "เย็น" }
+            ];
+
+            container.innerHTML = `
+                <div class="space-y-6 fade-in text-center">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800 justify-center"><i data-lucide="cloud-sun" class="text-yellow-500"></i> Scene 4: Calling Home</h2>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 p-5 rounded-2xl text-left">
+                        <p class="font-bold text-yellow-800 mb-2">🗣️ Speaking Goal:</p>
+                        <p class="text-sm text-slate-700">1. Ask your teacher: <b>"Aa-gàat bpen yang-ngai khráp?"</b> ${ttsBtn('อากาศเป็นยังไงครับ')}<br>2. Listen to their answer.<br>3. Click the matching picture below.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        ${choices.map(c => `
+                            <div role="button" onclick="checkWeather('${c.id}')" class="p-6 rounded-2xl border-2 border-slate-200 bg-white hover:border-blue-400 hover:shadow-md transition-all flex flex-col items-center gap-3 cursor-pointer">
+                                <i data-lucide="${c.icon}" class="w-10 h-10 ${c.color}"></i>
+                                <span class="font-bold text-slate-700 text-sm flex items-center flex-wrap justify-center gap-1">${c.label} <span class="text-slate-400 font-normal">(${c.eng})</span> ${ttsBtn(c.realThai)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkWeather(c) {
+            handleComplete('weather', 15);
+            showFeedback(`You heard: ${c}!`, 'neutral');
+            setTimeout(() => {
+                state.currentTask = 'directions';
+                updateUI();
+            }, 1000);
+        }
+
+        // TASK 5: Giving Directions
+        function renderDirections() {
+            const container = document.getElementById('app-container');
+            const steps = [
+                { eng: "Go Straight", thai: "Dtrong bpai", realThai: "ตรงไป" },
+                { eng: "Turn Right", thai: "Líao kwǎa", realThai: "เลี้ยวขวา" },
+                { eng: "Turn Left", thai: "Líao sáai", realThai: "เลี้ยวซ้าย" }
+            ];
+
+            container.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-slate-800"><i data-lucide="map-pin" class="text-red-500"></i> Scene 5: The Taxi Ride</h2>
+                    
+                    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl mb-4 text-left">
+                        <p class="font-bold text-red-800 mb-2">🗣️ Speaking Goal:</p>
+                        <p class="text-sm text-slate-700">You are in a taxi. Tell the driver (Teacher) how to get to your hotel using this route. <i>Tap an item if you need to peek at the Thai word.</i></p>
+                    </div>
+
+                    <div class="space-y-4">
+                        ${steps.map((step, i) => `
+                            <div onclick="toggleDirHint(${i})" class="relative p-5 rounded-xl border-2 border-slate-200 bg-white cursor-pointer hover:border-red-300 transition-all flex items-center justify-between overflow-hidden">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${i + 1}</div>
+                                    <span class="font-bold text-lg text-slate-800">${step.eng}</span>
+                                </div>
+                                <div class="font-bold text-blue-600 text-lg hint-reveal flex items-center ${state.dirHintsVisible[i] ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}">
+                                    ${step.thai} ${ttsBtn(step.realThai)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <button onclick="handleComplete('directions', 15); state.currentTask = 'finish'; updateUI();" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-4">
+                        Arrived! Finish Lesson <i data-lucide="check-circle-2"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function toggleDirHint(index) {
+            state.dirHintsVisible[index] = !state.dirHintsVisible[index];
+            updateUI();
+        }
+
+        function renderFinish() {
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <div class="text-center space-y-6 fade-in pb-10">
+                    <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto"><i data-lucide="check-circle-2" class="text-green-600 w-12 h-12"></i></div>
+                    <h1 class="text-3xl font-black text-slate-800">Sùt-yôot!</h1>
+                    <p class="text-lg text-slate-600 italic">You spoke excellent Thai today!</p>
+                    <div class="text-6xl font-black text-blue-600 my-4">${state.score} <span class="text-xl text-slate-400">pts</span></div>
+                    
+                    <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 text-left space-y-4">
+                        <h3 class="font-black text-indigo-800 uppercase tracking-widest text-sm flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i> Extension Activities
+                        </h3>
+                        <p class="text-sm text-slate-700">Finished early? Put it all together using these real-life communicative challenges!</p>
+                        
+                        <div class="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            
+                            <!-- 1. Roleplay -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-indigo-500"></i> 1. Real-life Role-play</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Shopping at MBK, but the color you want is sold out (mòt).</p>
+                                    <p><strong>Teacher:</strong> "Sûea sǐi dam mòt khráp. Mii sǐi daeng, ao mǎi khráp?" ${ttsBtn('เสื้อสีดำหมดครับ มีสีแดง เอาไหมครับ')}<br><span class="italic text-xs text-slate-400">(Black is sold out. I have red, want it?)</span></p>
+                                    <p><strong>Student:</strong> Reply you don't want it, complain about price, and ask for a discount on a white one instead.<br><span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Mâi ao khráp. Pɛɛng mâak. Sûea sǐi kǎao lót dâi mǎi khráp?" ${ttsBtn('ไม่เอาครับ แพงมาก เสื้อสีขาวลดได้ไหมครับ')}</span></p>
+                                </div>
+                            </details>
+
+                            <!-- 2. Speaking Game -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="gamepad-2" class="w-5 h-5 text-indigo-500"></i> 2. Speaking Game: Guess It!</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Student describes an item from the lesson without saying its name. Teacher guesses!</p>
+                                    <p><strong>Student:</strong> <span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Sǐi daeng. Bpen aa-hǎan. Sài prík. Pèt nít-nòi." ${ttsBtn('สีแดง เป็นอาหาร ใส่พริก เผ็ดนิดหน่อย')}</span> <br><span class="italic text-xs text-slate-400">(Red color. Is food. Put chilli. A bit spicy.)</span></p>
+                                    <p><strong>Teacher:</strong> "Gài nəəi mǎi khráp?" ${ttsBtn('ไก่เนยไหมครับ')} (Is it butter chicken?)</p>
+                                </div>
+                            </details>
+
+                            <!-- 3. Debate -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="swords" class="w-5 h-5 text-indigo-500"></i> 3. Real-life Debate</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Which weather is better: Hot (Summer) or Cold (Winter)?</p>
+                                    <p><strong>Teacher:</strong> "Phǒm chɔ̂ɔp aa-gàat rɔ́ɔn prɔ́-wâa ɔ̀ɔk bpai kâang-nɔ̂ɔk dâai." ${ttsBtn('ผมชอบอากาศร้อนเพราะว่าออกไปข้างนอกได้')}<br><span class="italic text-xs text-slate-400">(I like hot weather because I can go outside.)</span></p>
+                                    <p><strong>Student:</strong> Argue against it! <br><span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Phǒm mâi chɔ̂ɔp! Aa-gàat rɔ́ɔn ngʉ̀a-ɔ̀ɔk mâak. Phǒm chɔ̂ɔp aa-gàat nǎao, yùu kâang-nai, duu nǎng." ${ttsBtn('ผมไม่ชอบ อากาศร้อนเหงื่อออกมาก ผมชอบอากาศหนาว อยู่ข้างใน ดูหนัง')}</span> <br><span class="italic text-xs text-slate-400">(I don't like! Hot weather sweat a lot. I like cold weather, stay inside, watch movies.)</span></p>
+                                </div>
+                            </details>
+
+                            <!-- 4. Discussion -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="message-square" class="w-5 h-5 text-indigo-500"></i> 4. Discussion Question</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Talking about cooking and favorite international foods.</p>
+                                    <p><strong>Teacher:</strong> "Phǒm chɔ̂ɔp aa-hǎan in-dia tîi-sùt. Khun chɔ̂ɔp aa-hǎan in-dia mǎi khráp?" ${ttsBtn('ผมชอบอาหารอินเดียที่สุด คุณชอบอาหารอินเดียไหมครับ')}<br><span class="italic text-xs text-slate-400">(I like Indian food the most. Do you like Indian food?)</span></p>
+                                    <p><strong>Student:</strong> <span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Chɔ̂ɔp khráp! Phǒm chɔ̂ɔp tam aa-hǎan. Yàak gin gài-nəəi mǎi khráp?" ${ttsBtn('ชอบครับ ผมชอบทำอาหาร อยากกินไก่เนยไหมครับ')}</span> <br><span class="italic text-xs text-slate-400">(Like! I like cooking. Want to eat butter chicken?)</span></p>
+                                </div>
+                            </details>
+
+                            <!-- 5. Interview -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="user-check" class="w-5 h-5 text-indigo-500"></i> 5. Real-life Interview</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Meeting a new friend at a cafe in Bangkok.</p>
+                                    <p><strong>Teacher:</strong> "Sawatdee khráp. Khun chûe à-rai? Maa jàak prà-thêt à-rai? Wan-níi yàak gin à-rai khráp?" ${ttsBtn('สวัสดีครับ คุณชื่ออะไร มาจากประเทศอะไร วันนี้อยากกินอะไรครับ')}</p>
+                                    <p><strong>Student:</strong> <span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Phǒm chûe Jatinder khráp. Maa jàak Singapore. Yàak gin khâaw-nǐaw má-mûang khráp." ${ttsBtn('ผมชื่อจาทินเดอร์ครับ มาจากสิงคโปร์ อยากกินข้าวเหนียวมะม่วงครับ')}</span></p>
+                                </div>
+                            </details>
+
+                            <!-- 6. Story-telling -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5 text-indigo-500"></i> 6. Story-telling Task</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Tell a short story about a terrible shopping trip using sequence words.</p>
+                                    <p><strong>Student:</strong> <span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Wan-níi fǒn-dtòk. Phǒm bpai hâang. Yàak sʉ́ʉ gâo-îi dtɛ̀ɛ pɛɛng mâak! Lót mâi dâi. Phǒm mâi sʉ́ʉ khráp." ${ttsBtn('วันนี้ฝนตก ผมไปห้าง อยากซื้อเก้าอี้แต่แพงมาก ลดไม่ได้ ผมไม่ซื้อครับ')}</span> <br><span class="italic text-xs text-slate-400">(Today rains. I go to mall. Want to buy chair but very expensive! Cannot discount. I didn't buy.)</span></p>
+                                </div>
+                            </details>
+
+                            <!-- 7. Presentation -->
+                            <details class="bg-white border border-indigo-100 p-4 rounded-xl cursor-pointer group shadow-sm">
+                                <summary class="font-bold text-slate-700 outline-none flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><i data-lucide="presentation" class="w-5 h-5 text-indigo-500"></i> 7. Presentation Task</div>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+                                </summary>
+                                <div class="mt-3 text-sm text-slate-600 space-y-2 border-t pt-3">
+                                    <p><strong>Scenario:</strong> Stand up and present "My Perfect Meal" to the class.</p>
+                                    <p><strong>Student:</strong> <span class="font-medium text-blue-600 inline-flex items-center flex-wrap">"Sawatdee khráp. Phǒm chûe Jatinder. Phǒm chɔ̂ɔp gin phàt-thai. Mâi sài prík khráp. Lɛ́ɛw gɔ̂ ao nám-pǒn-lá-mái khráp. Phǒm ìm lɛ́ɛw khráp!" ${ttsBtn('สวัสดีครับ ผมชื่อจาทินเดอร์ ผมชอบกินผัดไทย ไม่ใส่พริกครับ แล้วก็เอาน้ำผลไม้ครับ ผมอิ่มแล้วครับ')}</span> <br><span class="italic text-xs text-slate-400">(Hello. I'm Jatinder. I like eating Pad Thai. Don't add chilli. And then I want fruit juice. I am full already!)</span></p>
+                                </div>
+                            </details>
+
+                        </div>
+                    </div>
+
+                    <button onclick="location.reload()" class="w-full bg-slate-100 py-4 rounded-2xl font-bold text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors mt-4 shadow-sm">
+                        <i data-lucide="rotate-ccw"></i> Restart Lesson
+                    </button>
+                </div>
+            `;
+        }
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>
