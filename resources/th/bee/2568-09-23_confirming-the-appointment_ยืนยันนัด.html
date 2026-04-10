@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Thai Lesson 3: Confirming & Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .lesson-section {
+            display: none;
+        }
+        .lesson-section.active {
+            display: block;
+        }
+        /* Flashcard styles */
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto max-w-3xl p-4 sm:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-sky-700 thai">บทเรียนที่ 3: ยืนยันและทบทวน</h1>
+            <p class="text-lg sm:text-xl text-slate-600 mt-2">Lesson 3: Confirming & Review</p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 rounded-full h-2.5 mb-8">
+            <div id="progress-bar" class="bg-sky-600 h-2.5 rounded-full" style="width: 10%;"></div>
+        </div>
+
+        <!-- Lesson Sections Container -->
+        <main id="lesson-container" class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+
+            <!-- 1. Dialogue Reading -->
+            <section id="section-1" class="lesson-section active">
+                <h2 class="text-2xl font-bold mb-4 thai">บทสนทนา (Dialogue)</h2>
+                <p class="mb-4">The handyman calls to confirm the appointment from Lesson 2.</p>
+                <div class="space-y-4">
+                    <div class="bg-sky-50 p-4 rounded-lg">
+                        <p class="font-semibold">Handyman:</p>
+                        <div class="flex items-center">
+                            <p class="text-lg thai">สวัสดีครับ ผมช่างนะครับ โทรมายืนยันนัดพรุ่งนี้ 10 โมงเช้าครับ</p>
+                            <button onclick="speakThai('สวัสดีครับ ผมช่างนะครับ โทรมายืนยันนัดพรุ่งนี้ 10 โมงเช้าครับ', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-500">sà wát dii kráp, pǒm châang ná kráp. too maa yʉʉn-yan nát prûng-níi sìp moong cháo kráp</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <p class="font-semibold">Customer:</p>
+                         <div class="flex items-center">
+                            <p class="text-lg thai">อ๋อ ค่ะ ยืนยันค่ะ</p>
+                             <button onclick="speakThai('อ๋อ ค่ะ ยืนยันค่ะ', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-500">ɔ̌ɔ, kâ. yʉʉn-yan kâ</p>
+                    </div>
+                    <div class="bg-sky-50 p-4 rounded-lg">
+                        <p class="font-semibold">Handyman:</p>
+                         <div class="flex items-center">
+                            <p class="text-lg thai">ปัญหาคืออินเทอร์เน็ตใช้ไม่ได้ใช่ไหมครับ</p>
+                             <button onclick="speakThai('ปัญหาคืออินเทอร์เน็ตใช้ไม่ได้ใช่ไหมครับ', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-500">bpan-hǎa kʉʉ in-toe-nèt chái mâi dâi châi mǎi kráp</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <p class="font-semibold">Customer:</p>
+                         <div class="flex items-center">
+                            <p class="text-lg thai">ใช่ค่ะ</p>
+                             <button onclick="speakThai('ใช่ค่ะ', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-500">châi kâ</p>
+                    </div>
+                     <div class="bg-sky-50 p-4 rounded-lg">
+                        <p class="font-semibold">Handyman:</p>
+                         <div class="flex items-center">
+                            <p class="text-lg thai">โอเคครับ เจอกันพรุ่งนี้ครับ</p>
+                             <button onclick="speakThai('โอเคครับ เจอกันพรุ่งนี้ครับ', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-slate-500">oo-kay kráp. jooe gan prûng-níi kráp</p>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button onclick="nextSection(2, 25)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Time Vocabulary 👇</button>
+                </div>
+            </section>
+
+            <!-- 2. Vocabulary -->
+            <section id="section-2" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">คำศัพท์เรื่องเวลา (Time Vocabulary)</h2>
+                <p class="mb-6">Click on a card to flip it and see the meaning.</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <!-- Vocabulary cards will be injected here by JS -->
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevSection(1, 10)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="nextSection(3, 50)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Practice Time ⏰</button>
+                </div>
+            </section>
+            
+            <!-- 3. Time Practice -->
+            <section id="section-3" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">ฝึกเรื่องเวลา (Time Practice)</h2>
+                <p class="mb-4">Match the Thai phrase to the correct time.</p>
+                <div class="space-y-4" id="time-practice-container">
+                   <!-- Time practice pairs will be injected here -->
+                </div>
+                <div id="time-practice-feedback" class="mt-4 font-bold text-lg text-center h-6"></div>
+                 <div class="mt-8 flex justify-between">
+                    <button onclick="prevSection(2, 25)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="nextSection(4, 75)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Review & Role-play 💬</button>
+                </div>
+            </section>
+
+            <!-- 4. Review & Role-play -->
+            <section id="section-4" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">ทบทวนและฝึกสนทนา (Review & Role-play)</h2>
+                <p class="mb-6">The handyman will ask you to confirm details. Use what you learned from all lessons to answer correctly.</p>
+
+                <div id="review-scenario-container" class="bg-slate-50 p-6 rounded-lg">
+                    <!-- Review Scenarios will be injected here by JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevSection(3, 50)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="nextSection(5, 90)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Final Quiz! 🧠</button>
+                </div>
+            </section>
+
+
+            <!-- 5. Quiz -->
+            <section id="section-5" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">แบบทดสอบ (Quiz)</h2>
+                <p class="mb-6">Let's check what you've learned. Choose the best answer.</p>
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Quiz questions will be injected here -->
+                </div>
+                 <div class="mt-8 flex justify-between items-center">
+                    <button onclick="prevSection(4, 75)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <div id="quiz-result" class="text-lg font-bold text-green-600"></div>
+                    <button onclick="nextSection(6, 95)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Add Vocab ✍️</button>
+                </div>
+            </section>
+
+            <!-- 6. Additional Vocabulary -->
+            <section id="section-6" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">คำศัพท์เพิ่มเติม (Additional Vocabulary)</h2>
+                <p class="mb-6">Your tutor can add new words you ask about here.</p>
+                <div class="bg-slate-100 p-4 rounded-lg">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="thai-vocab-input" class="w-full sm:w-1/2 px-3 py-2 border border-slate-300 rounded-lg thai" placeholder="คำศัพท์ (Thai Word)">
+                        <input type="text" id="meaning-vocab-input" class="w-full sm:w-1/2 px-3 py-2 border border-slate-300 rounded-lg" placeholder="ความหมาย (Meaning)">
+                        <button onclick="addCustomVocab()" class="bg-sky-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-sky-700">Save</button>
+                    </div>
+                </div>
+                <div id="custom-vocab-list" class="mt-6 space-y-3">
+                    <!-- Saved vocabulary will be displayed here -->
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevSection(5, 90)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="nextSection(7, 100)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Finish Lesson 🎉</button>
+                </div>
+            </section>
+            
+            <!-- 7. Cool-down -->
+            <section id="section-7" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">บทสรุป (Conclusion)</h2>
+                <p class="mb-4 text-lg">ยอดเยี่ยม! You've completed Lesson 3! 🎉</p>
+                <div class="bg-sky-50 p-6 rounded-lg">
+                    <h3 class="font-bold text-xl mb-3 thai">สรุป (Summary)</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>You learned how to confirm an appointment.</li>
+                        <li class="flex items-center">You can now use phrases for specific times, like <button onclick="speakThai('บ่ายสองโมงครึ่ง', event)" class="mx-1 text-sky-600 hover:text-sky-800 p-0 inline-flex items-center justify-center"><span class="thai font-medium">บ่ายสองโมงครึ่ง</span></button> (2:30 PM).</li>
+                        <li class="flex items-center">You reviewed problems from previous lessons, like <button onclick="speakThai('ก๊อกน้ำรั่ว', event)" class="mx-1 text-sky-600 hover:text-sky-800 p-0 inline-flex items-center justify-center"><span class="thai font-medium">ก๊อกน้ำรั่ว</span></button> and <button onclick="speakThai('ไฟดับ', event)" class="ml-1 text-sky-600 hover:text-sky-800 p-0 inline-flex items-center justify-center"><span class="thai font-medium">ไฟดับ</span></button>.</li>
+                    </ul>
+                </div>
+                 <div class="bg-amber-50 text-amber-900 p-6 rounded-lg mt-6">
+                    <h3 class="font-bold text-xl mb-3 thai">เป้าหมายต่อไป (Next Goal)</h3>
+                    <p>Practice telling a friend what time you will meet them tomorrow. For example: <span class="flex items-center">"<span class="thai">เจอกันพรุ่งนี้ตอนเย็น 6 โมง</span>" <button onclick="speakThai('เจอกันพรุ่งนี้ตอนเย็น 6 โมง', event)" class="ml-2 text-amber-800 hover:text-amber-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg></button></span></p>
+                </div>
+                 <div class="mt-8 flex justify-between">
+                     <button onclick="prevSection(6, 95)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="restartLesson()" class="bg-slate-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-slate-700 transition-all">Restart Lesson</button>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-8 text-sm text-slate-400">
+            <p>Interactive Thai Lesson by Gemini</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- State Management ---
+        let currentSection = 1;
+        let customVocabulary = [];
+        
+        // --- TTS Function ---
+        function speakThai(text, event) {
+            if (event) event.stopPropagation();
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9;
+                window.speechSynthesis.cancel(); // Cancel any previous speech
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech not supported in this browser.');
+            }
+        }
+        
+        // --- Data ---
+        const vocabulary = [
+            { thai: 'ยืนยัน', meaning: 'To confirm' },
+            { thai: 'นัด', meaning: 'Appointment' },
+            { thai: 'ปัญหา', meaning: 'Problem' },
+            { thai: 'ใช่ไหม', meaning: '..., right?' },
+            { thai: 'วันนี้', meaning: 'Today' },
+            { thai: 'โมง', meaning: 'o\'clock' },
+            { thai: 'ครึ่ง', meaning: 'Half (past)' },
+            { thai: 'ตอนเย็น', meaning: 'Evening' }
+        ];
+
+        const timePracticeData = [
+            { thai: "เก้าโมงเช้า", digital: "09:00 AM" },
+            { thai: "บ่ายสามโมง", digital: "03:00 PM" },
+            { thai: "สิบเอ็ดโมงครึ่ง", digital: "11:30 AM" },
+            { thai: "หกโมงเย็น", digital: "06:00 PM" }
+        ];
+
+        const reviewScenarios = [
+            {
+                id: 1,
+                handymanQuestion: "สวัสดีครับ โทรมายืนยันนัดพรุ่งนี้เรื่องก๊อกน้ำรั่วใช่ไหมครับ",
+                expectedAnswer: "ใช่ค่ะ"
+            },
+            {
+                id: 2,
+                handymanQuestion: "นัดไว้บ่ายสองโมงครึ่ง ถูกต้องไหมครับ",
+                expectedAnswer: "ใช่ค่ะ"
+            },
+            {
+                id: 3,
+                handymanQuestion: "โอเคครับ สรุปว่าพรุ่งนี้บ่ายสองโมงครึ่ง ปัญหาก๊อกน้ำรั่ว เจอกันครับ",
+                expectedAnswer: "ขอบคุณค่ะ"
+            }
+        ];
+        
+        const quizQuestions = [
+            {
+                question: "คุณใช้คำว่าอะไรเพื่อยืนยันบางสิ่ง",
+                phonetics: "kun chái kam wâa à-rai pʉ̂ʉa yʉʉn-yan baang sìng",
+                options: ["ได้ไหม", "อะไร", "ใช่ไหม", "เท่าไร"],
+                answer: "ใช่ไหม"
+            },
+            {
+                question: "'บ่ายโมงครึ่ง' หมายความว่าอะไร",
+                phonetics: "'bàai moong krûng' mǎai kwaam wâa à-rai",
+                options: ["1:00 AM", "1:30 PM", "1:30 AM", "1:00 PM"],
+                answer: "1:30 PM"
+            },
+            {
+                question: "(ทบทวน) 'ก๊อกน้ำรั่ว' พูดว่าอย่างไร",
+                phonetics: "(tóp-tuan) 'gɔ́ɔk náam rûa' pûut wâa yàang-rai",
+                options: ["ไฟดับ", "ส้วมตัน", "แอร์เสีย", "ก๊อกน้ำรั่ว"],
+                answer: "ก๊อกน้ำรั่ว"
+            }
+        ];
+
+        // --- Functions ---
+
+        function updateProgressBar(percentage) {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${percentage}%`;
+        }
+
+        function goToSection(sectionNumber) {
+            document.querySelectorAll('.lesson-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`section-${sectionNumber}`).classList.add('active');
+            currentSection = sectionNumber;
+        }
+
+        function nextSection(sectionNumber, progress) {
+            goToSection(sectionNumber);
+            updateProgressBar(progress);
+        }
+
+        function prevSection(sectionNumber, progress) {
+            goToSection(sectionNumber);
+            updateProgressBar(progress);
+        }
+
+        function restartLesson() {
+            createQuiz();
+            createTimePractice();
+            loadReviewScenario(0);
+            customVocabulary = [];
+            renderCustomVocab();
+            nextSection(1, 10);
+        }
+        
+        // --- DOM Initialization ---
+
+        function createVocabCards() {
+            const container = document.querySelector('#section-2 .grid');
+            container.innerHTML = '';
+            vocabulary.forEach(item => {
+                const cardHTML = `
+                <div class="flashcard-container h-36">
+                    <div class="flashcard relative w-full h-full" onclick="this.classList.toggle('is-flipped')">
+                        <div class="flashcard-face absolute w-full h-full flex flex-col items-center justify-center bg-white border-2 border-slate-200 rounded-lg p-2 shadow">
+                            <div class="flex items-center">
+                                <p class="text-2xl thai font-bold">${item.thai}</p>
+                                <button onclick="speakThai('${item.thai}', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flashcard-face flashcard-back absolute w-full h-full flex items-center justify-center bg-sky-100 border-2 border-sky-200 rounded-lg p-2">
+                             <p class="text-xl font-semibold text-sky-800 text-center">${item.meaning}</p>
+                        </div>
+                    </div>
+                </div>`;
+                container.innerHTML += cardHTML;
+            });
+        }
+        
+        // Time Practice Logic
+        let selectedThai = null;
+        let selectedDigital = null;
+        let correctMatches = 0;
+
+        function createTimePractice() {
+            const container = document.getElementById('time-practice-container');
+            container.innerHTML = '';
+            correctMatches = 0;
+            document.getElementById('time-practice-feedback').innerHTML = '';
+            
+            const shuffledThai = [...timePracticeData].sort(() => Math.random() - 0.5);
+            const shuffledDigital = [...timePracticeData].sort(() => Math.random() - 0.5);
+
+            const pairsHTML = shuffledThai.map((item, index) => `
+                <div class="flex items-center justify-between gap-4">
+                    <button class="w-1/2 p-3 bg-slate-100 rounded-lg hover:bg-sky-100 transition-colors thai text-lg flex items-center justify-center gap-2" data-thai="${shuffledThai[index].thai}" onclick="selectThai(this)">
+                        <span>${shuffledThai[index].thai}</span> 
+                        <span onclick="speakThai('${shuffledThai[index].thai}', event)" class="text-sky-600 hover:text-sky-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg></span>
+                    </button>
+                    <button class="w-1/2 p-3 bg-slate-100 rounded-lg hover:bg-amber-100 transition-colors font-mono text-lg" data-digital="${shuffledDigital[index].digital}" onclick="selectDigital(this)">${shuffledDigital[index].digital}</button>
+                </div>
+            `).join('');
+            container.innerHTML = pairsHTML;
+        }
+
+        function selectThai(button) {
+            if (button.classList.contains('bg-green-200')) return;
+            document.querySelectorAll('[data-thai]').forEach(btn => btn.classList.remove('ring-2', 'ring-sky-500'));
+            button.classList.add('ring-2', 'ring-sky-500');
+            selectedThai = button;
+            checkMatch();
+        }
+
+        function selectDigital(button) {
+            if (button.classList.contains('bg-green-200')) return;
+            document.querySelectorAll('[data-digital]').forEach(btn => btn.classList.remove('ring-2', 'ring-amber-500'));
+            button.classList.add('ring-2', 'ring-amber-500');
+            selectedDigital = button;
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (selectedThai && selectedDigital) {
+                const thaiValue = selectedThai.dataset.thai;
+                const digitalValue = selectedDigital.dataset.digital;
+                const correctPair = timePracticeData.find(item => item.thai === thaiValue && item.digital === digitalValue);
+                const feedbackEl = document.getElementById('time-practice-feedback');
+
+                if (correctPair) {
+                    selectedThai.classList.remove('bg-slate-100', 'ring-2', 'ring-sky-500');
+                    selectedDigital.classList.remove('bg-slate-100', 'ring-2', 'ring-amber-500');
+                    selectedThai.classList.add('bg-green-200');
+                    selectedDigital.classList.add('bg-green-200');
+                    selectedThai.disabled = true;
+                    selectedDigital.disabled = true;
+                    correctMatches++;
+                    feedbackEl.innerHTML = `<span class="text-green-600">Correct! ✅</span>`;
+                } else {
+                    feedbackEl.innerHTML = `<span class="text-red-600">Not a match. Try again! ❌</span>`;
+                }
+                
+                if (correctMatches === timePracticeData.length) {
+                    feedbackEl.innerHTML = `<span class="text-green-600">Excellent! You matched all of them! 🎉</span>`;
+                }
+
+                setTimeout(() => {
+                    if (!correctPair) feedbackEl.innerHTML = '';
+                    selectedThai.classList.remove('ring-2', 'ring-sky-500');
+                    selectedDigital.classList.remove('ring-2', 'ring-amber-500');
+                    selectedThai = null;
+                    selectedDigital = null;
+                }, 1500);
+            }
+        }
+        
+        // Review Scenario Logic
+        let currentReviewScenarioIndex = 0;
+
+        function loadReviewScenario(index) {
+            const scenario = reviewScenarios[index];
+            currentReviewScenarioIndex = index;
+            const container = document.getElementById('review-scenario-container');
+            container.innerHTML = `
+                <div id="review-scenario-${index}">
+                    <div class="bg-white p-4 rounded-lg">
+                        <div class="flex items-center mb-2">
+                             <p class="thai font-medium text-slate-600">ช่าง (Handyman): ${scenario.handymanQuestion}</p>
+                             <button onclick="speakThai('${scenario.handymanQuestion}', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                            </button>
+                        </div>
+                        <label for="review-input-${index}" class="block mb-2 font-medium thai">คุณ (You):</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="review-input-${index}" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 thai" placeholder="ตอบช่างที่นี่...">
+                            <button onclick="checkReviewAnswer(${index})" class="bg-sky-600 text-white font-bold px-4 rounded-lg hover:bg-sky-700">Send</button>
+                        </div>
+                        <div id="review-feedback-${index}" class="mt-2 text-sm h-5"></div>
+                    </div>
+                    <div id="review-convo-${index}" class="mt-4 space-y-3"></div>
+                </div>
+            `;
+        }
+
+        function checkReviewAnswer(index) {
+            const scenario = reviewScenarios[index];
+            const userInput = document.getElementById(`review-input-${index}`);
+            const feedback = document.getElementById(`review-feedback-${index}`);
+            const convoContainer = document.getElementById(`review-convo-${index}`);
+            
+            const simplifiedInput = userInput.value.replace(/[ค่ะครับ]/g, '').replace(/\s/g, '');
+            const simplifiedAnswer = scenario.expectedAnswer.replace(/[ค่ะครับ]/g, '').replace(/\s/g, '');
+
+            if (simplifiedInput === simplifiedAnswer) {
+                feedback.innerHTML = `<span class="text-green-600 font-semibold">✅ Correct!</span>`;
+                userInput.disabled = true;
+
+                if (currentReviewScenarioIndex < reviewScenarios.length - 1) {
+                    setTimeout(() => {
+                       loadReviewScenario(currentReviewScenarioIndex + 1);
+                    }, 1500);
+                } else {
+                    convoContainer.innerHTML += `<p class="mt-4 font-bold text-green-700">Great job! You completed the review!</p>`;
+                }
+
+            } else {
+                feedback.innerHTML = `<span class="text-red-600 font-semibold">❌ Not quite. The expected answer is: ${scenario.expectedAnswer}</span>`;
+            }
+        }
+
+        // Quiz Logic
+        let quizScore = 0;
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            quizScore = 0;
+            document.getElementById('quiz-result').textContent = '';
+            
+            quizQuestions.forEach((q, index) => {
+                const optionsHTML = q.options.map(option => `
+                    <button class="w-full text-left p-3 bg-slate-100 rounded-lg hover:bg-sky-100 transition-colors quiz-option thai flex items-center gap-2" data-question="${index}" onclick="checkQuizAnswer(this, '${q.answer}')">
+                        <span>${option}</span>
+                        <span onclick="speakThai('${option}', event)" class="text-sky-600 hover:text-sky-800 opacity-50"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg></span>
+                    </button>
+                `).join('');
+
+                const questionHTML = `
+                <div id="question-${index}">
+                    <div class="font-semibold mb-2 flex items-center">
+                         <p>${index + 1}. <span class="thai ml-2">${q.question}</span></p>
+                         <button onclick="speakThai('${q.question.replace(/'/g, "\\'")}', event)" class="ml-2 text-sky-600 hover:text-sky-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 8.464a5 5 0 000 7.072m2.828 2.828a9 9 0 000-12.728M12 12h.01M12 6v.01M12 18v.01" /></svg>
+                        </button>
+                    </div>
+                    <p class="text-slate-500 mb-3 ml-5">${q.phonetics}</p>
+                    <div class="space-y-2">
+                        ${optionsHTML}
+                    </div>
+                    <div class="h-5 mt-2 text-sm font-semibold" id="quiz-feedback-${index}"></div>
+                </div>`;
+                container.innerHTML += questionHTML;
+            });
+        }
+
+        function checkQuizAnswer(button, correctAnswer) {
+            const questionIndex = button.dataset.question;
+            const feedbackEl = document.getElementById(`quiz-feedback-${questionIndex}`);
+            const parentQuestion = document.getElementById(`question-${questionIndex}`);
+            const allOptions = parentQuestion.querySelectorAll('.quiz-option');
+
+            allOptions.forEach(opt => opt.disabled = true);
+
+            if (button.textContent.trim() === correctAnswer) {
+                button.classList.remove('bg-slate-100');
+                button.classList.add('bg-green-200', 'border-green-400', 'border-2');
+                feedbackEl.textContent = '✅ Correct!';
+                feedbackEl.classList.add('text-green-600');
+                quizScore++;
+            } else {
+                button.classList.remove('bg-slate-100');
+                button.classList.add('bg-red-200', 'border-red-400', 'border-2');
+                feedbackEl.textContent = '❌ Incorrect.';
+                feedbackEl.classList.add('text-red-600');
+                allOptions.forEach(opt => {
+                    if(opt.textContent.trim() === correctAnswer) {
+                       opt.classList.add('bg-green-200', 'border-green-400', 'border-2');
+                    }
+                });
+            }
+
+            const totalAnsweredButtons = Array.from(document.querySelectorAll('.quiz-option:disabled')).length;
+            const totalQuestionsWithOptions = quizQuestions.length * quizQuestions[0].options.length;
+
+            if(totalAnsweredButtons === totalQuestionsWithOptions) {
+                 document.getElementById('quiz-result').textContent = `Your Score: ${quizScore} / ${quizQuestions.length}`;
+            }
+        }
+        
+        // --- Custom Vocabulary Functions ---
+        function renderCustomVocab() {
+            const list = document.getElementById('custom-vocab-list');
+            list.innerHTML = '';
+            if (customVocabulary.length === 0) {
+                list.innerHTML = `<p class="text-slate-500 text-center">No additional vocabulary saved yet.</p>`;
+                return;
+            }
+            customVocabulary.forEach((item, index) => {
+                const vocabItemHTML = `
+                    <div class="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border">
+                        <div>
+                            <p class="thai font-semibold text-lg">${item.thai}</p>
+                            <p class="text-slate-600">${item.meaning}</p>
+                        </div>
+                        <button onclick="removeCustomVocab(${index})" class="text-red-500 hover:text-red-700 font-semibold py-1 px-3 rounded-lg hover:bg-red-100">Remove</button>
+                    </div>
+                `;
+                list.innerHTML += vocabItemHTML;
+            });
+        }
+
+        function addCustomVocab() {
+            const thaiInput = document.getElementById('thai-vocab-input');
+            const meaningInput = document.getElementById('meaning-vocab-input');
+            const thaiWord = thaiInput.value.trim();
+            const meaning = meaningInput.value.trim();
+
+            if (thaiWord && meaning) {
+                customVocabulary.push({ thai: thaiWord, meaning: meaning });
+                thaiInput.value = '';
+                meaningInput.value = '';
+                renderCustomVocab();
+            }
+        }
+
+        function removeCustomVocab(index) {
+            customVocabulary.splice(index, 1);
+            renderCustomVocab();
+        }
+
+
+        // --- Initial Load ---
+        window.onload = () => {
+            goToSection(1);
+            updateProgressBar(10);
+            createVocabCards();
+            createTimePractice();
+            loadReviewScenario(0);
+            createQuiz();
+            renderCustomVocab();
+        };
+
+    </script>
+</body>
+</html>
+
