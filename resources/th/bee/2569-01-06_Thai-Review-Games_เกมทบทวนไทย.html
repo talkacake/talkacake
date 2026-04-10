@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมทบทวนไทย (Thai Review Game)</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { background-color: #f0f9ff; font-family: 'Sarabun', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap');
+        
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .slot-machine {
+            background-image: radial-gradient(#ffffff 15%, transparent 16%), radial-gradient(#ffffff 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-color: #fce7f3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- VOCAB DATA (Categorized for randomizer) ---
+        
+        const characters = [
+            { thai: "ช่างประปา", ipa: "châang bprà-bpaa", en: "Plumber", emoji: "🔧" },
+            { thai: "พระพันปี", ipa: "prá-pan-bpii", en: "Queen Mother", emoji: "👸" },
+            { thai: "นก", ipa: "nók", en: "Bird", emoji: "🐦" },
+            { thai: "เพื่อนรัก", ipa: "pêuan rák", en: "Best friend", emoji: "👯‍♂️" },
+            { thai: "ช่างไฟ", ipa: "châng-fai", en: "Electrician", emoji: "⚡" },
+            { thai: "นักเรียนเกาหลี", ipa: "nák-riian gao-lǐi", en: "Korean Student", emoji: "🇰🇷" }
+        ];
+
+        const actions = [
+            { thai: "ซ่อมก๊อกน้ำ", ipa: "sɔ̂m gɔ́ɔk-náam", en: "Fix faucet", emoji: "🚰" },
+            { thai: "เต้น", ipa: "dtên", en: "Dance", emoji: "💃" },
+            { thai: "ร้องเพลง", ipa: "rɔ́ɔng pleeng", en: "Sing", emoji: "🎤" },
+            { thai: "ทำอาหาร", ipa: "tam aa-hǎan", en: "Cook", emoji: "🍳" },
+            { thai: "นอนไม่หลับ", ipa: "nɔɔn mâi làp", en: "Can't sleep", emoji: "😳" },
+            { thai: "เปลี่ยนหลอดไฟ", ipa: "bplìan lɔ̀ɔt-fai", en: "Change lightbulb", emoji: "💡" }
+        ];
+
+        const places = [
+            { thai: "ในครัว", ipa: "nai krua", en: "In kitchen", emoji: "🔪" },
+            { thai: "ห้องนอน", ipa: "hɔ̂ɔng nɔɔn", en: "Bedroom", emoji: "🛏️" },
+            { thai: "โรงงานซัมซุง", ipa: "roong-ngaan sam-sung", en: "Samsung Factory", emoji: "🏭" },
+            { thai: "หน้าประตู", ipa: "nâa bprà-dtuu", en: "In front of door", emoji: "🚪" }
+        ];
+
+        const conditions = [
+            { thai: "อย่างเครียด", ipa: "yàang krîat", en: "Stressfully", emoji: "😫" },
+            { thai: "ตอนตีสี่", ipa: "dtɔɔn dtii-sìi", en: "At 4 AM", emoji: "🕓" },
+            { thai: "เพราะหิว", ipa: "prɔ́ hǐu", en: "Because hungry", emoji: "😋" },
+            { thai: "แบบตลก", ipa: "bàep dtà-lòk", en: "Funnily", emoji: "🤪" },
+            { thai: "เพราะท่อแตก", ipa: "prɔ́ tɔ̂ɔ dtàek", en: "Because pipe broke", emoji: "💦" }
+        ];
+
+        const gameHeaders = {
+            story: {
+                title: { thai: "1. แต่งเรื่องตลก", ipa: "nʉ̀ng. dtèng rûuang dtà-lòk", en: "1. Funny Story Task", emoji: "🎲" },
+                desc: { thai: "กดปุ่มและแต่งประโยคจากภาพที่เห็น", ipa: "gòt bpùm láe dtèng bprà-yòok jàak pâap tîi hěn", en: "Press the button and make a sentence from the picture you see" }
+            },
+            debate: {
+                title: { thai: "2. โต้วาทีตลก", ipa: "sɔ̌ɔng. dtôo-waa-tii dtà-lòk", en: "2. Funny Debate", emoji: "🔥" },
+                desc: { thai: "เลือกข้างและให้เหตุผล", ipa: "lʉ̂uak kâang láe hâi hèet-pǒn", en: "Choose a side and give reasons" }
+            },
+            roleplay: {
+                title: { thai: "3. บทบาทสมมติ", ipa: "sǎam. bòt-bàat sǒm-mút", en: "3. Role Play", emoji: "🎭" },
+                desc: { thai: "เลือกสถานการณ์แล้วแสดง!", ipa: "lʉ̂uak sà-tǎan-ná-gaan láew sà-daeng!", en: "Choose a situation and act!" }
+            },
+            wordsToUse: {
+                thai: "คำศัพท์ที่ต้องใช้", ipa: "kam-sàp tîi dtɔ̂ng chái", en: "Words to use", emoji: "📝"
+            },
+            mainTitle: {
+                thai: "เกมทบทวนไทย", ipa: "geem tóp-tuuan tai", en: "Thai Review Game", emoji: "🎪"
+            }
+        };
+
+        const debatesData = [
+            {
+                q: { 
+                    thai: "เป็นคนหล่อ แต่ทำอาหารจืด... ดีไหม?", 
+                    ipa: "bpen kon lɔ̀ɔ dtàe tam aa-hǎan jèut... dii mái?", 
+                    en: "Being handsome but cooking bland food... is it good?" 
+                },
+                vocab: [
+                    { thai: "หล่อ", ipa: "lɔ̀ɔ", en: "Handsome" },
+                    { thai: "จืด", ipa: "jèut", en: "Bland" },
+                    { thai: "ทำอาหาร", ipa: "tam aa-hǎan", en: "To cook" }
+                ]
+            },
+            {
+                q: { 
+                    thai: "กินถั่วงอกทุกวัน หรือ ดูหนังเกาหลี 24 ชั่วโมง?", 
+                    ipa: "gin tùa-ngɔ̂ɔk túk wan rʉ̌ʉ duu nǎng gao-lǐi 24 chûua-moong?", 
+                    en: "Eat bean sprouts every day OR Watch Korean movies 24 hours?" 
+                },
+                vocab: [
+                    { thai: "ถั่วงอก", ipa: "tùa-ngɔ̂ɔk", en: "Bean sprouts" },
+                    { thai: "หนัง", ipa: "nǎng", en: "Movie" },
+                    { thai: "ชั่วโมง", ipa: "chûua-moong", en: "Hour" }
+                ]
+            },
+            {
+                q: { 
+                    thai: "ติดอยู่ในห้องน้ำ กับ ช่างประปา หรือ พระพันปี?", 
+                    ipa: "dtìt yùu nai hɔ̂ɔng-nám gàp châang bprà-bpaa rʉ̌ʉ prá-pan-bpii?", 
+                    en: "Stuck in the bathroom with a Plumber or the Queen Mother?" 
+                },
+                vocab: [
+                    { thai: "ติด", ipa: "dtìt", en: "Stuck/Attach" },
+                    { thai: "ช่าง", ipa: "châng", en: "Technician" },
+                    { thai: "ห้องน้ำ", ipa: "hɔ̂ɔng-nám", en: "Bathroom" }
+                ]
+            }
+        ];
+
+        const rolePlayData = [
+            {
+                title: { thai: "ช่างผิดคน", ipa: "châang pìt kon", en: "The Wrong Technician" },
+                emoji: "📞",
+                mission: {
+                    thai: "คุณโทรหาช่างไฟ แต่ปัญหาคือ 'หิวข้าว' และ 'อยากกินไข่ทอด'",
+                    ipa: "kun too hǎa châang-fai dtàe bpan-hǎa kʉʉ 'hǐu-kâao' láe 'yàak gin khài thɔ̂ɔt'",
+                    en: "You call an Electrician, but your problem is 'Hungry' and 'Want fried egg'."
+                },
+                mustUse: [
+                    { thai: "สวัสดี", ipa: "sà-wàt-dii", en: "Hello" },
+                    { thai: "ช่วย", ipa: "chûai", en: "Help" },
+                    { thai: "ไฟดับ", ipa: "fai dàp", en: "Power outage" },
+                    { thai: "หิว", ipa: "hǐu", en: "Hungry" },
+                    { thai: "ไข่ทอด", ipa: "khài thɔ̂ɔt", en: "Fried egg" }
+                ]
+            },
+            {
+                title: { thai: "ช่างประปาโรแมนติก", ipa: "châang bprà-bpaa roo-maen-dtìk", en: "The Romantic Plumber" },
+                emoji: "🌹",
+                mission: {
+                    thai: "ท่อประปารั่ว แต่ช่างประปา 'หล่อมาก' คุณเลยชวนคุยเรื่อง 'หนังเกาหลี'",
+                    ipa: "tɔ̂ɔ bprà-bpaa rûua dtàe châang bprà-bpaa 'lɔ̀ɔ mâak' kun ləəi chuuan kui rûuang 'nǎng gao-lǐi'",
+                    en: "Pipe is leaking, but the plumber is 'very handsome', so you talk about 'Korean movies'."
+                },
+                mustUse: [
+                    { thai: "รั่ว", ipa: "rûua", en: "Leak" },
+                    { thai: "หล่อ", ipa: "lɔ̀ɔ", en: "Handsome" },
+                    { thai: "ชอบ", ipa: "chɔ̂ɔp", en: "Like" },
+                    { thai: "ดูหนัง", ipa: "duu nǎng", en: "Watch movie" },
+                    { thai: "ว่างไหม", ipa: "wâang mái", en: "Free?" }
+                ]
+            },
+            {
+                title: { thai: "ครูเจ้าระเบียบ", ipa: "kruu jâo rá-bìiap", en: "The Strict Teacher" },
+                emoji: "👩‍🏫",
+                mission: {
+                    thai: "นักเรียนมาสาย เพราะ 'ช่วยแมว' และ 'รถติด'",
+                    ipa: "nák-riian maa sǎai prɔ́ 'chûai maew' láe 'rót dtìt'",
+                    en: "Student is late because 'Helped a cat' and 'Traffic jam'."
+                },
+                mustUse: [
+                    { thai: "ขอโทษ", ipa: "kɔ̌ɔ-tôot", en: "Sorry" },
+                    { thai: "แมว", ipa: "maew", en: "Cat" },
+                    { thai: "น่ารัก", ipa: "nâa-rák", en: "Cute" },
+                    { thai: "รถติด", ipa: "rót dtìt", en: "Traffic jam" },
+                    { thai: "พรุ่งนี้", ipa: "prûng-níi", en: "Tomorrow" }
+                ]
+            }
+        ];
+
+        // --- COMPONENTS ---
+
+        const TTSButton = ({ text, size = "md", color = "amber" }) => {
+            const speak = (e) => {
+                e.stopPropagation();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'th-TH';
+                window.speechSynthesis.speak(u);
+            };
+            const colorClass = color === "white" ? "text-slate-400 hover:text-slate-600" : "text-amber-500 hover:text-amber-600";
+            return (
+                <button onClick={speak} className={`transition-colors flex items-center justify-center rounded-full ${size === "lg" ? "p-2 hover:bg-amber-50" : "p-1 hover:bg-amber-50"} ${colorClass}`}>
+                    <i data-lucide="volume-2" width={size === "lg" ? 24 : 16}></i>
+                </button>
+            );
+        };
+
+        const ToggleBtn = ({ text, active, onClick, color, size = "md" }) => (
+            <button 
+                onClick={(e) => { e.stopPropagation(); onClick(e); }}
+                className={`font-bold rounded-full border transition-colors shadow-sm flex items-center justify-center ${
+                    active 
+                    ? (color === 'indigo' ? 'bg-indigo-600 text-white' : 'bg-emerald-600 text-white') 
+                    : 'bg-white text-slate-400 hover:bg-slate-50'
+                } ${size === "sm" ? "text-[9px] h-5 px-1.5" : "text-[10px] h-6 px-2"}`}
+            >
+                {text}
+            </button>
+        );
+
+        // New Reusable Component for Headers/Instructions/Vocab
+        const InteractiveText = ({ data, variant = "header", align = "center", className = "" }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const isHeader = variant === "header";
+            const textSize = isHeader ? "text-lg font-bold" : variant === "desc" ? "text-sm" : "text-base font-medium";
+            const containerClass = align === "center" ? "items-center" : "items-start";
+
+            return (
+                <div className={`flex flex-col ${containerClass} gap-1 mb-1 ${className}`}>
+                    <div className={`flex items-center gap-2 flex-wrap justify-${align}`}>
+                        {data.emoji && <span className={isHeader ? "text-xl" : "text-base"}>{data.emoji}</span>}
+                        <span className={`${textSize} text-slate-800`}>{data.thai}</span>
+                        
+                        <div className="flex gap-1 items-center ml-1">
+                            <TTSButton text={data.thai} size="sm" />
+                            <ToggleBtn text="IPA" active={showIPA} onClick={() => setShowIPA(!showIPA)} color="indigo" size="sm" />
+                            <ToggleBtn text="EN" active={showEN} onClick={() => setShowEN(!showEN)} color="emerald" size="sm" />
+                        </div>
+                    </div>
+
+                    {(showIPA || showEN) && (
+                        <div className={`text-xs ${align === "center" ? "text-center" : "text-left"} animate-pop bg-slate-50 px-2 py-1 rounded w-fit max-w-full`}>
+                            {showIPA && <div className="text-indigo-600 font-mono">/{data.ipa}/</div>}
+                            {showEN && <div className="text-slate-500 italic">"{data.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const VocabCard = ({ data }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-col items-center text-center animate-pop">
+                    <div className="text-3xl mb-2">{data.emoji}</div>
+                    <div className="flex items-center gap-1 mb-1 justify-center">
+                        <span className="font-bold text-lg text-slate-800">{data.thai}</span>
+                        <TTSButton text={data.thai} />
+                    </div>
+                    
+                    <div className="flex gap-2 mb-2 justify-center">
+                        <ToggleBtn text="IPA" active={showIPA} onClick={() => setShowIPA(!showIPA)} color="indigo" />
+                        <ToggleBtn text="EN" active={showEN} onClick={() => setShowEN(!showEN)} color="emerald" />
+                    </div>
+
+                    {(showIPA || showEN) && (
+                        <div className="text-sm bg-slate-50 w-full rounded p-1">
+                            {showIPA && <div className="text-indigo-600 font-mono text-xs">/{data.ipa}/</div>}
+                            {showEN && <div className="text-slate-500 italic text-xs">"{data.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const VocabChip = ({ data }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            return (
+                <div className="inline-flex flex-col items-start bg-white border border-slate-200 rounded-lg p-2 shadow-sm animate-pop m-1">
+                     <div className="flex items-center gap-2">
+                        <span className="text-slate-800 font-bold text-sm">{data.thai}</span>
+                        <div className="flex gap-1">
+                            <TTSButton text={data.thai} size="sm" />
+                            <ToggleBtn text="IPA" active={showIPA} onClick={() => setShowIPA(!showIPA)} color="indigo" size="sm" />
+                            <ToggleBtn text="EN" active={showEN} onClick={() => setShowEN(!showEN)} color="emerald" size="sm" />
+                        </div>
+                     </div>
+                     {(showIPA || showEN) && (
+                         <div className="mt-1 pt-1 border-t border-slate-100 w-full">
+                            {showIPA && <div className="text-indigo-600 font-mono text-[10px]">/{data.ipa}/</div>}
+                            {showEN && <div className="text-slate-500 italic text-[10px]">"{data.en}"</div>}
+                         </div>
+                     )}
+                </div>
+            );
+        }
+
+        // --- GAME MODES ---
+
+        // 1. Story Generator
+        const StoryGenerator = () => {
+            const [story, setStory] = useState([null, null, null, null]);
+            const [isSpinning, setIsSpinning] = useState(false);
+
+            const spin = () => {
+                setIsSpinning(true);
+                setStory([null, null, null, null]); // Reset
+                
+                // Simulate delay
+                setTimeout(() => {
+                    const char = characters[Math.floor(Math.random() * characters.length)];
+                    const act = actions[Math.floor(Math.random() * actions.length)];
+                    const place = places[Math.floor(Math.random() * places.length)];
+                    const cond = conditions[Math.floor(Math.random() * conditions.length)];
+                    setStory([char, act, place, cond]);
+                    setIsSpinning(false);
+                }, 500);
+            };
+
+            return (
+                <div className="text-center">
+                    <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-lg border border-blue-100">
+                        <InteractiveText data={gameHeaders.story.title} variant="header" />
+                        <div className="mt-2"></div>
+                        <InteractiveText data={gameHeaders.story.desc} variant="desc" />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        {story.map((item, idx) => (
+                            <div key={idx} className="aspect-square bg-white rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center">
+                                {item ? <VocabCard data={item} /> : <span className="text-slate-300 text-4xl">?</span>}
+                            </div>
+                        ))}
+                    </div>
+
+                    <button 
+                        onClick={spin}
+                        disabled={isSpinning}
+                        className="bg-purple-600 hover:bg-purple-700 text-white text-xl font-bold py-3 px-8 rounded-full shadow-lg transform transition active:scale-95 disabled:opacity-50 flex items-center gap-2 mx-auto"
+                    >
+                        {isSpinning ? <i data-lucide="loader-2" className="animate-spin"></i> : <i data-lucide="dices"></i>}
+                        สุ่มเรื่องราว (Spin!)
+                    </button>
+                </div>
+            );
+        };
+
+        // 2. Funny Debate
+        const DebateArena = () => {
+            const [topic, setTopic] = useState(0);
+            
+            const nextTopic = () => {
+                setTopic((prev) => (prev + 1) % debatesData.length);
+            };
+
+            const current = debatesData[topic];
+
+            return (
+                <div className="max-w-xl mx-auto">
+                    <div className="mb-6 p-4 bg-orange-50 text-orange-800 rounded-lg border border-orange-100 text-center">
+                        <InteractiveText data={gameHeaders.debate.title} variant="header" />
+                        <div className="mt-2"></div>
+                        <InteractiveText data={gameHeaders.debate.desc} variant="desc" />
+                    </div>
+
+                    <div className="bg-white border-4 border-orange-400 p-6 rounded-2xl shadow-xl text-center relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-4 bg-orange-400"></div>
+                        
+                        <div className="text-4xl mb-4 mt-2">🤔 VS 😆</div>
+                        
+                        <div className="mb-6 flex justify-center">
+                            <InteractiveText data={current.q} variant="normal" align="center" />
+                        </div>
+
+                        <div className="bg-slate-50 p-3 rounded-lg inline-block text-left w-full border border-slate-100">
+                            <InteractiveText data={gameHeaders.wordsToUse} variant="desc" align="center" className="mb-2" />
+                            <div className="flex flex-wrap justify-center gap-1">
+                                {current.vocab.map((w, i) => (
+                                    <VocabChip key={i} data={w} />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="mt-8">
+                             <button onClick={nextTopic} className="text-orange-600 font-bold hover:underline flex items-center justify-center gap-2 mx-auto">
+                                หัวข้อต่อไป (Next Topic) <i data-lucide="arrow-right"></i>
+                             </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 3. Role Play Cards
+        const RolePlay = () => {
+            const [card, setCard] = useState(null);
+
+            return (
+                <div>
+                    <div className="mb-6 p-4 bg-green-50 text-green-800 rounded-lg border border-green-100 text-center">
+                        <InteractiveText data={gameHeaders.roleplay.title} variant="header" />
+                        <div className="mt-2"></div>
+                        <InteractiveText data={gameHeaders.roleplay.desc} variant="desc" />
+                    </div>
+
+                    {!card ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {rolePlayData.map((s, i) => (
+                                <button key={i} onClick={() => setCard(s)} className="h-48 bg-white rounded-xl border-2 border-slate-200 hover:border-green-500 hover:bg-green-50 transition-all flex flex-col items-center justify-center p-4 shadow-sm group">
+                                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{s.emoji}</div>
+                                    {/* Using InteractiveText in button might cause nested button issues, just rendering title text here */}
+                                    <div className="font-bold text-slate-700">{s.title.thai}</div>
+                                    <div className="text-xs text-slate-400 mt-1">{s.title.en}</div>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="max-w-lg mx-auto bg-white border-2 border-green-500 rounded-2xl p-6 shadow-xl relative animate-pop">
+                            <button onClick={() => setCard(null)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500">
+                                <i data-lucide="x-circle"></i>
+                            </button>
+                            
+                            <div className="flex flex-col items-center mb-6">
+                                <div className="text-6xl mb-2">{card.emoji}</div>
+                                <InteractiveText data={card.title} variant="header" align="center" />
+                            </div>
+
+                            <div className="bg-green-50 p-4 rounded-xl mb-6 border border-green-100">
+                                <h3 className="font-bold text-green-800 mb-2 text-center text-sm uppercase">ภารกิจ (Mission)</h3>
+                                <InteractiveText data={card.mission} variant="normal" align="center" />
+                            </div>
+
+                            <div>
+                                <InteractiveText data={gameHeaders.wordsToUse} variant="desc" align="center" className="mb-2" />
+                                <div className="flex flex-wrap gap-1 justify-center">
+                                    {card.mustUse.map((w, i) => (
+                                        <VocabChip key={i} data={w} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('story');
+
+            useEffect(() => {
+                lucide.createIcons();
+                window.speechSynthesis.getVoices(); // Preload
+            }, [activeTab]); // Re-run icons on tab change
+
+            return (
+                <div className="min-h-screen pb-20">
+                    {/* Header */}
+                    <header className="bg-white border-b sticky top-0 z-10">
+                        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <InteractiveText data={gameHeaders.mainTitle} variant="header" align="start" />
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation Tabs */}
+                    <div className="max-w-4xl mx-auto px-4 py-6">
+                        <div className="flex gap-2 mb-8 bg-slate-100 p-1 rounded-xl overflow-x-auto">
+                            {[
+                                { id: 'story', label: '1. แต่งเรื่อง (Story)', icon: 'dices' },
+                                { id: 'debate', label: '2. โต้วาที (Debate)', icon: 'mic-2' },
+                                { id: 'roleplay', label: '3. การแสดง (Roleplay)', icon: 'drama' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold transition-all whitespace-nowrap ${
+                                        activeTab === tab.id 
+                                        ? 'bg-white text-indigo-600 shadow-sm' 
+                                        : 'text-slate-500 hover:text-slate-700'
+                                    }`}
+                                >
+                                    <i data-lucide={tab.icon} width="18"></i>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Content Area */}
+                        <main className="animate-pop">
+                            {activeTab === 'story' && <StoryGenerator />}
+                            {activeTab === 'debate' && <DebateArena />}
+                            {activeTab === 'roleplay' && <RolePlay />}
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
