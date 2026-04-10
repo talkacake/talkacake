@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Thai Lesson 2: Scheduling the Handyman</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .lesson-section {
+            display: none;
+        }
+        .lesson-section.active {
+            display: block;
+        }
+        /* Flashcard styles */
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto max-w-3xl p-4 sm:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-sky-700 thai">บทเรียนที่ 2: นัดช่าง</h1>
+            <p class="text-lg sm:text-xl text-slate-600 mt-2">Lesson 2: Scheduling the Handyman</p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 rounded-full h-2.5 mb-8">
+            <div id="progress-bar" class="bg-sky-600 h-2.5 rounded-full" style="width: 10%;"></div>
+        </div>
+
+        <!-- Lesson Sections Container -->
+        <main id="lesson-container" class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+
+            <!-- 1. Dialogue Reading -->
+            <section id="section-1" class="lesson-section active">
+                <h2 class="text-2xl font-bold mb-4 thai">บทสนทนา (Dialogue)</h2>
+                <p class="mb-4">In this dialogue, the customer schedules an appointment for the next day.</p>
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <p class="font-semibold">Customer:</p>
+                        <div>
+                            <p class="text-lg thai">สวัสดีค่ะ อินเทอร์เน็ตใช้ไม่ได้ค่ะ ช่วยมาดูให้หน่อยได้ไหมคะ</p>
+                            <p class="text-slate-500">sà wát dii kâ, in-toe-nèt chái mâi dâi kâ. chûai maa duu hâi nɔ̀ɔi dâi mǎi ká</p>
+                        </div>
+                    </div>
+                    <div class="bg-sky-50 p-4 rounded-lg">
+                        <p class="font-semibold">Handyman:</p>
+                         <div>
+                            <p class="text-lg thai">ได้ครับ พรุ่งนี้สะดวกไหมครับ</p>
+                            <p class="text-slate-500">dâi kráp. prûng-níi sà-dùak mǎi kráp</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <p class="font-semibold">Customer:</p>
+                         <div>
+                            <p class="text-lg thai">พรุ่งนี้ตอนเช้าว่างค่ะ</p>
+                            <p class="text-slate-500">prûng-níi dtɔɔn cháo wâang kâ</p>
+                        </div>
+                    </div>
+                    <div class="bg-sky-50 p-4 rounded-lg">
+                        <p class="font-semibold">Handyman:</p>
+                         <div>
+                            <p class="text-lg thai">กี่โมงดีครับ</p>
+                            <p class="text-slate-500">gìi moong dii kráp</p>
+                        </div>
+                    </div>
+                     <div class="bg-slate-50 p-4 rounded-lg">
+                        <p class="font-semibold">Customer:</p>
+                         <div>
+                            <p class="text-lg thai">ประมาณ 10 โมงเช้าได้ไหมคะ</p>
+                            <p class="text-slate-500">bprà-maan sìp moong cháo dâi mǎi ká</p>
+                        </div>
+                    </div>
+                     <div class="bg-sky-50 p-4 rounded-lg">
+                        <p class="font-semibold">Handyman:</p>
+                         <div>
+                            <p class="text-lg thai">ได้ครับ เจอกันพรุ่งนี้ 10 โมงเช้าครับ</p>
+                            <p class="text-slate-500">dâi kráp. jooe gan prûng-níi sìp moong cháo kráp</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button onclick="nextSection(2, 25)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">New Vocabulary 👇</button>
+                </div>
+            </section>
+
+            <!-- 2. Vocabulary -->
+            <section id="section-2" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">คำศัพท์ใหม่ (New Vocabulary)</h2>
+                <p class="mb-6">Click on a card to flip it and see the meaning.</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <!-- Vocabulary cards will be injected here by JS -->
+                </div>
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevSection(1, 10)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="nextSection(3, 50)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Let's Practice 💬</button>
+                </div>
+            </section>
+            
+            <!-- 3. Role-play Practice -->
+            <section id="section-3" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">ฝึกสนทนา (Role-play Practice)</h2>
+                <p class="mb-4">Read the scenarios, then try the interactive exercise below.</p>
+
+                <!-- Static Scenarios -->
+                <div class="space-y-6 mb-8">
+                    <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-400">
+                        <h3 class="font-bold text-lg mb-2">Scenario 1: The toilet is clogged. Schedule for tomorrow afternoon.</h3>
+                        <p class="mb-2"><span class="font-semibold">New words:</span> <span class="thai">ส้วมตัน (sûam dtan)</span> = toilet is clogged, <span class="thai">ตอนบ่าย (dtɔɔn bàai)</span> = afternoon</p>
+                        <div class="space-y-2 text-sm">
+                            <p><span class="font-semibold">You:</span> <span class="thai">สวัสดีค่ะ ส้วมตันค่ะ ช่วยมาดูให้หน่อยได้ไหมคะ</span></p>
+                            <p><span class="font-semibold">Handyman:</span> <span class="thai">ได้ครับ พรุ่งนี้สะดวกไหมครับ</span></p>
+                            <p><span class="font-semibold">You:</span> <span class="thai">พรุ่งนี้ตอนบ่ายว่างค่ะ</span></p>
+                             <p><span class="font-semibold">Handyman:</span> <span class="thai">บ่ายโมงดีไหมครับ</span></p>
+                            <p><span class="font-semibold">You:</span> <span class="thai">ได้ค่ะ</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-400">
+                        <h3 class="font-bold text-lg mb-2">Scenario 2: No electricity. Schedule for Wednesday morning.</h3>
+                         <p class="mb-2"><span class="font-semibold">New words:</span> <span class="thai">ไฟดับ (fai dàp)</span> = no electricity, <span class="thai">วันพุธ (wan pút)</span> = Wednesday</p>
+                        <div class="space-y-2 text-sm">
+                             <p><span class="font-semibold">You:</span> <span class="thai">สวัสดีค่ะ ไฟดับค่ะ ช่วยมาดูให้หน่อยได้ไหมคะ</span></p>
+                            <p><span class="font-semibold">Handyman:</span> <span class="thai">วันนี้ไม่ว่างเลยครับ วันพุธตอนเช้าสะดวกไหมครับ</span></p>
+                            <p><span class="font-semibold">You:</span> <span class="thai">วันพุธตอนเช้าได้ค่ะ</span></p>
+                            <p><span class="font-semibold">Handyman:</span> <span class="thai">โอเคครับ วันพุธ 9 โมงเช้านะครับ</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="text-xl font-bold mb-4 thai">ถึงตาคุณแล้ว! (Your Turn!)</h3>
+                <div id="scenario-container" class="bg-slate-50 p-6 rounded-lg">
+                    <!-- Scenarios will be injected here by JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevSection(2, 25)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <button onclick="nextSection(4, 75)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Quiz Time! 🧠</button>
+                </div>
+            </section>
+
+            <!-- 4. Quiz -->
+            <section id="section-4" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">แบบทดสอบ (Quiz)</h2>
+                <p class="mb-6">Let's check what you've learned. Choose the best answer.</p>
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Quiz questions will be injected here -->
+                </div>
+                 <div class="mt-8 flex justify-between items-center">
+                    <button onclick="prevSection(3, 50)" class="bg-slate-200 text-slate-800 font-bold py-2 px-6 rounded-lg hover:bg-slate-300 transition-all">👈 Back</button>
+                    <div id="quiz-result" class="text-lg font-bold text-green-600"></div>
+                    <button onclick="nextSection(5, 100)" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all">Finish Lesson 🎉</button>
+                </div>
+            </section>
+            
+            <!-- 5. Cool-down -->
+            <section id="section-5" class="lesson-section">
+                <h2 class="text-2xl font-bold mb-4 thai">ทบทวน (Review & Cool-down)</h2>
+                <p class="mb-4 text-lg">เยี่ยมมาก! You've completed Lesson 2! 🎉</p>
+                <div class="bg-sky-50 p-6 rounded-lg">
+                    <h3 class="font-bold text-xl mb-3 thai">สรุป (Summary)</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>You learned how to ask for and suggest a time for an appointment.</li>
+                        <li>You can use words like <span class="thai font-medium">พรุ่งนี้</span>, <span class="thai font-medium">ตอนเช้า</span>, and <span class="thai font-medium">ตอนบ่าย</span>.</li>
+                        <li>You learned key verbs for scheduling: <span class="thai font-medium">ว่าง</span> (free) and <span class="thai font-medium">สะดวก</span> (convenient).</li>
+                    </ul>
+                </div>
+                 <div class="bg-amber-50 text-amber-900 p-6 rounded-lg mt-6">
+                    <h3 class="font-bold text-xl mb-3 thai">ฝึกฝนเพิ่มเติม (Extra Practice)</h3>
+                    <p>How would you tell a handyman you are free on Friday afternoon?</p>
+                    <p class="mt-2">(Hint: Friday = <span class="thai font-medium">วันศุกร์ (wan sùk)</span>)</p>
+                </div>
+                 <div class="mt-8 text-center">
+                    <button onclick="restartLesson()" class="bg-slate-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-slate-700 transition-all">Restart Lesson</button>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-8 text-sm text-slate-400">
+            <p>Interactive Thai Lesson by Gemini</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- State Management ---
+        let currentSection = 1;
+        
+        // --- Data ---
+        const vocabulary = [
+            { thai: 'สะดวก', meaning: 'Convenient' },
+            { thai: 'ว่าง', meaning: 'Free / Available' },
+            { thai: 'พรุ่งนี้', meaning: 'Tomorrow' },
+            { thai: 'วัน', meaning: 'Day' },
+            { thai: 'ตอนเช้า', meaning: 'Morning' },
+            { thai: 'ตอนบ่าย', meaning: 'Afternoon' },
+            { thai: 'กี่โมง', meaning: 'What time?' },
+            { thai: 'เจอกัน', meaning: 'See you / Meet' },
+        ];
+        
+        const scenarios = [
+            {
+                id: 1,
+                problem: "The toilet is clogged.",
+                vocab: "ส้วมตัน (sûam dtan)",
+                handymanPrompt: "ได้ครับ พรุ่งนี้สะดวกไหมครับ",
+                customerResponse: "พรุ่งนี้ตอนบ่ายว่างค่ะ",
+                handymanConfirm: "บ่ายโมงดีไหมครับ",
+                customerFinal: "ได้ค่ะ"
+            },
+            {
+                id: 2,
+                problem: "There is no electricity.",
+                vocab: "ไฟดับ (fai dàp)",
+                handymanPrompt: "วันนี้ไม่ว่างเลยครับ วันพุธตอนเช้าสะดวกไหมครับ",
+                customerResponse: "วันพุธตอนเช้าได้ค่ะ",
+                handymanConfirm: "โอเคครับ วันพุธ 9 โมงเช้านะครับ",
+                customerFinal: "ขอบคุณค่ะ"
+            }
+        ];
+
+        const quizQuestions = [
+            {
+                question: "How do you say 'Tomorrow morning'?",
+                options: ["ตอนเช้า", "พรุ่งนี้ตอนเช้า", "พรุ่งนี้ตอนบ่าย", "วันพรุ่งนี้"],
+                answer: "พรุ่งนี้ตอนเช้า"
+            },
+            {
+                question: "The handyman asks if you are free. What word means 'free / available'?",
+                options: ["สะดวก", "พรุ่งนี้", "ว่าง", "กี่โมง"],
+                answer: "ว่าง"
+            },
+            {
+                question: "What does 'กี่โมง' (gìi moong) mean?",
+                options: ["What day?", "How much?", "Tomorrow?", "What time?"],
+                answer: "What time?"
+            }
+        ];
+
+        // --- Functions ---
+
+        function updateProgressBar(percentage) {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${percentage}%`;
+        }
+
+        function goToSection(sectionNumber) {
+            document.querySelectorAll('.lesson-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`section-${sectionNumber}`).classList.add('active');
+            currentSection = sectionNumber;
+        }
+
+        function nextSection(sectionNumber, progress) {
+            goToSection(sectionNumber);
+            updateProgressBar(progress);
+        }
+
+        function prevSection(sectionNumber, progress) {
+            goToSection(sectionNumber);
+            updateProgressBar(progress);
+        }
+
+        function restartLesson() {
+            createQuiz();
+            loadScenario(0);
+            nextSection(1, 10);
+        }
+        
+        // --- DOM Initialization ---
+
+        function createVocabCards() {
+            const container = document.querySelector('#section-2 .grid');
+            container.innerHTML = '';
+            vocabulary.forEach(item => {
+                const cardHTML = `
+                <div class="flashcard-container h-36">
+                    <div class="flashcard relative w-full h-full" onclick="this.classList.toggle('is-flipped')">
+                        <div class="flashcard-face absolute w-full h-full flex flex-col items-center justify-center bg-white border-2 border-slate-200 rounded-lg p-2 shadow">
+                            <p class="text-2xl thai font-bold">${item.thai}</p>
+                        </div>
+                        <div class="flashcard-face flashcard-back absolute w-full h-full flex items-center justify-center bg-sky-100 border-2 border-sky-200 rounded-lg p-2">
+                             <p class="text-xl font-semibold text-sky-800 text-center">${item.meaning}</p>
+                        </div>
+                    </div>
+                </div>`;
+                container.innerHTML += cardHTML;
+            });
+        }
+        
+        let currentScenarioIndex = 0;
+
+        function loadScenario(index) {
+            const scenario = scenarios[index];
+            currentScenarioIndex = index;
+            const container = document.getElementById('scenario-container');
+            container.innerHTML = `
+                <div id="scenario-${scenario.id}">
+                    <p class="font-semibold text-lg">Your problem: <span class="font-normal">${scenario.problem} (${scenario.vocab})</span></p>
+                    <div class="mt-4 bg-white p-4 rounded-lg">
+                        <p class="thai font-medium text-slate-600 mb-2">ช่าง (Handyman): ${scenario.handymanPrompt}</p>
+                        <label for="user-input-${scenario.id}" class="block mb-2 font-medium thai">คุณ (You):</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="user-input-${scenario.id}" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 thai" placeholder="ตอบช่างที่นี่...">
+                            <button onclick="checkScenarioAnswer(${scenario.id})" class="bg-sky-600 text-white font-bold px-4 rounded-lg hover:bg-sky-700">Send</button>
+                        </div>
+                        <div id="feedback-${scenario.id}" class="mt-2 text-sm h-5"></div>
+                    </div>
+                    <div id="handyman-convo-${scenario.id}" class="mt-4 space-y-3"></div>
+                </div>
+            `;
+        }
+
+        function checkScenarioAnswer(scenarioId) {
+            const scenario = scenarios.find(s => s.id === scenarioId);
+            const userInput = document.getElementById(`user-input-${scenarioId}`);
+            const feedback = document.getElementById(`feedback-${scenarioId}`);
+            const convoContainer = document.getElementById(`handyman-convo-${scenarioId}`);
+            const correctAnswer = scenario.customerResponse;
+
+            const simplifiedInput = userInput.value.replace(/[ค่ะครับ]/g, '').replace(/\s/g, '');
+            const simplifiedAnswer = correctAnswer.replace(/[ค่ะครับ]/g, '').replace(/\s/g, '');
+
+            if (simplifiedInput === simplifiedAnswer) {
+                feedback.innerHTML = `<span class="text-green-600 font-semibold">✅ Correct!</span>`;
+                userInput.disabled = true;
+
+                setTimeout(() => {
+                    convoContainer.innerHTML += `<div class="bg-white p-4 rounded-lg"><p class="thai font-medium text-slate-600">ช่าง (Handyman): ${scenario.handymanConfirm}</p></div>`;
+                     if(currentScenarioIndex < scenarios.length - 1) {
+                        convoContainer.innerHTML += `<button onclick="loadScenario(${currentScenarioIndex + 1})" class="mt-4 bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-sm hover:bg-green-700">Next Scenario</button>`;
+                    } else {
+                        convoContainer.innerHTML += `<p class="mt-4 font-bold text-green-700">Great job! You completed all scenarios!</p>`;
+                    }
+                }, 1000);
+
+            } else {
+                feedback.innerHTML = `<span class="text-red-600 font-semibold">❌ Not quite. The expected answer is: ${correctAnswer}</span>`;
+            }
+        }
+        
+        let quizScore = 0;
+        function createQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            quizScore = 0;
+            document.getElementById('quiz-result').textContent = '';
+            
+            quizQuestions.forEach((q, index) => {
+                const optionsHTML = q.options.map(option => `
+                    <button class="w-full text-left p-3 bg-slate-100 rounded-lg hover:bg-sky-100 transition-colors quiz-option thai" data-question="${index}" onclick="checkQuizAnswer(this, '${q.answer}')">
+                        ${option}
+                    </button>
+                `).join('');
+
+                const questionHTML = `
+                <div id="question-${index}">
+                    <p class="font-semibold mb-3">${index + 1}. ${q.question}</p>
+                    <div class="space-y-2">
+                        ${optionsHTML}
+                    </div>
+                    <div class="h-5 mt-2 text-sm font-semibold" id="quiz-feedback-${index}"></div>
+                </div>`;
+                container.innerHTML += questionHTML;
+            });
+        }
+
+        function checkQuizAnswer(button, correctAnswer) {
+            const questionIndex = button.dataset.question;
+            const feedbackEl = document.getElementById(`quiz-feedback-${questionIndex}`);
+            const parentQuestion = document.getElementById(`question-${questionIndex}`);
+            const allOptions = parentQuestion.querySelectorAll('.quiz-option');
+
+            allOptions.forEach(opt => opt.disabled = true);
+
+            if (button.textContent.trim() === correctAnswer) {
+                button.classList.remove('bg-slate-100');
+                button.classList.add('bg-green-200', 'border-green-400', 'border-2');
+                feedbackEl.textContent = '✅ Correct!';
+                feedbackEl.classList.add('text-green-600');
+                quizScore++;
+            } else {
+                button.classList.remove('bg-slate-100');
+                button.classList.add('bg-red-200', 'border-red-400', 'border-2');
+                feedbackEl.textContent = '❌ Incorrect.';
+                feedbackEl.classList.add('text-red-600');
+                allOptions.forEach(opt => {
+                    if(opt.textContent.trim() === correctAnswer) {
+                       opt.classList.add('bg-green-200', 'border-green-400', 'border-2');
+                    }
+                });
+            }
+
+            const totalAnswered = Array.from(document.querySelectorAll('.quiz-option:disabled')).length / quizQuestions[0].options.length;
+
+            if(totalAnswered === quizQuestions.length) {
+                document.getElementById('quiz-result').textContent = `Your Score: ${quizScore} / ${quizQuestions.length}`;
+            }
+        }
+
+        // --- Initial Load ---
+        window.onload = () => {
+            goToSection(1);
+            updateProgressBar(10);
+            createVocabCards();
+            loadScenario(0);
+            createQuiz();
+        };
+
+    </script>
+</body>
+</html>
+
+
