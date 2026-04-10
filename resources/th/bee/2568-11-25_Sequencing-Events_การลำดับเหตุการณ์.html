@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Lesson: Sequencing Events</title>
+    
+    <!-- 1. Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Load React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- 3. Load Babel to process JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- 4. Custom Styles for Google Sites Iframe -->
+    <style>
+        body { background-color: #f8fafc; }
+        /* Smooth fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Root Element for React -->
+    <div id="root"></div>
+
+    <!-- React Application Script -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Icons (Implemented as SVG components for standalone usage) ---
+        const Volume2 = ({ size = 24, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        );
+        const Star = ({ size = 24, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        );
+        const Clock = ({ size = 24, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        );
+        const Coffee = ({ size = 24, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+        );
+        const Mic = ({ size = 24, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        );
+
+        // --- Data ---
+        const pageTitle = {
+            thai: "การลำดับเหตุการณ์",
+            ipa: "gaan lam-dàp hèet-gaan",
+            en: "Sequencing Events",
+            emoji: "🔢"
+        };
+
+        const sections = {
+            review: {
+                header: {
+                thai: "1. ทบทวนคำศัพท์",
+                ipa: "nʉ̀ng. tóp-tuuan kam-sàp",
+                en: "1. Review Vocabulary",
+                emoji: "🧠"
+                },
+                instruction: {
+                thai: "ครูถามคำถามนักเรียน โดยใช้คำศัพท์เก่า",
+                ipa: "kruu tǎam kam-tǎam nák-riian dooi chái kam-sàp gào",
+                en: "Teacher asks student questions using old vocabulary"
+                }
+            },
+            newVocab: {
+                header: {
+                thai: "2. คำศัพท์ใหม่: การลำดับเหตุการณ์",
+                ipa: "sɔ̌ɔng. kam-sàp mài: gaan lam-dàp hèet-gaan",
+                en: "2. New Vocabulary: Sequencing Events",
+                emoji: "🆕"
+                },
+                instruction: {
+                thai: "เป้าหมาย: ใช้คำบอกลำดับเวลา",
+                ipa: "bpâo-mǎai: chái kam bàawk lam-dàp wee-laa",
+                en: "Goal: Use time sequence words"
+                }
+            },
+            story: {
+                header: {
+                thai: "3. ตัวอย่างเรื่องราว",
+                ipa: "sǎam. dtua-yàang rûuang-raao",
+                en: "3. Story Example",
+                emoji: "📖"
+                },
+                instruction: {
+                thai: "ฝึกอ่านและสังเกตคำเชื่อม",
+                ipa: "fʉ̀k àan láe sǎng-gèet kam-chûuam",
+                en: "Practice reading and observe connecting words"
+                }
+            },
+            activity: {
+                header: {
+                thai: "4. กิจกรรมพูดคุย",
+                ipa: "sìi. gìt-jà-gam pûut-kui",
+                en: "4. Speaking Activity",
+                emoji: "🗣️"
+                },
+                instruction: {
+                thai: "จงเล่าเรื่องโดยใช้: ก่อน, หลัง, ตอนแรก, สุดท้าย",
+                ipa: "jong lâo rûuang dooi chái: gàawn, lǎng, dtɔɔn-rêek, sùt-táai",
+                en: "Tell a story using: before, after, at first, finally"
+                }
+            },
+            footer: {
+                thai: "สู้ๆ นะครับ!",
+                ipa: "sûu-sûu ná kráp",
+                en: "Keep going!",
+                emoji: "✌️"
+            }
+        };
+
+        const reviewQuestions = [
+            {
+                thai: "ปกติคุณดื่มน้ำเปล่าเย็น หรือดื่มน้ำแบบไม่เย็น?",
+                ipa: "bpòk-gà-dtì kun dʉ̀ʉm nám-bplàao yen, rʉ̌ʉ dʉ̀ʉm nám bàep mâi-yen?",
+                en: "Do you usually drink cold water or room temperature water?",
+                vocab: ["น้ำเปล่า", "ไม่เย็น"],
+                emoji: "🧊"
+            },
+            {
+                thai: "เมื่อวานคุณตื่นกี่โมง? แล้วนอนหลับดีไหม?",
+                ipa: "mʉ̂ʉa-waan kun dtʉ̀ʉn gìi moong? láaeo nɔɔn làp dii mái?",
+                en: "What time did you wake up yesterday? And did you sleep well?",
+                vocab: ["ตื่น", "กี่โมง", "นอนไม่หลับ"],
+                emoji: "🛌"
+            },
+            {
+                thai: "ช่วงนี้คุณดูหนังเกาหลี หรือซีรี่ส์เรื่องอะไรบ้างไหม?",
+                ipa: "chûuang-níi kun duu nǎng gao-lǐi rʉ̌ʉ sii-rîi rʉ̂ʉang à-rai bâang mái?",
+                en: "Lately, have you watched any Korean movies or series?",
+                vocab: ["ดูหนัง", "เกาหลี", "ซีรี่ส์"],
+                emoji: "🇰🇷"
+            },
+            {
+                thai: "ถ้าไฟดับ หรือท่อน้ำรั่ว คุณจะโทรหาใคร?",
+                ipa: "tâa fai dàp rʉ̌ʉ tɔ̂ɔ-nám rûua, kun jà too hǎa krai?",
+                en: "If the power goes out or a pipe leaks, who will you call?",
+                vocab: ["ไฟดับ", "รั่ว", "โทร"],
+                emoji: "🔦"
+            },
+            {
+                thai: "คุณทำอาหารเก่งไหม? ชอบทำเมนูอะไร?",
+                ipa: "kun tam aa-hǎan gèng mái? chɔ̂ɔp tam mee-nuu à-rai?",
+                en: "Are you good at cooking? What menu do you like to make?",
+                vocab: ["ทำอาหาร", "เก่ง"],
+                emoji: "👨‍🍳"
+            }
+        ];
+
+        const newVocab = [
+            { thai: "ก่อน", ipa: "gàawn", en: "Before", emoji: "👈" },
+            { thai: "หลัง / หลังจาก", ipa: "lǎng / lǎng-jàak", en: "After", emoji: "👉" },
+            { thai: "ตอนแรก", ipa: "dtɔɔn-rêek", en: "At first / In the beginning", emoji: "1️⃣" },
+            { thai: "หลังจากนั้น", ipa: "lǎng-jàak-nán", en: "After that / Then", emoji: "⏭️" },
+            { thai: "สุดท้าย", ipa: "sùt-táai", en: "Finally / In the end", emoji: "🏁" }
+        ];
+
+        const storyActivity = [
+            { thai: "ตอนแรก ผมตื่นนอนตอน 7 โมงเช้า", ipa: "dtɔɔn-rêek pǒm dtʉ̀ʉn-nɔɔn dtɔɔn jèt moong cháao", en: "At first, I woke up at 7 AM.", emoji: "🌅" },
+            { thai: "หลังจากนั้น ผมอาบน้ำและแต่งตัว", ipa: "lǎng-jàak-nán pǒm àap-nám láe dtèng-dtua", en: "After that, I showered and got dressed.", emoji: "🚿" },
+            { thai: "ก่อนกินข้าว ผมดื่มกาแฟร้อน 1 แก้ว", ipa: "gàawn gin-kâao pǒm dʉ̀ʉm gaa-fae rɔ́ɔn nʉ̀ng gâaeo", en: "Before eating, I drank 1 cup of hot coffee.", emoji: "☕" },
+            { thai: "สุดท้าย ผมขับรถไปทำงาน", ipa: "sùt-táai pǒm kàp-rót bpai tam-ngaan", en: "Finally, I drove to work.", emoji: "🚗" }
+        ];
+
+        const scenarios = [
+            {
+                title: { thai: "วางแผนทำอาหาร", ipa: "waang-pěan tam-aa-hǎan", en: "Cooking Plan" },
+                emoji: "🍳",
+                steps: [
+                    { thai: "ซื้อวัตถุดิบ", ipa: "sʉ́ʉ wát-tù-dìp", en: "Buy ingredients", emoji: "🛒" },
+                    { thai: "ล้างผัก", ipa: "láang pàk", en: "Wash vegetables", emoji: "🥦" },
+                    { thai: "หั่นหมู", ipa: "hàn mǔu", en: "Cut pork", emoji: "🔪" },
+                    { thai: "ผัด", ipa: "pàt", en: "Stir-fry", emoji: "🔥" },
+                    { thai: "กิน", ipa: "gin", en: "Eat", emoji: "😋" }
+                ]
+            },
+            {
+                title: { thai: "วันหยุดสุดสัปดาห์", ipa: "wan-yùt sùt-sàp-daa", en: "Weekend Routine" },
+                emoji: "🏖️",
+                steps: [
+                    { thai: "ตื่นสาย", ipa: "dtʉ̀ʉn sǎai", en: "Wake up late", emoji: "😴" },
+                    { thai: "ดูหนัง", ipa: "duu nǎng", en: "Watch movie", emoji: "🎬" },
+                    { thai: "ไปห้าง", ipa: "bpai hâang", en: "Go to mall", emoji: "🛍️" },
+                    { thai: "กินข้าวเย็น", ipa: "gin kâao yen", en: "Eat dinner", emoji: "🍽️" },
+                    { thai: "นอน", ipa: "nɔɔn", en: "Sleep", emoji: "💤" }
+                ]
+            }
+        ];
+
+        // --- Components ---
+
+        const ControlButton = ({ onClick, icon, color, size = 'md' }) => {
+            const sizeClasses = size === 'xs' ? 'p-1' : size === 'sm' ? 'p-1.5' : 'p-2';
+            const colors = {
+                amber: 'bg-amber-100 text-amber-600 hover:bg-amber-200',
+            };
+            return (
+                <button 
+                onClick={onClick}
+                className={`${sizeClasses} ${colors[color]} rounded-full transition-colors`}
+                title="Listen"
+                >
+                {icon}
+                </button>
+            );
+        };
+
+        const ToggleButton = ({ active, onClick, label, color, size = 'md' }) => {
+            const sizeClasses = size === 'xs' ? 'w-6 h-6 text-[10px]' : size === 'sm' ? 'w-7 h-7 text-[10px]' : 'w-9 h-9 text-xs';
+            
+            let bgClass = '';
+            if (color === 'indigo') bgClass = active ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200';
+            if (color === 'emerald') bgClass = active ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200';
+
+            return (
+                <button 
+                onClick={onClick}
+                className={`${sizeClasses} ${bgClass} rounded-full transition-colors flex items-center justify-center font-bold`}
+                title={label}
+                >
+                {label}
+                </button>
+            );
+        };
+
+        const ThaiText = ({ data, variant = 'card', highlight = false, emoji = "" }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const { thai, ipa, en, emoji: dataEmoji } = data;
+            const displayEmoji = emoji || dataEmoji || "";
+
+            const speak = (e) => {
+                e.stopPropagation();
+                const utterance = new SpeechSynthesisUtterance(thai);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            };
+
+            if (variant === 'header') {
+                return (
+                <div className="flex flex-col gap-2 mb-6 border-b-2 pb-2 border-slate-200">
+                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-slate-800 flex items-center">
+                        {displayEmoji && <span className="mr-3">{displayEmoji}</span>}
+                        {thai}
+                        </h2>
+                    </div>
+                    <div className="flex gap-1">
+                        <ControlButton onClick={speak} icon={<Volume2 size={18} />} color="amber" />
+                        <ToggleButton active={showIPA} onClick={() => setShowIPA(!showIPA)} label="IPA" color="indigo" />
+                        <ToggleButton active={showEN} onClick={() => setShowEN(!showEN)} label="EN" color="emerald" />
+                    </div>
+                    </div>
+                    {showIPA && <div className="text-indigo-600 font-mono text-sm animate-fade-in">/{ipa}/</div>}
+                    {showEN && <div className="text-slate-500 italic text-sm animate-fade-in">{en}</div>}
+                </div>
+                );
+            }
+
+            if (variant === 'instruction') {
+                return (
+                <div className="mb-6 p-4 bg-slate-100 rounded-lg">
+                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="text-slate-700 font-medium text-lg flex items-center">
+                        {displayEmoji && <span className="mr-2">{displayEmoji}</span>}
+                        {thai}
+                        </div>
+                        {showIPA && <div className="text-indigo-600 font-mono text-sm mt-1">/{ipa}/</div>}
+                        {showEN && <div className="text-slate-500 italic text-sm mt-1">{en}</div>}
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                        <ControlButton onClick={speak} icon={<Volume2 size={16} />} color="amber" size="sm" />
+                        <ToggleButton active={showIPA} onClick={() => setShowIPA(!showIPA)} label="IPA" color="indigo" size="sm" />
+                        <ToggleButton active={showEN} onClick={() => setShowEN(!showEN)} label="EN" color="emerald" size="sm" />
+                    </div>
+                    </div>
+                </div>
+                );
+            }
+
+            if (variant === 'inline') {
+                return (
+                <div className="flex flex-col py-2 border-b border-slate-100 last:border-0">
+                    <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-800 flex items-center">
+                        {displayEmoji && <span className="mr-2">{displayEmoji}</span>}
+                        {thai}
+                    </span>
+                    <div className="flex gap-1 scale-90 origin-right">
+                        <ControlButton onClick={speak} icon={<Volume2 size={14} />} color="amber" size="xs" />
+                        <ToggleButton active={showIPA} onClick={() => setShowIPA(!showIPA)} label="IPA" color="indigo" size="xs" />
+                        <ToggleButton active={showEN} onClick={() => setShowEN(!showEN)} label="EN" color="emerald" size="xs" />
+                    </div>
+                    </div>
+                    {showIPA && <div className="text-indigo-600 font-mono text-xs mt-1">/{ipa}/</div>}
+                    {showEN && <div className="text-slate-500 italic text-xs">{en}</div>}
+                </div>
+                );
+            }
+
+            if (variant === 'nav') {
+                return (
+                <div className="flex flex-col items-start">
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-800 text-lg flex items-center">
+                        {displayEmoji && <span className="mr-2">{displayEmoji}</span>}
+                        {thai}
+                        </span>
+                        <div className="flex gap-1 ml-2">
+                            <ControlButton onClick={speak} icon={<Volume2 size={14} />} color="amber" size="xs" />
+                            <ToggleButton active={showIPA} onClick={() => setShowIPA(!showIPA)} label="IPA" color="indigo" size="xs" />
+                            <ToggleButton active={showEN} onClick={() => setShowEN(!showEN)} label="EN" color="emerald" size="xs" />
+                        </div>
+                    </div>
+                    {showIPA && <div className="text-indigo-600 font-mono text-xs">/{ipa}/</div>}
+                    {showEN && <div className="text-slate-500 italic text-xs">{en}</div>}
+                </div>
+                )
+            }
+
+            if (variant === 'plain') {
+                return (
+                    <div className="text-center">
+                        <div className="font-bold text-slate-400 text-sm mb-2 flex items-center justify-center gap-2">
+                        {displayEmoji && <span>{displayEmoji}</span>}
+                        {thai}
+                        <ControlButton onClick={speak} icon={<Volume2 size={14} />} color="amber" size="xs" />
+                        </div>
+                        {showIPA && <div className="text-indigo-400 font-mono text-xs">/{ipa}/</div>}
+                        {showEN && <div className="text-slate-400 italic text-xs">{en}</div>}
+                        
+                        <div className="flex justify-center gap-2 mt-2">
+                            <ToggleButton active={showIPA} onClick={() => setShowIPA(!showIPA)} label="IPA" color="indigo" size="xs" />
+                            <ToggleButton active={showEN} onClick={() => setShowEN(!showEN)} label="EN" color="emerald" size="xs" />
+                        </div>
+                    </div>
+                )
+            }
+
+            // Default Card
+            return (
+                <div className={`p-4 mb-4 bg-white rounded-xl shadow-sm border-l-4 ${highlight ? 'border-indigo-500 bg-indigo-50' : 'border-emerald-400'}`}>
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                        {displayEmoji && <span className="text-2xl">{displayEmoji}</span>}
+                        <h3 className="text-xl font-bold text-gray-800 leading-relaxed font-sans">{thai}</h3>
+                    </div>
+                    
+                    {showIPA && (
+                        <div className="text-indigo-600 font-mono text-sm mb-1 bg-indigo-50 p-2 rounded inline-block animate-fade-in">
+                        /{ipa}/
+                        </div>
+                    )}
+                    
+                    {showEN && (
+                        <div className="text-gray-600 italic text-sm bg-gray-100 p-2 rounded inline-block animate-fade-in block mt-1">
+                        "{en}"
+                        </div>
+                    )}
+                    </div>
+
+                    <div className="flex flex-col gap-2 shrink-0">
+                    <ControlButton onClick={speak} icon={<Volume2 size={20} />} color="amber" />
+                    <ToggleButton active={showIPA} onClick={() => setShowIPA(!showIPA)} label="IPA" color="indigo" />
+                    <ToggleButton active={showEN} onClick={() => setShowEN(!showEN)} label="EN" color="emerald" />
+                    </div>
+                </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            useEffect(() => {
+                // Preload voices
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.getVoices();
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen pb-20 font-sans">
+                {/* Navbar */}
+                <nav className="bg-white shadow-sm sticky top-0 z-10">
+                    <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+                    <span className="text-2xl">🇹🇭</span>
+                    <ThaiText data={pageTitle} variant="nav" />
+                    </div>
+                </nav>
+
+                <main className="max-w-3xl mx-auto px-4 py-8 space-y-12">
+                    
+                    {/* 1. Review Section */}
+                    <section>
+                    <ThaiText data={sections.review.header} variant="header" />
+                    <ThaiText data={sections.review.instruction} variant="instruction" emoji="💡" />
+                    
+                    <div className="space-y-2">
+                        {reviewQuestions.map((q, idx) => (
+                        <ThaiText key={idx} data={q} />
+                        ))}
+                    </div>
+                    </section>
+
+                    {/* 2. New Vocabulary Section */}
+                    <section>
+                    <ThaiText data={sections.newVocab.header} variant="header" />
+                    <ThaiText data={sections.newVocab.instruction} variant="instruction" emoji="🎯" />
+
+                    <div className="grid gap-3">
+                        {newVocab.map((word, idx) => (
+                        <ThaiText key={idx} data={word} highlight={true} />
+                        ))}
+                    </div>
+                    </section>
+
+                    {/* 3. Storytelling Example */}
+                    <section>
+                    <ThaiText data={sections.story.header} variant="header" />
+                    <ThaiText data={sections.story.instruction} variant="instruction" emoji="🗣️" />
+
+                    <div className="space-y-2">
+                        {storyActivity.map((line, idx) => (
+                        <ThaiText key={idx} data={line} />
+                        ))}
+                    </div>
+                    </section>
+
+                    {/* 4. Activities / Roleplay */}
+                    <section>
+                    <ThaiText data={sections.activity.header} variant="header" />
+                    <ThaiText data={sections.activity.instruction} variant="instruction" />
+                    
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {scenarios.map((scenario, idx) => (
+                        <div key={idx} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <div className="text-4xl mb-3 text-center">{scenario.emoji}</div>
+                            
+                            {/* Scenario Title with TTS */}
+                            <div className="flex flex-col items-center mb-4">
+                            <ThaiText data={scenario.title} variant="nav" />
+                            </div>
+
+                            <div className="bg-slate-50 rounded-lg p-3">
+                            {scenario.steps.map((step, sIdx) => (
+                                <div key={sIdx} className="flex gap-2 mb-2 last:mb-0">
+                                <div className="w-6 h-6 mt-2 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-xs font-bold shrink-0">
+                                    {sIdx + 1}
+                                </div>
+                                <div className="flex-1">
+                                    <ThaiText data={step} variant="inline" />
+                                </div>
+                                </div>
+                            ))}
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                    </section>
+
+                </main>
+
+                {/* Footer */}
+                <footer className="flex justify-center py-8">
+                    <ThaiText data={sections.footer} variant="plain" />
+                </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
