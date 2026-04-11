@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>งานอาสาสมัคร</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4; /* Light green theme for environment/sharing */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .slide-down {
+            animation: slideDown 0.25s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #86efac; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4ade80; }
+    </style>
+</head>
+<body class="text-green-950 antialiased p-3 sm:p-6 md:p-8 min-h-screen pb-24">
+
+    <div class="max-w-4xl mx-auto space-y-6 sm:space-y-8" id="app">
+        
+        <!-- Header Section -->
+        <div id="header-container" class="bg-white rounded-3xl shadow-sm border border-green-200 p-6 text-center">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- Section 1: Review -->
+        <div class="bg-white rounded-3xl shadow-sm border border-emerald-100 p-5 sm:p-8">
+            <div id="review-header"></div>
+            
+            <button onclick="rollRandomVocab()" class="w-full py-4 mt-6 bg-emerald-500 text-white text-xl font-bold rounded-2xl shadow hover:bg-emerald-600 transition-colors flex items-center justify-center gap-3 mb-6 touch-manipulation">
+                <span class="text-3xl">🎲</span> สุ่มคำศัพท์
+            </button>
+            
+            <div id="randomizer-result" class="min-h-[140px] flex items-center justify-center bg-emerald-50 rounded-2xl border-2 border-dashed border-emerald-300 p-2 sm:p-4 transition-all">
+                <p class="text-emerald-600/60 font-medium text-lg text-center">คลิกปุ่มเพื่อสุ่มคำศัพท์ (Click button to randomize)</p>
+            </div>
+        </div>
+
+        <!-- Section 1.5: Lead-in Questions -->
+        <div class="bg-white rounded-3xl shadow-sm border border-teal-100 p-5 sm:p-8">
+            <div id="leadin-header"></div>
+            <div id="leadin-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 2: Dialogue -->
+        <div class="bg-white rounded-3xl shadow-sm border border-blue-100 p-5 sm:p-8">
+            <div id="dialogue-header"></div>
+            <div id="dialogue-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 3: Target Vocab -->
+        <div class="bg-white rounded-3xl shadow-sm border border-orange-100 p-5 sm:p-8">
+            <div id="vocab-header"></div>
+            <div id="vocab-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 4: Main Activities -->
+        <div class="bg-white rounded-3xl shadow-sm border border-fuchsia-100 p-5 sm:p-8">
+            <div id="main-activity-header"></div>
+            <div id="main-activity-content" class="mt-6 space-y-4"></div>
+        </div>
+
+        <!-- Section 5: Extension Activities -->
+        <div class="bg-white rounded-3xl shadow-sm border border-purple-100 p-5 sm:p-8">
+            <div id="extension-header"></div>
+            <div id="extension-content" class="mt-6 space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        // Data Structure
+        const lessonData = {
+            header: { emoji: '🤝🌍', th: 'งานอาสาสมัคร', ipa: 'ngaan aa-săa-sà-màk', en: 'Volunteering Job' },
+            
+            review: {
+                header: { emoji: '🔄', th: 'ทบทวนคำศัพท์เก่า', ipa: 'tóp-tuan kam-sàp gào', en: 'Old Vocabulary Review' },
+                instruction: { emoji: '🗣️', th: 'สุ่มคำศัพท์ด้านล่างและแต่งประโยคให้สมบูรณ์', ipa: 'sùm kam-sàp dâan lâang láe dtàeng bprà-yòhk hâi sŏm-buun', en: 'Randomize a vocabulary word below and make a complete sentence.' },
+                words: [
+                    { emoji: '🐦🪶', th: 'จิก', ipa: 'jìk', en: 'to peck' },
+                    { emoji: '🔛', th: 'บน', ipa: 'bon', en: 'on' },
+                    { emoji: '👄', th: 'ปาก', ipa: 'bpàak', en: 'mouth' },
+                    { emoji: '🏺', th: 'โอ่ง', ipa: 'òng', en: 'water jar' },
+                    { emoji: '👻', th: 'ผี', ipa: 'pĕe', en: 'ghost' },
+                    { emoji: '🏦🤝📦', th: 'ฝาก', ipa: 'fàak', en: 'to deposit / to leave with' },
+                    { emoji: '👜', th: 'ถุง', ipa: 'tŭng', en: 'bag' },
+                    { emoji: '🍚', th: 'ข้าว', ipa: 'kâao', en: 'rice' },
+                    { emoji: '🧪🧫', th: 'สาร', ipa: 'săan', en: 'substance / milled rice' },
+                    { emoji: '🎁', th: 'ให้', ipa: 'hâi', en: 'to give' },
+                    { emoji: '🧍‍♀️', th: 'ฉัน', ipa: 'chăn', en: 'I / me' },
+                    { emoji: '🗣️✨', th: 'คล่อง', ipa: 'klông', en: 'fluently' },
+                    { emoji: '📝', th: 'แต่งประโยค', ipa: 'dtàeng-bprà-yòhk', en: 'make sentences' },
+                    { emoji: '💬🗣️', th: 'บทสนทนา', ipa: 'bòt-sŏn-tá-naa', en: 'dialogue' },
+                    { emoji: '🥹🙏', th: 'ซึ้งใจ', ipa: 'séung-jai', en: 'touched / deeply appreciative' },
+                    { emoji: '😌🏆', th: 'ภูมิใจ', ipa: 'puum-jai', en: 'proud' },
+                    { emoji: '😊💪', th: 'ภูมิใจในตัวเอง', ipa: 'puum-jai nai dtua-ehng', en: 'proud of myself' },
+                    { emoji: '🩺📄', th: 'รายงานทางการแพทย์', ipa: 'raai-ngaan taang gaan-pâet', en: 'medical report' },
+                    { emoji: '🎯🧹', th: 'เป็นคนเป๊ะ', ipa: 'bpĕn kon bpé', en: 'be a perfectionist' },
+                    { emoji: '🧊🥶', th: 'ค้าง', ipa: 'káang', en: 'freeze; frozen' },
+                    { emoji: '📈➕', th: 'เพิ่มขึ้น', ipa: 'pêrm-kêun', en: 'more; additional; increase' },
+                    { emoji: '🧠📋', th: 'พฤติกรรม', ipa: 'prʉ́t-dtì-gam', en: 'behaviour' },
+                    { emoji: '🏙️🌇', th: 'ระเบียงดาดฟ้า', ipa: 'rá-biang dàat-fáa', en: 'rooftop terrace' },
+                    { emoji: '📦📈', th: 'สะสม', ipa: 'sà-sŏm', en: 'accumulate; collect' },
+                    { emoji: '🧠👨‍⚕️', th: 'จิตแพทย์', ipa: 'jìt-dtà-pâet', en: 'psychiatrist' },
+                    { emoji: '🔤', th: 'พยัญชนะต้น', ipa: 'pá-yan-chá-ná-dtôn', en: 'initial consonant' },
+                    { emoji: '🔤', th: 'ตัวสะกด', ipa: 'dtua-sà-gòt', en: 'final consonant' },
+                    { emoji: '🩹💚', th: 'เยียวยา', ipa: 'yiao-yaa', en: 'heal' },
+                    { emoji: '🧠💭', th: 'จิตใจ', ipa: 'jìt-jai', en: 'mind' },
+                    { emoji: '🩸📅', th: 'ขึ้นอยู่กับประจำเดือน', ipa: 'kêun yòo gàp bprà-jam-deuan', en: 'depends on period' },
+                    { emoji: '🤝❤️', th: 'งานอาสาสมัคร', ipa: 'ngaan aa-săa-sà-màk', en: 'volunteering job' },
+                    { emoji: '🧠🗣️', th: 'นักจิตบำบัด', ipa: 'nák jìt-bam-bàt', en: 'psychotherapist' },
+                    { emoji: '💊🧠', th: 'ยาต้านเศร้า', ipa: 'yaa dtâan-sâo', en: 'antidepressants' },
+                    { emoji: '💊⚠️', th: 'ผลข้างเคียง', ipa: 'pŏn kâang-kiang', en: 'side effect' },
+                    { emoji: '🧠⚡️', th: 'โรคสมาธิสั้น', ipa: 'rôhk sà-maa-tí-sân', en: 'ADHD' },
+                    { emoji: '⚖️📉', th: 'ไม่คงที่', ipa: 'mâi kong-têe', en: 'not stable' },
+                    { emoji: '😔🧍‍♂️', th: 'แปลกแยก', ipa: 'bplàek-yâek', en: 'disrooted; alienated' },
+                    { emoji: '⚠️📉', th: 'วิกฤต', ipa: 'wí-grìt', en: 'crisis' },
+                    { emoji: '🪪🧩', th: 'ตัวตน', ipa: 'dtua-dton', en: 'identity' },
+                    { emoji: '🧠🔒', th: 'ฝังใจ', ipa: 'făng-jai', en: 'deeply embedded' },
+                    { emoji: '📌', th: 'สถานการณ์', ipa: 'sà-tăan-ná-gaan', en: 'situation' },
+                    { emoji: '🎯⚡️', th: 'กระตุ้น', ipa: 'grà-dtûn', en: 'trigger' },
+                    { emoji: '🚫⚖️', th: 'เหยียด', ipa: 'yìat', en: 'discriminate' },
+                    { emoji: '🍛🍽️', th: 'อาหารคาว', ipa: 'aa-hăan kaao', en: 'main course (not desserts)' },
+                    { emoji: '🧊❄️', th: 'ช่องฟรีซ', ipa: 'chông-fréet', en: 'freezer' },
+                    { emoji: '🍲🥬🌶️', th: 'แกงเลียง', ipa: 'gaeng-liang', en: 'Thai spicy mixed vegetable soup' },
+                    { emoji: '🍮🌿', th: 'ขนมเปียกปูน', ipa: 'kà-nŏm bpìak-bpuun', en: 'Pandan sweet pudding' },
+                    { emoji: '🦐🌶️', th: 'น้ำพริกลงเรือ', ipa: 'náam-prík long-reua', en: 'Spicy shrimp paste dip' },
+                    { emoji: '🌶️🥗🍜', th: 'ตำซั่ว', ipa: 'dtam-sûa', en: 'Spicy papaya salad with rice noodles' },
+                    { emoji: '🍛🌶️', th: 'แกงคั่ว', ipa: 'gaeng-kûa', en: 'Red curry variant' },
+                    { emoji: '🚌🚇', th: 'ขนส่งสาธารณะ', ipa: 'kŏn-sòng săa-taa-rá-ná', en: 'public transport' },
+                    { emoji: '🎤📝', th: 'สัมภาษณ์', ipa: 'săm-pâat', en: 'interview' },
+                    { emoji: '🎥📺', th: 'สารคดี', ipa: 'săa-rá-ká-dee', en: 'documentary' },
+                    { emoji: '🔥🌲', th: 'ไฟป่า', ipa: 'fai-bpàa', en: 'wildfire' },
+                    { emoji: '📐📍', th: 'มุม', ipa: 'mum', en: 'corner' },
+                    { emoji: '📥', th: 'นำเข้า', ipa: 'nam-kâo', en: 'import' },
+                    { emoji: '🔗➡️', th: 'ต่อ', ipa: 'dtòr', en: 'connect; continue' }
+                ]
+            },
+
+            leadin: {
+                header: { emoji: '🤔', th: 'คำถามก่อนเข้าบทเรียน', ipa: 'kam-tăam gòn kâo bòt-rian', en: 'Lead-in Questions' },
+                questions: [
+                    { emoji: '🙋‍♀️', th: 'คุณเคยทำงานอาสาสมัครประเภทไหนมาบ้าง?', ipa: 'kun koey tam ngaan aa-săa-sà-màk bprà-pâyt năi maa bâang?', en: 'What kind of volunteer work have you done before?' },
+                    { emoji: '🗑️🥪', th: 'คุณคิดว่าปัญหา "ขยะอาหาร" (Food waste) ในปัจจุบัน รุนแรงแค่ไหน?', ipa: 'kun kít wâa bpan-hăa "kà-yà aa-hăan" nai bpàt-jù-ban, run-raeng kâe năi?', en: 'How severe do you think the "Food waste" problem is currently?' }
+                ]
+            },
+
+            dialogue: {
+                header: { emoji: '💬', th: 'บทสนทนา: ทูตของ Foodsharing', ipa: 'bòt sŏn-tá-naa: tûut kŏng Foodsharing', en: 'Dialogue: Foodsharing Ambassador' },
+                lines: [
+                    { emoji: '👩🏽', speaker: 'เพื่อน', th: 'ช่วงนี้เห็นคุณยุ่งมากเลย งานอาสาสมัครที่คุณทำที่ foodsharing คืออะไรคะ?', ipa: 'chûang née hĕn kun yûng mâak loei. ngaan aa-săa-sà-màk tîi kun tam tîi foodsharing keu à-rai ká?', en: 'I see you are very busy lately. What is the volunteer job you do at foodsharing?' },
+                    { emoji: '👱🏼‍♀️', speaker: 'ทูต', th: 'ฉันเป็นทูตค่ะ หน้าที่หลักคือการไปรับอาหารที่เหลือจากการขายในร้าน', ipa: 'chăn bpĕn tûut kâ. nâa-tîi làk keu gaan bpai ráp aa-hăan tîi lĕua jàak gaan kăai nai ráan', en: 'I am an ambassador. The main duty is going to pick up food left over from sales in the shops.' },
+                    { emoji: '👩🏽', speaker: 'เพื่อน', th: 'โห ฟังดูดีมากเลยค่ะ แล้วคุณเอาอาหารพวกนั้นไปไว้ไหนคะ?', ipa: 'hŏh, fang duu dee mâak loei kâ. láeo kun ao aa-hăan pûak nán bpai wái năi ká?', en: 'Wow, sounds great. And where do you put those foods?' },
+                    { emoji: '👱🏼‍♀️', speaker: 'ทูต', th: 'เราจะนำไปแจกจ่ายให้คนในชุมชน หรือใส่ในตู้เย็นแบ่งปัน เพื่อลดปัญหาขยะอาหารค่ะ', ipa: 'rao jà nam bpai jàek-jàai hâi kon nai chum-chon, rĕu sài nai dtûu-yen bàeng-bpan, pêua lót bpan-hăa kà-yà aa-hăan kâ', en: 'We will distribute it to people in the community, or put it in sharing fridges to reduce the food waste problem.' },
+                    { emoji: '👩🏽', speaker: 'เพื่อน', th: 'แล้วคุณต้องดีลกับเจ้าของร้านด้วยไหมคะ?', ipa: 'láeo kun dtông deen gàp jâo-kŏng ráan dtuay măi ká?', en: 'Do you have to deal with the shop owners too?' },
+                    { emoji: '👱🏼‍♀️', speaker: 'ทูต', th: 'ใช่ค่ะ ทูตต้องรับผิดชอบในการดีล และสร้างความสัมพันธ์ที่ดีกับซูเปอร์ค่ะ', ipa: 'châi kâ. tûut dtông ráp pìt chôp nai gaan deen láe sâang kwaam săm-pan tîi dee gàp suu-bpêr kâ', en: 'Yes. Ambassadors are responsible for dealing and building good relationships with the supermarkets.' }
+                ]
+            },
+
+            targetVocab: {
+                header: { emoji: '🎯', th: 'คำศัพท์ใหม่', ipa: 'kam-sàp mài', en: 'New Vocabulary' },
+                words: [
+                    { emoji: '🚚🍞', th: 'ไปรับอาหารที่เหลือ', ipa: 'bpai ráp aa-hăan tîi lĕua', en: 'to pick up leftover food' },
+                    { emoji: '🤲📦', th: 'แจกจ่าย', ipa: 'jàek-jàai', en: 'to distribute / to hand out' },
+                    { emoji: '🗑️🍏', th: 'ขยะอาหาร', ipa: 'kà-yà aa-hăan', en: 'food waste' },
+                    { emoji: '🤝🗣️', th: 'ดีล', ipa: 'deen', en: 'to deal / to negotiate' },
+                    { emoji: '🏘️👥', th: 'ชุมชน', ipa: 'chum-chon', en: 'community' }
+                ]
+            },
+
+            mainActivities: {
+                header: { emoji: '🎭', th: 'กิจกรรมการพูด', ipa: 'gìt-jà-gam gaan pûut', en: 'Speaking Activities' },
+                tasks: [
+                    { emoji: '📱', th: 'บทบาทสมมติ: คุณเป็นทูต ต้อง "ดีล" กับผู้จัดการร้านเบเกอรี่ เพื่อขอรับบริจาคขนมปังที่ขายไม่หมด', ipa: 'bòt-bàat sŏm-mút: kun bpĕn tûut. dtông "deen" gàp pûu jàt gaan ráan bay-ger-rêe, pêua kŏr ráp bor-rí-jàak kà-nŏm-bpang tîi kăai mâi mòt', en: 'Role-play: You are an ambassador. You must "deal" with a bakery manager to receive donations of unsold bread.' },
+                    { emoji: '🎤', th: 'สัมภาษณ์: ครูจะสวมบทบาทเป็นนักข่าว สัมภาษณ์คุณเกี่ยวกับการทำงานไปรับอาหารที่เหลือเพื่อชุมชน', ipa: 'săm-pâat: kruu jà sŭam bòt-bàat bpĕn nák kàao, săm-pâat kun gìao gàp gaan tam ngaan bpai ráp aa-hăan tîi lĕua pêua chum-chon', en: 'Interview: The teacher will role-play as a journalist, interviewing you about your work picking up leftover food for the community.' },
+                    { emoji: '❓', th: 'คำถามอภิปราย: คุณคิดว่าการแจกจ่ายอาหารฟรี ทำให้คนบางกลุ่มมีพฤติกรรมรอคอยแต่ของฟรีหรือไม่?', ipa: 'kam-tăam a-pí-bpraai: kun kít wâa gaan jàek-jàai aa-hăan free, tam hâi kon baang glùm mee prʉ́t-dtì-gam ror koi dtàe kŏng free rĕu mâi?', en: 'Discussion Question: Do you think distributing free food causes some groups to have a behavior of only waiting for free stuff?' }
+                ]
+            },
+
+            extensionActivities: {
+                header: { emoji: '🌟', th: 'กิจกรรมเสริม', ipa: 'gìt-jà-gam sĕrm', en: 'Extension Activities' },
+                instruction: { emoji: '⏱️', th: 'หากมีเวลาเหลือ ให้ทำกิจกรรมเหล่านี้', ipa: 'hàak mee way-laa lĕua, hâi tam gìt-jà-gam lào née', en: 'If there is time left, do these activities.' },
+                tasks: [
+                    { emoji: '📊', th: 'นำเสนอ: พูดเชิญชวน 1 นาที ให้เพื่อนๆ มาร่วมเป็นอาสาสมัครลดขยะอาหาร', ipa: 'nam sà-nĕr: pûut chern-chuan nèung naa-tee hâi pêuan pêuan maa rûam bpĕn aa-săa-sà-màk lót kà-yà aa-hăan', en: 'Presentation: A 1-minute persuasive speech to invite friends to join as food waste reduction volunteers.' },
+                    { emoji: '⚖️', th: 'โต้วาที: ซูเปอร์ควรถูกปรับเงิน (fined) หากทิ้งอาหารที่ยังกินได้ จริงหรือไม่?', ipa: 'dtôh-waa-tee: suu-bpêr kuan dtùuk bpràp ngern, hàak tíng aa-hăan tîi yang gin dâi. jing rĕu mâi?', en: 'Debate: Supermarkets should be fined if they throw away edible food. True or False?' },
+                    { emoji: '📖', th: 'เล่าเรื่อง: เล่าเหตุการณ์ที่คุณรู้สึก "ซึ้งใจ" หรือ "ภูมิใจ" ที่สุดตั้งแต่ทำงานอาสาสมัคร', ipa: 'lâo rêuang: lâo hàyt-gaan tîi kun rú-sèuk "séung-jai" rĕu "puum-jai" tîi sùt dtâng-dtàe tam ngaan aa-săa-sà-màk', en: 'Story-telling: Tell the event where you felt the most "touched" or "proud" since working as a volunteer.' },
+                    { emoji: '🧩', th: 'เกมการพูด: ครูจะใบ้คำศัพท์ใหม่ 5 คำ โดยห้ามพูดคำนั้นตรงๆ ให้คุณทาย', ipa: 'gaym gaan pûut: kruu jà bâi kam-sàp mài hâa kam doy hâam pûut kam nán dtrong dtrong, hâi kun taai', en: 'Speaking Game: The teacher will hint the 5 new vocab words without saying them directly. You guess.' }
+                ]
+            }
+        };
+
+        // UI Generation
+        function createInteractiveBlock(item, isHeader = false) {
+            const speakerTag = item.speaker ? `<span class="font-bold text-teal-700 mr-2 border-b-2 border-teal-200 pb-1">${item.speaker}:</span>` : '';
+            const emojiTag = item.emoji ? `<span class="mr-3 text-2xl sm:text-3xl shrink-0 drop-shadow-sm">${item.emoji}</span>` : '';
+            
+            const uniqueId = Math.random().toString(36).substr(2, 9);
+            const ipaId = `ipa-${uniqueId}`;
+            const enId = `en-${uniqueId}`;
+
+            const safeThaiText = item.th.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            
+            const titleClass = isHeader ? "text-xl sm:text-2xl font-bold text-green-900" : "text-lg text-green-900 font-medium";
+            const containerClass = isHeader ? "bg-green-50 border-green-200" : "bg-white border-green-50";
+
+            return `
+            <div class="${containerClass} rounded-2xl shadow-sm border p-4 sm:p-5 transition hover:shadow-md w-full">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div class="${titleClass} leading-relaxed flex-1 flex items-start">
+                        ${emojiTag}
+                        <div class="pt-0.5">${speakerTag}${item.th}</div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
+                        <button onclick="speakThai('${safeThaiText}')" class="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 bg-teal-100 text-teal-700 rounded-full hover:bg-teal-200 transition shadow-sm touch-manipulation focus:outline-none focus:ring-2 focus:ring-teal-400" title="ฟังเสียง (Listen)">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z"/><path d="M15.932 7.757a.75.75 0 011.061 0 4.5 4.5 0 010 6.364.75.75 0 01-1.06-1.06 3 3 0 000-4.243.75.75 0 010-1.061z"/></svg>
+                        </button>
+                        <button onclick="toggleVisibility('${ipaId}')" class="px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm font-bold tracking-wide bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition shadow-sm touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-400">IPA</button>
+                        <button onclick="toggleVisibility('${enId}')" class="px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm font-bold tracking-wide bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition shadow-sm touch-manipulation focus:outline-none focus:ring-2 focus:ring-emerald-400">EN</button>
+                    </div>
+                </div>
+                <div id="${ipaId}" class="hidden mt-4 px-4 py-3 bg-blue-50 text-blue-800 rounded-xl text-base font-medium tracking-wide border border-blue-100 w-full slide-down"><span class="text-blue-500 mr-2 font-bold text-sm">IPA</span> ${item.ipa}</div>
+                <div id="${enId}" class="hidden mt-3 px-4 py-3 bg-emerald-50 text-emerald-800 rounded-xl text-base border border-emerald-100 w-full slide-down"><span class="text-emerald-500 mr-2 font-bold text-sm">EN</span> ${item.en}</div>
+            </div>
+            `;
+        }
+
+        function toggleVisibility(elementId) {
+            const el = document.getElementById(elementId);
+            el.classList.toggle('hidden');
+        }
+
+        // TTS setup specifically catering to iOS quirks
+        function speakThai(text) {
+            if (!('speechSynthesis' in window)) {
+                alert("อุปกรณ์ของคุณไม่รองรับระบบเสียง (TTS is not supported).");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            utterance.pitch = 1.0;
+            
+            let voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                const thaiVoice = voices.find(voice => voice.lang.includes('th'));
+                if (thaiVoice) utterance.voice = thaiVoice;
+            }
+            window.speechSynthesis.speak(utterance);
+        }
+
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+        }
+
+        function rollRandomVocab() {
+            const words = lessonData.review.words;
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const selectedWord = words[randomIndex];
+            
+            const container = document.getElementById('randomizer-result');
+            container.innerHTML = createInteractiveBlock(selectedWord);
+            
+            setTimeout(() => speakThai(selectedWord.th), 100);
+        }
+
+        function initializePage() {
+            // Header
+            document.getElementById('header-container').innerHTML = `
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-green-900 flex items-center justify-center gap-3">
+                    <span class="text-4xl sm:text-5xl">${lessonData.header.emoji}</span>
+                    ${lessonData.header.th}
+                </h1>
+                <div class="mt-6 flex justify-center gap-2 sm:gap-3 flex-wrap">
+                    <button onclick="speakThai('${lessonData.header.th}')" class="px-4 py-2 bg-teal-100 text-teal-800 rounded-full text-sm font-semibold hover:bg-teal-200 transition touch-manipulation shadow-sm">🔊 ฟังเสียง</button>
+                    <button onclick="toggleVisibility('header-ipa')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold hover:bg-blue-200 transition touch-manipulation shadow-sm">IPA</button>
+                    <button onclick="toggleVisibility('header-en')" class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold hover:bg-emerald-200 transition touch-manipulation shadow-sm">EN</button>
+                </div>
+                <div id="header-ipa" class="hidden mt-4 text-blue-700 font-medium text-lg slide-down">${lessonData.header.ipa}</div>
+                <div id="header-en" class="hidden mt-2 text-emerald-700 text-lg slide-down">${lessonData.header.en}</div>
+            `;
+
+            // Sections
+            document.getElementById('review-header').innerHTML = createInteractiveBlock(lessonData.review.header, true);
+            document.getElementById('review-header').innerHTML += `<div class="mt-4">` + createInteractiveBlock(lessonData.review.instruction) + `</div>`;
+            
+            document.getElementById('leadin-header').innerHTML = createInteractiveBlock(lessonData.leadin.header, true);
+            document.getElementById('leadin-content').innerHTML = lessonData.leadin.questions.map(q => createInteractiveBlock(q)).join('');
+
+            document.getElementById('dialogue-header').innerHTML = createInteractiveBlock(lessonData.dialogue.header, true);
+            document.getElementById('dialogue-content').innerHTML = lessonData.dialogue.lines.map(line => createInteractiveBlock(line)).join('');
+
+            document.getElementById('vocab-header').innerHTML = createInteractiveBlock(lessonData.targetVocab.header, true);
+            document.getElementById('vocab-content').innerHTML = lessonData.targetVocab.words.map(word => createInteractiveBlock(word)).join('');
+
+            document.getElementById('main-activity-header').innerHTML = createInteractiveBlock(lessonData.mainActivities.header, true);
+            document.getElementById('main-activity-content').innerHTML = lessonData.mainActivities.tasks.map(task => createInteractiveBlock(task)).join('');
+
+            document.getElementById('extension-header').innerHTML = createInteractiveBlock(lessonData.extensionActivities.header, true);
+            document.getElementById('extension-header').innerHTML += `<div class="mt-4">` + createInteractiveBlock(lessonData.extensionActivities.instruction) + `</div>`;
+            document.getElementById('extension-content').innerHTML = lessonData.extensionActivities.tasks.map(task => createInteractiveBlock(task)).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
