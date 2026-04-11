@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Review: Part 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        .thai-text {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .matched {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .selected-match {
+            border-color: #3b82f6 !important;
+            background-color: #eff6ff !important;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20" id="app-body">
+
+    <!-- Header & Controls -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-indigo-600 flex items-center gap-2">
+                    🇹🇭 Thai Review: Part 2
+                </h1>
+                <p class="text-sm text-gray-500">45-Minute Interactive Practice</p>
+            </div>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <div class="max-w-4xl mx-auto px-4 mt-2 flex overflow-x-auto gap-2 pb-2">
+            <button onclick="switchTab(1)" id="tab-btn-1" class="whitespace-nowrap px-4 py-2 rounded-lg font-semibold bg-indigo-600 text-white transition-colors">1. Warm Up</button>
+            <button onclick="switchTab(2)" id="tab-btn-2" class="whitespace-nowrap px-4 py-2 rounded-lg font-semibold bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">2. Match Words</button>
+            <button onclick="switchTab(3)" id="tab-btn-3" class="whitespace-nowrap px-4 py-2 rounded-lg font-semibold bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">3. Build Sentences</button>
+            <button onclick="switchTab(4)" id="tab-btn-4" class="whitespace-nowrap px-4 py-2 rounded-lg font-semibold bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">4. Fix Errors</button>
+            <button onclick="switchTab(5)" id="tab-btn-5" class="whitespace-nowrap px-4 py-2 rounded-lg font-semibold bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">5. Bonus</button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+
+        <!-- ACTIVITY 1: WARM UP (Q&A) -->
+        <section id="tab-1" class="tab-content active">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">💬 Warm Up Conversation</h2>
+                <p class="text-gray-500 mb-6">Read the question and select the best answer.</p>
+
+                <div class="space-y-8" id="chat-container">
+                    <!-- Q1 -->
+                    <div class="space-y-3">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl shrink-0">🧑‍🏫</div>
+                            <div class="bg-blue-50 text-gray-800 p-4 rounded-2xl rounded-tl-none border border-blue-100">
+                                <div class="flex gap-2 mb-2">
+                                    <button onclick="toggleInline('t1-q1-ipa')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">IPA</button>
+                                    <button onclick="toggleInline('t1-q1-en')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">EN</button>
+                                </div>
+                                <div class="text-lg thai-text font-medium">คุณชอบทำงานบ้านไหมครับ?</div>
+                                <div id="t1-q1-ipa" class="hidden text-xs text-blue-600 font-mono mt-2 pt-2 border-t border-blue-200/50">khun chɔ̂ɔp tam-ngaan-bâan mái kráp?</div>
+                                <div id="t1-q1-en" class="hidden text-xs text-gray-500 italic mt-1">Do you like doing housework?</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pl-12 flex-wrap" id="q1-options">
+                            <button onclick="answerChat('q1', false, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">เงินสดครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">ngoen-sòt kráp</div>
+                            </button>
+                            <button onclick="answerChat('q1', true, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">ไม่ชอบครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">mâi chɔ̂ɔp kráp</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="space-y-3 hidden" id="chat-q2">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl shrink-0">🧑‍🏫</div>
+                            <div class="bg-blue-50 text-gray-800 p-4 rounded-2xl rounded-tl-none border border-blue-100">
+                                <div class="flex gap-2 mb-2">
+                                    <button onclick="toggleInline('t1-q2-ipa')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">IPA</button>
+                                    <button onclick="toggleInline('t1-q2-en')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">EN</button>
+                                </div>
+                                <div class="text-lg thai-text font-medium">ห้องน้ำไปทางไหนครับ?</div>
+                                <div id="t1-q2-ipa" class="hidden text-xs text-blue-600 font-mono mt-2 pt-2 border-t border-blue-200/50">hâwng nám bpai taang nǎi kráp?</div>
+                                <div id="t1-q2-en" class="hidden text-xs text-gray-500 italic mt-1">Which way is the bathroom?</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pl-12 flex-wrap" id="q2-options">
+                            <button onclick="answerChat('q2', true, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">ไปทางนั้นครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">bpai taang nán kráp</div>
+                            </button>
+                            <button onclick="answerChat('q2', false, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">น้ำขวดครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">náam khùat kráp</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="space-y-3 hidden" id="chat-q3">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl shrink-0">🧑‍🏫</div>
+                            <div class="bg-blue-50 text-gray-800 p-4 rounded-2xl rounded-tl-none border border-blue-100">
+                                <div class="flex gap-2 mb-2">
+                                    <button onclick="toggleInline('t1-q3-ipa')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">IPA</button>
+                                    <button onclick="toggleInline('t1-q3-en')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">EN</button>
+                                </div>
+                                <div class="text-lg thai-text font-medium">ดื่มน้ำอะไรดีครับ?</div>
+                                <div id="t1-q3-ipa" class="hidden text-xs text-blue-600 font-mono mt-2 pt-2 border-t border-blue-200/50">dèum náam à-rai dii kráp?</div>
+                                <div id="t1-q3-en" class="hidden text-xs text-gray-500 italic mt-1">What water/drink would you like?</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pl-12 flex-wrap" id="q3-options">
+                            <button onclick="answerChat('q3', false, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">ทั้งหมดครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">tháng-mòt kráp</div>
+                            </button>
+                            <button onclick="answerChat('q3', true, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">ขอน้ำเปล่าครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">khɔ̌ɔ náam-plào kráp</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="space-y-3 hidden" id="chat-q4">
+                        <div class="flex gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl shrink-0">🧑‍🏫</div>
+                            <div class="bg-blue-50 text-gray-800 p-4 rounded-2xl rounded-tl-none border border-blue-100">
+                                <div class="flex gap-2 mb-2">
+                                    <button onclick="toggleInline('t1-q4-ipa')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">IPA</button>
+                                    <button onclick="toggleInline('t1-q4-en')" class="text-[10px] bg-white border border-blue-200 px-2 py-0.5 rounded text-blue-600 hover:bg-blue-50 transition">EN</button>
+                                </div>
+                                <div class="text-lg thai-text font-medium">เช็คบิลครับ จ่ายยังไงครับ?</div>
+                                <div id="t1-q4-ipa" class="hidden text-xs text-blue-600 font-mono mt-2 pt-2 border-t border-blue-200/50">chék bin kráp. jàai yang-ngai kráp?</div>
+                                <div id="t1-q4-en" class="hidden text-xs text-gray-500 italic mt-1">Check bill. How would you like to pay?</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pl-12 flex-wrap" id="q4-options">
+                            <button onclick="answerChat('q4', true, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">จ่ายบัตรได้ไหมครับ?</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">jàai bàt dâi mái kráp?</div>
+                            </button>
+                            <button onclick="answerChat('q4', false, this)" class="px-4 py-2 rounded-xl border-2 border-gray-200 hover:border-indigo-400 text-left transition-all">
+                                <span class="thai-text text-lg">กินผักโขมครับ</span>
+                                <div class="text-xs text-gray-500 mt-1 font-mono">gin pàk kǒm kráp</div>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 2: MATCHING -->
+        <section id="tab-2" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">🔗 Match the Words</h2>
+                        <p class="text-gray-500">Tap a Thai word, then tap its English meaning.</p>
+                    </div>
+                    <button onclick="resetMatching()" class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded">🔄 Reset</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 relative" id="match-container">
+                    <!-- Left Column (Thai) -->
+                    <div class="flex flex-col gap-3" id="match-left">
+                        <!-- Populated by JS -->
+                    </div>
+                    <!-- Right Column (English) -->
+                    <div class="flex flex-col gap-3" id="match-right">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 3: SENTENCE BUILDER -->
+        <section id="tab-3" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">🧩 Build the Sentence</h2>
+                <p class="text-gray-500 mb-6">Tap the words in the correct order to make a sentence.</p>
+
+                <!-- Sentence 1 -->
+                <div class="mb-10 pb-6 border-b border-gray-100 sentence-task" id="sent-task-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">1</span>
+                        <span class="font-semibold text-gray-700">Can I pay by cash?</span>
+                    </div>
+                    <!-- Answer Box -->
+                    <div class="min-h-[60px] bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl mb-4 p-2 flex flex-wrap gap-2 items-center" id="sent-ans-1"></div>
+                    <!-- Word Bank -->
+                    <div class="flex flex-wrap gap-2" id="sent-bank-1">
+                        <button onclick="selectWord(1, this, 'ได้', 'dâi')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ได้</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">dâi</span>
+                        </button>
+                        <button onclick="selectWord(1, this, 'ไหม', 'mái')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ไหม</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">mái</span>
+                        </button>
+                        <button onclick="selectWord(1, this, 'ผม', 'phǒm')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ผม</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">phǒm</span>
+                        </button>
+                        <button onclick="selectWord(1, this, 'จ่าย', 'jàai')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">จ่าย</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">jàai</span>
+                        </button>
+                        <button onclick="selectWord(1, this, 'เงินสด', 'ngoen-sòt')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">เงินสด</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">ngoen-sòt</span>
+                        </button>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="checkSentence(1, 'ผม จ่าย เงินสด ได้ ไหม')" class="bg-green-500 text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-green-600 hidden" id="sent-check-1">Check Answer</button>
+                        <button onclick="resetSentence(1)" class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-300">Undo All</button>
+                    </div>
+                    <div id="sent-fb-1" class="mt-2 text-sm font-bold hidden"></div>
+                </div>
+
+                <!-- Sentence 2 -->
+                <div class="mb-10 pb-6 border-b border-gray-100 sentence-task" id="sent-task-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">2</span>
+                        <span class="font-semibold text-gray-700">How much in total?</span>
+                    </div>
+                    <div class="min-h-[60px] bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl mb-4 p-2 flex flex-wrap gap-2 items-center" id="sent-ans-2"></div>
+                    <div class="flex flex-wrap gap-2" id="sent-bank-2">
+                        <button onclick="selectWord(2, this, 'ทั้งหมด', 'tháng-mòt')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ทั้งหมด</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">tháng-mòt</span>
+                        </button>
+                        <button onclick="selectWord(2, this, 'เท่าไร', 'tâo-rài')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">เท่าไร</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">tâo-rài</span>
+                        </button>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="checkSentence(2, 'ทั้งหมด เท่าไร')" class="bg-green-500 text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-green-600 hidden" id="sent-check-2">Check Answer</button>
+                        <button onclick="resetSentence(2)" class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-300">Undo All</button>
+                    </div>
+                    <div id="sent-fb-2" class="mt-2 text-sm font-bold hidden"></div>
+                </div>
+
+                <!-- Sentence 3 -->
+                <div class="mb-10 pb-6 border-b border-gray-100 sentence-task" id="sent-task-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">3</span>
+                        <span class="font-semibold text-gray-700">Can I have 2 bottles of water?</span>
+                    </div>
+                    <div class="min-h-[60px] bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl mb-4 p-2 flex flex-wrap gap-2 items-center" id="sent-ans-3"></div>
+                    <div class="flex flex-wrap gap-2" id="sent-bank-3">
+                        <button onclick="selectWord(3, this, 'สอง', 'sɔ̌ɔng')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">สอง</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">sɔ̌ɔng</span>
+                        </button>
+                        <button onclick="selectWord(3, this, 'ขวด', 'khùat')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ขวด</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">khùat</span>
+                        </button>
+                        <button onclick="selectWord(3, this, 'น้ำเปล่า', 'náam-plào')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">น้ำเปล่า</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">náam-plào</span>
+                        </button>
+                        <button onclick="selectWord(3, this, 'ขอ', 'khɔ̌ɔ')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ขอ</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">khɔ̌ɔ</span>
+                        </button>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="checkSentence(3, 'ขอ น้ำเปล่า สอง ขวด')" class="bg-green-500 text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-green-600 hidden" id="sent-check-3">Check Answer</button>
+                        <button onclick="resetSentence(3)" class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-300">Undo All</button>
+                    </div>
+                    <div id="sent-fb-3" class="mt-2 text-sm font-bold hidden"></div>
+                </div>
+
+                <!-- Sentence 4 -->
+                <div class="mb-4 sentence-task" id="sent-task-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded">4</span>
+                        <span class="font-semibold text-gray-700">I don't like doing housework.</span>
+                    </div>
+                    <div class="min-h-[60px] bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl mb-4 p-2 flex flex-wrap gap-2 items-center" id="sent-ans-4"></div>
+                    <div class="flex flex-wrap gap-2" id="sent-bank-4">
+                        <button onclick="selectWord(4, this, 'ผม', 'phǒm')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ผม</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">phǒm</span>
+                        </button>
+                        <button onclick="selectWord(4, this, 'ทำงานบ้าน', 'tam-ngaan-bâan')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ทำงานบ้าน</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">tam-ngaan-bâan</span>
+                        </button>
+                        <button onclick="selectWord(4, this, 'ชอบ', 'chɔ̂ɔp')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ชอบ</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">chɔ̂ɔp</span>
+                        </button>
+                        <button onclick="selectWord(4, this, 'ไม่', 'mâi')" class="px-3 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 flex flex-col items-center transition">
+                            <span class="thai-text text-lg">ไม่</span>
+                            <span class="text-[10px] text-gray-500 font-mono mt-0.5">mâi</span>
+                        </button>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="checkSentence(4, 'ผม ไม่ ชอบ ทำงานบ้าน')" class="bg-green-500 text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-green-600 hidden" id="sent-check-4">Check Answer</button>
+                        <button onclick="resetSentence(4)" class="bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-300">Undo All</button>
+                    </div>
+                    <div id="sent-fb-4" class="mt-2 text-sm font-bold hidden"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ACTIVITY 4: FIX ERRORS -->
+        <section id="tab-4" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">🛠️ Fix the Errors</h2>
+                <p class="text-gray-500 mb-6">The crossed-out word is wrong. Choose the correct word to fix the sentence!</p>
+
+                <div class="space-y-8 text-lg">
+                    <!-- Error 1 -->
+                    <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                        <div class="text-sm font-bold text-gray-600 mb-2">1. "I pay with cash."</div>
+                        <div class="flex flex-col md:flex-row md:items-center gap-3">
+                            <div class="thai-text bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 text-xl flex-grow">
+                                ผม <span class="line-through text-red-500 decoration-2">เอา</span> 
+                                <select id="err1" class="bg-yellow-50 border-2 border-yellow-300 text-indigo-700 font-bold rounded px-2 py-1 mx-1 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">...</option>
+                                    <option value="จ่าย">จ่าย (jàai)</option>
+                                    <option value="ทำ">ทำ (tham)</option>
+                                    <option value="ชอบ">ชอบ (chɔ̂ɔp)</option>
+                                </select> 
+                                เงินสด ครับ
+                            </div>
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleInline('e1-ipa')" class="text-[10px] bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-500 hover:bg-gray-100 transition">Show IPA</button>
+                        </div>
+                        <div id="e1-ipa" class="hidden text-sm text-gray-500 font-mono mt-1">phǒm [ ___ ] ngoen-sòt kráp</div>
+                    </div>
+
+                    <!-- Error 2 -->
+                    <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                        <div class="text-sm font-bold text-gray-600 mb-2">2. "Which way is the bathroom?"</div>
+                        <div class="flex flex-col md:flex-row md:items-center gap-3">
+                            <div class="thai-text bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 text-xl flex-grow">
+                                ห้องน้ำ ไป ทาง <span class="line-through text-red-500 decoration-2">อะไร</span> 
+                                <select id="err2" class="bg-yellow-50 border-2 border-yellow-300 text-indigo-700 font-bold rounded px-2 py-1 mx-1 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">...</option>
+                                    <option value="ไหม">ไหม (mái)</option>
+                                    <option value="ไหน">ไหน (nǎi)</option>
+                                    <option value="ยังไง">ยังไง (yang-ngai)</option>
+                                </select> 
+                                ครับ?
+                            </div>
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleInline('e2-ipa')" class="text-[10px] bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-500 hover:bg-gray-100 transition">Show IPA</button>
+                        </div>
+                        <div id="e2-ipa" class="hidden text-sm text-gray-500 font-mono mt-1">hâwng nám bpai taang [ ___ ] kráp?</div>
+                    </div>
+
+                    <!-- Error 3 -->
+                    <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                        <div class="text-sm font-bold text-gray-600 mb-2">3. "Can I have two bottles of plain water?"</div>
+                        <div class="flex flex-col md:flex-row md:items-center gap-3">
+                            <div class="thai-text bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 text-xl flex-grow">
+                                ขอ น้ำเปล่า <span class="line-through text-red-500 decoration-2">ขวด สอง</span> 
+                                <select id="err3" class="bg-yellow-50 border-2 border-yellow-300 text-indigo-700 font-bold rounded px-2 py-1 mx-1 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">...</option>
+                                    <option value="สอง ขวด">สอง ขวด (sɔ̌ɔng khùat)</option>
+                                    <option value="น้ำ ขวด">น้ำ ขวด (náam khùat)</option>
+                                </select> 
+                                ครับ
+                            </div>
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleInline('e3-ipa')" class="text-[10px] bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-500 hover:bg-gray-100 transition">Show IPA</button>
+                        </div>
+                        <div id="e3-ipa" class="hidden text-sm text-gray-500 font-mono mt-1">khɔ̌ɔ náam-plào [ ___ ] kráp</div>
+                    </div>
+
+                    <!-- Error 4 -->
+                    <div class="bg-red-50/50 p-4 rounded-xl border border-red-100">
+                        <div class="text-sm font-bold text-gray-600 mb-2">4. "How much in total?"</div>
+                        <div class="flex flex-col md:flex-row md:items-center gap-3">
+                            <div class="thai-text bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 text-xl flex-grow">
+                                <span class="line-through text-red-500 decoration-2">ทั้งหมด อะไร</span> 
+                                <select id="err4" class="bg-yellow-50 border-2 border-yellow-300 text-indigo-700 font-bold rounded px-2 py-1 mx-1 outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">...</option>
+                                    <option value="ทั้งหมด เท่าไร">ทั้งหมด เท่าไร (tháng-mòt tâo-rài)</option>
+                                    <option value="ทั้งหมด นั้น">ทั้งหมด นั้น (tháng-mòt nán)</option>
+                                </select> 
+                                ครับ?
+                            </div>
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <button onclick="toggleInline('e4-ipa')" class="text-[10px] bg-white border border-gray-300 px-2 py-0.5 rounded text-gray-500 hover:bg-gray-100 transition">Show IPA</button>
+                        </div>
+                        <div id="e4-ipa" class="hidden text-sm text-gray-500 font-mono mt-1">[ ___ ] kráp?</div>
+                    </div>
+
+                </div>
+                
+                <div class="mt-8 border-t border-gray-100 pt-6 flex items-center gap-4">
+                    <button onclick="checkErrors()" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition">Check Answers</button>
+                    <span id="err-feedback" class="font-bold hidden"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 5: BONUS / EXTENSION -->
+        <section id="tab-5" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">⭐ Bonus: Speaking Activities</h2>
+                <p class="text-gray-500 mb-6">Real-life tasks using your vocabulary. Speak with your teacher!</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- 1. Role-Play -->
+                    <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100 shadow-sm">
+                        <div class="text-2xl mb-2">🎭 Role-Play: Buying Water</div>
+                        <p class="text-sm text-gray-600 mb-4">You are at a shop. Buy some bottled water and ask to pay.</p>
+                        <ul class="text-base thai-text text-indigo-900 space-y-3 mb-4 list-disc list-inside">
+                            <li class="pb-1">
+                                ขอ ______________ สองขวด ครับ
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('rp1-ipa')" class="text-[10px] bg-white border border-indigo-200 px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition">IPA</button>
+                                    <button onclick="toggleInline('rp1-en')" class="text-[10px] bg-white border border-indigo-200 px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition">EN</button>
+                                </div>
+                                <div id="rp1-ipa" class="hidden text-sm font-mono text-indigo-600 mt-1 block pl-5">khɔ̌ɔ ______________ sɔ̌ɔng khùat kráp</div>
+                                <div id="rp1-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Can I have 2 bottles of ______________?</div>
+                            </li>
+                            <li class="pb-1">
+                                ______________ เท่าไรครับ?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('rp2-ipa')" class="text-[10px] bg-white border border-indigo-200 px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition">IPA</button>
+                                    <button onclick="toggleInline('rp2-en')" class="text-[10px] bg-white border border-indigo-200 px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition">EN</button>
+                                </div>
+                                <div id="rp2-ipa" class="hidden text-sm font-mono text-indigo-600 mt-1 block pl-5">______________ tâo-rài kráp?</div>
+                                <div id="rp2-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">How much in ______________?</div>
+                            </li>
+                            <li class="pb-1">
+                                ผม จ่าย __________ ได้ไหมครับ?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('rp3-ipa')" class="text-[10px] bg-white border border-indigo-200 px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition">IPA</button>
+                                    <button onclick="toggleInline('rp3-en')" class="text-[10px] bg-white border border-indigo-200 px-1.5 py-0.5 rounded text-indigo-600 hover:bg-indigo-50 transition">EN</button>
+                                </div>
+                                <div id="rp3-ipa" class="hidden text-sm font-mono text-indigo-600 mt-1 block pl-5">phǒm jàai __________ dâi mái kráp?</div>
+                                <div id="rp3-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Can I pay by __________?</div>
+                            </li>
+                        </ul>
+                        <div class="text-[11px] text-gray-500 bg-white p-2 rounded border border-indigo-100">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-gray-600">Word Bank:</span> น้ำขวด, ทั้งหมด, เงินสด, บัตร
+                                <div class="flex gap-1 ml-auto">
+                                    <button onclick="toggleInline('rpwb-ipa')" class="bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 hover:bg-gray-100 transition">IPA</button>
+                                    <button onclick="toggleInline('rpwb-en')" class="bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded text-gray-500 hover:bg-gray-100 transition">EN</button>
+                                </div>
+                            </div>
+                            <div id="rpwb-ipa" class="hidden font-mono text-indigo-600 text-xs mt-1 border-t border-gray-100 pt-1">náam khùat, tháng-mòt, ngoen-sòt, bàt</div>
+                            <div id="rpwb-en" class="hidden italic text-gray-500 text-xs mt-1">Bottled water, Total, Cash, Card</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Speaking Game -->
+                    <div class="bg-green-50 p-5 rounded-xl border border-green-100 shadow-sm">
+                        <div class="text-2xl mb-2">🤥 Game: 2 Truths & 1 Lie</div>
+                        <p class="text-sm text-gray-600 mb-4">Make 3 sentences using the choices. 2 must be true, 1 must be false. The teacher will guess the lie!</p>
+                        <ul class="text-base thai-text text-green-900 space-y-3 mb-3 list-disc list-inside">
+                            <li class="pb-1">
+                                ผม ชอบกิน _____ <span class="text-xs text-gray-500 font-sans">(เส้นเล็ก / เนื้อ / ผักโขม)</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('gm1-ipa')" class="text-[10px] bg-white border border-green-200 px-1.5 py-0.5 rounded text-green-700 hover:bg-green-50 transition">IPA</button>
+                                    <button onclick="toggleInline('gm1-en')" class="text-[10px] bg-white border border-green-200 px-1.5 py-0.5 rounded text-green-700 hover:bg-green-50 transition">EN</button>
+                                </div>
+                                <div id="gm1-ipa" class="hidden text-sm font-mono text-green-700 mt-1 block pl-5">phǒm chɔ̂ɔp gin _____ (sên lék / nʉ́ʉa / pàk kǒm)</div>
+                                <div id="gm1-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">I like to eat _____ (thin noodles / beef / spinach)</div>
+                            </li>
+                            <li class="pb-1">
+                                ผม ไม่ชอบ _____ <span class="text-xs text-gray-500 font-sans">(ทำงานบ้าน / ดูซีรีส์ / ฟังเพลง)</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('gm2-ipa')" class="text-[10px] bg-white border border-green-200 px-1.5 py-0.5 rounded text-green-700 hover:bg-green-50 transition">IPA</button>
+                                    <button onclick="toggleInline('gm2-en')" class="text-[10px] bg-white border border-green-200 px-1.5 py-0.5 rounded text-green-700 hover:bg-green-50 transition">EN</button>
+                                </div>
+                                <div id="gm2-ipa" class="hidden text-sm font-mono text-green-700 mt-1 block pl-5">phǒm mâi chɔ̂ɔp _____ (tam-ngaan-bâan / duu sii-rîi / fang pleeng)</div>
+                                <div id="gm2-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">I don't like _____ (doing housework / watching series / listening to music)</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 3. Discussion -->
+                    <div class="bg-yellow-50 p-5 rounded-xl border border-yellow-200 shadow-sm md:col-span-2">
+                        <div class="text-2xl mb-2">💬 Discussion: Housework & Food</div>
+                        <p class="text-sm text-gray-600 mb-4">Talk with your teacher using these questions.</p>
+                        <ul class="text-base thai-text text-yellow-900 space-y-3 mb-3 list-disc list-inside">
+                            <li class="pb-1">
+                                คุณ ชอบ ทำงานบ้าน ไหม? ทำงานบ้าน อะไร?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('ds1-ipa')" class="text-[10px] bg-white border border-yellow-300 px-1.5 py-0.5 rounded text-orange-600 hover:bg-yellow-100 transition">IPA</button>
+                                    <button onclick="toggleInline('ds1-en')" class="text-[10px] bg-white border border-yellow-300 px-1.5 py-0.5 rounded text-orange-600 hover:bg-yellow-100 transition">EN</button>
+                                </div>
+                                <div id="ds1-ipa" class="hidden text-sm font-mono text-orange-600 mt-1 block pl-5">khun chɔ̂ɔp tam-ngaan-bâan mái? tam-ngaan-bâan à-rai?</div>
+                                <div id="ds1-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Do you like doing housework? What housework do you do?</div>
+                            </li>
+                            <li class="pb-1">
+                                คุณ ชอบกิน ผักโขม ไหม?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('ds2-ipa')" class="text-[10px] bg-white border border-yellow-300 px-1.5 py-0.5 rounded text-orange-600 hover:bg-yellow-100 transition">IPA</button>
+                                    <button onclick="toggleInline('ds2-en')" class="text-[10px] bg-white border border-yellow-300 px-1.5 py-0.5 rounded text-orange-600 hover:bg-yellow-100 transition">EN</button>
+                                </div>
+                                <div id="ds2-ipa" class="hidden text-sm font-mono text-orange-600 mt-1 block pl-5">khun chɔ̂ɔp gin pàk kǒm mái?</div>
+                                <div id="ds2-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Do you like eating spinach?</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 4. Debate -->
+                    <div class="bg-red-50 p-5 rounded-xl border border-red-100 shadow-sm">
+                        <div class="text-2xl mb-2">⚖️ Debate: Cash vs Card</div>
+                        <p class="text-sm text-gray-600 mb-4">What is better? Cash or Card? Argue your side.</p>
+                        <ul class="text-base thai-text text-red-900 space-y-3 mb-3 list-disc list-inside">
+                            <li class="pb-1">
+                                จ่ายเงินสด ดี / ไม่ดี
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('db1-ipa')" class="text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-600 hover:bg-red-50 transition">IPA</button>
+                                    <button onclick="toggleInline('db1-en')" class="text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-600 hover:bg-red-50 transition">EN</button>
+                                </div>
+                                <div id="db1-ipa" class="hidden text-sm font-mono text-red-600 mt-1 block pl-5">jàai ngoen-sòt dii / mâi dii</div>
+                                <div id="db1-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Paying cash is good / not good</div>
+                            </li>
+                            <li class="pb-1">
+                                จ่ายบัตร ดี / ไม่ดี
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('db2-ipa')" class="text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-600 hover:bg-red-50 transition">IPA</button>
+                                    <button onclick="toggleInline('db2-en')" class="text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-600 hover:bg-red-50 transition">EN</button>
+                                </div>
+                                <div id="db2-ipa" class="hidden text-sm font-mono text-red-600 mt-1 block pl-5">jàai bàt dii / mâi dii</div>
+                                <div id="db2-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Paying by card is good / not good</div>
+                            </li>
+                            <li class="pb-1">
+                                ผม ชอบ จ่ายเงินสด / จ่ายบัตร
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('db3-ipa')" class="text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-600 hover:bg-red-50 transition">IPA</button>
+                                    <button onclick="toggleInline('db3-en')" class="text-[10px] bg-white border border-red-200 px-1.5 py-0.5 rounded text-red-600 hover:bg-red-50 transition">EN</button>
+                                </div>
+                                <div id="db3-ipa" class="hidden text-sm font-mono text-red-600 mt-1 block pl-5">phǒm chɔ̂ɔp jàai ngoen-sòt / jàai bàt</div>
+                                <div id="db3-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">I like paying cash / paying by card</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 5. Interview -->
+                    <div class="bg-purple-50 p-5 rounded-xl border border-purple-100 shadow-sm">
+                        <div class="text-2xl mb-2">🎤 Interview: Ask the Teacher</div>
+                        <p class="text-sm text-gray-600 mb-4">You are the interviewer. Ask the teacher 3 questions.</p>
+                        <ul class="text-base thai-text text-purple-900 space-y-3 mb-3 list-disc list-inside">
+                            <li class="pb-1">
+                                คุณ ทำงานบ้าน ไหมครับ?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('iv1-ipa')" class="text-[10px] bg-white border border-purple-200 px-1.5 py-0.5 rounded text-purple-600 hover:bg-purple-50 transition">IPA</button>
+                                    <button onclick="toggleInline('iv1-en')" class="text-[10px] bg-white border border-purple-200 px-1.5 py-0.5 rounded text-purple-600 hover:bg-purple-50 transition">EN</button>
+                                </div>
+                                <div id="iv1-ipa" class="hidden text-sm font-mono text-purple-600 mt-1 block pl-5">khun tam-ngaan-bâan mái kráp?</div>
+                                <div id="iv1-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Do you do housework?</div>
+                            </li>
+                            <li class="pb-1">
+                                ชอบกิน ผักโขม ไหมครับ?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('iv2-ipa')" class="text-[10px] bg-white border border-purple-200 px-1.5 py-0.5 rounded text-purple-600 hover:bg-purple-50 transition">IPA</button>
+                                    <button onclick="toggleInline('iv2-en')" class="text-[10px] bg-white border border-purple-200 px-1.5 py-0.5 rounded text-purple-600 hover:bg-purple-50 transition">EN</button>
+                                </div>
+                                <div id="iv2-ipa" class="hidden text-sm font-mono text-purple-600 mt-1 block pl-5">chɔ̂ɔp gin pàk kǒm mái kráp?</div>
+                                <div id="iv2-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Do you like eating spinach?</div>
+                            </li>
+                            <li class="pb-1">
+                                ดื่ม น้ำขวด ไหมครับ?
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('iv3-ipa')" class="text-[10px] bg-white border border-purple-200 px-1.5 py-0.5 rounded text-purple-600 hover:bg-purple-50 transition">IPA</button>
+                                    <button onclick="toggleInline('iv3-en')" class="text-[10px] bg-white border border-purple-200 px-1.5 py-0.5 rounded text-purple-600 hover:bg-purple-50 transition">EN</button>
+                                </div>
+                                <div id="iv3-ipa" class="hidden text-sm font-mono text-purple-600 mt-1 block pl-5">dèum náam khùat mái kráp?</div>
+                                <div id="iv3-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Do you drink bottled water?</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 6. Story-telling -->
+                    <div class="bg-pink-50 p-5 rounded-xl border border-pink-100 shadow-sm">
+                        <div class="text-2xl mb-2">📖 Story: Chores & Food</div>
+                        <p class="text-sm text-gray-600 mb-4">Tell a short story using these words in order:</p>
+                        <div class="flex items-center gap-2 mb-2 text-xl">
+                            🧹 ➡️ 🤤 ➡️ 🍜 ➡️ 💸 
+                        </div>
+                        <ul class="text-base thai-text text-pink-900 space-y-3 list-disc list-inside">
+                            <li class="pb-1">
+                                ตอนนี้ ทำงานบ้าน
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('st1-ipa')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">IPA</button>
+                                    <button onclick="toggleInline('st1-en')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">EN</button>
+                                </div>
+                                <div id="st1-ipa" class="hidden text-sm font-mono text-pink-600 mt-1 block pl-5">dtɔɔn-níi tam-ngaan-bâan</div>
+                                <div id="st1-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Right now, doing housework.</div>
+                            </li>
+                            <li class="pb-1">
+                                หิวข้าว ไป ร้านอาหาร
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('st2-ipa')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">IPA</button>
+                                    <button onclick="toggleInline('st2-en')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">EN</button>
+                                </div>
+                                <div id="st2-ipa" class="hidden text-sm font-mono text-pink-600 mt-1 block pl-5">hǐw khâao, bpai ráan aa-hǎan</div>
+                                <div id="st2-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Hungry for food, go to restaurant.</div>
+                            </li>
+                            <li class="pb-1">
+                                กินก๋วยเตี๋ยว เส้นเล็ก ผักโขม
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('st3-ipa')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">IPA</button>
+                                    <button onclick="toggleInline('st3-en')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">EN</button>
+                                </div>
+                                <div id="st3-ipa" class="hidden text-sm font-mono text-pink-600 mt-1 block pl-5">gin gǔay-dtǐao, sên lék, pàk kǒm</div>
+                                <div id="st3-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Eat noodles, thin noodles, spinach.</div>
+                            </li>
+                            <li class="pb-1">
+                                เช็คบิล ทั้งหมด จ่ายเงินสด
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('st4-ipa')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">IPA</button>
+                                    <button onclick="toggleInline('st4-en')" class="text-[10px] bg-white border border-pink-200 px-1.5 py-0.5 rounded text-pink-600 hover:bg-pink-50 transition">EN</button>
+                                </div>
+                                <div id="st4-ipa" class="hidden text-sm font-mono text-pink-600 mt-1 block pl-5">chék bin, tháng-mòt, jàai ngoen-sòt</div>
+                                <div id="st4-en" class="hidden text-sm italic text-gray-500 mt-1 block pl-5">Check bill, total, pay cash.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 7. Presentation -->
+                    <div class="bg-teal-50 p-5 rounded-xl border border-teal-100 shadow-sm md:col-span-2">
+                        <div class="text-2xl mb-2">👨‍🏫 Presentation: My Routine</div>
+                        <p class="text-sm text-gray-600 mb-4">Give a 30-second presentation using the script below.</p>
+                        <div class="bg-white p-5 rounded-xl border border-teal-200 space-y-4">
+                            
+                            <div>
+                                <span class="thai-text text-lg text-teal-900">สวัสดีครับ</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('pr1-ipa')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">IPA</button>
+                                    <button onclick="toggleInline('pr1-en')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">EN</button>
+                                </div>
+                                <div id="pr1-ipa" class="hidden text-sm font-mono text-teal-700 mt-1 block">sà-wàt-dii kráp</div>
+                                <div id="pr1-en" class="hidden text-sm italic text-gray-500 mt-1 block">Hello.</div>
+                            </div>
+
+                            <div>
+                                <span class="thai-text text-lg text-teal-900">ผม ชื่อ ______________</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('pr2-ipa')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">IPA</button>
+                                    <button onclick="toggleInline('pr2-en')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">EN</button>
+                                </div>
+                                <div id="pr2-ipa" class="hidden text-sm font-mono text-teal-700 mt-1 block">phǒm chûe ______________</div>
+                                <div id="pr2-en" class="hidden text-sm italic text-gray-500 mt-1 block">My name is ______________.</div>
+                            </div>
+
+                            <div>
+                                <span class="thai-text text-lg text-teal-900">ผม ชอบ กิน เส้นเล็ก และ ผักโขม</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('pr3-ipa')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">IPA</button>
+                                    <button onclick="toggleInline('pr3-en')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">EN</button>
+                                </div>
+                                <div id="pr3-ipa" class="hidden text-sm font-mono text-teal-700 mt-1 block">phǒm chɔ̂ɔp gin sên lék lɛ́ pàk kǒm</div>
+                                <div id="pr3-en" class="hidden text-sm italic text-gray-500 mt-1 block">I like to eat thin noodles and spinach.</div>
+                            </div>
+
+                            <div>
+                                <span class="thai-text text-lg text-teal-900">ผม ไม่ชอบ ทำงานบ้าน</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('pr4-ipa')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">IPA</button>
+                                    <button onclick="toggleInline('pr4-en')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">EN</button>
+                                </div>
+                                <div id="pr4-ipa" class="hidden text-sm font-mono text-teal-700 mt-1 block">phǒm mâi chɔ̂ɔp tam-ngaan-bâan</div>
+                                <div id="pr4-en" class="hidden text-sm italic text-gray-500 mt-1 block">I don't like doing housework.</div>
+                            </div>
+
+                            <div>
+                                <span class="thai-text text-lg text-teal-900">ขอบคุณครับ</span>
+                                <div class="inline-flex gap-1 shrink-0 ml-2 align-middle">
+                                    <button onclick="toggleInline('pr5-ipa')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">IPA</button>
+                                    <button onclick="toggleInline('pr5-en')" class="text-[10px] bg-white border border-teal-200 px-1.5 py-0.5 rounded text-teal-700 hover:bg-teal-50 transition">EN</button>
+                                </div>
+                                <div id="pr5-ipa" class="hidden text-sm font-mono text-teal-700 mt-1 block">khɔ̀ɔp-khun kráp</div>
+                                <div id="pr5-en" class="hidden text-sm italic text-gray-500 mt-1 block">Thank you.</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. Global Controls ---
+        function toggleInline(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Reset button styles
+            for(let i=1; i<=5; i++) {
+                let btn = document.getElementById('tab-btn-' + i);
+                if(btn) {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-600');
+                }
+            }
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabId).classList.add('active');
+            let activeBtn = document.getElementById('tab-btn-' + tabId);
+            activeBtn.classList.remove('bg-gray-200', 'text-gray-600');
+            activeBtn.classList.add('bg-indigo-600', 'text-white');
+        }
+
+        // --- 2. Activity 1: Chat Logic ---
+        function answerChat(questionId, isCorrect, btnElement) {
+            // Disable buttons in this group
+            const container = document.getElementById(questionId + '-options');
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:border-indigo-400');
+            });
+
+            if (isCorrect) {
+                btnElement.classList.add('border-green-500', 'bg-green-50');
+                
+                // Show next question logic
+                let nextQ = null;
+                if(questionId === 'q1') nextQ = 'chat-q2';
+                else if(questionId === 'q2') nextQ = 'chat-q3';
+                else if(questionId === 'q3') nextQ = 'chat-q4';
+
+                if (nextQ) {
+                    setTimeout(() => {
+                        document.getElementById(nextQ).classList.remove('hidden');
+                        document.getElementById(nextQ).classList.add('animate-pulse');
+                        setTimeout(()=> document.getElementById(nextQ).classList.remove('animate-pulse'), 1000);
+                    }, 800);
+                } else if (questionId === 'q4') {
+                    setTimeout(() => {
+                        alert('🎉 Great job! You finished the Warm Up. Try the next tab.');
+                    }, 500);
+                }
+            } else {
+                btnElement.classList.add('border-red-400', 'bg-red-50');
+                setTimeout(() => {
+                    btnElement.classList.remove('border-red-400', 'bg-red-50');
+                    buttons.forEach(b => {
+                        b.disabled = false;
+                        b.classList.add('hover:border-indigo-400');
+                    });
+                }, 1500);
+            }
+        }
+
+        // --- 3. Activity 2: Matching Logic ---
+        const matchData = [
+            { id: 'w1', thai: 'ทำงานบ้าน', ipa: 'tam-ngaan-bâan', en: 'Housework' },
+            { id: 'w2', thai: 'เงินสด', ipa: 'ngoen-sòt', en: 'Cash' },
+            { id: 'w3', thai: 'เส้นเล็ก', ipa: 'sên lék', en: 'Thin noodles' },
+            { id: 'w4', thai: 'ทั้งหมด', ipa: 'tháng-mòt', en: 'Total' },
+            { id: 'w5', thai: 'ขวด', ipa: 'khùat', en: 'Bottle' },
+            { id: 'w6', thai: 'จ่าย', ipa: 'jàai', en: 'To pay' }
+        ];
+
+        let selectedThai = null;
+        let selectedEn = null;
+        let matchesFound = 0;
+
+        function initMatching() {
+            const leftContainer = document.getElementById('match-left');
+            const rightContainer = document.getElementById('match-right');
+            leftContainer.innerHTML = '';
+            rightContainer.innerHTML = '';
+            matchesFound = 0;
+            selectedThai = null;
+            selectedEn = null;
+
+            let thaiList = [...matchData].sort(() => Math.random() - 0.5);
+            let enList = [...matchData].sort(() => Math.random() - 0.5);
+
+            thaiList.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'p-3 border-2 border-gray-200 rounded-xl cursor-pointer text-center hover:bg-gray-50 transition-colors match-item-th';
+                div.dataset.id = item.id;
+                div.onclick = () => handleMatchClick('th', div);
+                div.innerHTML = `
+                    <div class="thai-text text-lg font-medium">${item.thai}</div>
+                    <div class="text-xs text-gray-500 font-mono mt-1">${item.ipa}</div>
+                `;
+                leftContainer.appendChild(div);
+            });
+
+            enList.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'p-3 border-2 border-gray-200 rounded-xl cursor-pointer text-center hover:bg-gray-50 transition-colors flex items-center justify-center min-h-[60px] match-item-en';
+                div.dataset.id = item.id;
+                div.onclick = () => handleMatchClick('en', div);
+                div.innerHTML = `<div class="font-semibold text-gray-700">${item.en}</div>`;
+                rightContainer.appendChild(div);
+            });
+        }
+
+        function handleMatchClick(side, el) {
+            document.querySelectorAll(`.match-item-${side}`).forEach(d => {
+                if(d !== el) d.classList.remove('selected-match');
+            });
+
+            if (el.classList.contains('selected-match')) {
+                el.classList.remove('selected-match');
+                if (side === 'th') selectedThai = null;
+                else selectedEn = null;
+            } else {
+                el.classList.add('selected-match');
+                if (side === 'th') selectedThai = el;
+                else selectedEn = el;
+            }
+
+            if (selectedThai && selectedEn) {
+                if (selectedThai.dataset.id === selectedEn.dataset.id) {
+                    selectedThai.classList.add('matched');
+                    selectedEn.classList.add('matched');
+                    selectedThai.classList.remove('selected-match');
+                    selectedEn.classList.remove('selected-match');
+                    selectedThai = null;
+                    selectedEn = null;
+                    matchesFound++;
+                    if(matchesFound === matchData.length) {
+                        setTimeout(() => alert('🎉 Perfect! You matched all words.'), 300);
+                    }
+                } else {
+                    selectedThai.classList.add('border-red-400', 'bg-red-50');
+                    selectedEn.classList.add('border-red-400', 'bg-red-50');
+                    let t = selectedThai;
+                    let e = selectedEn;
+                    setTimeout(() => {
+                        t.classList.remove('selected-match', 'border-red-400', 'bg-red-50');
+                        e.classList.remove('selected-match', 'border-red-400', 'bg-red-50');
+                    }, 800);
+                    selectedThai = null;
+                    selectedEn = null;
+                }
+            }
+        }
+
+        function resetMatching() {
+            initMatching();
+        }
+
+        // --- 4. Activity 3: Sentence Builder Logic ---
+        let userSentences = { 1: [], 2: [], 3: [], 4: [] };
+
+        function selectWord(sentId, btnEl, word, ipa) {
+            btnEl.classList.add('hidden');
+            userSentences[sentId].push({ word: word, ipa: ipa, btnRef: btnEl });
+            renderAnswerBox(sentId);
+        }
+
+        function renderAnswerBox(sentId) {
+            const ansBox = document.getElementById('sent-ans-' + sentId);
+            const checkBtn = document.getElementById('sent-check-' + sentId);
+            
+            ansBox.innerHTML = '';
+            userSentences[sentId].forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = 'px-3 py-1.5 bg-indigo-100 text-indigo-800 rounded shadow-sm cursor-pointer hover:bg-indigo-200 transition flex flex-col items-center';
+                div.innerHTML = `<span class="thai-text text-lg">${item.word}</span><span class="text-[10px] text-indigo-500/80 font-mono mt-0.5">${item.ipa}</span>`;
+                div.onclick = () => {
+                    item.btnRef.classList.remove('hidden');
+                    userSentences[sentId].splice(index, 1);
+                    renderAnswerBox(sentId);
+                };
+                ansBox.appendChild(div);
+            });
+
+            const bankSize = document.getElementById('sent-bank-' + sentId).children.length;
+            if(userSentences[sentId].length === bankSize) {
+                checkBtn.classList.remove('hidden');
+            } else {
+                checkBtn.classList.add('hidden');
+            }
+            
+            document.getElementById('sent-fb-' + sentId).classList.add('hidden');
+        }
+
+        function resetSentence(sentId) {
+            userSentences[sentId].forEach(item => {
+                item.btnRef.classList.remove('hidden');
+            });
+            userSentences[sentId] = [];
+            renderAnswerBox(sentId);
+            document.getElementById('sent-fb-' + sentId).classList.add('hidden');
+        }
+
+        function checkSentence(sentId, targetSentence) {
+            const currentStr = userSentences[sentId].map(i => i.word).join(' ');
+            const fb = document.getElementById('sent-fb-' + sentId);
+            fb.classList.remove('hidden');
+            
+            if (currentStr === targetSentence) {
+                fb.innerText = '✅ Correct!';
+                fb.className = 'mt-2 text-sm font-bold text-green-600';
+            } else {
+                fb.innerText = '❌ Not quite right. Tap a word to remove it and try again.';
+                fb.className = 'mt-2 text-sm font-bold text-red-500';
+            }
+        }
+
+        // --- 5. Activity 4: Fix Errors Logic ---
+        function checkErrors() {
+            const answers = {
+                err1: 'จ่าย',
+                err2: 'ไหน',
+                err3: 'สอง ขวด',
+                err4: 'ทั้งหมด เท่าไร'
+            };
+            
+            let allCorrect = true;
+            
+            for (const [id, correctVal] of Object.entries(answers)) {
+                const select = document.getElementById(id);
+                if (select.value === correctVal) {
+                    select.classList.remove('border-yellow-300', 'bg-yellow-50', 'text-indigo-700', 'border-red-400', 'bg-red-50');
+                    select.classList.add('border-green-400', 'bg-green-50', 'text-green-700');
+                } else {
+                    allCorrect = false;
+                    select.classList.remove('border-green-400', 'bg-green-50', 'text-green-700', 'border-yellow-300', 'bg-yellow-50', 'text-indigo-700');
+                    select.classList.add('border-red-400', 'bg-red-50', 'text-red-700');
+                }
+            }
+
+            const fb = document.getElementById('err-feedback');
+            fb.classList.remove('hidden');
+            if (allCorrect) {
+                fb.innerText = '✅ All correct! Great job.';
+                fb.className = 'font-bold text-green-600';
+            } else {
+                fb.innerText = '❌ Some answers are incorrect. Try again!';
+                fb.className = 'font-bold text-red-500';
+            }
+        }
+
+        window.onload = () => {
+            initMatching();
+        };
+
+    </script>
+</body>
+</html>
