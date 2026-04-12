@@ -1,0 +1,562 @@
+import React, { useState, useEffect } from 'react';
+import { CheckCircle2, XCircle, RefreshCw, Eye, EyeOff, Play, Check } from 'lucide-react';
+
+// Data for activities based strictly on provided vocabulary
+const vocabData = {
+  qa: [
+    { id: 1, qTh: "คุณชื่ออะไร", qPh: "Khun chûe à-rai?", aTh: "ผม/ฉันชื่อ...", aPh: "Phǒm / Chǎn chûe...", en: "What is your name?" },
+    { id: 2, qTh: "คุณมาจากประเทศอะไร", qPh: "Khun maa jàak prà-têt à-rai?", aTh: "ผม/ฉันมาจากประเทศ...", aPh: "Phǒm / Chǎn maa jàak prà-têt...", en: "What country are you from?" },
+    { id: 3, qTh: "คุณทำงานอะไร", qPh: "Khun tam-ngaan à-rai?", aTh: "ผม/ฉันเป็น...", aPh: "Phǒm / Chǎn bpen...", en: "What is your job / What do you work as?" },
+    { id: 4, qTh: "สบายดีไหม", qPh: "sà-baai-dii-mái?", aTh: "สบายดี / เครียด / ไม่สบาย", aPh: "sà-baai-dii / krîat / mâi-sà-baai", en: "How are you? / Are you well?" },
+    { id: 5, qTh: "เอาอะไร", qPh: "ao à-rai?", aTh: "เอาส้มตำ / น้ำเปล่า...", aPh: "ao sôm-dtam / náam bplào...", en: "What do you want?" }
+  ],
+  jumbled: [
+    { id: 1, parts: [ {th: "ผม", ph: "Phǒm"}, {th: "มา", ph: "maa"}, {th: "จาก", ph: "jàak"}, {th: "ประเทศ", ph: "prà-têt"}, {th: "เกาหลี", ph: "gaw lǐi"} ], en: "I come from Korea." },
+    { id: 2, parts: [ {th: "พ่อ", ph: "phâw"}, {th: "ทำงาน", ph: "tam-ngaan"}, {th: "เป็น", ph: "bpen"}, {th: "ตำรวจ", ph: "dtam-rùat"} ], en: "Dad works as a police officer." },
+    { id: 3, parts: [ {th: "ขอ", ph: "Khǎw"}, {th: "ส้มตำ", ph: "sôm-dtam"}, {th: "สอง", ph: "sɔ̌ɔng"}, {th: "จาน", ph: "jaan"} ], en: "Can I have two plates of papaya salad?" },
+    { id: 4, parts: [ {th: "ทำไม", ph: "tam-mai"}, {th: "เขา", ph: "khao"}, {th: "ไม่สบาย", ph: "mâi-sà-baai"} ], en: "Why is he/she unwell?" },
+    { id: 5, parts: [ {th: "ฉัน", ph: "Chǎn"}, {th: "พูด", ph: "phôut"}, {th: "ภาษา", ph: "phaa-sǎa"}, {th: "ญี่ปุ่น", ph: "yîi-bpùn"}, {th: "ได้", ph: "dâi"} ], en: "I can speak Japanese." }
+  ],
+  gapFill: [
+    { id: 1, textPre: "Phǒm", textPost: "jàak prà-têt yîi-bpùn.", options: ["maa", "mii", "ao"], answer: "maa", en: "I come from Japan." },
+    { id: 2, textPre: "Khun", textPost: "à-rai?", options: ["krîat", "bpen", "chûe"], answer: "chûe", en: "What is your name?" },
+    { id: 3, textPre: "Kâao sɔ̌ɔng", textPost: ".", options: ["jaan", "gâaeo", "kon"], answer: "jaan", en: "Two plates of rice." },
+    { id: 4, textPre: "Khao tam-ngaan", textPost: "roong-pá-yaa-baan.", options: ["nai", "tîi", "jàak"], answer: "tîi", en: "He/She works at the hospital." },
+    { id: 5, textPre: "Chǎn", textPost: "náam bplào.", options: ["ao", "hěn", "pèt"], answer: "ao", en: "I want plain water." }
+  ],
+  conversation: [
+    { id: 1, prompt: "Sà-baai-dii-mái? 😊", options: ["sà-baai-dii", "pèt", "bpen dtiiw-dtêr"], answer: 0, en: "Are you well? -> Fine." },
+    { id: 2, prompt: "Sàng tâo-rài? 🧾", options: ["khao phôut dâi", "kâao sɔ̌ɔng jaan", "sǎa-mii"], answer: 1, en: "How much to order? -> Two plates of rice." },
+    { id: 3, prompt: "Khun tam-ngaan à-rai? 💼", options: ["mʉang Grung-têp", "bpen nák-ban-chee", "aa-yú sìp bpii"], answer: 1, en: "What do you work as? -> Accountant." },
+    { id: 4, prompt: "Ao ìik mái? 🙋‍♀️➕", options: ["hǎao láaeo", "ao nít-nòi", "sà-baai-dii"], answer: 1, en: "Do you want more? -> Want a bit more." },
+    { id: 5, prompt: "kâao jaan lá tâo-rài? 🍽️", options: ["yîi-sìp", "ngûang", "sôm-dtam"], answer: 0, en: "How much per plate of rice? -> 20." }
+  ],
+  matching: [
+    { id: 1, ph: "pèt", emoji: "🌶️", en: "Spicy" },
+    { id: 2, ph: "mʉang", emoji: "🏙️", en: "City" },
+    { id: 3, ph: "sôm-dtam", emoji: "🥗🌶️", en: "Papaya salad" },
+    { id: 4, ph: "ngûang", emoji: "😴", en: "Sleepy" },
+    { id: 5, ph: "bpen dtiiw-dtêr", emoji: "👨‍🏫", en: "To be a tutor" }
+  ],
+  errorCorrection: [
+    { id: 1, sentence: [{w:"Chǎn", c:true}, {w:"maa", c:true}, {w:"bpen", c:false}, {w:"yîi-bpùn", c:true}], correction: "jàak", en: "I come from Japan." },
+    { id: 2, sentence: [{w:"Khun", c:true}, {w:"chûe", c:true}, {w:"thâo-rài", c:false}, {w:"?", c:true}], correction: "à-rai", en: "What is your name?" },
+    { id: 3, sentence: [{w:"Náam bplào", c:true}, {w:"sɔ̌ɔng", c:true}, {w:"jaan", c:false}], correction: "gâaeo", en: "Two glasses of water." },
+    { id: 4, sentence: [{w:"Khao", c:true}, {w:"aa-yú", c:true}, {w:"sɔ̌ɔng", c:true}, {w:"kon", c:false}], correction: "bpii", en: "He/She is two years old." },
+    { id: 5, sentence: [{w:"Phǒm", c:true}, {w:"pèt", c:false}, {w:"aa-hăan-jeen", c:true}], correction: "gin", en: "I eat Chinese food." }
+  ]
+};
+
+// Sub-components for each section
+const QASection = ({ showEng }) => {
+  return (
+    <div className="space-y-4">
+      {vocabData.qa.map((item, idx) => (
+        <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition">
+          <div className="flex gap-4 items-start">
+            <span className="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full">{idx + 1}</span>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-slate-800">{item.qPh}</h3>
+              <p className="text-sm text-slate-500 mb-2">{item.qTh}</p>
+              {showEng && <p className="text-sm text-green-600 font-medium mb-3">En: {item.en}</p>}
+              <div className="mt-4 bg-slate-50 p-3 rounded-lg">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Hint / Answer Structure</span>
+                <p className="text-lg text-slate-700 font-medium">{item.aPh}</p>
+                <p className="text-xs text-slate-400">{item.aTh}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const JumbledSection = ({ showEng }) => {
+  return (
+    <div className="space-y-8">
+      {vocabData.jumbled.map((item, idx) => {
+        // Simple state for each jumbled question
+        const [available, setAvailable] = useState(() => [...item.parts].sort(() => Math.random() - 0.5));
+        const [selected, setSelected] = useState([]);
+        const [status, setStatus] = useState(null); // null, 'correct', 'incorrect'
+
+        const handleSelect = (part) => {
+          setAvailable(available.filter(p => p !== part));
+          setSelected([...selected, part]);
+          setStatus(null);
+        };
+
+        const handleDeselect = (part) => {
+          setSelected(selected.filter(p => p !== part));
+          setAvailable([...available, part]);
+          setStatus(null);
+        };
+
+        const checkAnswer = () => {
+          if (selected.length !== item.parts.length) return;
+          const isCorrect = selected.every((s, i) => s.ph === item.parts[i].ph);
+          setStatus(isCorrect ? 'correct' : 'incorrect');
+        };
+
+        const reset = () => {
+          setAvailable([...item.parts].sort(() => Math.random() - 0.5));
+          setSelected([]);
+          setStatus(null);
+        };
+
+        return (
+          <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+             <div className="flex justify-between items-center mb-3">
+               <span className="bg-indigo-100 text-indigo-700 font-bold px-3 py-1 rounded-full text-sm">Sentence {idx + 1}</span>
+               {showEng && <span className="text-sm text-green-600 font-medium">{item.en}</span>}
+             </div>
+             
+             {/* Selected area */}
+             <div className="min-h-[60px] bg-slate-50 border-2 border-dashed border-slate-200 rounded-lg p-3 flex flex-wrap gap-2 mb-4 items-center">
+                {selected.length === 0 && <span className="text-slate-400 text-sm">Tap words below to build sentence...</span>}
+                {selected.map((part, i) => (
+                  <button key={i} onClick={() => handleDeselect(part)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow cursor-pointer hover:bg-indigo-700 transition">
+                    <span className="block font-bold">{part.ph}</span>
+                    <span className="block text-[10px] opacity-70">{part.th}</span>
+                  </button>
+                ))}
+             </div>
+
+             {/* Available area */}
+             <div className="flex flex-wrap gap-2 mb-4">
+                {available.map((part, i) => (
+                  <button key={i} onClick={() => handleSelect(part)} className="bg-white border-2 border-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:border-indigo-400 hover:text-indigo-600 transition">
+                    <span className="block font-bold">{part.ph}</span>
+                    <span className="block text-[10px] text-slate-400">{part.th}</span>
+                  </button>
+                ))}
+             </div>
+
+             {/* Controls */}
+             <div className="flex items-center gap-3">
+               <button onClick={checkAnswer} disabled={selected.length !== item.parts.length} className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 ${selected.length === item.parts.length ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+                 <CheckCircle2 size={18}/> Check
+               </button>
+               <button onClick={reset} className="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg flex items-center gap-2">
+                 <RefreshCw size={18}/> Reset
+               </button>
+               {status === 'correct' && <span className="text-green-600 font-bold flex items-center gap-1"><CheckCircle2 size={18}/> Correct!</span>}
+               {status === 'incorrect' && <span className="text-red-500 font-bold flex items-center gap-1"><XCircle size={18}/> Try again</span>}
+             </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const GapFillSection = ({ showEng }) => {
+  const [answers, setAnswers] = useState({});
+  const [results, setResults] = useState({});
+
+  const handleSelect = (id, val, correctAns) => {
+    setAnswers(prev => ({...prev, [id]: val}));
+    setResults(prev => ({...prev, [id]: val === correctAns}));
+  };
+
+  return (
+    <div className="space-y-4">
+      {vocabData.gapFill.map((item, idx) => (
+        <div key={item.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4 justify-between md:items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-amber-100 text-amber-700 font-bold px-3 py-1 rounded-full text-sm">{idx + 1}</span>
+              {showEng && <span className="text-sm text-green-600 font-medium">{item.en}</span>}
+            </div>
+            <p className="text-xl font-medium text-slate-800 leading-relaxed">
+              {item.textPre} <span className="inline-block min-w-[80px] border-b-2 border-slate-300 text-center text-indigo-600 font-bold px-2">{answers[item.id] || "____"}</span> {item.textPost}
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap gap-2 shrink-0">
+            {item.options.map(opt => (
+              <button 
+                key={opt}
+                onClick={() => handleSelect(item.id, opt, item.answer)}
+                className={`px-4 py-2 rounded-lg font-bold border-2 transition ${
+                  answers[item.id] === opt 
+                    ? results[item.id] 
+                      ? 'bg-green-100 border-green-500 text-green-700' 
+                      : 'bg-red-100 border-red-500 text-red-700'
+                    : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50'
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const ConversationSection = ({ showEng }) => {
+  const [selected, setSelected] = useState({});
+
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      {vocabData.conversation.map((item, idx) => (
+        <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <div className="mb-4">
+             <span className="bg-rose-100 text-rose-700 font-bold px-3 py-1 rounded-full text-sm mb-3 inline-block">Q {idx + 1}</span>
+             <h3 className="text-xl font-bold text-slate-800">{item.prompt}</h3>
+             {showEng && <p className="text-sm text-green-600 mt-1">{item.en}</p>}
+          </div>
+          <div className="space-y-2">
+            {item.options.map((opt, oIdx) => {
+              const isSelected = selected[item.id] === oIdx;
+              const isCorrect = oIdx === item.answer;
+              let btnClass = "w-full text-left px-4 py-3 rounded-lg border-2 font-medium transition flex justify-between items-center ";
+              
+              if (isSelected) {
+                btnClass += isCorrect ? "bg-green-100 border-green-500 text-green-800" : "bg-red-100 border-red-500 text-red-800";
+              } else {
+                btnClass += "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50";
+              }
+
+              return (
+                <button 
+                  key={oIdx} 
+                  onClick={() => setSelected({...selected, [item.id]: oIdx})}
+                  className={btnClass}
+                >
+                  {opt}
+                  {isSelected && isCorrect && <CheckCircle2 size={18} className="text-green-600"/>}
+                  {isSelected && !isCorrect && <XCircle size={18} className="text-red-600"/>}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const MatchingSection = ({ showEng }) => {
+  const [leftSelected, setLeftSelected] = useState(null);
+  const [rightSelected, setRightSelected] = useState(null);
+  const [matched, setMatched] = useState([]);
+  const [error, setError] = useState(false);
+
+  // Scramble once
+  const [leftCol] = useState([...vocabData.matching].sort(() => Math.random() - 0.5));
+  const [rightCol] = useState([...vocabData.matching].sort(() => Math.random() - 0.5));
+
+  useEffect(() => {
+    if (leftSelected && rightSelected) {
+      if (leftSelected.id === rightSelected.id) {
+        setMatched(prev => [...prev, leftSelected.id]);
+        setLeftSelected(null);
+        setRightSelected(null);
+      } else {
+        setError(true);
+        setTimeout(() => {
+          setLeftSelected(null);
+          setRightSelected(null);
+          setError(false);
+        }, 800);
+      }
+    }
+  }, [leftSelected, rightSelected]);
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-slate-600 font-medium">Tap a phonetic word, then tap the matching emoji.</p>
+        <div className="text-sm font-bold bg-slate-100 px-3 py-1 rounded-lg text-slate-600">Matches: {matched.length} / 5</div>
+      </div>
+      
+      <div className="flex gap-4 md:gap-12">
+        {/* Left Column (Phonetics) */}
+        <div className="flex-1 space-y-3">
+          {leftCol.map(item => {
+            const isMatched = matched.includes(item.id);
+            const isSelected = leftSelected?.id === item.id;
+            return (
+              <button
+                key={`l-${item.id}`}
+                disabled={isMatched}
+                onClick={() => setLeftSelected(item)}
+                className={`w-full p-4 rounded-xl text-lg font-bold border-2 transition ${
+                  isMatched ? 'bg-slate-100 border-slate-200 text-slate-300' :
+                  isSelected ? (error ? 'bg-red-100 border-red-500 text-red-700' : 'bg-teal-100 border-teal-500 text-teal-800') :
+                  'bg-white border-slate-200 text-slate-700 hover:border-teal-300'
+                }`}
+              >
+                {item.ph}
+                {showEng && !isMatched && <span className="block text-xs font-normal text-slate-400 mt-1">{item.en}</span>}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Right Column (Emojis) */}
+        <div className="flex-1 space-y-3">
+          {rightCol.map(item => {
+            const isMatched = matched.includes(item.id);
+            const isSelected = rightSelected?.id === item.id;
+            return (
+              <button
+                key={`r-${item.id}`}
+                disabled={isMatched}
+                onClick={() => setRightSelected(item)}
+                className={`w-full p-4 rounded-xl text-3xl flex justify-center items-center border-2 transition h-[74px] md:h-[84px] ${
+                  isMatched ? 'bg-slate-100 border-slate-200 opacity-30' :
+                  isSelected ? (error ? 'bg-red-100 border-red-500' : 'bg-teal-100 border-teal-500') :
+                  'bg-white border-slate-200 hover:border-teal-300'
+                }`}
+              >
+                {item.emoji}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ErrorCorrectionSection = ({ showEng }) => {
+  const [results, setResults] = useState({});
+
+  return (
+    <div className="space-y-4">
+      {vocabData.errorCorrection.map((item, idx) => (
+        <div key={item.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+          <div className="flex gap-3 items-center mb-3">
+            <span className="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-full text-sm">Find Error {idx + 1}</span>
+            {showEng && <span className="text-sm text-green-600 font-medium">{item.en}</span>}
+          </div>
+          
+          <p className="text-sm text-slate-500 mb-4">Click the word that is <strong className="text-red-500">incorrect</strong>.</p>
+          
+          <div className="flex flex-wrap gap-2 mb-4">
+            {item.sentence.map((wordObj, wIdx) => {
+              if (wordObj.w === "?" || wordObj.w === ".") {
+                return <span key={wIdx} className="text-2xl font-bold text-slate-800 flex items-center">{wordObj.w}</span>;
+              }
+              
+              const isCorrectClick = results[item.id] === true;
+              const isWrongClick = results[item.id] === wordObj.w;
+
+              return (
+                <button
+                  key={wIdx}
+                  disabled={isCorrectClick}
+                  onClick={() => {
+                    if (!wordObj.c) setResults({...results, [item.id]: true});
+                    else setResults({...results, [item.id]: wordObj.w});
+                  }}
+                  className={`text-xl md:text-2xl font-bold px-3 py-2 rounded-lg border-2 transition ${
+                    isCorrectClick && !wordObj.c ? 'bg-green-100 border-green-500 text-green-800 line-through' :
+                    isCorrectClick && wordObj.c ? 'bg-white border-transparent text-slate-400' :
+                    isWrongClick ? 'bg-red-100 border-red-500 text-red-700 animate-pulse' :
+                    'bg-white border-slate-200 text-slate-800 hover:bg-slate-50 hover:border-slate-300'
+                  }`}
+                >
+                  {wordObj.w}
+                </button>
+              )
+            })}
+          </div>
+
+          {results[item.id] === true && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 flex items-center gap-2 font-medium">
+              <CheckCircle2 size={20} /> Correct! It should be changed to: <strong className="text-xl bg-white px-2 py-1 rounded">{item.correction}</strong>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const ExtensionActivities = () => {
+  return (
+    <div className="bg-slate-800 text-slate-100 p-6 rounded-xl shadow-lg mt-8">
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-white"><Play size={24} className="text-amber-400"/> Extension Activities</h2>
+      <p className="text-slate-300 mb-6 text-sm">Real-life scenarios using ONLY vocabulary learned so far. Teacher and student interact directly.</p>
+      
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-slate-700 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-amber-400 mb-2">1. Role-play: Food Order 🍽️</h3>
+          <p className="text-sm leading-relaxed">
+            <strong>T:</strong> Sà-baai-dii-mái? Ao à-rai?<br/>
+            <strong>S:</strong> (Orders food, e.g., Khǎw sôm-dtam, kâao, náam bplào)<br/>
+            <strong>T:</strong> Sàng tâo-rài? / เอาอีกไหม (Ao ìik mái?)<br/>
+            <strong>S:</strong> (Specifies quantity, e.g., sɔ̌ɔng jaan, yîi-sìp)
+          </p>
+        </div>
+
+        <div className="bg-slate-700 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-blue-400 mb-2">2. Speaking Game: Who is it? 🕵️‍♂️</h3>
+          <p className="text-sm leading-relaxed">
+            Think of a person (family or job). Ask Yes/No questions.<br/>
+            <strong>Q:</strong> Khao bpen dtam-rùat mái? / Khao aa-yú sìp bpii mái? / Khao bpen phîi-chaay mái?<br/>
+            <strong>A:</strong> (Yes/No based on Thai vocab)
+          </p>
+        </div>
+
+        <div className="bg-slate-700 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-green-400 mb-2">3. Debate: Rice vs Noodles 🍚🍜</h3>
+          <p className="text-sm leading-relaxed">
+            Which is better?<br/>
+            Use: kâao, gǔai-dtǐao, pèt, dii, mâi dii, châawp, gin bpen, àat jà.<br/>
+            Teacher takes one side, student takes the other.
+          </p>
+        </div>
+
+        <div className="bg-slate-700 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-pink-400 mb-2">4. 5 Discussion Qs 💬</h3>
+          <ul className="text-sm space-y-1 list-disc pl-4 text-slate-300">
+            <li>Khun châawp gin à-rai?</li>
+            <li>Krâwp-krua mii gîi kon?</li>
+            <li>Tam-ngaan krîat mái?</li>
+            <li>Châawp mʉang à-rai?</li>
+            <li>Phôut phaa-sǎa à-rai dâi bâang?</li>
+          </ul>
+        </div>
+
+        <div className="bg-slate-700 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-purple-400 mb-2">5. Interview 🎤</h3>
+          <p className="text-sm leading-relaxed">
+            Teacher interviews student for a job.<br/>
+            <strong>T:</strong> Khun chûe à-rai? Aa-yú tâo-rài? Tam-ngaan à-rai? Phôut phaa-sǎa yîi-bpùn dâi mái?
+          </p>
+        </div>
+
+        <div className="bg-slate-700 p-4 rounded-lg">
+          <h3 className="text-lg font-bold text-orange-400 mb-2">6. Story-telling 📖</h3>
+          <p className="text-sm leading-relaxed">
+            Describe a busy day.<br/>
+            Use words: yûng, tam-ngaan, krîat, gin, hǎao láaeo, ngûang. Try to link 3-4 simple sentences together.
+          </p>
+        </div>
+        
+        <div className="bg-slate-700 p-4 rounded-lg md:col-span-2">
+          <h3 className="text-lg font-bold text-cyan-400 mb-2">7. Presentation 👨‍👩‍👧‍👦</h3>
+          <p className="text-sm leading-relaxed">
+            Present your family using only Thai learned.<br/>
+            E.g., "Phǒm mii phâw, mâe, pîi-nóong. Phâw bpen... Khao aa-yú..."
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function App() {
+  const [showEng, setShowEng] = useState(false);
+  const [activeTab, setActiveTab] = useState('qa');
+
+  const tabs = [
+    { id: 'qa', label: '1. Q&A', icon: '❓' },
+    { id: 'jumbled', label: '2. Sentence Order', icon: '🧩' },
+    { id: 'gapFill', label: '3. Gap Fill', icon: '📝' },
+    { id: 'conv', label: '4. Conversation', icon: '🗣️' },
+    { id: 'match', label: '5. Matching', icon: '🔗' },
+    { id: 'error', label: '6. Error Correction', icon: '❌' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-20">
+      {/* Header */}
+      <header className="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Thai Review Lesson</h1>
+            <p className="text-indigo-200 text-sm">Task-based interactive practice</p>
+          </div>
+          <button 
+            onClick={() => setShowEng(!showEng)}
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full transition font-medium backdrop-blur-sm"
+          >
+            {showEng ? <><EyeOff size={18} /> Hide English</> : <><Eye size={18} /> Show English</>}
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-5xl mx-auto p-4 mt-6">
+        {/* Navigation */}
+        <div className="flex overflow-x-auto gap-2 pb-4 mb-6 hide-scrollbar">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`whitespace-nowrap px-5 py-3 rounded-xl font-bold transition flex items-center gap-2 ${
+                activeTab === tab.id 
+                  ? 'bg-indigo-600 text-white shadow-md' 
+                  : 'bg-white text-slate-600 hover:bg-indigo-50 border border-slate-200'
+              }`}
+            >
+              <span>{tab.icon}</span> {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {activeTab === 'qa' && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">❓ Asking Questions (Q&A)</h2>
+              <QASection showEng={showEng} />
+            </section>
+          )}
+
+          {activeTab === 'jumbled' && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">🧩 Sentence Order</h2>
+              <JumbledSection showEng={showEng} />
+            </section>
+          )}
+
+          {activeTab === 'gapFill' && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">📝 Gap Fill</h2>
+              <GapFillSection showEng={showEng} />
+            </section>
+          )}
+
+          {activeTab === 'conv' && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">🗣️ Interactive Conversation</h2>
+              <ConversationSection showEng={showEng} />
+            </section>
+          )}
+
+          {activeTab === 'match' && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">🔗 Matching</h2>
+              <MatchingSection showEng={showEng} />
+            </section>
+          )}
+
+          {activeTab === 'error' && (
+            <section>
+              <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">❌ Error Correction</h2>
+              <ErrorCorrectionSection showEng={showEng} />
+            </section>
+          )}
+        </div>
+
+        {/* Extension Activities always visible at bottom or integrated into flow */}
+        <div className="mt-16 border-t-2 border-slate-200 pt-8">
+           <ExtensionActivities />
+        </div>
+
+      </main>
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
+    </div>
+  );
+}
