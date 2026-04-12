@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Mentor The Face Men - Thai Speaking Practice</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc; /* Slate-50 */
+            color: #0f172a;
+        }
+        h1, h2, h3, h4, button, div, p {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .hidden-content { display: none; }
+        .show-content { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .thai-text { font-size: 1.2rem; line-height: 1.6; }
+        
+        /* Interactive Button Styles */
+        .ctrl-btn {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 4px;
+        }
+        .btn-ipa { background-color: #fef08a; color: #854d0e; border: 1px solid #fde047; } 
+        .btn-ipa:hover { background-color: #fde047; }
+        .btn-en { background-color: #bae6fd; color: #0369a1; border: 1px solid #7dd3fc; } 
+        .btn-en:hover { background-color: #7dd3fc; }
+        
+        .tts-btn {
+            width: 24px; height: 24px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background-color: #ccfbf1; color: #0f766e;
+            cursor: pointer; margin-left: 4px;
+        }
+        .tts-btn:hover { background-color: #99f6e4; transform: scale(1.1); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-900 text-white p-4 shadow-lg sticky top-0 z-50 border-b-4 border-yellow-500">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div id="nav-title-container"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-8">
+
+        <!-- Section 1: Review Game -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-yellow-400">
+            <div id="sec1-title-container" class="mb-4 text-2xl font-bold text-gray-800"></div>
+            <div id="sec1-desc-container" class="mb-6 text-gray-600"></div>
+            
+            <div id="review-card" class="bg-yellow-50 border-2 border-dashed border-yellow-400 rounded-xl p-10 text-center min-h-[250px] flex flex-col justify-center items-center relative overflow-hidden transition hover:shadow-md">
+                <div class="text-6xl mb-4 animate-bounce" id="card-emoji">🔄</div>
+                <div id="card-word-container" class="text-3xl font-bold text-gray-800"></div>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <div id="btn-random-container"></div>
+            </div>
+        </section>
+
+        <!-- Section 2: Lead-in, Video & Comprehension -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-blue-600">
+            <div id="sec2-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <!-- Lead-in Questions -->
+            <div class="mb-6 bg-sky-50 rounded-xl p-5 border border-sky-200">
+                <h3 class="font-bold text-sky-800 mb-3 flex items-center"><i class="fas fa-comments mr-2"></i> ชวนคุยก่อนดู (Lead-in)</h3>
+                <div id="sec2-leadin-container" class="space-y-3 pl-2"></div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-2xl text-center relative group p-8 max-w-lg mx-auto border border-gray-700">
+                <div class="mb-4 drop-shadow-md">
+                    <i class="fab fa-facebook fa-4x text-blue-500 bg-white rounded-full"></i>
+                </div>
+                <h3 class="text-white text-xl font-bold mb-4 drop-shadow-md">Master Mentor The Face</h3>
+                <a href="https://www.facebook.com/watch/?v=1282420003809681" target="_blank" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition transform hover:scale-105 shadow-lg border-2 border-white cursor-pointer">
+                    <i class="fas fa-play mr-2"></i> ดูบน Facebook
+                </a>
+            </div>
+
+            <!-- Comprehension Questions -->
+            <div class="mt-8 bg-blue-50 rounded-xl p-5 border border-blue-200">
+                <h3 class="font-bold text-blue-800 mb-4 flex items-center"><i class="fas fa-question-circle mr-2"></i> คำถามท้ายคลิป (Comprehension)</h3>
+                <div id="sec2-questions-container" class="space-y-3 pl-2"></div>
+            </div>
+        </section>
+
+        <!-- Section 3: Target Vocab (Max 5) -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-teal-500">
+            <div id="sec3-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            <div id="vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- Section 4: Script & Breakdown -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-green-600">
+            <div id="sec4-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            <div id="sec4-desc-container" class="mb-6 text-gray-600 bg-green-50 p-4 rounded-lg border border-green-200 shadow-sm"></div>
+            
+            <div id="script-container" class="space-y-6"></div>
+        </section>
+
+        <!-- Section 5: Real-Life Activities (Core Lesson) -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-purple-600">
+            <div id="sec5-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <div class="space-y-6">
+                <!-- Role Play -->
+                <div class="bg-white rounded-xl p-6 border border-purple-200 shadow-sm hover:shadow-md transition">
+                    <div id="act1-header" class="mb-3"></div>
+                    <div id="act1-desc" class="mb-4"></div>
+                    <div class="text-4xl text-center p-4 bg-purple-50 rounded-lg">👨‍💼✋🗣️</div>
+                </div>
+
+                <!-- Debate -->
+                <div class="bg-white rounded-xl p-6 border border-indigo-200 shadow-sm hover:shadow-md transition">
+                    <div id="act2-header" class="mb-3"></div>
+                    <div id="act2-desc" class="mb-4"></div>
+                    <div class="text-4xl text-center p-4 bg-indigo-50 rounded-lg">👴⚖️ vs 💡✅</div>
+                </div>
+
+                <!-- Discussion -->
+                <div class="bg-white rounded-xl p-6 border border-fuchsia-200 shadow-sm hover:shadow-md transition">
+                    <div id="act3-header" class="mb-3"></div>
+                    <div id="act3-desc" class="mb-4"></div>
+                    <div class="text-4xl text-center p-4 bg-fuchsia-50 rounded-lg">😞💼📉</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Extension Activities -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-orange-500">
+            <div id="sec6-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Interview -->
+                <div class="bg-white rounded-xl p-5 border border-orange-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext1-header" class="mb-2"></div>
+                    <div id="ext1-desc"></div>
+                </div>
+
+                <!-- Story Telling -->
+                <div class="bg-white rounded-xl p-5 border border-yellow-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext2-header" class="mb-2"></div>
+                    <div id="ext2-desc"></div>
+                </div>
+
+                <!-- Speaking Game -->
+                <div class="bg-white rounded-xl p-5 border border-amber-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext3-header" class="mb-2"></div>
+                    <div id="ext3-desc"></div>
+                </div>
+
+                <!-- Presentation -->
+                <div class="bg-white rounded-xl p-5 border border-red-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext4-header" class="mb-2"></div>
+                    <div id="ext4-desc"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-500 py-6 text-sm">
+        <div id="footer-container" class="flex justify-center"></div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // --- DATA: UI STRINGS ---
+        const uiData = {
+            "nav-title": { th: "Master Mentor The Face Men", ipa: "Master Mentor The Face Men", en: "Master Mentor The Face Men Thailand" },
+            "sec1-title": { th: "1. ทบทวนคำศัพท์ 🎲", ipa: "tóp-tuan kam-sàp", en: "Vocabulary Review" },
+            "sec1-desc": { th: "สุ่มคำศัพท์แล้วแต่งประโยค", ipa: "sùm kam-sàp láew dtàeng bprà-yòhk", en: "Randomize a word and make a sentence." },
+            "btn-random": { th: "สุ่มคำศัพท์", ipa: "sùm kam-sàp", en: "Randomize" },
+            "card-init": { th: "กดปุ่มเพื่อเริ่ม", ipa: "gòt bpùm pêua rêrm", en: "Press button to start" },
+            
+            "sec2-title": { th: "2. วิดีโอ และ ความเข้าใจ 📺", ipa: "wí-dee-oh láe kwaam kâo jai", en: "Video & Comprehension" },
+            "li1": { th: "คุณเคยทำงานเป็นกรรมการ (Judge) ไหม?", ipa: "kun koie tam ngaan bpen gam-má-gaan măi", en: "Have you ever worked as a judge?" },
+            "li2": { th: "เวลาไม่เห็นด้วยกับรุ่นพี่หรือเจ้านาย คุณกล้าขัดค้านไหม?", ipa: "weh-laa mâi hĕn dûuay gàp rûn pêe rĕu jâo naai · kun glâa kàt káan măi", en: "When you disagree with seniors or bosses, do you dare to object?" },
+            "cq1": { th: "ออฟและมายตัดสินใจให้ผู้เข้าแข่งขันผ่านไหม?", ipa: "aawp láe maai dtàt-sĭn jai hâi pûu kâo kàeng-kăn pàan măi", en: "Did Oab and Mild decide to let the contestant pass?" },
+            "cq2": { th: "ทำไมออฟถึงรู้สึกงงและไม่เข้าใจ?", ipa: "tam-mai aawp tĕung rúu-sèuk ngong láe mâi kâo jai", en: "Why did Oab feel confused and not understand?" },
+            "cq3": { th: "มายอยากรู้เรื่องอะไรตอนท้ายคลิป?", ipa: "maai yàak rúu rêuuang à-rai dtawn táai klíp", en: "What did Mild want to know at the end of the clip?" },
+
+            "sec3-title": { th: "3. คำศัพท์เป้าหมาย (5 คำ) 🔑", ipa: "kam-sàp bpâo-măai", en: "Target Vocabulary" },
+            
+            "sec4-title": { th: "4. เจาะลึกบทสนทนา 💬", ipa: "jòk lêuk bòt sŏn-tá-naa", en: "Deep Dive: Conversation" },
+            "sec4-desc": { th: "กดปุ่ม 'วิเคราะห์ประโยค' เพื่อดูโครงสร้าง ตัวอย่าง และลองแต่งประโยคของคุณเอง", ipa: "gòt bpùm 'wí-kráw bprà-yòhk' pêua duu krohng sâang, dtua yàang, láew lawng dtàeng bprà-yòhk kăawng kun eng", en: "Click 'Breakdown' to see the structure, examples, and try making your own sentence." },
+            "btn-breakdown": { th: "💡 วิเคราะห์ประโยค", ipa: "wí-kráw bprà-yòhk", en: "Breakdown" },
+            "prompt-student": { th: "📝 ลองแต่งประโยคของคุณเอง:", ipa: "lawng dtàeng bprà-yòhk kăawng kun eng", en: "Try making your own sentence:" },
+
+            "sec5-title": { th: "5. กิจกรรมชีวิตจริง (Real-Life Tasks) 🗣️", ipa: "gìt-jà-gam chee-wít jing", en: "Real-Life Activities" },
+            "act1-head": { th: "บทบาทสมมติ: ขอขัดเจ้านาย", ipa: "bòt-bàat sŏm-mút: kăaw kàt jâo naai", en: "Role-Play: Interrupting the Boss" },
+            "act1-desc": { th: "เจ้านายกำลังจะตัดสินใจเรื่องที่ผิดพลาด คุณต้องใช้คำว่า 'ขอขัด...' เพื่อหยุดเขาอย่างสุภาพ", ipa: "jâo naai gam-lang jà dtàt-sĭn jai rêuuang têe pìt plâat · kun dtâwng chái kam wâa 'kăaw kàt...' pêua yùt kăo yàang sù-pâap", en: "Your boss is about to make a mistake. You must use 'May I interrupt...' to stop them politely." },
+            "act2-head": { th: "โต้วาที: ระบบอาวุโส vs ความสมเหตุสมผล", ipa: "dtôh-waa-tee: rá-bòp aa-wú-sŏh vs kwaam sŏm-hàet-sŏm-pŏn", en: "Debate: Seniority vs. Logic" },
+            "act2-desc": { th: "ในสังคมไทย 'คำพูดของผู้ใหญ่' ถือเป็นคำขาดที่ถูกต้องเสมอ จริงหรือไม่?", ipa: "nai săng-kom tai · 'kam pôot kăawng pûu yài' tĕu bpen kam kàat têe dtùuk dtâwng sà-mĕr · jing rĕu mâi", en: "In Thai society, 'a senior's word' is always the absolute correct final say. True or False?" },
+            "act3-head": { th: "ชวนคุย: มีฉันไว้ทำไม?", ipa: "chuan kui: mee chăn wái tam-mai", en: "Discussion: What am I here for?" },
+            "act3-desc": { th: "คุณเคยทำงานกลุ่มหรือโปรเจค แล้วรู้สึกว่า 'ไม่ต้องมีฉันก็ได้' ไหม? คุณจัดการความรู้สึกนั้นอย่างไร?", ipa: "kun koie tam ngaan glùm rĕu project · láew rúu-sèuk wâa 'mâi dtâwng mee chăn gôr dâai' măi · kun jàt gaan kwaam rúu-sèuk nán yàang-rai", en: "Have you ever worked in a group and felt 'you don't even need me'? How did you handle that feeling?" },
+
+            "sec6-title": { th: "6. กิจกรรมเสริม (Extension) 🚀", ipa: "gìt-jà-gam sĕrm", en: "Extension Activities" },
+            "ext1-head": { th: "สัมภาษณ์: กรรมการที่ถูกลืม", ipa: "săm-pâat: gam-má-gaan têe dtùuk leum", en: "Interview: The Forgotten Judge" },
+            "ext1-desc": { th: "สัมภาษณ์เพื่อนที่รับบทเป็นกรรมการที่ให้ผู้แข่งขัน 'ไม่ผ่าน' แต่ประธานกลับให้ 'ผ่าน'", ipa: "săm-pâat pêuuan têe ráp bòt bpen gam-má-gaan têe hâi pûu kàeng-kăn 'mâi pàan' dtàe bprà-taan glàp hâi 'pàan'", en: "Interview a friend playing a judge who failed a contestant, but the president passed them anyway." },
+            "ext2-head": { th: "เล่าเรื่อง: วันที่ฉันถูกมองข้าม", ipa: "lâo rêuuang: wan têe chăn dtùuk maawng kâam", en: "Story-Telling: The Day I Was Ignored" },
+            "ext2-desc": { th: "เล่าเหตุการณ์ที่คุณพยายามออกความเห็น แต่ไม่มีใครฟัง", ipa: "lâo hàet-gaan têe kun pá-yaa-yaam àawk kwaam hĕn · dtàe mâi mee krai fang", en: "Tell a story of a time you tried to voice your opinion but nobody listened." },
+            "ext3-head": { th: "เกม: แต่ผมคิดว่า...", ipa: "game: dtàe pŏm kít wâa...", en: "Game: But I think..." },
+            "ext3-desc": { th: "ครูเสนอไอเดียแย่ๆ ให้นักเรียนฝึกพูด 'ขอขัดนะครับ/คะ แต่ผม/หนูคิดว่า...'", ipa: "kruu sà-nĕr idea yâe yâe · hâi nák-riian fèuk pôot 'kăaw kàt ná kráp/ká · dtàe pŏm/nŭu kít wâa...'", en: "Teacher proposes bad ideas, student practices saying 'May I interrupt, but I think...'." },
+            "ext4-head": { th: "นำเสนอ: วิธีจัดการความขัดแย้ง", ipa: "nam sà-nĕr: wí-tee jàt gaan kwaam kàt yáeng", en: "Presentation: Handling Conflict" },
+            "ext4-desc": { th: "พรีเซนต์ 3 วิธีแก้ปัญหา เมื่อคุณและเพื่อนร่วมงานเห็นไม่ตรงกัน", ipa: "present 3 wí-tee gâe bpan-hăa · mêua kun láe pêuuan rûuam ngaan hĕn mâi dtrong gan", en: "Present 3 ways to solve problems when you and a coworker disagree." },
+            
+            "footer-text": { th: "สร้างเพื่อการเรียนการสอนภาษาไทย", ipa: "sâang pêua gaan riian gaan sŏn paa-săa tai", en: "Created for Thai learning" }
+        };
+
+        // --- DATA: Target Vocab (Max 5) ---
+        const targetVocab = [
+            { th: "ขอขัด", ipa: "kăaw kàt", en: "To interrupt / To politely disagree", emoji: "✋" },
+            { th: "คัดเลือก", ipa: "kát lêuuak", en: "To select / To screen", emoji: "✅" },
+            { th: "งง", ipa: "ngong", en: "Confused", emoji: "😵" },
+            { th: "สรุป", ipa: "sà-rùp", en: "To conclude / In conclusion", emoji: "📝" },
+            { th: "เอาออก", ipa: "ao àawk", en: "To take out / To eliminate", emoji: "🗑️" }
+        ];
+
+        // --- DATA: Review Vocab List (Merged Old + New 22 Words) ---
+        const reviewVocab = [
+            // NEW 22 Items
+            {th: "ใบกำกับภาษี", ipa: "bai gam-gàp paa-sĕe", en: "Tax invoice", emoji: "🧾💰"},
+            {th: "ลงคะแนนเสียง", ipa: "long ká-naen sĭiang", en: "Cast votes", emoji: "🗳️"},
+            {th: "ลำ", ipa: "lam", en: "Delicious (Northern Thai)", emoji: "😋"},
+            {th: "ขนาด", ipa: "kà-nàat", en: "Very (Northern Thai)", emoji: "📏"},
+            {th: "รสจัด", ipa: "rót jàt", en: "Strong flavour", emoji: "🌶️😋"},
+            {th: "กล่าวหา", ipa: "glàao hăa", en: "Accuse", emoji: "⚖️👉"},
+            {th: "โลภ", ipa: "lôhp", en: "Greedy", emoji: "💰🐷"},
+            {th: "ความโลภ", ipa: "kwaam lôhp", en: "Greed", emoji: "🤑"},
+            {th: "หน้าผาจำลอง", ipa: "nâa păa jam-laawng", en: "Artificial Climbing Wall", emoji: "🧗🧱"},
+            {th: "วิชา", ipa: "wí-chaa", en: "Subjects", emoji: "📚"},
+            {th: "สายสิญจน์", ipa: "săai-sĭn", en: "Holy thread", emoji: "🧵🙏"},
+            {th: "จรรยาบรรณ", ipa: "jan-yaa-ban", en: "Morality; ethics", emoji: "⚖️🧭"},
+            {th: "การกระทำ", ipa: "gaan grà-tam", en: "Actions", emoji: "🎬🛠️"},
+            {th: "หงุดหงิด", ipa: "ngùt-ngìt", en: "Frustrated; irritated", emoji: "😤😠"},
+            {th: "เจ้าเล่ห์", ipa: "jâo lêh", en: "Cunning", emoji: "🦊😏"},
+            {th: "แผ่นดินใหญ่", ipa: "pàen-din yài", en: "Mainland", emoji: "🗺️🏞️"},
+            {th: "วันแรงงาน", ipa: "wan raeng ngaan", en: "Labour Day", emoji: "👷‍♂️🛠️📅"},
+            {th: "วันหยุดนักขัตฤกษ์", ipa: "wan yùt nák-kàt-dtà-rêrk", en: "Public holiday", emoji: "🎌📅"},
+            {th: "เกมพวกนี้", ipa: "game pûuak née", en: "These games", emoji: "🎮🕹️"},
+            {th: "ประมาณนึง", ipa: "bprà-maan neung", en: "To some degree; somewhat", emoji: "🤏"},
+            {th: "ช่องโหว่", ipa: "chàwng wôh", en: "Loopholes", emoji: "🕳️⚠️"},
+            {th: "ได้เปรียบ", ipa: "dâai bprìiap", en: "Have an edge over others", emoji: "🏅⚔️"},
+
+            // Sample from previous lessons to mix in
+            {th: "สมอง", ipa: "sà-măawng", en: "Brain / Intelligence", emoji: "🧠"},
+            {th: "เล่นใหญ่", ipa: "lên yài", en: "To overact", emoji: "🎭"},
+            {th: "สนิท", ipa: "sà-nìt", en: "Close (relationship)", emoji: "🤞"},
+            {th: "เสื้อยืด", ipa: "sêuua yêut", en: "T-shirt", emoji: "👕"},
+            {th: "ดนตรีบำบัด", ipa: "don-dtree bam-bàt", en: "Music therapy", emoji: "🎵🩺"},
+            {th: "ฆ่าตัวตาย", ipa: "kâa dtua dtaai", en: "Commit suicide", emoji: "🕯️💔"},
+            {th: "โลกกลม", ipa: "lôhk glom", en: "Small world", emoji: "🌍🤏"}
+        ];
+
+        // --- DATA: Script & Breakdown ---
+        const scriptData = [
+            { role: "คิม", th: "อากาโตะ", ipa: "aa-gaa-dtòh", en: "Akato (Name)" },
+            { role: "แพน", th: "อยากเห็นเดินค่ะ", ipa: "yàak hĕn dern kâ", en: "I want to see (him) walk." },
+            { role: "อนันดา", th: "อยากเห็นเดินเหมือนกัน", ipa: "yàak hĕn dern mĕuuan gan", en: "I want to see (him) walk too." },
+            { 
+                role: "มาย", th: "แต่ว่า ผมอาจจะขอขัดพี่ๆนะ ผมยังรู้สึกว่า ยัง", ipa: "dtàe wâa · pŏm àat jà kăaw kàt pêe pêe ná · pŏm yang rúu-sèuk wâa · yang", en: "But, I might have to interrupt/disagree with you seniors. I still feel that... not yet.",
+                breakdown: {
+                    structTh: "ขอขัด + [บุคคล] + นะ", structIpa: "kăaw kàt + [Person] + ná", structEn: "May I interrupt / politely disagree with [Person]",
+                    exTh: "ขอขัดหัวหน้านะครับ ผมคิดว่าวิธีนี้ช้าไป", exIpa: "kăaw kàt hŭua nâa ná kráp · pŏm kít wâa wí-tee née cháa bpai", exEn: "May I interrupt/disagree, boss. I think this method is too slow."
+                }
+            },
+            { role: "ออฟ", th: "ยังไม่ผ่านครับ", ipa: "yang mâi pàan kráp", en: "Not passed yet." },
+            { 
+                role: "มาย", th: "หน้าที่ผมก็คือ ต้องคัดเลือก ผมก็ต้องเลือก", ipa: "nâa têe pŏm gôr keu · dtâwng kát lêuuak · pŏm gôr dtâwng lêuuak", en: "My duty is to select/screen. I have to choose.",
+                breakdown: {
+                    structTh: "หน้าที่ของ[ฉัน] ก็คือ...", structIpa: "nâa têe kăawng [Pronoun] gôr keu...", structEn: "My/His/Her duty is...",
+                    exTh: "หน้าที่ของพนักงานเสิร์ฟก็คือดูแลลูกค้า", exIpa: "nâa têe kăawng pá-nák-ngaan sèrp gôr keu duu-lae lûuk-káa", exEn: "The waiter's duty is to take care of customers."
+                }
+            },
+            { role: "ออฟ", th: "โทษที", ipa: "tôht tee", en: "Sorry." },
+            { role: "อดัม", th: "ขอดูตอน…อีกรอบ", ipa: "kăaw duu dtawn ... èek râawp", en: "Can I see the part when... again?" },
+            { role: "ออฟ", th: "อ๋อ โอเค", ipa: "ăaw · oh kay", en: "Oh, okay." },
+            { 
+                role: "ออฟ", th: "มาสเตอร์เมนเทอร์ให้ผ่าน แค่นั้นเลยเหรอ แล้วมีผมทำไมอ่ะ", ipa: "master mentor hâi pàan · kâe nán loie rĕr · láew mee pŏm tam-mai à", en: "The master mentor passed him, just like that? Then why am I here? (Why have me?)",
+                breakdown: {
+                    structTh: "มี + [คำนาม] + ไว้ทำไม", structIpa: "mee + [Noun] + wái tam-mai", structEn: "Why have [Noun]? / What's the point of having [Noun]?",
+                    exTh: "ถ้ามีกฎแต่ไม่มีคนทำตาม จะมีกฎไว้ทำไม", exIpa: "tâa mee gòt dtàe mâi mee kon tam dtaam · jà mee gòt wái tam-mai", exEn: "If there are rules but no one follows them, why have rules?"
+                }
+            },
+            { 
+                role: "ออฟ", th: "ก็เอาเขามาคนเดียวก็ได้ ไม่ต้องมีผมก็ได้ ผมงง เออ ไม่เข้าใจ", ipa: "gôr ao kăo maa kon diiao gôr dâai · mâi dtâwng mee pŏm gôr dâai · pŏm ngong · er · mâi kâo jai", en: "Just bring him alone then. You don't need me. I'm confused. Yeah, I don't understand.",
+                breakdown: {
+                    structTh: "ไม่ต้องมี...ก็ได้", structIpa: "mâi dtâwng mee ... gôr dâai", structEn: "Don't need to have ... (and that's fine).",
+                    exTh: "งานนี้ง่ายมาก ไม่ต้องมีผู้ช่วยก็ได้", exIpa: "ngaan née ngâai mâak · mâi dtâwng mee pûu chûuay gôr dâai", exEn: "This job is very easy. We don't need to have an assistant."
+                }
+            },
+            { role: "อนันดา", th: "เอ้า โชคดีไป ได้เดิน ได้เดิน", ipa: "âo · chôhk dee bpai · dâai dern · dâai dern", en: "Oh, lucky you. You get to walk, you get to walk." },
+            { role: "แพน", th: "แย่ละ สรุปทุกคนเข้าไปเดิน", ipa: "yâe lá · sà-rùp túk kon kâo bpai dern", en: "Oh no/Too bad. In conclusion, everyone goes in to walk." },
+            { role: "ออฟ", th: "เฮ้ย ไม่เอาออกกันบ้างเลยเหรอ", ipa: "héuy · mâi ao àawk gan bâang loie rĕr", en: "Hey, aren't we eliminating (taking out) anyone at all?" },
+            { 
+                role: "มาย", th: "ผมอยากรู้จริงๆว่า สิ่งที่มาสเตอร์เมนเทอร์เห็นคืออะไร", ipa: "pŏm yàak rúu jing jing wâa · sìng têe master mentor hĕn keu à-rai", en: "I really want to know what the master mentor saw.",
+                breakdown: {
+                    structTh: "สิ่งที่ + [ประธาน] + [กริยา] + คืออะไร", structIpa: "sìng têe + [Subj] + [Verb] + keu à-rai", structEn: "What the [Subject] [Verb] is...",
+                    exTh: "ฉันอยากรู้ว่า สิ่งที่คุณคิดคืออะไร", exIpa: "chăn yàak rúu wâa · sìng têe kun kít keu à-rai", exEn: "I want to know what you are thinking."
+                }
+            }
+        ];
+
+        // --- FUNCTIONS ---
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("TTS not supported");
+            }
+        }
+
+        function toggleVisibility(elementId) {
+            const el = document.getElementById(elementId);
+            if (el.classList.contains('hidden-content')) {
+                el.classList.remove('hidden-content');
+                el.classList.add('show-content');
+            } else {
+                el.classList.add('hidden-content');
+                el.classList.remove('show-content');
+            }
+        }
+
+        // Render Universal Text Unit
+        function renderInteractive(id, thai, ipa, en, options = {}) {
+            const type = options.type || 'inline';
+            const textSize = options.textSize || '';
+            const emoji = options.emoji || '';
+
+            // Layout 1: BUTTON (Special)
+            if (type === 'button') {
+                return `
+                    <div class="inline-flex flex-col items-center">
+                        <button onclick="randomReviewWord()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center mb-1">
+                            <i class="fas fa-dice mr-2"></i> ${thai}
+                        </button>
+                        <div class="flex items-center mt-2">
+                             <button onclick="speak('${thai}')" class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs hover:bg-teal-200 border border-teal-200 shadow-sm">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <button onclick="toggleVisibility('ipa-${id}')" class="ctrl-btn btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}')" class="ctrl-btn btn-en">EN</button>
+                        </div>
+                        <div id="ipa-${id}" class="hidden-content mt-1 text-xs text-gray-500 font-mono text-center bg-white p-1 rounded shadow-sm border border-yellow-200">${ipa}</div>
+                        <div id="en-${id}" class="hidden-content mt-1 text-xs text-blue-700 font-medium text-center bg-white p-1 rounded shadow-sm border border-blue-200">${en}</div>
+                    </div>
+                `;
+            }
+
+            // Layout 2: BLOCK
+            if (type === 'block') {
+                return `
+                <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition shadow-sm">
+                    <div class="flex items-start space-x-3">
+                        ${emoji ? `<span class="text-3xl pt-1">${emoji}</span>` : ''}
+                        <div class="flex-1">
+                            <p class="thai-text font-bold text-slate-800 mb-2">${thai}</p>
+                            
+                            <div class="flex flex-wrap items-center">
+                                <button onclick="speak('${thai.replace(/'/g, "\\'")}')" class="w-8 h-8 bg-teal-500 text-white rounded-full hover:bg-teal-600 flex items-center justify-center shadow-sm mr-2">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                                <button onclick="toggleVisibility('ipa-${id}')" class="px-2 py-1 bg-yellow-50 text-yellow-800 rounded text-xs font-bold mr-2 hover:bg-yellow-200 border border-yellow-200">IPA</button>
+                                <button onclick="toggleVisibility('en-${id}')" class="px-2 py-1 bg-blue-50 text-blue-800 rounded text-xs font-bold hover:bg-blue-200 border border-blue-200">EN</button>
+                            </div>
+
+                            <div id="ipa-${id}" class="hidden-content mt-3 text-sm text-gray-500 font-mono bg-slate-50 p-2 rounded border border-gray-100">${ipa}</div>
+                            <div id="en-${id}" class="hidden-content mt-2 text-sm text-blue-700 font-medium bg-slate-50 p-2 rounded border border-gray-100">${en}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // Layout 3: INLINE / HEADER
+            return `
+                <div class="inline-block w-full">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="${textSize}">${thai}</span>
+                        <div class="inline-flex items-center space-x-1 ml-1">
+                            <button onclick="speak('${thai.replace(/'/g, "\\'")}')" class="tts-btn" title="Listen">
+                                <i class="fas fa-volume-up" style="font-size: 0.8rem;"></i>
+                            </button>
+                            <button onclick="toggleVisibility('ipa-${id}')" class="ctrl-btn btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}')" class="ctrl-btn btn-en">EN</button>
+                        </div>
+                    </div>
+                    <div id="ipa-${id}" class="hidden-content mt-2 text-sm text-gray-500 font-mono ml-1 border-l-2 border-yellow-400 pl-2 bg-yellow-50 p-1 rounded shadow-sm">${ipa}</div>
+                    <div id="en-${id}" class="hidden-content mt-1 text-sm text-blue-700 font-medium ml-1 border-l-2 border-blue-400 pl-2 bg-blue-50 p-1 rounded shadow-sm">${en}</div>
+                </div>
+            `;
+        }
+
+        // Random Review Generator
+        function randomReviewWord() {
+            const container = document.getElementById('card-word-container');
+            const random = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            const id = 'rev-dynamic';
+            
+            const displayEmoji = random.emoji || "🔄";
+            document.getElementById('card-emoji').innerText = displayEmoji;
+            
+            container.innerHTML = `
+                <div class="animate-fadeIn">
+                    <h3 class="text-4xl font-bold text-slate-800 mb-4">${random.th}</h3>
+                    <div class="flex justify-center space-x-3">
+                         <button onclick="speak('${random.th}')" class="w-12 h-12 bg-teal-500 text-white rounded-full flex items-center justify-center hover:bg-teal-600 shadow-lg transition transform hover:scale-110">
+                            <i class="fas fa-volume-up fa-lg"></i>
+                        </button>
+                        <button onclick="toggleVisibility('ipa-${id}')" class="px-4 py-2 bg-yellow-200 text-yellow-900 rounded-lg font-bold shadow-sm hover:bg-yellow-300">IPA</button>
+                        <button onclick="toggleVisibility('en-${id}')" class="px-4 py-2 bg-blue-200 text-blue-900 rounded-lg font-bold shadow-sm hover:bg-blue-300">EN</button>
+                    </div>
+                    <div id="ipa-${id}" class="hidden-content mt-4 text-xl text-gray-500 font-mono bg-white p-3 rounded-lg shadow-inner border border-gray-200">${random.ipa}</div>
+                    <div id="en-${id}" class="hidden-content mt-2 text-xl text-blue-600 font-semibold bg-white p-3 rounded-lg shadow-inner border border-gray-200">${random.en}</div>
+                </div>
+            `;
+        }
+
+        // Generate Script Breakdown HTML
+        function generateScriptHTML(line, index) {
+            let roleColor = "bg-gray-200 text-gray-800";
+            if (line.role === "ออฟ") roleColor = "bg-red-600 text-white";
+            if (line.role === "มาย") roleColor = "bg-blue-600 text-white";
+            if (line.role === "คิม" || line.role === "แพน" || line.role === "อนันดา" || line.role === "อดัม") roleColor = "bg-purple-600 text-white";
+
+            const basicLineHTML = renderInteractive(`script-${index}`, line.th, line.ipa, line.en, { type: 'inline', textSize: 'text-lg font-bold text-slate-800' });
+            
+            let breakdownHTML = "";
+            if (line.breakdown) {
+                const bd = line.breakdown;
+                const bdTitle = renderInteractive(`bd-title-${index}`, "โครงสร้าง/คำศัพท์:", "krohng sâang / kam-sàp:", "Structure/Vocab:");
+                const bdStruct = renderInteractive(`bd-str-${index}`, bd.structTh, bd.structIpa, bd.structEn, { textSize: 'font-semibold text-green-800' });
+                const exTitle = renderInteractive(`ex-title-${index}`, "ตัวอย่าง:", "dtua yàang:", "Example:");
+                const exBody = renderInteractive(`ex-body-${index}`, bd.exTh, bd.exIpa, bd.exEn, { textSize: 'text-gray-800' });
+                const promptStudent = renderInteractive(`pr-std-${index}`, uiData['prompt-student'].th, uiData['prompt-student'].ipa, uiData['prompt-student'].en, { textSize: 'font-bold text-green-700' });
+                const btnBreakdown = renderInteractive(`btn-bd-${index}`, uiData['btn-breakdown'].th, uiData['btn-breakdown'].ipa, uiData['btn-breakdown'].en, { textSize: 'text-xs text-white' });
+
+                breakdownHTML = `
+                    <div class="mt-2">
+                        <button onclick="toggleVisibility('bd-panel-${index}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded-md text-sm transition shadow-sm">
+                            <i class="fas fa-lightbulb mr-1 text-yellow-300"></i> ${btnBreakdown}
+                        </button>
+                        
+                        <div id="bd-panel-${index}" class="hidden-content mt-3 bg-emerald-50 p-4 rounded-lg border border-emerald-200 shadow-inner">
+                            <div class="mb-3">
+                                <span class="text-sm text-emerald-600 font-bold">${bdTitle}</span><br>
+                                ${bdStruct}
+                            </div>
+                            <div class="mb-4 bg-white p-3 rounded border border-gray-200 shadow-sm">
+                                <span class="text-sm text-gray-500 font-bold">${exTitle}</span><br>
+                                ${exBody}
+                            </div>
+                            <div class="bg-white p-3 rounded border-2 border-dashed border-emerald-300">
+                                ${promptStudent}
+                                <input type="text" placeholder="..." class="mt-2 w-full p-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex-shrink-0 w-16 h-16 ${roleColor} rounded-full flex items-center justify-center font-bold shadow-md text-xs overflow-hidden text-center leading-tight">
+                        ${line.role}
+                    </div>
+                    <div class="flex-grow pt-1">
+                        ${basicLineHTML}
+                        ${breakdownHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            
+            // Nav
+            document.getElementById('nav-title-container').innerHTML = 
+                renderInteractive('nav', uiData['nav-title'].th, uiData['nav-title'].ipa, uiData['nav-title'].en, { textSize: 'text-xl font-bold' });
+
+            // Section 1 (Review)
+            document.getElementById('sec1-title-container').innerHTML = 
+                renderInteractive('sec1t', uiData['sec1-title'].th, uiData['sec1-title'].ipa, uiData['sec1-title'].en);
+            document.getElementById('sec1-desc-container').innerHTML = 
+                renderInteractive('sec1d', uiData['sec1-desc'].th, uiData['sec1-desc'].ipa, uiData['sec1-desc'].en);
+            document.getElementById('card-word-container').innerHTML = 
+                renderInteractive('card', uiData['card-init'].th, uiData['card-init'].ipa, uiData['card-init'].en, { textSize: 'text-xl text-gray-400' });
+            document.getElementById('btn-random-container').innerHTML = 
+                renderInteractive('btn-rnd', uiData['btn-random'].th, uiData['btn-random'].ipa, uiData['btn-random'].en, { type: 'button' });
+
+            // Section 2 (Lead-in, Video, Comprehension)
+            document.getElementById('sec2-title-container').innerHTML = 
+                renderInteractive('sec2t', uiData['sec2-title'].th, uiData['sec2-title'].ipa, uiData['sec2-title'].en);
+            
+            const leadinCont = document.getElementById('sec2-leadin-container');
+            leadinCont.innerHTML += renderInteractive('li1', uiData['li1'].th, uiData['li1'].ipa, uiData['li1'].en, { type: 'block', emoji: '📺' });
+            leadinCont.innerHTML += renderInteractive('li2', uiData['li2'].th, uiData['li2'].ipa, uiData['li2'].en, { type: 'block', emoji: '🤔' });
+
+            const compCont = document.getElementById('sec2-questions-container');
+            compCont.innerHTML += renderInteractive('cq1', uiData['cq1'].th, uiData['cq1'].ipa, uiData['cq1'].en, { type: 'block', emoji: '1️⃣' });
+            compCont.innerHTML += renderInteractive('cq2', uiData['cq2'].th, uiData['cq2'].ipa, uiData['cq2'].en, { type: 'block', emoji: '2️⃣' });
+            compCont.innerHTML += renderInteractive('cq3', uiData['cq3'].th, uiData['cq3'].ipa, uiData['cq3'].en, { type: 'block', emoji: '3️⃣' });
+
+            // Section 3 (Vocab)
+            document.getElementById('sec3-title-container').innerHTML = 
+                renderInteractive('sec3t', uiData['sec3-title'].th, uiData['sec3-title'].ipa, uiData['sec3-title'].en);
+            const vocabContainer = document.getElementById('vocab-container');
+            targetVocab.forEach((item, index) => {
+                vocabContainer.innerHTML += renderInteractive(`vocab-${index}`, item.th, item.ipa, item.en, { type: 'block', emoji: item.emoji });
+            });
+
+            // Section 4 (Script & Breakdown)
+            document.getElementById('sec4-title-container').innerHTML = 
+                renderInteractive('sec4t', uiData['sec4-title'].th, uiData['sec4-title'].ipa, uiData['sec4-title'].en);
+            document.getElementById('sec4-desc-container').innerHTML = 
+                renderInteractive('sec4d', uiData['sec4-desc'].th, uiData['sec4-desc'].ipa, uiData['sec4-desc'].en);
+            
+            const scriptContainer = document.getElementById('script-container');
+            scriptData.forEach((line, index) => {
+                scriptContainer.innerHTML += generateScriptHTML(line, index);
+            });
+
+            // Section 5 (Core Activities)
+            document.getElementById('sec5-title-container').innerHTML = 
+                renderInteractive('sec5t', uiData['sec5-title'].th, uiData['sec5-title'].ipa, uiData['sec5-title'].en);
+            
+            document.getElementById('act1-header').innerHTML = 
+                renderInteractive('act1-h', uiData['act1-head'].th, uiData['act1-head'].ipa, uiData['act1-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('act1-desc').innerHTML = 
+                renderInteractive('act1-d', uiData['act1-desc'].th, uiData['act1-desc'].ipa, uiData['act1-desc'].en, { textSize: 'text-gray-600' });
+
+            document.getElementById('act2-header').innerHTML = 
+                renderInteractive('act2-h', uiData['act2-head'].th, uiData['act2-head'].ipa, uiData['act2-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('act2-desc').innerHTML = 
+                renderInteractive('act2-d', uiData['act2-desc'].th, uiData['act2-desc'].ipa, uiData['act2-desc'].en, { textSize: 'text-gray-600' });
+
+            document.getElementById('act3-header').innerHTML = 
+                renderInteractive('act3-h', uiData['act3-head'].th, uiData['act3-head'].ipa, uiData['act3-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('act3-desc').innerHTML = 
+                renderInteractive('act3-d', uiData['act3-desc'].th, uiData['act3-desc'].ipa, uiData['act3-desc'].en, { textSize: 'text-gray-600' });
+
+            // Section 6 (Extensions)
+            document.getElementById('sec6-title-container').innerHTML = 
+                renderInteractive('sec6t', uiData['sec6-title'].th, uiData['sec6-title'].ipa, uiData['sec6-title'].en);
+
+            document.getElementById('ext1-header').innerHTML = 
+                renderInteractive('ext1-h', uiData['ext1-head'].th, uiData['ext1-head'].ipa, uiData['ext1-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext1-desc').innerHTML = 
+                renderInteractive('ext1-d', uiData['ext1-desc'].th, uiData['ext1-desc'].ipa, uiData['ext1-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            document.getElementById('ext2-header').innerHTML = 
+                renderInteractive('ext2-h', uiData['ext2-head'].th, uiData['ext2-head'].ipa, uiData['ext2-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext2-desc').innerHTML = 
+                renderInteractive('ext2-d', uiData['ext2-desc'].th, uiData['ext2-desc'].ipa, uiData['ext2-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            document.getElementById('ext3-header').innerHTML = 
+                renderInteractive('ext3-h', uiData['ext3-head'].th, uiData['ext3-head'].ipa, uiData['ext3-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext3-desc').innerHTML = 
+                renderInteractive('ext3-d', uiData['ext3-desc'].th, uiData['ext3-desc'].ipa, uiData['ext3-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            document.getElementById('ext4-header').innerHTML = 
+                renderInteractive('ext4-h', uiData['ext4-head'].th, uiData['ext4-head'].ipa, uiData['ext4-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext4-desc').innerHTML = 
+                renderInteractive('ext4-d', uiData['ext4-desc'].th, uiData['ext4-desc'].ipa, uiData['ext4-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            // Footer
+            document.getElementById('footer-container').innerHTML = 
+                renderInteractive('foot', uiData['footer-text'].th, uiData['footer-text'].ipa, uiData['footer-text'].en);
+        };
+    </script>
+</body>
+</html>
