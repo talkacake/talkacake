@@ -493,6 +493,24 @@
             </div>
         </section>
 
+        <!-- 6. Additional Vocabulary -->
+        <section class="mb-12 bg-slate-100 p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-slate-500">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    📚 6. คำศัพท์เพิ่มเติม
+                    <button class="tts-button" onclick="playTTS('หก คำศัพท์เพิ่มเติม', this)">🔊</button>
+                </h2>
+                <div class="controls-row mb-4">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                </div>
+                <div class="ipa">kham-sàp phə̂əm-dtəəm</div>
+                <div class="en">Additional Vocabulary</div>
+            </div>
+            
+            <div id="additional-vocab-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
     </div>
 
     <script>
@@ -679,6 +697,44 @@
             };
         });
 
+        // Additional Vocab List
+        const additionalVocabList = [
+            { emoji: "⚖️📉", th: "ความเหลื่อมล้ำ", ipa: "khwaam-lʉ̂am-láam", en: "inequality" },
+            { emoji: "🧳🌍", th: "ผู้อพยพ", ipa: "pûu-òp-phá-yóp", en: "immigrants" },
+            { emoji: "⚡️📉", th: "ผลกระทบ", ipa: "pŏn-grà-thóp", en: "effects" },
+            { emoji: "🔁🔄", th: "วงจรต่อเนื่อง", ipa: "wong-jon-dtàaw-nʉ̂ʉang", en: "perpetuating cycle" },
+            { emoji: "🚫🤥", th: "เชื่อถือไม่ได้", ipa: "chêua-thĕuue-mâi-dâai", en: "not reliable; not credible" },
+            { emoji: "🛠️", th: "แก้ไข", ipa: "gâae-kǎi", en: "solve; fix" },
+            { emoji: "🚨⏱️", th: "เร่งด่วน", ipa: "rêng-dùan", en: "urgent" },
+            { emoji: "🏥🩺", th: "สาธารณสุข", ipa: "sàa-thaa-rá-ná-sùk", en: "healthcare" },
+            { emoji: "🔗", th: "เชื่อม", ipa: "chʉ̂ʉam", en: "connect" },
+            { emoji: "🏥👵", th: "ศูนย์ดูแลผู้สูงอายุ", ipa: "sǔun-doolae-phûu-sǔung-aa-yú", en: "nursing home" },
+            { emoji: "👵🏠", th: "บ้านพักคนชรา", ipa: "bâan-phák-kon-chraa", en: "retirement home" }
+        ];
+
+        window.onload = () => {
+            const additionalVocabContainer = document.getElementById('additional-vocab-container');
+            if (additionalVocabContainer) {
+                additionalVocabList.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-slate-500 transition-all";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl text-slate-800">${item.emoji} ${item.th}</span>
+                            <button class="tts-button" onclick="playTTS('${item.th}', this)">🔊</button>
+                        </div>
+                        <div class="controls-row mb-1">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa font-medium text-amber-600">${item.ipa}</div>
+                        <div class="en text-slate-500">${item.en}</div>
+                    `;
+                    additionalVocabContainer.appendChild(div);
+                });
+            }
+        };
+
         function randomizeWord() {
             const displayArea = document.getElementById('word-display-area');
             const word = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
@@ -722,7 +778,7 @@
         }
         
         function checkReadingQuiz() {
-            const correctAnswers = { rq1: 'b', rq2: 'c' };
+            const correctAnswers = { rq1: 'a', rq2: 'a' };
             const questions = document.querySelectorAll('.reading-quiz-question');
             questions.forEach(question => {
                 const radios = question.querySelectorAll('input[type="radio"]');
@@ -740,6 +796,20 @@
                     }
                 });
             });
+        }
+
+        function toggleId(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden-content');
+        }
+
+        function toggleLocal(btn, type) {
+            const block = btn.closest('.content-block');
+            if (block) {
+                const targets = block.querySelectorAll('.' + type);
+                targets.forEach(t => t.classList.toggle('reveal'));
+                btn.classList.toggle('active');
+            }
         }
 
         // --- Text-to-Speech (TTS) Logic using Google AI ---
@@ -796,16 +866,16 @@
                 btn.classList.add('playing');
             }
 
-            const apiKey = "AIzaSyAHtJTFnj2m81ykb48Liod4xOMUIw8V5gw"; 
+            const apiKey = ""; // User will put their API key here
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
 
             const payload = {
-                contents: [{ parts: [{ text: `Say in a male voice: ${text}` }] }],
+                contents: [{ parts: [{ text: `พูดว่า: ${text}` }] }], // Using Thai prompt for natural tone
                 generationConfig: {
                     responseModalities: ["AUDIO"],
                     speechConfig: {
                         voiceConfig: {
-                            prebuiltVoiceConfig: { voiceName: "Puck" }
+                            prebuiltVoiceConfig: { voiceName: "Puck" } // Male voice
                         }
                     }
                 },
@@ -847,6 +917,7 @@
                 }
             } catch (error) {
                 console.error("Failed to generate or play audio:", error);
+                alert("เกิดข้อผิดพลาดในการเล่นเสียง กรุณาตรวจสอบ API Key");
             } finally {
                 if (btn) {
                     btn.innerHTML = originalText;
