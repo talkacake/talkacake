@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ทบทวน</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.95); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- TTS Engine ---
+        const speakThai = (text, e) => {
+            if(e) e.stopPropagation();
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // --- Core SmartText Component ---
+        const SmartText = ({ th, ipa, en, emoji = "", size = "md", isTitle = false }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const textSize = size === "lg" ? "text-xl md:text-2xl font-bold" : 
+                             size === "xl" ? "text-2xl md:text-3xl font-bold" : 
+                             "text-lg md:text-xl font-medium";
+
+            return (
+                <div className={`flex flex-col gap-2 ${isTitle ? 'mb-4' : 'bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3 w-full'}`}>
+                    <div className={`flex items-start gap-3 ${isTitle ? 'justify-center text-center' : ''}`}>
+                        {emoji && <span className="text-2xl shrink-0 mt-0.5">{emoji}</span>}
+                        <div className={`flex-1 ${isTitle ? 'flex flex-col items-center' : ''}`}>
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                <button 
+                                    onClick={(e) => speakThai(th, e)}
+                                    className="p-2 bg-sky-100 text-sky-600 rounded-full hover:bg-sky-200 btn-press shrink-0"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                </button>
+                                <span className={`${textSize} text-slate-800 leading-snug`}>{th}</span>
+                            </div>
+
+                            <div className={`flex gap-2 ${isTitle ? 'justify-center' : ''}`}>
+                                {ipa && (
+                                    <button 
+                                        onClick={() => setShowIPA(!showIPA)}
+                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showIPA ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-400 border-slate-200'}`}
+                                    >
+                                        IPA
+                                    </button>
+                                )}
+                                {en && (
+                                    <button 
+                                        onClick={() => setShowEN(!showEN)}
+                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showEN ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-400 border-slate-200'}`}
+                                    >
+                                        EN
+                                    </button>
+                                )}
+                            </div>
+
+                            {showIPA && <div className={`mt-2 font-mono text-sm pl-3 border-l-2 border-indigo-300 text-indigo-600 ${isTitle ? 'text-center border-l-0' : 'text-left'}`}>{ipa}</div>}
+                            {showEN && <div className={`mt-1 text-sm pl-3 border-l-2 border-emerald-300 text-emerald-700 ${isTitle ? 'text-center border-l-0' : 'text-left'}`}>{en}</div>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Exercise Components ---
+        
+        const OrderSentence = ({ items }) => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [selectedWords, setSelectedWords] = useState([]);
+            const [availableWords, setAvailableWords] = useState([]);
+            const [isCorrect, setIsCorrect] = useState(false);
+            const [showError, setShowError] = useState(false);
+
+            useEffect(() => {
+                resetQuestion();
+            }, [currentIdx]);
+
+            const resetQuestion = () => {
+                const words = items[currentIdx].jumbled;
+                setAvailableWords([...words]);
+                setSelectedWords([]);
+                setIsCorrect(false);
+                setShowError(false);
+            };
+
+            const selectWord = (word, index) => {
+                setSelectedWords([...selectedWords, word]);
+                const newAvailable = [...availableWords];
+                newAvailable.splice(index, 1);
+                setAvailableWords(newAvailable);
+                setShowError(false);
+            };
+
+            const unselectWord = (word, index) => {
+                setAvailableWords([...availableWords, word]);
+                const newSelected = [...selectedWords];
+                newSelected.splice(index, 1);
+                setSelectedWords(newSelected);
+                setShowError(false);
+                setIsCorrect(false);
+            };
+
+            const checkAnswer = () => {
+                // Remove spaces for accurate comparison (fixes trailing space bugs)
+                const currentAnswer = selectedWords.map(w => w.th).join('').replace(/\s+/g, '');
+                const targetAnswer = items[currentIdx].target.th.replace(/\s+/g, '');
+
+                if (currentAnswer === targetAnswer && availableWords.length === 0) {
+                    setIsCorrect(true);
+                    setShowError(false);
+                    speakThai(items[currentIdx].target.th);
+                } else {
+                    setShowError(true);
+                }
+            };
+
+            return (
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-sky-100 mb-6">
+                    <SmartText th="เรียงประโยคให้ถูกต้อง" ipa="riang bprà-yòok hâi tùuk dtɔ̂ng" en="Put the sentence in the correct order" emoji="🧩" isTitle={true} />
+                    
+                    <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
+                    
+                    <div className="min-h-[80px] p-4 bg-sky-50 rounded-xl mb-4 border-2 border-dashed border-sky-200 flex flex-wrap gap-2 items-center">
+                        {selectedWords.map((w, i) => (
+                            <button key={i} onClick={() => unselectWord(w, i)} className="px-4 py-2 bg-sky-500 text-white rounded-lg font-bold text-lg shadow-sm btn-press">
+                                {w.th.trim()}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                        {availableWords.map((w, i) => (
+                            <button key={i} onClick={() => selectWord(w, i)} className="px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg font-bold text-lg hover:bg-slate-50 btn-press">
+                                {w.th.trim()}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-col items-center gap-3 mb-4">
+                        {availableWords.length === 0 && !isCorrect && (
+                            <button onClick={checkAnswer} className="px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold text-lg btn-press shadow-md transition-colors">
+                                ตรวจคำตอบ
+                            </button>
+                        )}
+                        {showError && (
+                            <div className="text-rose-500 font-bold animate-shake text-sm">
+                                ❌ ยังไม่ถูกต้อง ลองจัดเรียงใหม่นะ
+                            </div>
+                        )}
+                    </div>
+
+                    {isCorrect && (
+                        <div className="animate-slide bg-emerald-50 p-4 rounded-xl border border-emerald-200 mb-4">
+                            <SmartText th={items[currentIdx].target.th} ipa={items[currentIdx].target.ipa} en={items[currentIdx].target.en} emoji="✅" />
+                        </div>
+                    )}
+
+                    <div className="flex justify-between items-center">
+                        <button onClick={resetQuestion} className="px-4 py-2 text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold btn-press transition-colors">เริ่มใหม่</button>
+                        {isCorrect && currentIdx < items.length - 1 && (
+                            <button onClick={() => setCurrentIdx(currentIdx + 1)} className="px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold btn-press shadow-md transition-colors">ข้อต่อไป ➡️</button>
+                        )}
+                        {isCorrect && currentIdx === items.length - 1 && (
+                            <span className="text-emerald-600 font-bold mr-2 animate-pulse">🎉 เก่งมาก! จบแล้ว</span>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const MultipleChoice = ({ items }) => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [showAnswer, setShowAnswer] = useState(false);
+            const [selected, setSelected] = useState(null);
+
+            const handleSelect = (idx, isCorrect) => {
+                setSelected(idx);
+                setShowAnswer(true);
+                if(isCorrect) speakThai(items[currentIdx].options[idx].th);
+            };
+
+            const next = () => {
+                setShowAnswer(false);
+                setSelected(null);
+                setCurrentIdx(c => c + 1);
+            };
+
+            const q = items[currentIdx];
+
+            return (
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-purple-100 mb-6">
+                    <SmartText th="เลือกคำตอบที่ถูกต้อง" ipa="lʉ̂ak kam-dtɔ̀ɔp tîi tùuk dtɔ̂ng" en="Choose the correct answer" emoji="🎯" isTitle={true} />
+                    <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
+                    
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
+                        <SmartText th={q.q.th} ipa={q.q.ipa} en={q.q.en} emoji="🗣️" />
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                        {q.options.map((opt, i) => {
+                            let btnStyle = "bg-white border-slate-200 text-slate-700";
+                            if (showAnswer) {
+                                if (opt.correct) btnStyle = "bg-emerald-100 border-emerald-500 text-emerald-800";
+                                else if (selected === i) btnStyle = "bg-rose-100 border-rose-500 text-rose-800";
+                                else btnStyle = "bg-slate-50 border-slate-200 text-slate-400 opacity-50";
+                            }
+
+                            return (
+                                <button 
+                                    key={i} 
+                                    disabled={showAnswer}
+                                    onClick={() => handleSelect(i, opt.correct)}
+                                    className={`w-full p-4 rounded-xl border-2 font-bold text-lg text-left transition-all btn-press ${btnStyle}`}
+                                >
+                                    {opt.th}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {showAnswer && (
+                        <div className="animate-slide">
+                            <SmartText th={q.options.find(o=>o.correct).th} ipa={q.options.find(o=>o.correct).ipa} en={q.options.find(o=>o.correct).en} emoji="✅" />
+                            {currentIdx < items.length - 1 && (
+                                <button onClick={next} className="w-full mt-4 py-3 bg-purple-500 text-white rounded-xl font-bold btn-press">ข้อต่อไป ➡️</button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const SimpleCard = ({ title, emoji, items, bgColor }) => (
+            <div className={`p-5 rounded-3xl shadow-sm border border-slate-100 mb-6 ${bgColor}`}>
+                <SmartText th={title.th} ipa={title.ipa} en={title.en} emoji={emoji} isTitle={true} size="lg" />
+                <div className="space-y-3 mt-4">
+                    {items.map((item, i) => (
+                        <SmartText key={i} th={item.th} ipa={item.ipa} en={item.en} emoji={item.emoji} />
+                    ))}
+                </div>
+            </div>
+        );
+
+        // --- Data ---
+        const reviewData = {
+            order: [
+                {
+                    jumbled: [{th:"หมอ "}, {th:"ปรึกษา "}, {th:"ก็ต้อง "}, {th:"ไป "}],
+                    target: { th: "ก็ต้องไปปรึกษาหมอ ", ipa: "gɔ̂ɔ dtɔ̂ɔng bpai bprʉ̀k sǎa mɔ̌ɔ", en: "you have to consult the doctor." }
+                },
+                {
+                    jumbled: [{th:"ดีๆหน่อย "}, {th:"ให้ "}, {th:"ดูแล "}, {th:"ร่างกายตัวเอง "}],
+                    target: { th: "ดูแลร่างกายตัวเองให้ดีๆหน่อย ", ipa: "duu lɛɛ râang gaai dtua eeng hâi dii dii nɔ̀ɔi", en: "Take care of your body well, please." }
+                },
+                {
+                    jumbled: [{th:"ตอนกลางคืน "}, {th:"ไป "}, {th:"ใช่ไหม "}, {th:"ตกหมึก "}],
+                    target: { th: "ไปตกหมึกตอนกลางคืนใช่ไหม ", ipa: "bpai dtòk mèuk dtɔɔn glaang kʉʉn châi mái", en: "We go squid fishing at night, right?" }
+                },
+                {
+                    jumbled: [{th:"คนแก่ "}, {th:"ขับรถ "}, {th:"ไม่ควร "}],
+                    target: { th: "คนแก่ไม่ควรขับรถ ", ipa: "kon gɛ̀ɛ mâi kuan kàp rót", en: "Old people shouldn't drive." }
+                },
+                {
+                    jumbled: [{th:"ประคบร้อน "}, {th:"ต้อง "}, {th:"ปวดคอ "}],
+                    target: { th: "ปวดคอต้องประคบร้อน ", ipa: "bpùat kɔɔ dtɔ̂ng bprà kóp rɔ́ɔn", en: "Neck pain requires hot compress." }
+                }
+            ],
+            mcq: [
+                {
+                    q: { th: "ไม่ได้เจอกันนานเลย สบายดีไหม?", ipa: "mâi dâi jəə gan naan loei, sà-baai-dii mái", en: "Haven't seen you for a long time. Are you well?" },
+                    options: [
+                        { th: "สบายดีจ้ะ", ipa: "sà-baai dii jâ", en: "I'm well.", correct: true },
+                        { th: "เป็นลม", ipa: "bpen lom", en: "Fainted.", correct: false },
+                        { th: "ปวดคอ", ipa: "bpùat kɔɔ", en: "Neck pain.", correct: false }
+                    ]
+                },
+                {
+                    q: { th: "ขอเช่ารถสามวันค่ะ คิดราคาเท่าไหร่คะ?", ipa: "kɔ̌ɔ châo rót sǎam wan kà, kít raa-kaa tâo-rài ká", en: "I'd like to rent a car for 3 days. How much?" },
+                    options: [
+                        { th: "แดดออก", ipa: "dɛ̀ɛt ɔ̀ɔk", en: "Sunny.", correct: false },
+                        { th: "พันห้าครับ", ipa: "pan hâa kráp", en: "1500 baht.", correct: true },
+                        { th: "ขับหนี", ipa: "kàp nǐi", en: "Drive away.", correct: false }
+                    ]
+                },
+                {
+                    q: { th: "แอร์ไม่เย็นเลยค่ะ ช่วยดูให้หน่อย", ipa: "ae mâi yen loei kà, chûai duu hâi nòi", en: "The AC isn't cold at all. Please check it." },
+                    options: [
+                        { th: "อร่อยมาก", ipa: "à-rɔ̀ɔi mâak", en: "Very delicious.", correct: false },
+                        { th: "ขี้หนาว", ipa: "kîi nǎao", en: "Get cold easily.", correct: false },
+                        { th: "เดี๋ยวช่างไปดูให้ครับ", ipa: "dǐao châang bpai duu hâi kráp", en: "The technician will go check it.", correct: true }
+                    ]
+                },
+                {
+                    q: { th: "ไปตกหมึกตอนกลางคืนใช่ไหม?", ipa: "bpai dtòk mèuk dtɔɔn glaang kʉʉn châi mái", en: "Go squid fishing at night, right?" },
+                    options: [
+                        { th: "ใช่จ้ะ", ipa: "châi jâ", en: "Yes.", correct: true },
+                        { th: "ป่วย", ipa: "bpùai", en: "Sick.", correct: false },
+                        { th: "ร่ม", ipa: "rôm", en: "Umbrella.", correct: false }
+                    ]
+                },
+                {
+                    q: { th: "เกิดอะไรขึ้น?", ipa: "gə̀ət à rai kʉ̂n", en: "What happened?" },
+                    options: [
+                        { th: "กินยา", ipa: "gin yaa", en: "Take medicine.", correct: false },
+                        { text: "รถชนกัน", th: "รถชนกัน", ipa: "rót chon gan", en: "Cars collided.", correct: true },
+                        { th: "อาบน้ำ", ipa: "àap náam", en: "Take a shower.", correct: false }
+                    ]
+                }
+            ]
+        };
+
+        const scenariosData = [
+            {
+                title: { th: "1. นวด", ipa: "nûat", en: "Massage" }, emoji: "💆‍♀️", color: "bg-rose-50",
+                items: [
+                    { th: "พี่คะ ช่วยนวดตรงบ่ากับไหล่เยอะๆ หน่อยค่ะ", ipa: "pîi ká, chûai nûat dtrong bàa gàp lài yə́-yə́ nɔ̀ɔi kâ", en: "Excuse me, please massage the shoulders a lot.", emoji: "💪" },
+                    { th: "เจ็บนิดหน่อยค่ะ เบาๆ ได้ไหมคะ", ipa: "jèp nít-nɔ̀ɔi kâ, bao-bao dâi mǎi ká", en: "It hurts a little. Can you do it softly?", emoji: "🤕" },
+                    { th: "นอนคว่ำ หรือ นอนหงายคะ?", ipa: "nɔɔn kwâm rʉ̌ʉ nɔɔn ngǎai ká?", en: "Lie on your belly or lie on your back?", emoji: "🛌" },
+                    { th: "สบายมากเลยค่ะ หายปวดแล้ว", ipa: "sà-baai mâak ləəi kâ, hǎai bpùat lɛ́ɛo", en: "Very comfortable. The pain is gone.", emoji: "😌" }
+                ]
+            },
+            {
+                title: { th: "2. ตกหมึก", ipa: "dtòk mʉ̀k", en: "Squid Fishing" }, emoji: "🦑", color: "bg-indigo-50",
+                items: [
+                    { th: "ไปตกหมึกตอนกลางคืนใช่ไหมคะ?", ipa: "bpai dtòk mʉ̀k dtɔɔn glaang kʉʉn châi mǎi ká?", en: "We go squid fishing at night, right?", emoji: "🌙" },
+                    { th: "ท่าเรืออยู่ที่ไหนคะ?", ipa: "tâa rʉa yùu tîi-nǎi ká?", en: "Where is the pier?", emoji: "⚓️" },
+                    { th: "ต้องใส่เหยื่อที่เบ็ดไหม?", ipa: "dtɔ̂ng sài yʉ̀a tîi bèt mǎi?", en: "Do I need to put bait on the fishing rod?", emoji: "🎣" },
+                    { th: "หมึกสดๆ อร่อยมาก มีน้ำจิ้มไหม", ipa: "mʉ̀k sòt-sòt à-rɔ̀ɔi mâak, mii nám-jîm mǎi", en: "Fresh squid is very delicious. Do you have dipping sauce?", emoji: "😋" }
+                ]
+            },
+            {
+                title: { th: "3. ดำน้ำตื้น และ พายเรือ", ipa: "dam náam dtʉ̂ʉn lɛ́ paai rʉa", en: "Snorkeling & Kayaking" }, emoji: "🤿🛶", color: "bg-cyan-50",
+                items: [
+                    { th: "แดดแรงมาก ต้องทาครีมกันแดดก่อน", ipa: "dɛ̀ɛt rɛɛng mâak, dtɔ̂ng taa kriim-gan-dɛ̀ɛt gɔ̀ɔn", en: "The sun is very strong. Must apply sunscreen first.", emoji: "🧴" },
+                    { th: "น้ำใสมาก เห็นก้นทะเลเลย", ipa: "náam sǎi mâak, hěn gôn tá-lee ləəi", en: "The water is very clear, can see the bottom of the sea.", emoji: "🌊" },
+                    { th: "พายเรือเหนื่อยไหม", ipa: "paai rʉa nʉ̀ai mǎi", en: "Is kayaking tiring?", emoji: "💦" }
+                ]
+            },
+            {
+                title: { th: "4. เช่ารถ และ ขับรถ", ipa: "châo rót lɛ́ kàp rót", en: "Rent & Drive a car" }, emoji: "🚗", color: "bg-amber-50",
+                items: [
+                    { th: "ขอเช่ารถสามวันค่ะ คิดราคาเท่าไหร่", ipa: "kɔ̌ɔ châo rót sǎam wan kâ, kít raa-kaa tâo-rài", en: "I'd like to rent a car for 3 days. How much do you calculate?", emoji: "💰" },
+                    { th: "ต้องใช้ใบขับขี่ เซ็นสัญญาไหมคะ?", ipa: "dtɔ̂ng chái bai-kàp-kìi sen sǎn-yaa mǎi ká?", en: "Do I need to use a driver's license and sign a contract?", emoji: "✍️" },
+                    { th: "น้ำมันเต็มถังไหม", ipa: "náam-man dtem tǎng mǎi", en: "Is the gas tank full?", emoji: "⛽" },
+                    { th: "ขับรถช้าๆ ชิดซ้ายนะคะ ทางอันตราย", ipa: "kàp rót cháa-cháa chít sáai ná ká, taang an-dtà-raai", en: "Drive slowly, keep left please, the road is dangerous.", emoji: "⚠️" }
+                ]
+            },
+            {
+                title: { th: "5. โฮมสเตย์ และ โรงแรม", ipa: "hoom sà-dtee lɛ́ roong-rɛɛm", en: "Homestay & Hotel" }, emoji: "🏡🏨", color: "bg-emerald-50",
+                items: [
+                    { th: "จองห้องไว้ชื่อ... ค่ะ ขอกุญแจหน่อยค่ะ", ipa: "jɔɔng hɔ̂ng wái chʉ̂ʉ... kâ. kɔ̌ɔ gun-jɛɛ nɔ̀ɔi kâ", en: "I booked a room under the name... Can I have the key?", emoji: "🔑" },
+                    { th: "ผ้าปูที่นอน กับ ผ้าห่ม สะอาดดีค่ะ", ipa: "pâa bpuu tîi nɔɔn gàp pâa hòm sà-àat dii kâ", en: "The bed sheets and blankets are nice and clean.", emoji: "🛏️" },
+                    { th: "แอร์ไม่เย็นเลยค่ะ ช่วยดูให้หน่อย", ipa: "ɛɛ mâi yen ləəi kâ, chûai duu hâi nɔ̀ɔi", en: "The AC isn't cold at all. Please check it for me.", emoji: "❄️" },
+                    { th: "แถวนี้มีร้านสะดวกซื้อไหม", ipa: "tɛ̌o níi mii ráan-sà-dùak-sʉ́ʉ mǎi", en: "Is there a convenience store around here?", emoji: "🏪" }
+                ]
+            },
+            {
+                title: { th: "6. เจอเพื่อนคนไทย", ipa: "jəə pʉ̂an kon-tai", en: "Meeting a Thai friend" }, emoji: "🇹🇭", color: "bg-fuchsia-50",
+                items: [
+                    { th: "ไม่ได้เจอกันนานเลย สบายดีไหม", ipa: "mâi dâi jəə gan naan ləəi, sà-baai-dii mǎi", en: "Haven't seen you for a long time. Are you well?", emoji: "👋" },
+                    { th: "หิวแล้ว ไปหาอะไรกินกันเถอะ", ipa: "hǐu lɛ́ɛo, bpai hǎa à-rai gin gan tə̀", en: "I'm hungry already. Let's go find something to eat.", emoji: "🍽️" },
+                    { th: "เดี๋ยวเราเลี้ยงเองนะ", ipa: "dǐao rao líang eeng ná", en: "I'll treat you.", emoji: "🍻" },
+                    { th: "มาเม้ามอยกัน มีข่าวลืออะไรบ้าง?", ipa: "maa máao-mɔɔi gan. mii kàao lʉʉ à-rai bâang?", en: "Let's chit-chat. Any rumors?", emoji: "🗣️" }
+                ]
+            }
+        ];
+
+        const extensionData = [
+            {
+                title: { th: "บทบาทสมมติ", ipa: "bòt-bàat sǒm-mút", en: "Role-play" }, emoji: "🎭",
+                items: [
+                    { th: "คุณเช่ารถขับไปหาเพื่อนที่โฮมสเตย์ แต่แอร์รถไม่เย็น และหลงทาง", ipa: "kun châo rót kàp bpai hǎa pʉ̂an tîi hoom sà-dtee dtɛ̀ɛ ɛɛ rót mâi yen lɛ́ lǒng taang", en: "You rent a car to drive to your friend's homestay, but the car AC isn't cold and you get lost." },
+                    { th: "โทรหาเพื่อน เล่าว่าเกิดอะไรขึ้น และให้เพื่อนบอกทาง", ipa: "too hǎa pʉ̂an, lâo wâa gə̀ət à-rai kʉ̂n, lɛ́ hâi pʉ̂an bɔ̀ɔk taang", en: "Call your friend, tell them what happened, and ask them to give directions." }
+                ]
+            },
+            {
+                title: { th: "เกมสุ่มพูด", ipa: "geem sùm pûut", en: "Speaking Game" }, emoji: "🎲",
+                items: [
+                    { th: "คุณเพิ่งทำข้อเท้าพลิกตอนลงเรือ", ipa: "kun pə̂ng tam kɔ̂ɔ-táao plík dtɔɔn long rʉa", en: "You just sprained your ankle when getting off the boat." },
+                    { th: "คุณจะบอกหมอว่ายังไง?", ipa: "kun jà bɔ̀ɔk mɔ̌ɔ wâa yang-ngai?", en: "How will you tell the doctor?" }
+                ]
+            },
+            {
+                title: { th: "โต้วาที", ipa: "dtôo-waa-tii", en: "Debate" }, emoji: "⚔️",
+                items: [
+                    { th: "ไปเที่ยวทะเล 'ตอนกลางวัน' หรือ 'ตอนกลางคืน' ดีกว่ากัน?", ipa: "bpai tîao tá-lee 'dtɔɔn glaang wan' rʉ̌ʉ 'dtɔɔn glaang kʉʉn' dii gwàa gan?", en: "Is it better to go to the sea 'during the day' or 'at night'?" },
+                    { th: "บอกจุดแข็งและจุดอ่อนของแต่ละเวลา", ipa: "bɔ̀ɔk jùt kɛ̌ng lɛ́ jùt ɔ̀ɔn kɔ̌ɔng dtɛ̀ɛ lá wee-laa", en: "Tell the strengths and weaknesses of each time." }
+                ]
+            },
+            {
+                title: { th: "คำถามชวนคุย", ipa: "kam-tǎam chuan kui", en: "Discussion Questions" }, emoji: "💬",
+                items: [
+                    { th: "1. เวลาไปเที่ยว ชอบนอนโฮมสเตย์หรือโรงแรม? ทำไม?", ipa: "wee-laa bpai tîao, chɔ̂ɔp nɔɔn hoom sà-dtee rʉ̌ʉ roong-rɛɛm? tam-mai?", en: "When traveling, do you prefer sleeping in a homestay or hotel? Why?" },
+                    { th: "2. ชอบขับรถเอง หรือ ให้คนอื่นขับ?", ipa: "chɔ̂ɔp kàp rót eeng rʉ̌ʉ hâi kon ʉ̀ʉn kàp?", en: "Do you like to drive yourself or let someone else drive?" },
+                    { th: "3. ปกติซื้อของฝากอะไรให้เพื่อน?", ipa: "bpòk-gà-dtì sʉ́ʉ kɔ̌ɔng-fàak à-rai hâi pʉ̂an?", en: "Normally what souvenirs do you buy for friends?" }
+                ]
+            },
+            {
+                title: { th: "เล่าเรื่อง", ipa: "lâo rʉ̂ang", en: "Story-telling" }, emoji: "📖",
+                items: [
+                    { th: "เล่าเรื่องอุบัติเหตุหรือปัญหาที่เคยเจอตอนไปเที่ยว", ipa: "lâo rʉ̂ang ù-bàt-dtì-hèet rʉ̌ʉ bpan-hǎa tîi kəəi jəə dtɔɔn bpai tîao", en: "Tell a story about an accident or problem you experienced while traveling." },
+                    { th: "แก้ปัญหานั้นยังไง? (เช่น รถชน, ของหาย, ป่วย)", ipa: "gɛ̂ɛ bpan-hǎa nán yang-ngai? (chên rót chon, kɔ̌ɔng hǎai, bpùai)", en: "How did you solve that problem? (e.g. car crash, lost things, sick)" }
+                ]
+            }
+        ];
+
+        // --- Main App ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState("review"); // review | scenarios | extension
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen pb-20">
+                    
+                    {/* Header */}
+                    <div className="bg-sky-500 p-6 text-white rounded-b-3xl shadow-md sticky top-0 z-50">
+                        <SmartText th="ทบทวน" ipa="tóp-tuan" en="Review" emoji="🇹🇭" size="xl" isTitle={true} />
+                        
+                        {/* Tabs */}
+                        <div className="flex bg-white/20 p-1 rounded-xl mt-2 backdrop-blur-sm shadow-inner">
+                            <button onClick={() => setActiveTab("review")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "review" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <span>แบบฝึกหัด</span>
+                            </button>
+                            <button onClick={() => setActiveTab("scenarios")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "scenarios" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <span>สถานการณ์</span>
+                            </button>
+                            <button onClick={() => setActiveTab("extension")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "extension" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <span>กิจกรรมเสริม</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="px-4 mt-6">
+                        
+                        {/* TAB 1: Review Exercises */}
+                        {activeTab === "review" && (
+                            <div className="animate-slide">
+                                <OrderSentence items={reviewData.order} />
+                                <MultipleChoice items={reviewData.mcq} />
+                            </div>
+                        )}
+
+                        {/* TAB 2: Scenarios */}
+                        {activeTab === "scenarios" && (
+                            <div className="animate-slide">
+                                {scenariosData.map((scene, i) => (
+                                    <SimpleCard key={i} title={scene.title} emoji={scene.emoji} items={scene.items} bgColor={scene.color} />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* TAB 3: Extension */}
+                        {activeTab === "extension" && (
+                            <div className="animate-slide">
+                                {extensionData.map((ext, i) => (
+                                    <SimpleCard key={i} title={ext.title} emoji={ext.emoji} items={ext.items} bgColor="bg-white" />
+                                ))}
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
