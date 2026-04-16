@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>นี้ นั้น พวกนี้ พวกนั้น</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Glassmorphism containers */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-24 selection:bg-indigo-100 selection:text-indigo-900">
+
+    <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="text-center bg-white p-8 rounded-[2rem] glass-card border-t-4 border-t-indigo-500" id="header-container">
+            <!-- Rendered via JS -->
+        </header>
+
+        <!-- Section 1: Vocab Review -->
+        <section class="glass-card p-6 rounded-3xl border border-blue-100 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full mix-blend-multiply filter blur-2xl opacity-70 transform translate-x-1/2 -translate-y-1/2"></div>
+            
+            <div id="review-title-container" class="mb-4 border-b border-blue-50 pb-4 relative z-10"></div>
+            
+            <div class="flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-dashed border-blue-200 min-h-[250px] relative z-10">
+                <div id="random-vocab-display" class="mb-8 empty:hidden transition-all duration-300 transform scale-110"></div>
+                
+                <button id="btn-randomize" class="bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg shadow-indigo-200 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-3">
+                    <span class="text-2xl">🎲</span> <span>สุ่มคำศัพท์ (Randomize)</span>
+                </button>
+                
+                <div id="review-instruction-container" class="mt-6 opacity-0 transition-opacity duration-500 text-center"></div>
+            </div>
+        </section>
+
+        <!-- Section 2: Homework Check -->
+        <section class="glass-card p-6 rounded-3xl border border-green-100">
+            <div id="homework-title-container" class="mb-4 border-b border-green-50 pb-4"></div>
+            <div class="space-y-4 pl-4 border-l-4 border-green-400" id="homework-content">
+                <!-- Rendered via JS -->
+            </div>
+        </section>
+
+        <!-- Section 3: Lead-in Questions -->
+        <section class="glass-card p-6 rounded-3xl border border-orange-100">
+            <div id="leadin-title-container" class="mb-4 border-b border-orange-50 pb-4"></div>
+            <div class="space-y-4 pl-4 border-l-4 border-orange-400" id="leadin-content">
+                <!-- Rendered via JS -->
+            </div>
+        </section>
+
+        <!-- Section 4: Target Vocabulary -->
+        <section class="glass-card p-6 rounded-3xl border border-purple-100">
+            <div id="grammar-title-container" class="mb-4 border-b border-purple-50 pb-4"></div>
+            <div id="grammar-list" class="flex flex-wrap gap-4 justify-center py-6 bg-purple-50/50 rounded-2xl"></div>
+        </section>
+
+        <!-- Section 5: Dialogue & Questions -->
+        <section class="glass-card p-6 rounded-3xl border border-yellow-100">
+            <div id="dialogue-title-container" class="mb-6 border-b border-yellow-50 pb-4"></div>
+            
+            <div class="bg-gradient-to-b from-yellow-50 to-white p-6 rounded-2xl mb-8 shadow-inner border border-yellow-100 space-y-4" id="dialogue-content">
+                <!-- Rendered via JS -->
+            </div>
+
+            <div id="questions-title-container" class="mb-4 border-b border-yellow-50 pb-4 mt-8"></div>
+            <div class="space-y-4 pl-4 border-l-4 border-yellow-400 bg-white p-4 rounded-r-2xl" id="questions-content">
+                <!-- Rendered via JS -->
+            </div>
+        </section>
+
+        <!-- Section 6: Practice Tasks -->
+        <section class="glass-card p-6 rounded-3xl border border-rose-100">
+            <div id="tasks-title-container" class="mb-6 border-b border-rose-50 pb-4"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="tasks-content">
+                <!-- Rendered via JS -->
+            </div>
+        </section>
+
+        <!-- Section 7: Extension Activities -->
+        <section class="glass-card p-6 rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white">
+            <div id="extensions-title-container" class="mb-6 border-b border-slate-100 pb-4"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="extensions-content">
+                <!-- Rendered via JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. DATA STRUCTURES ---
+
+        const vocabulary = [
+            { emoji: "🧭⬇️", thai: "ใต้", ipa: "dtâi", en: "south" },
+            { emoji: "📖", thai: "อ่าน", ipa: "àan", en: "read" },
+            { emoji: "❓", thai: "ทำไม", ipa: "tam-mai", en: "why" },
+            { emoji: "📚📝", thai: "เรียน", ipa: "riian", en: "learn/study" },
+            { emoji: "☸️🙏", thai: "พุทธ", ipa: "pút", en: "Buddhist" },
+            { emoji: "❓", thai: "ใคร", ipa: "krai", en: "who" },
+            { emoji: "🍛🌶️", thai: "แกงเขียวหวาน", ipa: "gaaeng kǐao wǎan", en: "green curry (sweet)" },
+            { emoji: "✅", thai: "ได้", ipa: "dâi", en: "can" },
+            { emoji: "✍️📝", thai: "เขียน", ipa: "kǐian", en: "write" },
+            { emoji: "🚿🪲🤔", thai: "เธอจะให้ด้วงช่วยอาบน้ำจริงๆเหรอ", ipa: "thəə jà hâi dûuang chûay àap nám jing-jing rə̌ə", en: "Do you really want me to help you shower?" },
+            { emoji: "🤝", thai: "กับ", ipa: "gàp", en: "and; with" },
+            { emoji: "🔊🎧", thai: "เสียง", ipa: "sĭang", en: "audio; voice; sound; noise" },
+            { emoji: "🙏✨", thai: "อยาก", ipa: "yàak", en: "want; would like to" },
+            { emoji: "😓🧗‍♂️", thai: "ยาก", ipa: "yâak", en: "difficult; hard" },
+            { emoji: "💧🚰", thai: "น้ำเปล่า", ipa: "náam-plào", en: "plain water" },
+            { emoji: "🔗🚫", thai: "ลิงก์ใช้งานไม่ได้", ipa: "líng chái-ngaan mâi dâi", en: "The link doesn't work." },
+            { emoji: "🏞️🌳", thai: "สวน", ipa: "sŭan", en: "park" },
+            { emoji: "🙅‍♂️", thai: "ไม่ใช่", ipa: "mâi châi", en: "no, it's not" },
+            { emoji: "❓🤔", thai: "ใช่ไหม", ipa: "châi mái", en: "right? isn't it?" },
+            { emoji: "😊🤝", thai: "ดีใจที่ได้เจอกันนะ", ipa: "dii-jai tii dâi jer gan ná", en: "Happy to(that) get to meet each other." },
+            { emoji: "🏠💻", thai: "ทำงานที่บ้าน", ipa: "tham-ngaan-thîi-bâan", en: "work from(at) home" },
+            { emoji: "💼🧰", thai: "งาน", ipa: "ngaan", en: "job; task; event" },
+            { emoji: "🍰🍮", thai: "ของหวาน", ipa: "kɔ̌ɔng wǎan", en: "dessert (sweet stuff)" },
+            { emoji: "🍚", thai: "ข้าวเหนียว", ipa: "kâao nĭeow", en: "sticky rice" },
+            { emoji: "🥭", thai: "มะม่วง", ipa: "má-mûang", en: "mango" },
+            { emoji: "🐇", thai: "กระต่าย", ipa: "grà-dtàai", en: "rabbit" },
+            { emoji: "📏", thai: "เล็ก", ipa: "lék", en: "small" },
+            { emoji: "📅⏮️", thai: "เมื่อวาน", ipa: "mûuea-waan", en: "yesterday" },
+            { emoji: "👋😊", thai: "ยินดีต้อนรับ", ipa: "yin-dee-dtôn-ráp", en: "welcome" },
+            { emoji: "📝💪", thai: "ฝึก", ipa: "fèuk", en: "practice" },
+            { emoji: "🎵", thai: "เพลง", ipa: "pleeng", en: "song" },
+            { emoji: "🎲✨", thai: "บังเอิญ", ipa: "bang-eern", en: "coincident" },
+            { emoji: "🥤💧", thai: "ถ้าไม่กินน้ำฉันก็หิว", ipa: "tâa-mâi-gin-náam-chăn-gâaw-hĭw", en: "If I don't drink, then I'm thirsty." },
+            { emoji: "🍳🥣", thai: "ฉันมักจะไม่กินข้าวเช้า", ipa: "chăn-mák-jà-mâi-gin-kâao-cháao", en: "I usually don't eat breakfast." },
+            { emoji: "💇‍♂️", thai: "ผมของคุณ", ipa: "pŏm-kŏng-kun", en: "your hair" },
+            { emoji: "😎", thai: "มัม", ipa: "mam", en: "big shot (mom)" },
+            { emoji: "😎🏆💼", thai: "ตัวมัม", ipa: "dtua-mam", en: "big shot" },
+            { emoji: "🍋", thai: "เปรี้ยว", ipa: "bprîao", en: "sour" },
+            { emoji: "🍬", thai: "หวาน", ipa: "wăan", en: "sweet" },
+            { emoji: "📚✏️", thai: "การบ้าน", ipa: "gaan-bâan", en: "homework" },
+            { emoji: "🎲✨", thai: "นี่คือความบังเอิญ", ipa: "nîi-kʉʉ-kwaam-bang-ʉʉn", en: "This is coincidence." },
+            { emoji: "⏪", thai: "...มา", ipa: "maa", en: "indicating past tense" },
+            { emoji: "📚😔", thai: "ถ้าไม่เรียนภาษาไทย ฉันก็รู้สึกไม่ดี", ipa: "tâa-mâi-riian-paa-săa-thai, chăn-gôr rúu-sèuk mâi-dii", en: "If I don't learn Thai, I then feel bad (not good)." },
+            { emoji: "🟰", thai: "เป็น", ipa: "bpen", en: "To be (is/am/are)" },
+            { emoji: "🧠💭", thai: "จำ", ipa: "jam", en: "remember" },
+            { emoji: "💍❤️", thai: "แต่งงานกับ", ipa: "dtàeng-ngaan-gàp", en: "married to(with)" },
+            { emoji: "🎃", thai: "ฟักทอง", ipa: "fák-thong", en: "pumpkin" },
+            { emoji: "👨‍👦1️⃣", thai: "ลูกชายคนที่ 1", ipa: "lûuk-chaai-kon-tîi-nùeng", en: "the first son" },
+            { emoji: "👩‍🏫📚", thai: "สอน", ipa: "sŏn", en: "teach" },
+            { emoji: "📚", thai: "หนังสือ", ipa: "năng-sĕu", en: "books" },
+            { emoji: "🎬", thai: "หนัง", ipa: "năng", en: "movie" },
+            { emoji: "🌐🗣️", thai: "แปล", ipa: "plae", en: "translate" },
+            { emoji: "🧸🪀", thai: "ของเล่น", ipa: "kŏng-lên", en: "toys" },
+            { emoji: "🗓️⏳", thai: "อาทิตย์ที่แล้ว", ipa: "aa-thít-thîi-láew", en: "last week" },
+            { emoji: "⏳🙅‍♂️", thai: "ไม่มีเวลา", ipa: "mâi-mii-waylaa", en: "don't have time" },
+            { emoji: "📝", thai: "ประโยค", ipa: "bprà-yòok", en: "sentence" },
+            { emoji: "⏰😴", thai: "ตื่น", ipa: "dtèun", en: "wake up" },
+            { emoji: "⏰🕒", thai: "กี่โมง", ipa: "gìi-mohng", en: "What time?" },
+            { emoji: "⏳", thai: "เกือบ", ipa: "gèuuap", en: "almost" },
+            { emoji: "⏳", thai: "ตั้งแต่", ipa: "dtâng-dtàe", en: "since" },
+            { emoji: "👊🚪", thai: "เคาะ", ipa: "kɔ́ɔ", en: "knock; bang" },
+            { emoji: "❓🗣️", thai: "ถาม", ipa: "tăam", en: "ask (questions)" },
+            { emoji: "🌀😵‍💫", thai: "วุ่นวาย", ipa: "wûn-waai", en: "hot mess; chaotic" },
+            { emoji: "👌", thai: "ได้แล้ว", ipa: "dâi-láew", en: "got it; clock it" },
+            { emoji: "🐰🥚", thai: "บังเอิญว่า วันนี้เป็นวันอีสเตอร์", ipa: "bang-əən-wâa wan-níi bpen wan-íit-dtə̂r", en: "It's coincident that today is Easter." },
+            { emoji: "🍳🥣", thai: "มื้อเช้า", ipa: "mʉ́ʉ-cháao", en: "breakfast (meal)" },
+            { emoji: "🤒🍺🥣", thai: "ฉันมักจะกินมื้อเช้า แต่เมื่อวานฉันดื่มมาก ไม่สบาย ก็เลยไม่หิว", ipa: "chăn-mák-ja-gin-méuu-cháao-dtàe-mêuua-waan-chăn-dùuem-mâak-mâi-sà-baai-gâaw-ləəi-mâi-hĭu", en: "I usually eat breakfast, but yesterday I drank a lot. I'm sick. So, I'm not hungry." },
+            { emoji: "👩‍👧", thai: "แม่ของฉัน", ipa: "mâe-kŏng-chăn", en: "My mum" },
+            { emoji: "⏳🕑", thai: "2 ชั่วโมงที่แล้ว", ipa: "sŏng-chûua-mohng-thîi-láew", en: "2 hours ago" },
+            { emoji: "➕👕", thai: "ใส่", ipa: "sài", en: "put in; add; wear" },
+            { emoji: "🧊", thai: "น้ำแข็ง", ipa: "náam-khĕng", en: "ice" },
+            { emoji: "🤥🙊", thai: "โกหก", ipa: "go-hòk", en: "To tell lies" },
+            { emoji: "❓🤔", thai: "...บ้าง", ipa: "bâang", en: "question particle used when expecting more than 1 answer" },
+            { emoji: "📅🔁", thai: "ทุกวัน", ipa: "túk-wan", en: "every day" },
+            { emoji: "🔁", thai: "ทุก", ipa: "túk", en: "every" },
+            { emoji: "🍚🥤", thai: "กินข้าวเหนียวกับโค้กด้วย", ipa: "gin-kâao-nǐao-gàp-kóhk-dûay", en: "Eat sticky rice with coke as well" },
+            { emoji: "📍", thai: "ใกล้", ipa: "glâi", en: "near" },
+            { emoji: "🌏📏", thai: "ไกล", ipa: "glai", en: "far" },
+            { emoji: "😷🤧", thai: "ไอ", ipa: "ai", en: "cough" },
+            { emoji: "💊🏥", thai: "ยา", ipa: "yaa", en: "medicine" },
+            { emoji: "🕛🌙", thai: "เที่ยงคืน", ipa: "tîang-kʉʉn", en: "midnight" },
+            { emoji: "🏁", thai: "จบ", ipa: "jòp", en: "finish; end" },
+            { emoji: "📅", thai: "ปีที่แล้ว", ipa: "bpee-têe-láew", en: "last year" },
+            { emoji: "📌", thai: "ต้อง", ipa: "dtông", en: "must; have to" },
+            { emoji: "🎁🤲", thai: "ให้", ipa: "hâi", en: "give; let; allow" },
+            { emoji: "🚶‍♂️➡️", thai: "กูต้องไป มึงก็เลยต้องให้กูไป", ipa: "guu-dtông-bpai meung-gâaw-loei-dtông-hâi-guu-bpai", en: "I have to leave(go). So, you have to let me go." },
+            { emoji: "🎯", thai: "เพื่อ", ipa: "pêua", en: "in order to" },
+            { emoji: "❓🙋", thai: "เอาอะไรอีกไหม", ipa: "ao-à-rai-ìik-mǎi", en: "Anything else?" },
+            { emoji: "🕘🌙", thai: "3 ทุ่ม", ipa: "săam-thûm", en: "9pm" },
+            { emoji: "🤔✨", thai: "น่าสนใจ", ipa: "nâa-sŏn-jai", en: "interesting" },
+            { emoji: "🧩", thai: "แบบ", ipa: "bàep", en: "type; like" },
+            { emoji: "🕰️", thai: "ช่วงนี้", ipa: "chûang-níi", en: "lately" },
+            { emoji: "🐾", thai: "ตัว", ipa: "dtua", en: "body; animal; classifier" },
+            { emoji: "🦷", thai: "กัด", ipa: "gàt", en: "bite" },
+            { emoji: "🐇1️⃣", thai: "กระต่ายตัวที่ 1", ipa: "grà-dtàai-dtua-têe-nùeng", en: "the first rabbit" },
+            { emoji: "😢", thai: "เศร้า", ipa: "sâo", en: "sad" },
+            { emoji: "📈😅", thai: "เยอะ", ipa: "yóe", en: "a lot" },
+            { emoji: "🪟", thai: "หน้าต่าง", ipa: "nâa-dtàang", en: "window" },
+            { emoji: "🥥🥛", thai: "กะทิ", ipa: "gà-thí", en: "coconut milk" },
+            { emoji: "🪞", thai: "กระจก", ipa: "grà-jòk", en: "mirror" },
+            { emoji: "🏖️🎉", thai: "วันหยุด", ipa: "wan-hyùt", en: "holiday" },
+            { emoji: "👵", thai: "อายุมาก", ipa: "aa-yú-maâk", en: "old age" },
+            { emoji: "🔤", thai: "การ", ipa: "gaan", en: "prefix to turn action verbs to nouns" },
+            { emoji: "🧠", thai: "ความ", ipa: "kwaam", en: "prefix to turn abstract adj/verb to nouns" },
+            { emoji: "🔁", thai: "เหมือนเดิม", ipa: "mĕuan-deerm", en: "same as usual" },
+            { emoji: "🦵😖", thai: "ปวดขา", ipa: "bpùuat-kăa", en: "leg pain(muscle strain)" },
+            { emoji: "👶👨‍👩‍👧‍👦", thai: "หลาน", ipa: "lăan", en: "grandchildren; nieces; nephew" },
+            { emoji: "👧👪", thai: "หลานสาว", ipa: "lăan-săao", en: "nieces; granddaughter" },
+            { emoji: "👦👨‍👩‍👧‍👦", thai: "หลานชาย", ipa: "lăan-chai", en: "nephews; grandson" },
+            { emoji: "😴🛌", thai: "การพักผ่อน", ipa: "gaan-phák-phàwn", en: "Resting" },
+            { emoji: "🛠️✨", thai: "ทำให้", ipa: "tam-hâi", en: "To make someone be something" },
+            { emoji: "⭐️✅", thai: "สำคัญ", ipa: "sǎm-kan", en: "important" },
+            { emoji: "👉🚶", thai: "ไป...กันเถอะ", ipa: "bpai...gan-thòe", en: "Let's ..." },
+            { emoji: "🏢⏰", thai: "เลิกงาน", ipa: "lêrk-ngaan", en: "get off work" },
+            { emoji: "½", thai: "ครึ่ง", ipa: "krêung", en: "half" },
+            { emoji: "➕", thai: "...อื่น", ipa: "èun", en: "(an)other..." },
+            { emoji: "🙏", thai: "ต้องการ", ipa: "dtông-gaan", en: "need" },
+            { emoji: "✈️🧳🚆", thai: "เดินทาง", ipa: "dern-thaang", en: "travel; commute" },
+            { emoji: "⏱️", thai: "ชั่วโมง", ipa: "chûa-moong", en: "hours" },
+            { emoji: "⏳", thai: "นาน", ipa: "naan", en: "long time" },
+            { emoji: "📅🌞", thai: "เสาร์อาทิตย์", ipa: "săo-aa-thít", en: "weekend" },
+            { emoji: "🔁🧘‍♂️✨", thai: "การกลับชาติมาเกิด", ipa: "gaan-glàp-châat-maa-gèrt", en: "reinacarnation" },
+            { emoji: "⏰", thai: "ตอน", ipa: "dtaawn", en: "when (not a question)" },
+            { emoji: "🚀", thai: "เริ่ม", ipa: "r̂erm", en: "start; begin" },
+            { emoji: "📨", thai: "ส่ง", ipa: "sòng", en: "send; drop off" },
+            { emoji: "🕢🌅", thai: "เจ็ดโมงครึ่งเช้า", ipa: "jèt-moong-krêueng-cháao", en: "7.30am" },
+            { emoji: "🧪✅", thai: "ลอง", ipa: "long", en: "try; experiment" },
+            { emoji: "💪🎯", thai: "พยายาม", ipa: "phá-yaa-yaam", en: "try; attempt" },
+            { emoji: "⚡🏃💨", thai: "เร็ว", ipa: "reo", en: "fast; quickly; early" },
+            { emoji: "💊😴", thai: "ยานอนหลับ", ipa: "yaa-naawn-làp", en: "sleeping pills" },
+            { emoji: "👌✨", thai: "เป๊ะ", ipa: "bpé", en: "perfect" },
+            { emoji: "🚗💨", thai: "ขับรถ", ipa: "khàp-rót", en: "To drive" },
+            { emoji: "🤝", thai: "เจอ", ipa: "jer", en: "meet" },
+            { emoji: "🤔❓", thai: "เธอเชื่อไหม", ipa: "thooe-cheûua-mái", en: "Do you believe it?" }
+        ];
+
+        const uiHeadings = {
+            header: { emoji: "🇹🇭✨", thai: "นี้ นั้น พวกนี้ พวกนั้น", ipa: "níi nán pûak-níi pûak-nán", en: "Demonstrative pronouns: this, that, these, those" },
+            reviewTitle: { emoji: "🔄🧠", thai: "ทบทวนคำศัพท์", ipa: "tóp-tuuan kam-sàp", en: "Vocabulary Review" },
+            reviewInstruction: { emoji: "🗣️💬", thai: "แต่งประโยคจากคำนี้", ipa: "dtàeng bprà-yòok jàak kam níi", en: "Make a sentence from this word" },
+            homeworkTitle: { emoji: "📝✅", thai: "ตรวจการบ้าน", ipa: "dtruuat gaan-bâan", en: "Homework Check" },
+            leadInTitle: { emoji: "🤔💭", thai: "คำถามก่อนเรียน", ipa: "kăm-tăam gòrn riian", en: "Lead-in Questions" },
+            grammarTitle: { emoji: "🎯📚", thai: "คำศัพท์ใหม่", ipa: "kam-sàp mài", en: "Target Vocabulary" },
+            dialogueTitle: { emoji: "🗣️👥", thai: "บทสนทนา", ipa: "bòt-sŏn-tá-naa", en: "Dialogue" },
+            questionsTitle: { emoji: "❓🙋", thai: "ตอบคำถาม", ipa: "dtòp kăm-tăam", en: "Answer the questions" },
+            tasksTitle: { emoji: "🎯💪", thai: "กิจกรรมฝึกพูด", ipa: "gìt-jà-gam fèuk pûut", en: "Speaking Practice Tasks" },
+            extensionsTitle: { emoji: "🌟🚀", thai: "กิจกรรมเพิ่มเติม", ipa: "gìt-jà-gam pêrm-dterm", en: "Extension Activities" }
+        };
+
+        const homeworkQuestions = [
+            { emoji: "1️⃣", thai: "คุณทำการบ้านหรือยัง", ipa: "kun tam gaan-bâan rĕu-yang", en: "Have you done the homework yet?" },
+            { emoji: "2️⃣", thai: "การบ้านยากไหม", ipa: "gaan-bâan yâak măi", en: "Was the homework difficult?" }
+        ];
+
+        const leadInQuestions = [
+            { emoji: "1️⃣", thai: "คุณชอบของเล่นไหม", ipa: "kun chôp kŏng-lên măi", en: "Do you like toys?" },
+            { emoji: "2️⃣", thai: "คุณมีหนังสือเยอะไหม", ipa: "kun mii năng-sĕu yóe măi", en: "Do you have a lot of books?" }
+        ];
+
+        const targetVocab = [
+            { emoji: "👇", thai: "นี้", ipa: "níi", en: "this (singular)" },
+            { emoji: "👉", thai: "นั้น", ipa: "nán", en: "that (singular)" },
+            { emoji: "👇👇", thai: "พวกนี้", ipa: "pûak-níi", en: "these (plural)" },
+            { emoji: "👉👉", thai: "พวกนั้น", ipa: "pûak-nán", en: "those (plural)" }
+        ];
+
+        const dialogue = [
+            { speaker: "👩‍🦰", thai: "สวัสดี คุณชอบหนังสือเล่มนี้ไหม", ipa: "sà-wàt-dii, kun chôp năng-sĕu lêm-níi măi", en: "Hello, do you like this book?" },
+            { speaker: "👨", thai: "ไม่ชอบ ฉันชอบหนังสือเล่มนั้นมากกว่า", ipa: "mâi chôp, chăn chôp năng-sĕu lêm-nán mâak-gwàa", en: "No, I like that book more." },
+            { speaker: "👩‍🦰", thai: "อ๋อ แล้วของเล่นพวกนี้ล่ะ ของใคร", ipa: "ŏr, láew kŏng-lên pûak-níi lâ, kŏng krai", en: "Oh, and whose are these toys?" },
+            { speaker: "👨", thai: "พวกนี้ของฉัน แต่ของเล่นพวกนั้นของเพื่อน", ipa: "pûak-níi kŏng chăn, dtàae kŏng-lên pûak-nán kŏng pêuan", en: "These are mine, but those toys are my friend's." },
+            { speaker: "👩‍🦰", thai: "โอเค ฉันอยากได้อันนี้", ipa: "oo-kee, chăn yàak dâi an-níi", en: "Okay, I want this one." }
+        ];
+
+        const comprehensionQuestions = [
+            { emoji: "1️⃣", thai: "ผู้ชายชอบหนังสือเล่มไหน", ipa: "pûu-chaai chôp năng-sĕu lêm năi", en: "Which book does the man like?" },
+            { emoji: "2️⃣", thai: "ของเล่นพวกนี้เป็นของใคร", ipa: "kŏng-lên pûak-níi bpen kŏng krai", en: "Whose are these toys?" },
+            { emoji: "3️⃣", thai: "ของเล่นพวกนั้นเป็นของใคร", ipa: "kŏng-lên pûak-nán bpen kŏng krai", en: "Whose are those toys?" }
+        ];
+
+        const tasks = [
+            { 
+                emoji: "🎭🛍️", 
+                title: { thai: "บทบาทสมมติ: ซื้อของ", ipa: "bòt-bàat-sŏm-mút: séu kŏng", en: "Role-play: Shopping" },
+                desc: { thai: "ใช้คำว่า นี้, นั้น, พวกนี้, พวกนั้น และคำเชื่อม (กับ, และ, แต่, ก็เลย, แล้วก็) เพื่อซื้อของ", ipa: "chái kam wâa níi, nán, pûak-níi, pûak-nán láe kam-chêuam (gàp, láe, dtàae, gô-loei, láew-gô) pêuua séu kŏng", en: "Use 'this, that, these, those' and connectives (and, but, so, then) to buy things." }
+            },
+            { 
+                emoji: "🎲❓", 
+                title: { thai: "เกม: ชี้และอธิบาย", ipa: "geem: chíi láe à-tí-baai", en: "Game: Point and describe" },
+                desc: { thai: "ชี้ของในห้องและอธิบายโดยใช้คำเชื่อม (เช่น และ, แต่, ก็เลย) ก่อนถามเพื่อนว่าคืออะไร", ipa: "chíi kŏng nai hông láe à-tí-baai dooi chái kam-chêuam (chên láe, dtàae, gô-loei) gòrn tăam pêuan wâa kʉʉ à-rai", en: "Point at things and describe them using connectives (like and, but, so) before asking what they are." }
+            },
+            { 
+                emoji: "💬🏠", 
+                title: { thai: "อภิปราย: ของในห้อง", ipa: "à-pí-bpraai: kŏng nai hông", en: "Discussion: Things in the room" },
+                desc: { thai: "บอกฉันเกี่ยวกับ 'พวกนี้' และ 'พวกนั้น' โดยใช้คำเชื่อม (และ, แล้วก็) แต่งประโยคยาวๆ", ipa: "bòk chăn gìiao-gàp 'pûak-níi' láe 'pûak-nán' dooi chái kam-chêuam (láe, láew-gô) dtàeng bprà-yòok yaao-yaao", en: "Tell me about 'these' and 'those' by using connectives (and, and then) to make long sentences." }
+            }
+        ];
+
+        const extensions = [
+            { 
+                emoji: "🗣️⚖️", 
+                title: { thai: "โต้วาที: ทำงานแบบนี้ หรือ แบบนั้น", ipa: "dtôo-waa-tii: tam-ngaan bàep-níi rĕu bàep-nán", en: "Debate: Working like this or like that" },
+                desc: { thai: "คุณชอบทำงานที่บ้าน 'แบบนี้' หรือ ไปออฟฟิศ 'แบบนั้น' (ใช้ ก็เลย, แต่ เพื่อให้เหตุผล)", ipa: "kun chôp tam-ngaan tîi bâan 'bàep-níi' rĕu bpai óf-fít 'bàep-nán' (chái gô-loei, dtàae pêuua hâi hèet-pŏn)", en: "Do you like working at home 'like this' or office 'like that'? (Use so, but for reasoning)" }
+            },
+            { 
+                emoji: "🎤🤔", 
+                title: { thai: "สัมภาษณ์: คิดยังไง", ipa: "săm-pâat: kít yang-ngai", en: "Interview: What do you think?" },
+                desc: { thai: "ถามเพื่อนว่าคิดยังไงกับของ 'พวกนี้' และใช้คำเชื่อม (กับ, และ) เพื่อถามต่อ", ipa: "tăam pêuan wâa kít yang-ngai gàp kŏng 'pûak-níi' láe chái kam-chêuam (gàp, láe) pêuua tăam dtòr", en: "Ask your friend what they think about 'these' and use connectives (with, and) to ask further." }
+            },
+            { 
+                emoji: "📖😂", 
+                title: { thai: "เล่าเรื่อง: คนนี้ และ คนนั้น", ipa: "lâo-rêuang: kon-níi láe kon-nán", en: "Story-telling: This person and that person" },
+                desc: { thai: "เล่าเรื่องเพื่อน 'คนนี้' และ 'คนนั้น' ให้สนุกโดยใช้คำเชื่อม แล้วก็, ก็เลย", ipa: "lâo rêuang pêuan 'kon-níi' láe 'kon-nán' hâi sà-nùk dooi chái kam-chêuam láew-gô, gô-loei", en: "Tell a fun story about 'this' friend and 'that' friend using 'and then', 'so'." }
+            },
+            { 
+                emoji: "📊💻", 
+                title: { thai: "นำเสนอ: ของบนโต๊ะ", ipa: "nam-sà-nĕr: kŏng bon dtó", en: "Presentation: Things on the desk" },
+                desc: { thai: "นำเสนอของ 'พวกนี้' บนโต๊ะของคุณ โดยใช้คำเชื่อม (และ, แต่) เชื่อมประโยค", ipa: "nam-sà-nĕr kŏng 'pûak-níi' bon dtó kŏng kun dooi chái kam-chêuam (láe, dtàae) chêuam bprà-yòok", en: "Present 'these' things on your desk, using connectives (and, but) to link sentences." }
+            }
+        ];
+
+        // --- 2. CORE COMPONENT BUILDER ---
+
+        function createThaiBlock(data, options = {}) {
+            const { isTitle = false, isLarge = false, hideDetails = false } = options;
+            
+            const wrap = document.createElement('div');
+            wrap.className = 'inline-flex flex-col mb-4 mr-4 align-top max-w-full';
+
+            const mainContainer = document.createElement('div');
+            mainContainer.className = `inline-flex items-center flex-wrap gap-2 p-2.5 bg-white rounded-2xl shadow-sm border border-slate-200 transition-all hover:shadow-md ${isTitle ? 'w-full justify-center bg-slate-50' : ''}`;
+
+            const textSpan = document.createElement('span');
+            textSpan.className = `font-bold text-slate-800 tracking-wide break-words ${isLarge ? 'text-3xl sm:text-4xl text-indigo-700' : isTitle ? 'text-xl sm:text-2xl text-slate-900' : 'text-lg sm:text-xl'}`;
+            textSpan.innerText = (data.emoji ? data.emoji + ' ' : '') + data.thai;
+
+            mainContainer.appendChild(textSpan);
+
+            // Control Buttons
+            if (!hideDetails) {
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'flex gap-1.5 sm:ml-3 pl-3 border-l-2 border-slate-100 flex-shrink-0';
+
+                // TTS Button
+                const ttsBtn = document.createElement('button');
+                ttsBtn.innerHTML = '🔊';
+                ttsBtn.className = 'w-9 h-9 flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-full transition-colors cursor-pointer text-sm shadow-sm active:scale-95';
+                ttsBtn.onclick = () => {
+                    const utterance = new SpeechSynthesisUtterance(data.thai);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85; // A1 suitable speed
+                    window.speechSynthesis.speak(utterance);
+                };
+
+                // IPA Button
+                const ipaBtn = document.createElement('button');
+                ipaBtn.innerText = 'IPA';
+                ipaBtn.className = 'px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm active:scale-95 border border-purple-100';
+
+                // EN Button
+                const enBtn = document.createElement('button');
+                enBtn.innerText = 'EN';
+                enBtn.className = 'px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-sm active:scale-95 border border-emerald-100';
+
+                btnGroup.appendChild(ttsBtn);
+                btnGroup.appendChild(ipaBtn);
+                btnGroup.appendChild(enBtn);
+                mainContainer.appendChild(btnGroup);
+
+                // Detail Panel
+                const detailContainer = document.createElement('div');
+                detailContainer.className = `mt-2 min-h-[28px] transition-all duration-300 ease-in-out ${isTitle ? 'text-center' : 'text-left'}`;
+
+                const detailText = document.createElement('span');
+                detailText.className = 'hidden';
+
+                let activeDetail = null;
+
+                const resetButtons = () => {
+                    ipaBtn.classList.remove('ring-2', 'ring-purple-400', 'bg-purple-200');
+                    enBtn.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-200');
+                };
+
+                ipaBtn.onclick = () => {
+                    if (activeDetail === 'ipa') {
+                        detailText.classList.add('hidden');
+                        activeDetail = null;
+                        resetButtons();
+                    } else {
+                        resetButtons();
+                        detailText.innerText = data.ipa;
+                        detailText.className = 'text-[15px] font-medium px-4 py-1.5 rounded-full bg-purple-100 text-purple-900 inline-block animate-fade-in shadow-sm border border-purple-200';
+                        activeDetail = 'ipa';
+                        ipaBtn.classList.add('ring-2', 'ring-purple-400', 'bg-purple-200');
+                    }
+                };
+
+                enBtn.onclick = () => {
+                    if (activeDetail === 'en') {
+                        detailText.classList.add('hidden');
+                        activeDetail = null;
+                        resetButtons();
+                    } else {
+                        resetButtons();
+                        detailText.innerText = data.en;
+                        detailText.className = 'text-[15px] font-medium px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-900 inline-block animate-fade-in shadow-sm border border-emerald-200';
+                        activeDetail = 'en';
+                        enBtn.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-200');
+                    }
+                };
+
+                detailContainer.appendChild(detailText);
+                wrap.appendChild(mainContainer);
+                wrap.appendChild(detailContainer);
+            } else {
+                wrap.appendChild(mainContainer);
+            }
+
+            return wrap;
+        }
+
+        // --- 3. INITIALIZATION ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Render Headings
+            document.getElementById('header-container').appendChild(createThaiBlock(uiHeadings.header, { isTitle: true, isLarge: true }));
+            document.getElementById('review-title-container').appendChild(createThaiBlock(uiHeadings.reviewTitle, { isTitle: true }));
+            document.getElementById('homework-title-container').appendChild(createThaiBlock(uiHeadings.homeworkTitle, { isTitle: true }));
+            document.getElementById('leadin-title-container').appendChild(createThaiBlock(uiHeadings.leadInTitle, { isTitle: true }));
+            document.getElementById('grammar-title-container').appendChild(createThaiBlock(uiHeadings.grammarTitle, { isTitle: true }));
+            document.getElementById('dialogue-title-container').appendChild(createThaiBlock(uiHeadings.dialogueTitle, { isTitle: true }));
+            document.getElementById('questions-title-container').appendChild(createThaiBlock(uiHeadings.questionsTitle, { isTitle: true }));
+            document.getElementById('tasks-title-container').appendChild(createThaiBlock(uiHeadings.tasksTitle, { isTitle: true }));
+            document.getElementById('extensions-title-container').appendChild(createThaiBlock(uiHeadings.extensionsTitle, { isTitle: true }));
+
+            // Render Vocab Review Logic
+            const vocabDisplay = document.getElementById('random-vocab-display');
+            const instructionContainer = document.getElementById('review-instruction-container');
+            
+            document.getElementById('btn-randomize').onclick = () => {
+                const randomItem = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+                vocabDisplay.innerHTML = '';
+                vocabDisplay.appendChild(createThaiBlock(randomItem, { isLarge: true }));
+                
+                instructionContainer.innerHTML = '';
+                instructionContainer.appendChild(createThaiBlock(uiHeadings.reviewInstruction));
+                instructionContainer.classList.remove('opacity-0');
+            };
+
+            // Render Homework Check
+            const hwContent = document.getElementById('homework-content');
+            homeworkQuestions.forEach(q => hwContent.appendChild(createThaiBlock(q)));
+
+            // Render Lead-in Questions
+            const leadInContent = document.getElementById('leadin-content');
+            leadInQuestions.forEach(q => leadInContent.appendChild(createThaiBlock(q)));
+
+            // Render Target Grammar/Vocab
+            const grammarList = document.getElementById('grammar-list');
+            targetVocab.forEach(word => grammarList.appendChild(createThaiBlock(word)));
+
+            // Render Dialogue
+            const dialogueContent = document.getElementById('dialogue-content');
+            dialogue.forEach(line => {
+                const lineWrap = document.createElement('div');
+                lineWrap.className = 'flex items-start gap-4 bg-white p-4 rounded-2xl shadow-sm border border-yellow-100 hover:shadow-md transition-shadow';
+                
+                const speakerIcon = document.createElement('div');
+                speakerIcon.className = 'text-4xl mt-1 drop-shadow-sm';
+                speakerIcon.innerText = line.speaker;
+                
+                lineWrap.appendChild(speakerIcon);
+                lineWrap.appendChild(createThaiBlock(line));
+                dialogueContent.appendChild(lineWrap);
+            });
+
+            // Render Comprehension Questions
+            const questionsContent = document.getElementById('questions-content');
+            comprehensionQuestions.forEach(q => questionsContent.appendChild(createThaiBlock(q)));
+
+            // Render Practice Tasks
+            const tasksContent = document.getElementById('tasks-content');
+            tasks.forEach(task => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-3xl border border-rose-100 shadow-sm flex flex-col items-center text-center hover:-translate-y-1 transition-transform duration-300';
+                card.appendChild(createThaiBlock(task.title, { isTitle: true }));
+                
+                const descContainer = document.createElement('div');
+                descContainer.className = 'mt-3 w-full border-t border-rose-50 pt-3';
+                descContainer.appendChild(createThaiBlock(task.desc));
+                card.appendChild(descContainer);
+                
+                tasksContent.appendChild(card);
+            });
+
+            // Render Extensions
+            const extensionsContent = document.getElementById('extensions-content');
+            extensions.forEach(ext => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300';
+                card.appendChild(createThaiBlock(ext.title, { isTitle: true }));
+                
+                const descContainer = document.createElement('div');
+                descContainer.className = 'mt-3 pl-4 border-l-2 border-slate-100 w-full text-left';
+                descContainer.appendChild(createThaiBlock(ext.desc));
+                
+                card.appendChild(descContainer);
+                extensionsContent.appendChild(card);
+            });
+
+        });
+    </script>
+</body>
+</html>
