@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Most common verbs and words</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for better Thai legibility -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Thai', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .thai-highlight {
+            color: #4f46e5;
+        }
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a5b4fc;
+        }
+        .flashcard-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Header -->
+    <header class="bg-white p-6 shadow-sm border-b border-gray-200 mb-6 sticky top-0 z-50 flex flex-col items-center justify-center">
+        <div class="max-w-3xl mx-auto w-full flex items-center justify-center">
+            <thai-text thai="คำกริยาและคำศัพท์ที่พบบ่อย 🗣️✨" ipa="kham-gì-rí-yaa láe kham-sàp têe póp bòi" en="Most common verbs and vocabulary"></thai-text>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 space-y-8">
+
+        <!-- Section 1: Review (Random Word) -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 bg-gradient-to-br from-white to-blue-50">
+            <thai-text thai="ทบทวนคำศัพท์ 🔄🧠" ipa="tóp-tuan kham-sàp" en="Review vocabulary"></thai-text>
+            <thai-text thai="สุ่มคำศัพท์และแต่งประโยค 🎲💬" ipa="sǔm kham-sàp láe dtàeng bprà-yòok" en="Randomize a word and make a sentence"></thai-text>
+            
+            <div class="mt-6 flex flex-col items-center">
+                <!-- Word Display Container -->
+                <div id="random-word-container" class="w-full max-w-md bg-white p-8 rounded-2xl shadow-md border-2 border-blue-200 text-center min-h-[160px] flex items-center justify-center mb-6">
+                    <p class="text-gray-400 font-medium">กดปุ่มเพื่อสุ่มคำศัพท์ 👇</p>
+                </div>
+                
+                <button onclick="generateRandomWord()" class="bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 touch-manipulation flex items-center gap-2">
+                    <span>สุ่มคำศัพท์</span> 🎲
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 2: Lead-in -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <thai-text thai="คำถามนำ 🗣️💭" ipa="kham-tǎam nam" en="Lead-in questions"></thai-text>
+            <div class="space-y-4 mt-4 pl-2 border-l-4 border-indigo-300">
+                <thai-text thai="คุณชอบทำอะไรกับแฟนครับ 👨‍❤️‍👨❓" ipa="khun chôop tam à-rai gàp faaen khráp" en="What do you like to do with your boyfriend?"></thai-text>
+                <thai-text thai="คุณพูดภาษาไทยกับแฟนบ่อยไหมครับ 🇹🇭💬" ipa="khun phôut phaa-sǎa tai gàp faaen bòi mái khráp" en="Do you speak Thai with your boyfriend often?"></thai-text>
+            </div>
+        </section>
+
+        <!-- Section 3: Target Vocabulary -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <thai-text thai="คำศัพท์ใหม่ 9 คำ 🎯📚" ipa="kham-sàp mài gâao kham" en="9 New words"></thai-text>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="1. ไป 🚶‍♂️➡️" ipa="bpai" en="to go"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="2. ทำ 🛠️🤲" ipa="tam" en="to do/make"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="3. ดู 👀📺" ipa="doo" en="to watch/look"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="4. หนัง 🎬🍿" ipa="nǎng" en="movie"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="5. บ้าน 🏠" ipa="bâan" en="home/house"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="6. เจอ 🤝😊" ipa="jer" en="to meet"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="7. คุย 💬🗣️" ipa="kui" en="to talk/chat"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="8. หิว 🤤🍽️" ipa="hǐu" en="hungry"></thai-text></div>
+                <div class="p-3 bg-gray-50 border border-gray-200 rounded-xl"><thai-text thai="9. สนุก 🎉😄" ipa="sà-nùk" en="fun"></thai-text></div>
+            </div>
+        </section>
+
+        <!-- Section 4: Comprehension & Dialogue -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 bg-gradient-to-b from-white to-indigo-50">
+            <thai-text thai="ฟังบทสนทนา 🎧💬" ipa="fang bot-sǒn-tá-naa" en="Listen to the dialogue"></thai-text>
+            
+            <div class="space-y-3 mt-4 bg-white p-5 rounded-xl shadow-inner border border-indigo-100">
+                <thai-text thai="แฟน: วันนี้อยากทำอะไรครับ 👨🏼❓" ipa="Faaen: wan-née yàak tam à-rai khráp" en="Boyfriend: What do you want to do today?"></thai-text>
+                <thai-text thai="คุณ: ผมอยากเจอคุณ ไปดูหนังไหมครับ 🧑🏻🎬" ipa="Khun: phǒm yàak jer khun, bpai doo nǎng mái khráp" en="You: I want to meet you. Go watch a movie?"></thai-text>
+                <thai-text thai="แฟน: ไปดูหนังที่บ้านไหมครับ 👨🏼🏠" ipa="Faaen: bpai doo nǎng têe bâan mái khráp" en="Boyfriend: Go watch a movie at home?"></thai-text>
+                <thai-text thai="คุณ: ดีครับ คุยกัน สนุกดี 🧑🏻💬" ipa="Khun: dee khráp, kui gan, sà-nùk dee" en="You: Good. Talk together. It's fun."></thai-text>
+                <thai-text thai="แฟน: ตอนนี้หิวไหมครับ 👨🏼🤤" ipa="Faaen: dtoon-née hǐu mái khráp" en="Boyfriend: Are you hungry now?"></thai-text>
+                <thai-text thai="คุณ: ไม่หิวครับ 🧑🏻❌" ipa="Khun: mâi hǐu khráp" en="You: Not hungry."></thai-text>
+            </div>
+
+            <div class="mt-8 border-t border-indigo-200 pt-6">
+                <thai-text thai="คำถามเพื่อความเข้าใจ 🧠🔍" ipa="kham-tǎam pûea kwaam-kâo-jai" en="Comprehension questions"></thai-text>
+                <div class="pl-2 border-l-4 border-indigo-300 space-y-3">
+                    <thai-text thai="แฟนอยากไปดูหนังที่ไหน 🏠❓" ipa="faaen yàak bpai doo nǎng têe nǎi" en="Where does the boyfriend want to watch a movie?"></thai-text>
+                    <thai-text thai="ตอนนี้คุณหิวไหม 🤤❓" ipa="dtoon-née khun hǐu mái" en="Are you hungry right now?"></thai-text>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Interests -->
+        <section class="bg-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100">
+            <thai-text thai="ความสนใจ 💖✨" ipa="kwaam sǒn-jai" en="Interests"></thai-text>
+            <div class="mt-3 bg-white p-5 rounded-xl shadow-sm border border-blue-200">
+                <p class="text-sm text-gray-700 mb-5">Ask and answer about your interests:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <thai-text thai="คุณชอบพูดไหมครับ 🗣️" ipa="khun chôop phôut mái khráp" en="Do you like speaking?"></thai-text>
+                        <div class="border-t border-gray-200 my-2"></div>
+                        <thai-text thai="ชอบพูดว่าอะไรครับ 💬" ipa="chôop phôut wâa a-rai khráp" en="What do you like to say?"></thai-text>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <thai-text thai="คุณชอบเขียนไหมครับ ✍️" ipa="khun chôop khǐan mái khráp" en="Do you like writing?"></thai-text>
+                        <div class="border-t border-gray-200 my-2"></div>
+                        <thai-text thai="ชอบเขียนอะไรครับ 📝" ipa="chôop khǐan a-rai khráp" en="What do you like to write?"></thai-text>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <thai-text thai="คุณชอบดูไหมครับ 👀" ipa="khun chôop doo mái khráp" en="Do you like watching?"></thai-text>
+                        <div class="border-t border-gray-200 my-2"></div>
+                        <thai-text thai="ชอบดูอะไรครับ 📺" ipa="chôop doo a-rai khráp" en="What do you like to watch?"></thai-text>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <thai-text thai="คุณชอบอ่านไหมครับ 📖" ipa="khun chôop àan mái khráp" en="Do you like reading?"></thai-text>
+                        <div class="border-t border-gray-200 my-2"></div>
+                        <thai-text thai="ชอบอ่านอะไรครับ 📚" ipa="chôop àan a-rai khráp" en="What do you like to read?"></thai-text>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 md:col-span-2">
+                        <thai-text thai="คุณชอบฟังไหมครับ 👂" ipa="khun chôop fang mái khráp" en="Do you like listening?"></thai-text>
+                        <div class="border-t border-gray-200 my-2"></div>
+                        <thai-text thai="ชอบฟังอะไรครับ 🎵" ipa="chôop fang a-rai khráp" en="What do you like to listen to?"></thai-text>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Activities -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <thai-text thai="กิจกรรม 🎭🌟" ipa="gìt-jà-gam" en="Activities"></thai-text>
+            <div class="space-y-6 mt-4">
+                
+                <!-- Role-play -->
+                <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                    <thai-text thai="สวมบทบาท: คุยกับแฟน 👨‍❤️‍👨📞" ipa="sǔam bot-bàat: kui gàp faaen" en="Real-life role-play: Talk with boyfriend"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg space-y-3 shadow-sm border border-orange-100/50">
+                        <p class="text-sm font-semibold text-gray-800">💡 คำใบ้ (Prompts):</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2">
+                            <li>Ask what he wants to do today.</li>
+                            <li>Tell him you want to go watch a movie at home.</li>
+                            <li>Tell him you are hungry.</li>
+                        </ul>
+                        <p class="text-sm font-semibold text-gray-800 pt-2 border-t border-orange-100">💬 ตัวอย่าง (Example):</p>
+                        <thai-text thai="วันนี้อยากทำอะไรครับ ผมหิวครับ" ipa="wan-née yàak tam à-rai khráp, phǒm hǐu khráp" en="What do you want to do today? I am hungry."></thai-text>
+                    </div>
+                </div>
+
+                <!-- Speaking Game (Gap Fill) -->
+                <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-100">
+                    <thai-text thai="เกมพูด: เติมคำในช่องว่าง 🧩🗣️" ipa="game phôut: dterm kham nai chôong-wâang" en="Speaking game: Fill in the blanks"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg shadow-sm border border-yellow-100/50">
+                        <p class="text-sm text-gray-700 mb-4">Tap the correct Thai word to complete the sentence.</p>
+                        <div id="game-gap-fill-container" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <!-- Discussion (Gap Fill) -->
+                <div class="p-4 bg-red-50 rounded-xl border border-red-100">
+                    <thai-text thai="อภิปราย: ดูหนังที่บ้าน 🤔🏠" ipa="à-pí-bpraai: doo nǎng têe bâan" en="Real-life discussion: Watching movies at home"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg shadow-sm border border-red-100/50">
+                        <div id="discussion-gap-fill-container"></div>
+                    </div>
+                </div>
+
+                <!-- Interview -->
+                <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                    <thai-text thai="สัมภาษณ์: ถามแฟน 🎤👨🏼" ipa="sǎm-pâat: tǎam faaen" en="Real-life interview: Ask your boyfriend"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg space-y-3 shadow-sm border border-purple-100/50">
+                        <p class="text-sm font-semibold text-gray-800">💡 คำใบ้ (Prompts):</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2">
+                            <li>วันนี้อยากเจอผมไหมครับ (Do you want to meet me today?)</li>
+                            <li>อยากคุยเรื่องอะไรครับ (What do you want to talk about?)</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 7: Extension Activities -->
+        <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <thai-text thai="กิจกรรมเพิ่มเติม ➕✨" ipa="gìt-jà-gam pêrm-dterm" en="Extension Activities"></thai-text>
+            <div class="space-y-6 mt-4">
+                
+                <!-- Debate Gap Fill -->
+                <div class="p-4 bg-teal-50 rounded-xl border border-teal-100">
+                    <thai-text thai="โต้วาที: ดูหนังที่บ้านดีกว่าไปข้างนอกใช่ไหม ⚖️🍿" ipa="dtôo-waa-tee: doo nǎng têe bâan dee-gwàa bpai kâang-nôok châi-mái" en="Real-life debate: Watching a movie at home is better than going outside, right?"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg shadow-sm border border-teal-100/50">
+                        <div id="debate-gap-fill-container"></div>
+                    </div>
+                </div>
+                
+                <!-- Story Gap Fill -->
+                <div class="p-4 bg-pink-50 rounded-xl border border-pink-100">
+                    <thai-text thai="เล่าเรื่อง: วันนี้ไปไหน 📖🛤️" ipa="lâo rûeang: wan-née bpai nǎi" en="Real-life story-telling: Where did you go today?"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg shadow-sm border border-pink-100/50">
+                        <div id="story-gap-fill-container"></div>
+                    </div>
+                </div>
+
+                <!-- Presentation -->
+                <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                    <thai-text thai="นำเสนอ: สิ่งที่ผมชอบทำ 📊💖" ipa="nam-sà-něr: sìng têe phǒm chôop tam" en="Real-life presentation: Things I like to do"></thai-text>
+                    <div class="mt-3 bg-white/70 p-4 rounded-lg space-y-3 shadow-sm border border-indigo-100/50">
+                        <p class="text-sm font-semibold text-gray-800">💡 คำใบ้ (Prompts):</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 ml-2">
+                            <li>ผมชอบไป... (I like to go...)</li>
+                            <li>ผมชอบดู... (I like to watch...)</li>
+                        </ul>
+                        <p class="text-sm font-semibold text-gray-800 pt-2 border-t border-indigo-100">💬 ตัวอย่าง (Example):</p>
+                        <thai-text thai="ผมชอบดูหนังที่บ้านมากครับ" ipa="phǒm chôop doo nǎng têe bâan mâak khráp" en="I like watching movies at home a lot."></thai-text>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        // Custom Web Component for Thai Text with TTS, IPA, and EN toggles
+        class ThaiText extends HTMLElement {
+            connectedCallback() {
+                const thai = this.getAttribute('thai') || '';
+                const ipa = this.getAttribute('ipa') || '';
+                const en = this.getAttribute('en') || '';
+
+                this.innerHTML = `
+                    <div class="mb-4 w-full">
+                        <div class="flex items-center gap-3 mb-2 flex-wrap">
+                            <span class="text-xl md:text-2xl font-semibold text-gray-800 tracking-wide">${thai}</span>
+                            <button class="tts-btn bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-full w-10 h-10 flex items-center justify-center transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="Listen to pronunciation">🔊</button>
+                        </div>
+                        <div class="flex gap-2 mb-2">
+                            <button class="toggle-ipa text-xs md:text-sm font-bold px-4 py-1.5 bg-green-100 text-green-700 rounded-full border border-green-200 hover:bg-green-200 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 shadow-sm">IPA</button>
+                            <button class="toggle-en text-xs md:text-sm font-bold px-4 py-1.5 bg-purple-100 text-purple-700 rounded-full border border-purple-200 hover:bg-purple-200 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm">EN</button>
+                        </div>
+                        <div class="ipa-text hidden text-green-800 font-mono text-sm md:text-base mt-2 bg-green-50 p-3 rounded-lg border border-green-100 text-left">${ipa}</div>
+                        <div class="en-text hidden text-purple-800 text-sm md:text-base mt-2 bg-purple-50 p-3 rounded-lg border border-purple-100 text-left">${en}</div>
+                    </div>
+                `;
+
+                // TTS Event (Strips emojis to prevent TTS engine from reading emoji descriptions)
+                this.querySelector('.tts-btn').addEventListener('click', () => {
+                    const cleanText = thai.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '');
+                    const utterance = new SpeechSynthesisUtterance(cleanText);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85; 
+                    window.speechSynthesis.speak(utterance);
+                });
+
+                // Toggle IPA
+                const ipaText = this.querySelector('.ipa-text');
+                this.querySelector('.toggle-ipa').addEventListener('click', () => {
+                    ipaText.classList.toggle('hidden');
+                });
+
+                // Toggle EN
+                const enText = this.querySelector('.en-text');
+                this.querySelector('.toggle-en').addEventListener('click', () => {
+                    enText.classList.toggle('hidden');
+                });
+            }
+        }
+        customElements.define('thai-text', ThaiText);
+
+        // --- Data for Random Review Word ---
+        const reviewWords = [
+            { thai: "อายุเท่าไร 🎂", ipa: "aa-yú tâo-rài", en: "How old are you?" },
+            { thai: "มา 🚶‍♂️➡️", ipa: "maa", en: "come" },
+            { thai: "จาก ➡️", ipa: "jàak", en: "from" },
+            { thai: "สุขสันต์วันสงกรานต์ 💦🎉", ipa: "sùk-sǎn wan sǒng-graan", en: "Happy Songkran Day" },
+            { thai: "สวัสดีปีใหม่ไทย 🎉🇹🇭", ipa: "sà-wàt-dee bpee-mài tai", en: "Happy Thai New Year" },
+            { thai: "สอน 👨‍🏫", ipa: "sɔ̌ɔn", en: "to teach" },
+            { thai: "เรียน 📚", ipa: "rian", en: "to study" },
+            { thai: "แมว 🐱", ipa: "maaeo", en: "cat" },
+            { thai: "อยาก 🤲", ipa: "yàak", en: "to want" },
+            { thai: "เขียน ✍️", ipa: "khǐan", en: "to write" },
+            { thai: "ภาษาที่ 2 🗣️", ipa: "paa-sǎa têe sǒng", en: "second language" },
+            { thai: "ของ 🔗", ipa: "kǒng", en: "of / belonging to" },
+            { thai: "อ่าน 📖", ipa: "àan", en: "to read" },
+            { thai: "เหนื่อย 😴", ipa: "nùai", en: "tired" }
+        ];
+
+        function generateRandomWord() {
+            const container = document.getElementById('random-word-container');
+            const randomIndex = Math.floor(Math.random() * reviewWords.length);
+            const word = reviewWords[randomIndex];
+            
+            // Clear and apply animation class
+            container.innerHTML = '';
+            container.classList.remove('flashcard-pop');
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('flashcard-pop');
+            
+            const thaiComp = document.createElement('thai-text');
+            thaiComp.setAttribute('thai', word.thai);
+            thaiComp.setAttribute('ipa', word.ipa);
+            thaiComp.setAttribute('en', word.en);
+            
+            container.appendChild(thaiComp);
+        }
+
+        // --- Data for Gap Fill Exercises (Target words: ไป, ทำ, ดู, หนัง, บ้าน, เจอ, คุย, หิว, สนุก) ---
+        const gameData = [
+            { pre: "วันนี้ผมอยากไปดู", post: "ครับ", ans: {th:"หนัง", ipa:"nǎng"}, wrong: {th:"เจอ", ipa:"jer"}, ipa: "wan-née phǒm yàak bpai doo ___ khráp", en: "Today I want to go watch a ___." },
+            { pre: "คุณ", post: "อะไรอยู่ครับ", ans: {th:"ทำ", ipa:"tam"}, wrong: {th:"สนุก", ipa:"sà-nùk"}, ipa: "khun ___ a-rai yùu khráp", en: "What are you ___?" },
+            { pre: "ผมอยากไป", post: "แฟนครับ", ans: {th:"เจอ", ipa:"jer"}, wrong: {th:"บ้าน", ipa:"bâan"}, ipa: "phǒm yàak bpai ___ faaen khráp", en: "I want to go ___ my boyfriend." },
+            { pre: "ผมไม่", post: "ครับ", ans: {th:"หิว", ipa:"hǐu"}, wrong: {th:"คุย", ipa:"kui"}, ipa: "phǒm mâi ___ khráp", en: "I am not ___." },
+            { pre: "ผมชอบ", post: "กับคุณครับ", ans: {th:"คุย", ipa:"kui"}, wrong: {th:"หนัง", ipa:"nǎng"}, ipa: "phǒm chôop ___ gàp khun khráp", en: "I like to ___ with you." },
+            { pre: "ดูหนังที่บ้าน", post: "มากครับ", ans: {th:"สนุก", ipa:"sà-nùk"}, wrong: {th:"ไป", ipa:"bpai"}, ipa: "doo nǎng têe bâan ___ mâak khráp", en: "Watching movies at home is very ___." }
+        ];
+
+        const discussionData = [
+            { pre: "ดูหนังที่", post: "สนุกครับ", ans: {th:"บ้าน", ipa:"bâan"}, wrong: {th:"หิว", ipa:"hǐu"}, ipa: "doo nǎng têe ___ sà-nùk khráp", en: "Watching movies at ___ is fun." }
+        ];
+
+        const debateData = [
+            { pre: "ไป", post: "หนังที่บ้านดีกว่าไปข้างนอก", ans: {th:"ดู", ipa:"doo"}, wrong: {th:"เจอ", ipa:"jer"}, ipa: "bpai ___ nǎng têe bâan dee-gwàa bpai kâang-nôok", en: "Going to ___ movies at home is better than going outside." }
+        ];
+
+        const storyData = [
+            { pre: "วันนี้ผม", post: "ทำอาหารที่บ้าน", ans: {th:"ไป", ipa:"bpai"}, wrong: {th:"สนุก", ipa:"sà-nùk"}, ipa: "wan-née phǒm ___ tam aa-hǎan têe bâan", en: "Today I ___ to make food at home." }
+        ];
+
+
+        // --- Function to build Gap Fill interaction (English hidden in choices) ---
+        function createGapFillGame(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            dataArray.forEach((item, index) => {
+                const block = document.createElement('div');
+                block.className = 'bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm mb-4';
+
+                // Top Section (Sentence + Toggles)
+                const topSection = document.createElement('div');
+                topSection.className = 'mb-4';
+
+                // Sentence line
+                const sentenceLine = document.createElement('div');
+                sentenceLine.className = 'flex items-center gap-3 flex-wrap mb-3';
+                
+                const sentenceWrapper = document.createElement('div');
+                sentenceWrapper.className = 'flex flex-wrap items-center gap-2 text-lg md:text-xl font-semibold text-gray-800';
+                
+                const gapElement = document.createElement('span');
+                gapElement.className = 'inline-flex items-center justify-center min-w-[80px] h-[40px] px-3 bg-gray-100 border-2 border-dashed border-gray-400 rounded-lg text-gray-500 font-normal transition-all';
+                gapElement.innerText = '______';
+
+                sentenceWrapper.innerHTML = `<span>${item.pre}</span>`;
+                sentenceWrapper.appendChild(gapElement);
+                sentenceWrapper.innerHTML += `<span>${item.post}</span>`;
+
+                const ttsBtn = document.createElement('button');
+                ttsBtn.className = 'tts-btn bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-full w-9 h-9 flex items-center justify-center transition-colors shadow-sm focus:outline-none';
+                ttsBtn.innerText = '🔊';
+                ttsBtn.onclick = () => {
+                    const currentGapWord = gapElement.dataset.filled ? gapElement.dataset.th : 'อะไร';
+                    const fullText = `${item.pre} ${currentGapWord} ${item.post}`.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '');
+                    const utterance = new SpeechSynthesisUtterance(fullText);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85;
+                    window.speechSynthesis.speak(utterance);
+                };
+
+                sentenceLine.appendChild(sentenceWrapper);
+                sentenceLine.appendChild(ttsBtn);
+                topSection.appendChild(sentenceLine);
+
+                // IPA / EN Toggle buttons
+                const toggleLine = document.createElement('div');
+                toggleLine.className = 'flex gap-2 mb-2';
+                
+                const ipaBtn = document.createElement('button');
+                ipaBtn.className = 'text-xs md:text-sm font-bold px-4 py-1.5 bg-green-100 text-green-700 rounded-full border border-green-200 hover:bg-green-200 transition-colors focus:outline-none shadow-sm';
+                ipaBtn.innerText = 'IPA';
+                
+                const enBtn = document.createElement('button');
+                enBtn.className = 'text-xs md:text-sm font-bold px-4 py-1.5 bg-purple-100 text-purple-700 rounded-full border border-purple-200 hover:bg-purple-200 transition-colors focus:outline-none shadow-sm';
+                enBtn.innerText = 'EN';
+                
+                toggleLine.appendChild(ipaBtn);
+                toggleLine.appendChild(enBtn);
+                topSection.appendChild(toggleLine);
+
+                // Hidden IPA / EN text
+                const ipaText = document.createElement('div');
+                ipaText.className = 'hidden text-green-800 font-mono text-sm md:text-base mt-2 bg-green-50 p-3 rounded-lg border border-green-100';
+                ipaText.innerText = item.ipa;
+                
+                const enText = document.createElement('div');
+                enText.className = 'hidden text-purple-800 text-sm md:text-base mt-2 bg-purple-50 p-3 rounded-lg border border-purple-100';
+                enText.innerText = item.en;
+                
+                topSection.appendChild(ipaText);
+                topSection.appendChild(enText);
+
+                // Toggle logic
+                ipaBtn.onclick = () => ipaText.classList.toggle('hidden');
+                enBtn.onclick = () => enText.classList.toggle('hidden');
+
+                block.appendChild(topSection);
+
+                // Options Wrapper (No English Translation here)
+                const optionsWrapper = document.createElement('div');
+                optionsWrapper.className = 'flex flex-wrap gap-3 mt-4 pt-4 border-t border-gray-100';
+                
+                const options = [
+                    {...item.ans, correct: true},
+                    {...item.wrong, correct: false}
+                ].sort(() => Math.random() - 0.5);
+
+                options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'flex flex-col items-center justify-center px-5 py-2.5 bg-white border-2 border-gray-200 shadow-sm rounded-xl hover:border-indigo-400 transition-colors focus:outline-none touch-manipulation cursor-pointer';
+                    btn.innerHTML = `
+                        <span class="text-lg font-bold text-gray-800">${opt.th}</span>
+                        <span class="text-xs text-green-700 font-mono mt-1">${opt.ipa}</span>
+                    `;
+                    
+                    btn.onclick = () => {
+                        gapElement.innerText = opt.th;
+                        gapElement.dataset.filled = "true";
+                        gapElement.dataset.th = opt.th;
+                        gapElement.classList.remove('border-dashed', 'border-gray-400', 'text-gray-500', 'bg-gray-100');
+                        gapElement.classList.add('border-solid', 'font-bold');
+
+                        if(opt.correct) {
+                            gapElement.classList.add('border-green-500', 'bg-green-100', 'text-green-800');
+                            gapElement.classList.remove('border-red-500', 'bg-red-100', 'text-red-800');
+                        } else {
+                            gapElement.classList.add('border-red-500', 'bg-red-100', 'text-red-800');
+                            gapElement.classList.remove('border-green-500', 'bg-green-100', 'text-green-800');
+                        }
+                    };
+                    optionsWrapper.appendChild(btn);
+                });
+                
+                block.appendChild(optionsWrapper);
+                container.appendChild(block);
+            });
+        }
+
+        // Initialize content when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            createGapFillGame('game-gap-fill-container', gameData);
+            createGapFillGame('discussion-gap-fill-container', discussionData);
+            createGapFillGame('debate-gap-fill-container', debateData);
+            createGapFillGame('story-gap-fill-container', storyData);
+        });
+
+    </script>
+</body>
+</html>
