@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้า 61 ย่อหน้าสุดท้าย</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4; /* Soft green tint */
+            color: #1f2937;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .show-content {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .interactive-block {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid #3b82f6;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-24 max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-2">หน้า 61 ย่อหน้าสุดท้าย</h1>
+    </header>
+
+    <!-- Section 1: Vocab Review -->
+    <section class="mb-12 bg-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100">
+        <h2 class="text-2xl font-bold text-blue-800 mb-4">🔄 ทบทวนคำศัพท์เก่า (แต่งประโยค)</h2>
+        <p class="text-gray-700 mb-6">คลิกปุ่มด้านล่างเพื่อสุ่มคำศัพท์ ให้นักเรียนฝึกแต่งประโยคจากคำที่ได้ 💬</p>
+        
+        <div id="vocab-display-area" class="text-center bg-white p-8 rounded-xl shadow-inner mb-6 min-h-[150px] flex flex-col items-center justify-center">
+            <p class="text-gray-400 italic">คำศัพท์จะแสดงที่นี่...</p>
+        </div>
+
+        <div class="text-center">
+            <button onclick="generateRandomVocab()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform active:scale-95 transition-transform text-lg">
+                🎲 สุ่มคำศัพท์
+            </button>
+        </div>
+    </section>
+
+    <!-- Section 2: Lead-in Questions -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">🤔 ก่อนเริ่มอ่าน (ชวนคุย)</h2>
+        <div id="leadin-container"></div>
+    </section>
+
+    <!-- Section 3: Reading Text -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-purple-700 mb-4">📖 หน้า 61 ย่อหน้าสุดท้าย</h2>
+        <div id="reading-container" class="space-y-4"></div>
+    </section>
+
+    <!-- Section 5: Comprehension & Discussion -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">❓ คำถามความเข้าใจ และ คำถามอภิปราย</h2>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 mt-4">คำถามเกี่ยวกับเนื้อเรื่อง</h3>
+        <div id="comprehension-container"></div>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 mt-8">คำถามชวนคิด (Discussion)</h3>
+        <div id="discussion-container"></div>
+    </section>
+
+    <!-- Section 4: Target Vocabulary -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-yellow-600 mb-4">🔑 คำศัพท์หลักจากเรื่อง (5 คำ)</h2>
+        <div id="target-vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- Section 6: Real-life Production Tasks -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-indigo-600 mb-4">🎭 กิจกรรมฝึกพูดและการนำไปใช้จริง</h2>
+        <div id="production-container"></div>
+    </section>
+
+    <!-- Section 7: Extension Activities -->
+    <section class="mb-12 border-t-2 border-dashed border-gray-300 pt-8 mt-8">
+        <h2 class="text-2xl font-bold text-teal-600 mb-4">✨ กิจกรรมเพิ่มเติม (หากมีเวลาเหลือ)</h2>
+        <div id="extension-container"></div>
+    </section>
+
+    <footer class="text-center text-gray-500 mt-12 mb-8">
+        <p>🎉 จบบทเรียน ขอให้สนุกกับการเรียนภาษาไทยครับ 🎉</p>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // --- 1. TTS Setup ---
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; // Slightly slower for comprehension
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียง (TTS)");
+            }
+        }
+
+        // --- 2. Toggle Functionality ---
+        function toggleContent(buttonElement, targetClass) {
+            const container = buttonElement.closest('.interactive-block');
+            const targetElement = container.querySelector(`.${targetClass}`);
+            
+            if (targetElement.classList.contains('hidden-content')) {
+                targetElement.classList.remove('hidden-content');
+                targetElement.classList.add('show-content');
+                buttonElement.classList.add('active');
+            } else {
+                targetElement.classList.remove('show-content');
+                targetElement.classList.add('hidden-content');
+                buttonElement.classList.remove('active');
+            }
+        }
+
+        // --- 3. Component Generator ---
+        function generateBlockHTML(emoji, thaiText, ipaText, enText, isVocabCard = false) {
+            const extraClass = isVocabCard ? 'bg-yellow-50 border-yellow-400' : 'bg-white border-blue-400';
+            return `
+                <div class="interactive-block ${extraClass}">
+                    <div class="flex items-start justify-between mb-3">
+                        <p class="text-lg text-gray-800 font-medium leading-relaxed flex-1">
+                            <span class="mr-2 text-xl">${emoji}</span> ${thaiText}
+                        </p>
+                        <button onclick="speakThai('${thaiText.replace(/'/g, "\\'")}')" class="ml-4 p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition">
+                            🔊
+                        </button>
+                    </div>
+                    <div class="flex gap-3 mb-2">
+                        <button onclick="toggleContent(this, 'ipa-content')" class="btn-toggle text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 px-4 py-1.5 rounded-full border border-gray-300">IPA</button>
+                        <button onclick="toggleContent(this, 'en-content')" class="btn-toggle text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 px-4 py-1.5 rounded-full border border-gray-300">EN</button>
+                    </div>
+                    <div class="ipa-content hidden-content mt-3 p-2 bg-gray-50 rounded text-blue-800 font-mono text-sm">
+                        🗣️ ${ipaText}
+                    </div>
+                    <div class="en-content hidden-content mt-2 p-2 bg-gray-50 rounded text-green-800 text-sm italic">
+                        🇬🇧 ${enText}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 4. Render Functions ---
+        function renderSection(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = dataArray.map(item => 
+                generateBlockHTML(item.emoji, item.th, item.ipa, item.en)
+            ).join('');
+        }
+        
+        function renderVocabCards(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = dataArray.map(item => 
+                generateBlockHTML(item.emoji, item.th, item.ipa, item.en, true)
+            ).join('');
+        }
+
+        // --- 5. Data Objects ---
+        
+        const leadInQuestions = [
+            { emoji: '🕵️‍♂️', th: 'คุณเคยทำของสำคัญหายตอนที่กำลังรีบไหม? คุณรู้สึกอย่างไร?', ipa: 'kun kəəi tam kɔ̌ɔng sǎm-kan hǎai dtɔɔn tîi gam-lang rîip mǎi? kun rúu-sʉ̀k yàang-rai?', en: 'Have you ever lost something important while in a hurry? How did you feel?' },
+            { emoji: '🏃💨', th: 'ถ้าคุณบังเอิญอยู่ในสถานการณ์ที่อันตราย คุณจะเลือกวิ่งหนีหรือซ่อนตัว? เพราะอะไร?', ipa: 'tâa kun bang-əən yùu nai sà-tǎa-ná-gaan tîi an-dtà-raai, kun jà lʉ̂ʉak wîng nǐi rʉ̌ʉ sɔ̂ɔn dtua? prɔ́ à-rai?', en: 'If you happened to be in a dangerous situation, would you choose to run away or hide? Why?' }
+        ];
+
+        const readingData = [
+            { emoji: '🔫', th: 'กูวางปืนลงบนโต๊ะ แล้วก็หยิบเงินนั้นไปด้วย อยากได้เข้าใจไหม... น้องสาว...', ipa: 'guu waang bpʉʉn long bon dtó, lɛ́ɛo gɔ̂ɔ yìp ngən nán bpai dûuai. yàak dâai kâo jai mǎi... nɔ́ɔng sǎao...', en: 'I put the gun down on the table and took that money with me. I wanted it, understand?... little sister...' },
+            { emoji: '👖', th: 'กูเอาเงินยัดใส่ในกระเป๋ากางเกง แต่สักครู่เองก็มีเสียงคนวิ่งมาหากูแล้ว คงมีใครได้ยินเสียงปืนมั้ง', ipa: 'guu ao ngən yát sài nai grà-bpǎo gaang-geeng. dtɛ̀ɛ sàk krûu eeng gɔ̂ɔ mii sǐang kon wîng maa hǎa guu lɛ́ɛo. kong mii krai dâai yin sǐang bpʉʉn máng', en: 'I stuffed the money into my pants pocket. But a moment later, there was the sound of people running towards me. Someone probably heard the gunshot.' },
+            { emoji: '🏃🚢', th: 'กูก็เลยต้องรีบเผ่นหนีไป วิ่งขึ้นไปที่ดาดฟ้าเรือ แล้วก็กระโดดลงน้ำ', ipa: 'guu gɔ̂ɔ ləəi dtɔ̂ng rîip pèn nǐi bpai. wîng kʉ̂n bpai tîi dàat fáa rʉʉa, lɛ́ɛo gɔ̂ɔ grà-dòot long náam', en: 'So I had to quickly flee. I ran up to the deck of the boat and jumped into the water.' },
+            { emoji: '💦😱', th: 'เพราะความที่กูตกใจกลัวกูเสือกกระโดดลงน้ำทั้งที่กูว่ายน้ำไม่เป็น', ipa: 'prɔ́ kwaam tîi guu dtòk jai glua, guu sʉ̀ʉak grà-dòot long náam táng tîi guu wâai náam mâi bpen', en: 'Because I was so terrified, I f***ing jumped into the water even though I can\'t swim.' },
+            { emoji: '🏊‍♂️🤦‍♂️', th: 'แต่กูลอยน้ำเป็นนะ กูลอยคอไปจนเกือบถึงที่หาดแล้ว เพิ่งจะนึกออกว่ากูลืมเอาปืนมาด้วย ปืนมันยังวางอยู่บนโต๊ะบนเรือ', ipa: 'dtɛ̀ɛ guu looi náam bpen ná. guu looi kɔɔ bpai jon gʉ̀ʉap tʉ̌ng tîi hàat lɛ́ɛo, pə̂ng jà nʉ́k ɔ̀ɔk wâa guu lʉʉm ao bpʉʉn maa dûuai. bpʉʉn man yang waang yùu bon dtó bon rʉʉa', en: 'But I know how to float. I treaded water until I almost reached the beach, when I just realized that I forgot to bring the gun. The gun was still lying on the table on the boat.' },
+            { emoji: '🤬', th: 'พอนึกออกก็สายไปแล้ว กูก็เลยด่าตัวเองว่า... โง่ฉิบหาย', ipa: 'pɔɔ nʉ́k ɔ̀ɔk gɔ̂ɔ sǎai bpai lɛ́ɛo. guu gɔ̂ɔ ləəi dàa dtua eeng wâa... ngôo chìp-hǎai', en: 'By the time I realized, it was too late. So I cursed myself... incredibly stupid.' },
+            { emoji: '💸😖', th: 'แล้วเชื่อไหม เงินที่หยิบมา แม่งดันหลุดหายไปจากกระเป๋าด้วย โคตรซวยเลยกู... เงินมันคงหายไปเมื่อตอนกระโดดลงทะเลมั้ง', ipa: 'lɛ́ɛo chʉ̂ʉa mǎi, ngən tîi yìp maa, mɛ̂ɛng dan lùt hǎai bpai jàak grà-bpǎo dûuai. kôot suai ləəi guu... ngən man kong hǎai bpai mʉ̂ʉa dtɔɔn grà-dòot long tá-lee máng', en: 'And would you believe it? The money I took f***ing slipped out of my pocket and got lost too. I\'m so damn unlucky... The money probably got lost when I jumped into the sea.' },
+            { emoji: '🏥💪', th: 'นอกจากนั้น นายบัญชายังไม่ตายอีก มันทนจริงๆ มีชีวิตอยู่ต่อไปอีกจนถึงสองวัน', ipa: 'nɔ̂ɔk jàak nán, naai ban-chaa yang mâi dtaai ìik. man ton jing jing. mii chii-wít yùu dtɔ̀ɔ bpai ìik jon tʉ̌ng sɔ̌ɔng wan', en: 'Besides that, Mr. Bancha didn\'t even die. He\'s really tough. He stayed alive for another two days.' },
+            { emoji: '🚨⛵', th: 'มันแจ้งตำรวจว่า มันสงสัยไอ้สมใจมาก มันบอกว่าไอ้สมใจคงอยากได้เรือประมงของมันมาก ถึงขนาดสั่งมือปืนมาฆ่ามัน', ipa: 'man jɛ̂ɛng dtam-rùat wâa, man sǒng-sǎi âi sǒm-jai mâak. man bɔ̀ɔk wâa âi sǒm-jai kong yàak dâai rʉʉa bprà-mong kɔ̌ɔng man mâak tʉ̌ng kà-nàat sǎng mʉʉ bpʉʉn maa kâa man', en: 'He reported to the police that he highly suspected Somjai. He said Somjai probably wanted his fishing boat so much that he ordered a hitman to kill him.' }
+        ];
+
+        const targetVocab = [
+            { emoji: '📦', th: 'ยัด', ipa: 'yát', en: 'To cram / stuff (into something)' },
+            { emoji: '🏃💨', th: 'เผ่นหนี', ipa: 'pèn nǐi', en: 'To flee / run away quickly' },
+            { emoji: '🏊', th: 'ลอยคอ', ipa: 'looi kɔɔ', en: 'To tread water (float with head above water)' },
+            { emoji: '🤬', th: 'โง่ฉิบหาย', ipa: 'ngôo chìp-hǎai', en: 'Incredibly stupid (vulgar/slang)' },
+            { emoji: '🍀😵‍💫', th: 'ซวย', ipa: 'suai', en: 'Unlucky / doomed' }
+        ];
+
+        const comprehensionQuestions = [
+            { emoji: '❓', th: 'ทำไมเขาถึงต้องรีบกระโดดลงน้ำ ทั้งๆ ที่ว่ายน้ำไม่เป็น?', ipa: 'tam-mai kǎo tʉ̌ng dtɔ̂ng rîip grà-dòot long náam táng-táng tîi wâai náam mâi bpen?', en: 'Why did he have to quickly jump into the water even though he couldn\'t swim?' },
+            { emoji: '❓', th: 'เกิดอะไรขึ้นกับเงินที่เขาตั้งใจขโมยมา?', ipa: 'gə̀ət à-rai kʉ̂n gàp ngən tîi kǎo dtâng-jai kà-mooi maa?', en: 'What happened to the money he intended to steal?' },
+            { emoji: '❓', th: 'ทำไมเขาถึงด่าตัวเองว่า "โง่ฉิบหาย"?', ipa: 'tam-mai kǎo tʉ̌ng dàa dtua eeng wâa "ngôo chìp-hǎai"?', en: 'Why did he curse himself as "incredibly stupid"?' },
+            { emoji: '❓', th: 'นายบัญชาตายทันทีหรือไม่? และเขาบอกอะไรกับตำรวจก่อนตาย?', ipa: 'naai ban-chaa dtaai tan-tii rʉ̌ʉ mâi? lɛ́ kǎo bɔ̀ɔk à-rai gàp dtam-rùat gɔ̀ɔn dtaai?', en: 'Did Mr. Bancha die immediately? And what did he tell the police before he died?' }
+        ];
+
+        const discussionQuestions = [
+            { emoji: '💭', th: 'คุณคิดว่ามือปืนคนนี้เป็นมืออาชีพหรือไม่? เพราะอะไร?', ipa: 'kun kít wâa mʉʉ bpʉʉn kon níi bpen mʉʉ aa-chîip rʉ̌ʉ mâi? prɔ́ à-rai?', en: 'Do you think this gunman is a professional? Why or why not?' },
+            { emoji: '⚖️', th: 'ถ้าตำรวจจับมือปืนได้จากหลักฐาน "ปืนที่ลืมไว้" คุณคิดว่าเขาจะอ้างว่าปืนนั้นไม่ใช่ของเขาได้ไหม?', ipa: 'tâa dtam-rùat jàp mʉʉ bpʉʉn dâai jàak làk-tǎan "bpʉʉn tîi lʉʉm wái" kun kít wâa kǎo jà âang wâa bpʉʉn nán mâi châi kɔ̌ɔng kǎo dâai mǎi?', en: 'If the police catch the gunman using the evidence of the "left-behind gun," do you think he could claim the gun isn\'t his?' },
+            { emoji: '💰', th: 'คุณเชื่อเรื่อง "เงินร้อน" ไหม? (เงินที่ได้มาโดยทุจริตมักจะอยู่ได้ไม่นาน)', ipa: 'kun chʉ̂ʉa rʉ̂ʉang "ngən rɔ́ɔn" mǎi? (ngən tîi dâai maa dooi tút-jà-rìt mák jà yùu dâai mâi naan)', en: 'Do you believe in "hot money"? (Money obtained dishonestly usually doesn\'t stay long)' },
+            { emoji: '🛥️', th: 'การที่คุณสมใจอยากได้ "เรือประมง" มากจนถึงขั้นจ้างคนมาฆ่า คุณคิดว่าเรือลำนี้มีความสำคัญอย่างไร', ipa: 'gaan tîi kun sǒm-jai yàak dâai "rʉʉa bprà-mong" mâak jon tʉ̌ng kân jâang kon maa kâa kun kít wâa rʉʉa lam níi mii kwaam sǎm-kan yàang-rai?', en: 'The fact that Mr. Somjai wanted the "fishing boat" so much that he hired someone to kill for it, what significance do you think this boat has?' },
+            { emoji: '🔍', th: 'ในยุคปัจจุบัน ถ้ามือปืนทำแบบในเรื่อง คุณคิดว่าตำรวจจะตามจับเขาได้เร็วแค่ไหน และจะใช้เทคโนโลยีอะไรบ้าง?', ipa: 'nai yók bpàt-jù-ban tâa mʉʉ bpʉʉn tam bàɛp nai rʉ̂ʉang kun kít wâa dtam-rùat jà dtaam jàp kǎo dâai reo kɛ̂ɛ nǎi lɛ́ jà chái ték-noo-loo-yii à-rai bâang?', en: 'In the modern era, if a gunman did what happened in the story, how quickly do you think the police would catch him, and what technologies would they use?' }
+        ];
+
+        const productionTasks = [
+            { emoji: '👮‍♂️', th: 'บทบาทสมมติ (Role-play): การสอบสวนของตำรวจ คุณคือผู้ต้องสงสัย (มือปืน) และครูคือตำรวจ ให้ตอบคำถามและแก้ตัว!', ipa: 'bòt-bàat sǒm-mút: gaan sɔ̀ɔp sǔan kɔ̌ɔng dtam-rùat. kun kʉʉ pûu dtɔ̂ng sǒng-sǎi, lɛ́ kruu kʉʉ dtam-rùat. hâi dtɔ̀ɔp kǎm-tǎam lɛ́ gɛ̂ɛ-dtua!', en: 'Role-play: Police interrogation. You are the suspect (shooter) and the teacher is the police. Answer questions and make excuses!' },
+            { emoji: '🗣️', th: 'อภิปราย (Discussion): อาชญากรมักจะทำผิดพลาดง่ายๆ (เช่น ลืมอาวุธไว้ที่เกิดเหตุ) คุณคิดว่าในชีวิตจริงเป็นเรื่องที่เกิดขึ้นบ่อยไหม?', ipa: 'à-pí-bpraai: àat-chá-yaa-gɔɔn mák jà tam pìt plâat ngâai ngâai (chên lʉʉm aa-wút wái tîi gə̀ət hèet). kun kít wâa nai chii-wít jing bpen rʉ̂ʉang tîi gə̀ət kʉ̂n bɔ̀oi mǎi?', en: 'Discussion: Criminals often make simple mistakes (like leaving weapons at the scene). Do you think this happens often in real life?' },
+            { emoji: '📖', th: 'เล่าเรื่อง (Story-telling): เล่าเหตุการณ์ที่คุณหรือคนรู้จักรู้สึกว่า "ซวย" มากๆ หรือทำเรื่องที่ "โง่ฉิบหาย"', ipa: 'lâo rʉ̂ʉang: lâo hèet-gaan tîi kun rʉ̌ʉ kon rúu-jàk rúu-sʉ̀k wâa "suai" mâak mâak rʉ̌ʉ tam rʉ̂ʉang tîi "ngôo chìp-hǎai"', en: 'Story-telling: Tell an event where you or someone you know felt very "unlucky" or did something "incredibly stupid".' }
+        ];
+
+        const extensionTasks = [
+            { emoji: '⚖️', th: 'โต้วาที (Debate): คนที่ "สั่งฆ่า" (นายสมใจ) ควรได้รับโทษหนักกว่า "มือปืน" (คนลงมือ) หรือไม่? เพราะอะไร?', ipa: 'dtôo-waa-tii: kon tîi "sǎng kâa" kuuan dâai ráp tôot nàk gwàa "mʉʉ bpʉʉn" rʉ̌ʉ mâi? prɔ́ à-rai?', en: 'Debate: Should the person who "ordered the hit" get a heavier sentence than the "hitman"? Why?' },
+            { emoji: '🎤', th: 'นำเสนอ (Presentation): สมมติว่าคุณเป็นนักข่าว ให้รายงานข่าวอาชญากรรมที่ท่าเรือนี้แบบสดๆ!', ipa: 'nam sà-nə̌ə: sǒm-mút wâa kun bpen nák kàao, hâi raai ngaan kàao àat-chá-yaa-gam tîi tâa rʉʉa níi bàɛp sòt sòt!', en: 'Presentation: Imagine you are a news reporter. Report this crime scene at the pier live!' }
+        ];
+
+        // Render all sections on load
+        renderSection('leadin-container', leadInQuestions);
+        renderSection('reading-container', readingData);
+        renderVocabCards('target-vocab-container', targetVocab);
+        renderSection('comprehension-container', comprehensionQuestions);
+        renderSection('discussion-container', discussionQuestions);
+        renderSection('production-container', productionTasks);
+        renderSection('extension-container', extensionTasks);
+
+        // --- 6. Giant Vocab List Logic (Raw string splitting) ---
+        const rawVocabString = `🏃‍♂️🔄✨	ขยับ	kà-yàp	move a little
+⏳🛑🏁	จน	jon	until / so much that
+👕👗👟	ชุด	chút	suit; outfit; wear (n)
+⛓️👤💂‍♂️	เชลย	chá-loie	prisoner; hostage
+🎯🧠💪	ตั้งใจ	dtâng-jai	pay attention
+⛓️🕴️🪝	ถูกห้อย	tòok hôi	To be hanged
+⏳⏱️✨	ไม่กี่นาที	mâi-gìi naa-tee	not a lot of minutes (a few minutes)
+📈🪴🌳	โต	dtooh	grow in size (grow up); big (collocates with ตัว, ตา)
+🎯➡️📍	โดยตรง	doie dtrong	directly
+🙏👤👑	ท่าน	t tâan	people who we respect or of higher rank/position
+🏆👏✨	ให้มันได้ยังงี้สิ	hâi man dâai yang-ngée sì	It's gotta be like this.
+😨🫣🏠	ขี้กลัว	kêe-glua	scaredy cat
+💡➡️🏁	ถ้างั้น	tâa-ngán	If so
+😱⚡️‼️	ขี้ตกใจ	kêe dtòk-jai	get surprised easily
+👉✨🤔	ยังงี้	yang-ngée	อย่างนี้
+🎭🤳✨	ทำท่า	tam tâa	To act
+✅🎯✨	ได้ผล	dâai pǒn	get result (it works)
+⚡️👁️✨	ทันตาเห็น	tan dtaa hěn	keep up with eyes to see (immediately; ทันที)
+🗣️🔄✅	ตอบสนอง	dtòp-sà-nǒng	respond
+🐱🥺💕	ออดอ้อน	òt-ôn	plead; beg
+🥣🔄🌀	ปน	bpon	mixed
+👣🌫️📍	รอย	roi	trace; mark
+✨👁️🌟	ประกาย	bprà-gaai	sparkle
+🧍‍♂️⬆️✨	ลุกขึ้น	lúk-kêun	stand up
+🤝🧗‍♂️⬅️	ดึง	deung	pull
+💀⚰️🥀	ศพ	sòp	corpse; dead body
+🛌☁️😴	ฟูกนอน	fôok norn	mattress
+📈✨‼️	แสนจะ	sǎen jà	so...
+👶🐈🍎	ลูก	lôok	measure word for mattresses, sth round
+💩🧹🤢	สกปรก	sòk-gà-bpròk	dirty
+👁️🔍🔎	สังเกต	sǎng-gèet	notice
+🧂🌶️	เครื่องเทศ	khrʉ̂ang-thêet	Seasonings / spices
+👀⬆️	เงย	ngəəi	look up
+💋😏	เจ้าชู้	jâo-chúu	womanizer
+🏚️🔞	ซ่อง	sɔ̂ng	whorehouse
+🈵	เต็ม	dtem	full
+📝📊	ให้คะแนน	hâi ká-nnaen	To grade (give scores)
+🥣	ผสม	phà-sǒm	mix
+🤷‍♂️	ทั้งที่	táng-tîi	Even though
+🛣️	ถนน	thà-nǒn	street/road
+🤢	คลื่นไส้	khlʉ̂un-sâi	nausea
+🤕	ปวดหัว	bpùat-hǔua	To have a headache
+🛣️	ทาง	taang	way / side
+🏆	สมควร	sǒm-khuuan	deserve
+💬	หมายถึง	mǎai-thʉ̌ng	To mean
+⚖️	สิทธิ	sìt(-thí)	rights
+🏞️	แผ่นดิน	phàaen-din	land
+📈	สูงขึ้น	sǔung khʉ̂n	higher than before
+🧑	มนุษย์	má-nút	human
+😎💪	มั่นใจ	mân-jai	confident
+🕵️‍♂️	ล้วง	lúang	delve
+😈🙃	ซุกซน	súk-son	naughty
+✅	พอจะ	pɔɔ jà	To have enough capacitty to do sth
+🏛️	ทางการ	taang-gaan	the authority
+🧍‍♂️	ร่างกาย	râang-gaai	body
+❌	ข้อผิดพลาด	khɔ̂ɔ-pìt-plâat	mistakes
+✅	อย่างแน่นอน	yàang-nâae-nɔ̂n	certainly
+⏳🗓️	ล่วงหน้า	lûang-nâa	in advance
+🗣️	เอ่ย	ə̀əi	utter / vocalise / remark
+🤔	ถ้ายังงั้น	tâa yang-ngán	ถ้าอย่างนั้น If that's so
+📑⚖️	หลักฐาน	làk tǎan	evidence
+⛔️🏠	ถูกกักบริเวณ	tùuk-gàk-bɔɔ-rí-ween	To get grounded (detain area)
+📌	ส่วนใหญ่	sùan yài	Mostly (big part)
+🤗	กอด	gɔ̀t	hug
+😌	ค่อยยังชั่ว	khɔ̂i-yang-chùa	That's relief.
+🤢👃	เหม็น	mĕn	Stinky
+⏳	นานแล้ว	naan-lɛ́ɛo	long time ago
+🤔	ถึงแม้ว่า	thʉ̌ng-mɛ́ɛ-wâa	even though
+✅	ยืนยัน	yʉʉn-yan	confirm
+🏁	ในที่สุด	nai-thîi-sùt	finally / in the end
+🏛️🌆	เมืองหลวง	mʉʉang-lǔuang	capital city
+📝🚨	ข้อสอบรั่ว	khɔ̂ɔ-sòp rûa	Test leaking
+📄	กระดาษ	grà-dàat	paper
+🕵️‍♂️🤨	น่าสงสัย	nâa sǒng-sǎi	suspicious
+🏁	เลิกงาน	lôoek-ngaan	get off work
+🧮	เหลือ...	lʉ̌ʉa	remaining
+🌍	ทั่วโลก	tûua-lôok	all over the world / throughout the world
+📅	วันธรรมดา	wan-tam-má-daa	weekdays
+📚✏️	ติว	dtiu	To tutor
+🛠️	ฝีมือ	fǐi-mʉʉ	work (of the suspect)
+🤬	ไอ้บัดซบ	âi-bàt-sòp	bastard
+🌅	เมื่อเช้านี้	mʉ̂ʉa-cháao-níi	this morning
+📁🗂️	แฟ้ม	fɛ́ɛm	folders / files
+🏆	เยี่ยม	yîiam	visit
+☕️	โอเลี้ยง	oo-líiang	(Sweet) black coffee
+✅	อนุญาต	à-nú-yâat	permission
+🔁	อีกแล้ว	ìik-lɛ́ɛo	again
+😤	ดื้อ	dʉ̂ʉ	stubborn
+🕵️	ผู้ต้องสงสัย	pûu-dtɔ̂ng-sǒng-sǎi	suspect (n)
+🤝🔍	เจอ	jəə	Find out / discover / Meet / Experience
+🦘	กระโดด	grà dòot	jump
+🕯️🎂	เป่าเทียน	bpào tian	blow candles
+⏳	ตั้งแต่	dtâng-dtàɛ	Since
+⏳	ตอนแรก	dtɔɔn-râɛk	At first
+🤔	สงสัย	sǒng-sǎi	suspected
+🦜	นกต่อ	nók-dtɔ̀ɔ	decoy
+🗡️🩸	ถูกแทง	tùuk tɛɛng	get stabbed
+🐐🧑‍⚖️	แพะรับบาป	pɛ́ ráp bàap	scape goat (take sin)
+📹🎥	ตากล้อง	dtaa glɔ̂ɔng	Cameraman
+↔️	กว้าง	gwâang	Wide / Broad
+📸	ช่างถ่ายรูป	châng tàai rûup	Photographer
+💄✨	ช่างแต่งหน้า	châang dtɛ̀ng nâa	makeup artist
+🛠️📋	จัดการ	jàt-gaan	Manage / Handle
+💇‍♂️✂️	ช่างทำผม	châang tam pǒm	hairdresser
+⚡️🔧	ช่างไฟ	châng fai	electrician
+🏢🪂	กระโดดตึก	grà dòot dtʉ̀k	Jump off the building
+💸📆	หนี้รายวัน	nîi raai wan	Daily debts
+💸📄	หนี้นอกระบบ	nîi nɔ̂ɔk rá bòp	Debts outside system
+👊💥	ทุบตี	túp dtii	Beat hit = Beat someone up
+👮📄	ใบแจ้งความ	bai jɛ̂ɛng kwaam	Police report
+⚖️	กระทำ	grà tam	commit / do
+☎️📞	ติดต่อ	dtìt-dtɔ̀ɔ	contact
+🔑	เข้าถึง	kâo-tʉ̌ng	access
+⚙️	ระบบ	rá-bòp	system
+🤕⚖️	ทำร้าย	tam ráai	to harm/hurt
+🔁	แต่ละ	dtàɛ-lá	each
+⚔️🪖	สงครามกลางเมือง	sǒng kraam glaang mʉang	Civil war
+⚖️🔥	ขัดแย้งกัน	kàt yɛ́ɛng gan	Controversial
+😱😰	แตกตื่น	dtɛ̀ɛk dtʉ̀ʉn	panicked
+🚔⚖️	อาชญากรรม	àat-chá-yaa-gam	crime
+👤✨	ปรากฏตัว	bpraa gòt dtua	appear
+👑🏰	ราชอาณาจักร	râat chá aa naa jàk	Kingdom
+🏠📄	หมดสัญญา	mòt sǎn-yaa	The lease/contract ends
+🏥🧑‍⚕️	คนไข้	kon-kâi	Patients
+🔮	หมอดู	mɔ̌ɔ-duu	Fortune teller
+⚠️	เตือน	dtuuan	Warn
+😭	ร้องไห้	rɔ́ɔng-hâi	cry
+👫	ทั้งคู่	táng-kûu	Both
+➡️	ถัดไป	tàt-bpai	Next ...
+🛣️	ทางเดียวกัน	taang diiao gan	same route
+🎉	งาน	ngaan	Events
+👄	อ้าปาก	âa bpàak	open mouth
+🗣️	กล่าว	glàao	To state
+🕵️‍♂️🔒	ข้อมูลลับ	kɔ̂ɔ-muun láp	secret information
+⛓️	ถูกบีบบังคับ	tùuk bìip-bang-káp	to be forced to do sth
+🤝	เผชิญหน้า	pà-chəən-nâa	confront
+🕶️🔫	นักเลง	nák-leeng	gangster
+➕	ยิ่งกว่านั้น	yîng-gwàa-nán	Furthermore
+✋⏸️	เดี๋ยวก่อน	dǐiao-gɔ̀ɔn	Hold up
+🗣️✋	สอด	sɔ̀ɔt	To interrupt / interject
+❓	สาเหตุ	sǎa-hèet	cause
+📝📚	แบบฝึกหัด	bàɛp-fʉ̀k-hàt	Exercises (in workbooks, forms)
+⏸️📚	พักการเรียน	pák-gaan-riian	suspension (rest)
+🎬	ผู้กำกับ	pûu-gam-gàp	Director (Films/Series)
+🔀	ต่างๆ	dtàang dtàang	Other / different
+✂️	แยก	yâɛk	separate
+📊	คะแนน	ká-nɛɛn	scores
+🏺	ดั้งเดิม	dâng-dəəm	traditional
+🧠🤔	คิดอย่างมีเหตุผล	kít-yàang-mii-hèet-pǒn	think reasonably
+💪	กล้าม	glâam	Muscles
+🥶✨	ขนลุก	kǒn lúk	getting goose bumps
+🤝	กัน	gan	each other
+🏗️📚	พื้นฐาน	pʉ́ʉn-tǎan	foundation / basic (skills)
+💥	เกิดขึ้น	gə̀ət kʉ̂n	Happen
+⚡️🐇	เร็วเกินไป	reo-gəən-bpai	too fast
+📏	ขนาด	kà nàat	size
+❓	ข้อ	kɔ̂ɔ	classifier for questions, points, problems
+👥🤝	จับกลุ่ม	jàp glùm	form team (catch group)
+✅	คือ	kʉʉ	is/am/are
+🚪➡️	เข้า	kâo	enter / go in
+📝➗	โจทย์	jòot	problem questions / quest / challenge
+👀🧠	มุมมอง	mum mɔɔng	perspective
+🔁	ต่อเนื่อง	dtɔ̀ɔ-nʉ̂ʉang	Continuous
+😐	เฉยๆ	chə̌əi chə̌əi	Normally (without much thoughts)
+⭕️	วงกลม	wong-glom	Circle
+🚀💨	ความเร็ว	kwaam-reo	Velocity
+⚖️📄	คดี	ká-dii	(crime)case
+📝	เช่น	chên	such as
+🏎️💨	ความเร่ง	kwaam-rêng	Acceleration
+📏	คงที่	kong-tîi	 constant
+🐢	ช้าลง	cháa-long	Slower than before
+✅📌	ควร	kuuan	should
+↔️	สวนทาง	sǔuan-taang	go in the opposite direction
+📍🛠️	ตั้ง	dtâng	to set / to place / to be located
+📍	ตำแหน่ง	dtam nɛ̀ng	position
+📍	ติดกับ	dtìt gàp	Next to
+🚔🔒	ติดคุก	dtìt kúk	(Stuck) in jail
+🥛🍵	ถ้วย	tûai	Cups
+🍽️	ถาด	tàat	Tray
+🧾	เป็นหลักฐาน	bpen làk tǎan	as evidence
+🤲	ถือ	tʉ̌ʉ	Carry / Hold
+✊🔥	กบฎ	gà bòt	rebel
+🗣️💬	คุย	kui	talk
+🧠📊	พฤติกรรม	prʉ́ dtì gam	Behavior
+🪑	นั่ง	nâng	sit
+🧑	นาย	naai	Mr. / You (for friends)
+📰	นิตยสาร	nít dtà yá sǎan	magazine
+⏳	บ้าง	bâang	from time to time
+🛡️	ปกป้อง	bpòk bpɔ̂ɔng	Protect
+🙅‍♂️	ปฏิเสธ	bpà dtì sèet	Reject/Refuse/Decline
+🏢	เอกชน	èek gà chon	Private
+😰	เครียด	krîat	stressed
+⚙️📋	สภาพ	sà pâap	conditions
+🧘‍♂️🎯	สมาธิ	sà-maa-tí	focus / concentration
+✅	ทำตาม	tam-dtaam	Follow / act accordingly
+🤬	สบถ	sà-bòt	Cuss / curse / swear
+☝️	เพียงแค่	piang kɛ̂ɛ	only
+🔪	ฆ่า	kâa	kill
+👶✨	ดูเด็ก	duu-dèk	Look young
+😰🆘	หมดหนทาง	mòt-hǒn-taang	desperate
+🔫🕵️	มือปืน	mʉʉ bpʉʉn	gunman
+🧙‍♂️👻	หมอผี	mɔ̌ɔ-pǐi	sorcerer / ghost hunter
+🎖️	ยศ	yót	rank
+🤝	ยอม	yɔɔm	Be willing to / surrender
+👥	คนดู	kon-duu	audience
+⏳	รอ	rɔɔ	wait
+🕵️‍♂️📝	จดหมายปลอม	jòt-mǎai-bplɔɔm	Fake letters
+↔️	ระหว่าง	rá wàang	between
+😎✨	เก๋	gě	chic / cool
+🔎🧩	หายาก	hǎa-yâak	Hard to find
+🧪	ลอง	lɔɔng	Try / Experiment
+🎩✨	มายากล	maa yaa gon	Magic
+🤠🎶	ลูกทุ่ง	lûuk tûng	Country
+✋👮	จับ	jàp	Catch / Arrest
+👥	ผู้ติดตาม	pûu dtìt dtaam	Follower
+☠️💊	วางยา	waang yaa	To poison
+😈	นางมาร	naang maan	Devil
+❤️	หัวใจ	hǔa jai	heart
+👵	อายุมาก	aa yú mâak	a lot of age (old)
+👶	อายุน้อย	aa yú nɔ́ɔi	less age (young)
+📏⬆️	สูง	sǔung	high / tall
+📍	จุด	jùt	Light up / point/dot
+😖	แย่จัง	yâɛ-jang	So terrible / awful
+💔😢	ใจสลาย	jai-sà-lǎai	Broken heart (feeling devastated)
+🤔❓	หรือ	rʉ̌ʉ	or / question word
+🔗🤝	ทั้ง...และ...	táng...lɛ́...	Both...and...
+⏳	ขณะที่	kà-nà-tîi	While / As
+⏳↔️	ระหว่างที่	rá-wàang-tîi	In between ... 
+💰✨	คุ้ม	kúm	Worth it
+⏳	อยู่	yùu	-ing
+🕊️	เสียชีวิต	sǐa chii wít	pass away
+🔑🏠	เป็นเจ้าของ	bpen jâo kɔ̌ɔng	To own
+🙏✨	ไถ่บาป	tài bàap	make up for the sin you did 
+🪪	ชื่อจริง	chʉ̂ʉ jing	Real name / First name
+🥺	เดียวดาย	diao daai	alone
+🐢	ค่อยๆ	kɔ̂ɔi kɔ̂ɔi	Slowly
+🗿	รูปปั้น	rûup bpân	Statue
+🎵	ดนตรี	don dtrii	Music
+🚬	สูบ	sùup	To smoke
+🪶	เบา	bao	Light / Soft / lightweight
+😜	ล้อเล่น	lɔ́ɔ lên	Kidding
+🗣️🔍	เปิดเผย	bpə̀ət-pə̌əi	Disclose / Reveal
+😊	พอใจ	pɔɔ-jai	Satisfied
+📣	ดัง	dang	Famous / loud
+👕👟	ถอด	tɔ̀ɔt	take off
+💅	เล็บ	lép	Nails (body part)
+🔛	บน	bon	on
+➡️	เพราะฉะนั้น	prɔ́-chà-nán	Therefore
+👋🏠	มาหา	maa-hǎa	come visit
+📉	ถูกลดตำแหน่ง	tùuk lót dtam nɛ̀ng	get position lowered (demoted)
+🎭	ตัวเอก	dtua èek	main character
+🚶	เดิน	dəən	Walk
+🛡️	บัง	bang	cover / shield
+🔒⛓️	คุก	kúk	jail
+🥇	คนแรก	kon rɛ̂ɛk	The first person
+🧭🌏	ภาคใต้	pâak dtâai	Southen region
+🏙️🚗	นอกเมือง	nɔ̂ɔk mʉang	Outside the city
+🎶📀	เครื่องเล่นแผ่นเสียง	krʉ̂ang lên pɛ̀n sǐang	record player
+💀🖤	ฆ่าตัวตาย	kâa dtua dtaai	commit a suicide (die)
+👉	ชี้	chíi	point (v)
+😱	ตกใจ	dtòk jai	heart sank (fall heart)
+📺	โทรทัศน์	too rá tát	Television
+⏳	แต่ก่อน	dtɛ̀ɛ gɔ̀ɔn	Back then / In the past
+💵🧾	ธนบัตร	tá ná bàt	bills / bank notes
+🥃💵	ใบ	bai	measure word for glass, bottle, bill, bank notes
+✊📣	ประท้วง	bprà túang	protest
+✅	ปรกติ	bpròk gà dtì	Normal / usual (ปกติ)
+😴	นอน	nɔɔn	sleep
+🚪🛏️	ห้อง	hɔ̂ng	room
+⭐️	สำคัญ	sǎm-kan	important
+🫵	เอง	eeng	by yourself
+↔️	ตรงข้าม	dtrong kâam	opposite
+✅🤝	รับ	ráp	accept/take in
+📛	คำนำหน้า	kam-nam-nâa	prefix (titles)
+⏳	ตลอด	dtà lɔ̀ɔt	always / throughout
+🕵️‍♂️🔎	สืบสวน	sʉ̀ʉp sǔan	interrograte / investigate
+🤬	หยาบคาย	yàap kaai	Rude
+🙇	ก้มหน้า	gôm nâa	tilt head down
+🌍✈️	ต่างประเทศ	dtàang bprà têet	foreign countries
+👁️	ตา	dtaa	eyes
+⚠️🛑	ความรุนแรง	kwaam run rɛɛng	violence
+👴🕰️	เก่างั่ก	gào ngâk	Super old
+⏱️	ขณะนั้น	kà nà nán	at that moment`;
+
+        // Process raw string into array of objects
+        const parsedVocabList = rawVocabString.trim().split('\n').map(line => {
+            const parts = line.split('\t');
+            if(parts.length >= 4) {
+                return { emoji: parts[0].trim(), th: parts[1].trim(), ipa: parts[2].trim(), en: parts[3].trim() };
+            }
+            return null;
+        }).filter(item => item !== null);
+
+        // --- 7. Random Vocab Generator ---
+        function generateRandomVocab() {
+            if(parsedVocabList.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * parsedVocabList.length);
+            const word = parsedVocabList[randomIndex];
+            
+            const displayArea = document.getElementById('vocab-display-area');
+            displayArea.innerHTML = generateBlockHTML(word.emoji, word.th, word.ipa, word.en, false);
+            
+            // Auto play the audio for the random word
+            // speakThai(word.th); // TTS is now turned off for auto-play, requiring manual click.
+        }
+
+    </script>
+</body>
+</html>
