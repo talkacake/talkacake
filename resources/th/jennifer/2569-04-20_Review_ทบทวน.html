@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทบทวน (Review)</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts (Sarabun for Thai) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        .thai-font {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // TTS Helper
+        const speak = (text) => {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // --- COMPONENTS ---
+
+        const InteractiveText = ({ textObj, size = "lg", color = "text-gray-800", icon = null, hideControls = false }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+            const txtSize = size === "xl" ? "text-2xl" : (size === "lg" ? "text-xl" : (size === "md" ? "text-lg" : "text-base"));
+            
+            return (
+                <div className="flex flex-col gap-1 mb-3 fade-in">
+                    <div className="flex items-start gap-2">
+                        {icon && <span className="text-2xl mt-0.5">{icon}</span>}
+                        <button onClick={() => speak(textObj.thai)} className="text-blue-500 hover:text-blue-700 flex-shrink-0 mt-1">
+                            <i className="ph ph-speaker-high text-xl"></i>
+                        </button>
+                        <h3 className={`${txtSize} font-bold ${color} thai-font leading-snug`}>{textObj.thai}</h3>
+                    </div>
+                    
+                    {!hideControls && (
+                        <div className="flex gap-2 ml-9 mt-1">
+                            <button onClick={() => setShowIPA(!showIPA)} className={`text-xs px-2 py-0.5 rounded border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-300 text-gray-400'}`}>IPA</button>
+                            <button onClick={() => setShowEN(!showEN)} className={`text-xs px-2 py-0.5 rounded border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'border-gray-300 text-gray-400'}`}>EN</button>
+                        </div>
+                    )}
+
+                    {(showIPA || showEN) && !hideControls && (
+                        <div className="ml-9 space-y-1 mt-1 bg-white p-2 rounded border border-gray-100 shadow-sm">
+                            {showIPA && <div className="text-purple-600 text-sm font-mono">/{textObj.ipa}/</div>}
+                            {showEN && <div className="text-blue-600 text-sm italic">"{textObj.en}"</div>}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const TaskCard = ({ title, type, children, bgClass = "bg-white" }) => (
+            <div className={`${bgClass} rounded-2xl shadow-sm border border-gray-200 p-5 mb-6 relative overflow-hidden`}>
+                <div className="mb-4 border-b border-gray-100 pb-3">
+                    <InteractiveText textObj={title} size="lg" color="text-blue-900" />
+                    <p className="text-xs text-gray-400 ml-9 uppercase tracking-wider">{type}</p>
+                </div>
+                <div className="ml-2">
+                    {children}
+                </div>
+            </div>
+        );
+
+        const WordBadge = ({ thai, ipa, en, emoji }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+            return (
+                <div className="inline-flex flex-col items-center m-1 p-3 bg-white border border-gray-200 rounded-xl shadow-sm min-w-[100px] max-w-[140px]">
+                    {emoji && <span className="text-3xl mb-2">{emoji}</span>}
+                    <div className="flex items-center gap-1 mb-2">
+                        <button onClick={() => speak(thai)} className="text-blue-500 hover:text-blue-700 flex-shrink-0">
+                            <i className="ph ph-speaker-high text-lg"></i>
+                        </button>
+                        <span className="font-bold text-gray-800 text-lg text-center leading-tight">{thai}</span>
+                    </div>
+                    <div className="flex gap-1 mb-1">
+                        <button onClick={() => setShowIPA(!showIPA)} className={`text-[10px] px-1.5 py-0.5 rounded border ${showIPA ? 'bg-purple-100 border-purple-300 text-purple-700' : 'border-gray-200 text-gray-400'}`}>IPA</button>
+                        <button onClick={() => setShowEN(!showEN)} className={`text-[10px] px-1.5 py-0.5 rounded border ${showEN ? 'bg-blue-100 border-blue-300 text-blue-700' : 'border-gray-200 text-gray-400'}`}>EN</button>
+                    </div>
+                    {showIPA && <span className="text-xs text-purple-600 font-mono mt-1 text-center break-words">/{ipa}/</span>}
+                    {showEN && <span className="text-xs text-blue-600 italic mt-1 text-center break-words">"{en}"</span>}
+                </div>
+            );
+        }
+
+        // --- DATA ---
+        
+        const textData = {
+            mainTitle: { thai: "ทบทวน", ipa: "thóp-thuan", en: "Review" },
+            extTitle: { thai: "กิจกรรมเสริม", ipa: "gìt-jà-gam sǒem", en: "Extension Activities" },
+            
+            // Task 1
+            t1Title: { thai: "1. พูดประโยค", ipa: "phûut bprà-yòok", en: "1. Speak a sentence (Game)" },
+            t1Desc: { thai: "แต่งประโยคจากคำศัพท์", ipa: "dtàeng bprà-yòok jàak kham-sàp", en: "Make sentences from these words" },
+            
+            // Task 2
+            t2Title: { thai: "2. สัมภาษณ์", ipa: "sǎm-phâat", en: "2. Real-life Interview" },
+            t2Q1: { thai: "คุณชื่อเล่นอะไร", ipa: "khun chûue-lên à-rai", en: "What is your nickname?" },
+            t2Q2: { thai: "คุณทำงานที่ไหน", ipa: "khun tham-ngaan thîi-nǎi", en: "Where do you work?" },
+            t2Q3: { thai: "งานอดิเรกอะไร", ipa: "ngaan-à-dì-rèek à-rai", en: "What is your hobby?" },
+            t2Q4: { thai: "ที่เที่ยวโปรดอะไร", ipa: "thîi-thîeow bpròht à-rai", en: "What is your favorite travel place?" },
+
+            // Task 3
+            t3Title: { thai: "3. ร้านอาหาร", ipa: "ráan aa-hǎan", en: "3. Restaurant (Role-play)" },
+            t3Desc: { thai: "คุณไปร้านอาหาร สั่งอะไร", ipa: "khun bpai ráan aa-hǎan sàng à-rai", en: "You go to a restaurant. What do you order?" },
+            
+            // Task 4
+            t4Title: { thai: "4. ห้าคำถาม", ipa: "hâa kham-thǎam", en: "4. Five Questions (Discussion)" },
+            t4Q1: { thai: "อาหารอะไรอร่อยที่สุด", ipa: "aa-hǎan à-rai à-ròi thîi-sùt", en: "What food is the most delicious?" },
+            t4Q2: { thai: "ภูเขา กับ ทะเล ที่เที่ยวโปรดอะไร", ipa: "phuu-khǎo gàp thá-lee, thîi-thîeow bpròht à-rai", en: "Mountain and sea, what is your favorite place?" },
+            t4Q3: { thai: "วันเสาร์ วันอาทิตย์ ทำอะไร", ipa: "wan sǎo wan aa-thít tham à-rai", en: "Saturday and Sunday, what do you do?" },
+            t4Q4: { thai: "คุณนอนกี่ชั่วโมง", ipa: "khun noon gìi chûua-moong", en: "How many hours do you sleep?" },
+            t4Q5: { thai: "เรียนภาษาไทยเหนื่อยไหม", ipa: "rian phaa-sǎa-thai nùeay mǎi", en: "Is learning Thai language tiring?" },
+
+            // Task 5
+            t5Title: { thai: "5. เล่าเรื่อง", ipa: "lâo rûeang", en: "5. Story-telling" },
+            t5Desc: { thai: "วันนี้คุณทำอะไร", ipa: "wan-níi khun tham à-rai", en: "What do you do today?" },
+
+            // Ext 1
+            e1Title: { thai: "คุยกัน", ipa: "khui gan", en: "Discussion / Debate" },
+            e1Desc: { thai: "กินข้าวที่บ้าน กับ ร้านอาหาร อะไรดีกว่า", ipa: "gin khâao thîi bâan gàp ráan aa-hǎan, à-rai dii gwàa", en: "Eating rice at home vs Restaurant, what is better?" },
+
+            // Ext 2
+            e2Title: { thai: "นำเสนอ", ipa: "nam-sà-nǒe", en: "Presentation" },
+            e2Desc: { thai: "เล่าเรื่องที่เที่ยวโปรด", ipa: "lâo rûeang thîi-thîeow bpròht", en: "Tell a story about your favorite travel place" },
+            e2Hint: { thai: "ไปที่ไหน กับใคร ไกลไหม", ipa: "bpai thîi-nǎi, gàp khrai, glai mǎi", en: "Go where? With who? Is it far?" },
+        };
+
+        const App = () => {
+            return (
+                <div className="max-w-xl mx-auto min-h-screen pb-20 font-sans text-gray-800">
+                    {/* Header */}
+                    <header className="bg-blue-600 text-white p-6 shadow-md mb-8 sticky top-0 z-50 rounded-b-2xl">
+                        <div className="flex justify-between items-center">
+                            <InteractiveText textObj={textData.mainTitle} size="xl" color="text-white" hideControls={false} />
+                            <div className="text-3xl">🎓</div>
+                        </div>
+                    </header>
+
+                    <div className="px-4">
+                        {/* Task 1: Speaking Game */}
+                        <TaskCard title={textData.t1Title} type="Speaking Game">
+                            <InteractiveText textObj={textData.t1Desc} size="md" color="text-gray-600" />
+                            <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                                <WordBadge thai="ครอบครัว" ipa="krôp-kruua" en="family" emoji="👨‍👩‍👧‍👦" />
+                                <WordBadge thai="เพื่อนร่วมงาน" ipa="pêuuan-rûuam-ngaan" en="co-workers" emoji="👥" />
+                                <WordBadge thai="ออกกำลังกาย" ipa="òok-gam-lang-gaai" en="exercise" emoji="🏋️‍♂️" />
+                                <WordBadge thai="สะอาด" ipa="sà-àat" en="clean" emoji="✨" />
+                                <WordBadge thai="เมื่อวาน" ipa="mêua-waan" en="yesterday" emoji="📅" />
+                            </div>
+                        </TaskCard>
+
+                        {/* Task 2: Real-life Interview */}
+                        <TaskCard title={textData.t2Title} type="Interview">
+                            <div className="space-y-4 mt-2">
+                                <InteractiveText textObj={textData.t2Q1} icon="🗣️" />
+                                <InteractiveText textObj={textData.t2Q2} icon="🏢" />
+                                <InteractiveText textObj={textData.t2Q3} icon="🎨" />
+                                <InteractiveText textObj={textData.t2Q4} icon="✈️" />
+                            </div>
+                        </TaskCard>
+
+                        {/* Task 3: Role Play */}
+                        <TaskCard title={textData.t3Title} type="Role Play">
+                            <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                                <InteractiveText textObj={textData.t3Desc} size="md" color="text-amber-900" />
+                                
+                                <div className="mt-4 space-y-2 border-l-2 border-amber-300 pl-3">
+                                    <p className="text-sm font-bold text-gray-400">Vocab you can use:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        <WordBadge thai="สั่งอาหาร" ipa="sàng aa-hǎan" en="order food" emoji="🍽️" />
+                                        <WordBadge thai="เอา..." ipa="ao..." en="want/take..." emoji="🤲" />
+                                        <WordBadge thai="น้ำเปล่า" ipa="náam-plào" en="plain water" emoji="💦" />
+                                        <WordBadge thai="เช็คบิล" ipa="chék-bin" en="check bill" emoji="🧾" />
+                                        <WordBadge thai="เงินสด" ipa="ngern-sòt" en="cash" emoji="💵" />
+                                    </div>
+                                </div>
+                            </div>
+                        </TaskCard>
+
+                        {/* Task 4: 5 Questions */}
+                        <TaskCard title={textData.t4Title} type="Discussion">
+                            <div className="space-y-4 mt-2">
+                                <InteractiveText textObj={textData.t4Q1} icon="1️⃣" />
+                                <InteractiveText textObj={textData.t4Q2} icon="2️⃣" />
+                                <InteractiveText textObj={textData.t4Q3} icon="3️⃣" />
+                                <InteractiveText textObj={textData.t4Q4} icon="4️⃣" />
+                                <InteractiveText textObj={textData.t4Q5} icon="5️⃣" />
+                            </div>
+                        </TaskCard>
+
+                        {/* Task 5: Storytelling */}
+                        <TaskCard title={textData.t5Title} type="Storytelling">
+                            <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                                <InteractiveText textObj={textData.t5Desc} size="md" color="text-green-900" />
+                                
+                                <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                                    <WordBadge thai="เช้า" ipa="châo" en="morning" emoji="🌅" />
+                                    <WordBadge thai="ข้าวเที่ยง" ipa="kâao-tîiang" en="lunch" emoji="🍱" />
+                                    <WordBadge thai="ทำงาน" ipa="tam-ngaan" en="work" emoji="💼" />
+                                    <WordBadge thai="เหนื่อย" ipa="nùay" en="tired" emoji="😮‍💨" />
+                                    <WordBadge thai="กลับบ้าน" ipa="glàp bâan" en="go back home" emoji="🏠" />
+                                </div>
+                            </div>
+                        </TaskCard>
+
+                        {/* Extension Activities */}
+                        <div className="mt-12 border-t-[3px] border-dashed border-gray-300 pt-8">
+                            <div className="mb-6 flex items-center justify-center gap-2">
+                                <i className="ph ph-star text-2xl text-amber-500"></i>
+                                <InteractiveText textObj={textData.extTitle} size="xl" hideControls={true} />
+                                <i className="ph ph-star text-2xl text-amber-500"></i>
+                            </div>
+
+                            {/* Extension 1: Debate */}
+                            <TaskCard title={textData.e1Title} type="Debate" bgClass="bg-purple-50">
+                                <InteractiveText textObj={textData.e1Desc} size="md" color="text-purple-900" />
+                                <div className="flex justify-center items-center gap-4 mt-4 text-4xl">
+                                    🏠 <span className="text-sm font-bold text-gray-400">VS</span> 🍽️
+                                </div>
+                            </TaskCard>
+
+                            {/* Extension 2: Presentation */}
+                            <TaskCard title={textData.e2Title} type="Presentation" bgClass="bg-indigo-50">
+                                <InteractiveText textObj={textData.e2Desc} size="md" color="text-indigo-900" />
+                                <div className="mt-3 bg-white/50 p-3 rounded border border-indigo-100">
+                                    <InteractiveText textObj={textData.e2Hint} size="sm" color="text-indigo-700" />
+                                </div>
+                            </TaskCard>
+                        </div>
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
