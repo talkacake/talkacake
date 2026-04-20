@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถานที่ต่างๆ Various places</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            touch-action: manipulation;
+        }
+        .thai-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .btn-toggle {
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+            margin-left: 4px;
+        }
+        .btn-toggle.active {
+            background-color: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+        .hidden-content {
+            display: none;
+        }
+        .visible-content {
+            display: block;
+            margin-top: 4px;
+        }
+        .tts-btn {
+            background: #e2e8f0;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-left: 8px;
+            transition: background 0.2s;
+        }
+        .tts-btn:hover { background: #cbd5e1; }
+        .section-container { margin-bottom: 3rem; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-2xl mx-auto">
+        
+        <!-- Header -->
+        <header class="text-center mb-10 mt-4">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-4" id="main-title"></h1>
+        </header>
+
+        <!-- 1. Vocab Review Section -->
+        <section class="section-container">
+            <div id="header-review" class="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-indigo-200 pb-2"></div>
+            <div class="thai-card text-center bg-gradient-to-b from-white to-indigo-50">
+                <div id="random-word-controls" class="mb-6"></div>
+                <button onclick="pickRandomWord()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105 mt-4">
+                    ดู ประโยค ต่างๆ
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Task 1: Guess the place -->
+        <section class="section-container">
+            <div id="header-task1" class="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-indigo-200 pb-2"></div>
+            <div class="thai-card">
+                <div id="content-task1" class="space-y-6"></div>
+            </div>
+        </section>
+
+        <!-- 3. Dialogue -->
+        <section class="section-container">
+            <div id="header-dialogue" class="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-indigo-200 pb-2"></div>
+            <div class="thai-card">
+                <div id="desc-dialogue" class="mb-6 bg-gray-50 p-3 rounded-lg border-l-4 border-blue-400"></div>
+                <div id="content-dialogue" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- 4. Discussion Questions (Swapped from 6) -->
+        <section class="section-container">
+            <div id="header-questions" class="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-indigo-200 pb-2"></div>
+            <div class="thai-card border-t-4 border-green-400">
+                <div id="content-questions" class="space-y-6"></div>
+            </div>
+        </section>
+
+        <!-- 5. Debate (Swapped from Story Telling) -->
+        <section class="section-container">
+            <div id="header-debate" class="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-indigo-200 pb-2"></div>
+            <div class="thai-card">
+                <div id="content-debate" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- 6. Story Telling (Swapped from Debate) -->
+        <section class="section-container">
+            <div id="header-story" class="text-xl font-semibold mb-4 text-gray-700 border-b-2 border-indigo-200 pb-2"></div>
+            <div class="thai-card">
+                <div id="desc-story" class="mb-6 bg-gray-50 p-3 rounded-lg border-l-4 border-pink-400"></div>
+                <div id="content-story" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <footer class="text-center text-gray-400 text-sm mt-20 pb-10">
+            เรียน ประโยค ต่างๆ 🗣️✨
+        </footer>
+    </div>
+
+    <script>
+        // Topic-specific vocab (Places, Directions, Time, Actions - Excluded Food)
+        const lessonVocab = [
+            { th: "ห้าง", ipa: "hang", en: "mall", icon: "🏬🛍️" },
+            { th: "ห้องสมุด", ipa: "hong-sa-mut", en: "library", icon: "📚" },
+            { th: "โรงหนัง", ipa: "rong-nang", en: "cinema", icon: "🎥" },
+            { th: "ป้ายรถเมล์", ipa: "pai-rot-may", en: "bus stop", icon: "🚏🚌" },
+            { th: "ตรงข้าม", ipa: "trong-kham", en: "opposite", icon: "↔️" },
+            { th: "ข้างหน้า", ipa: "khang-na", en: "in front", icon: "⏩" },
+            { th: "ข้างบน", ipa: "khang-bon", en: "on / above", icon: "🔝" },
+            { th: "ใกล้", ipa: "klai", en: "near / close to", icon: "📍" },
+            { th: "หัวมุม", ipa: "hua-mum", en: "corner", icon: "📐" },
+            { th: "เมื่อวานนี้", ipa: "muea-wan-nee", en: "yesterday", icon: "⏪📅" },
+            { th: "ชอบตั้งแต่เด็ก", ipa: "chop tang-tae dek", en: "Like since I was a child", icon: "👧💖" },
+            { th: "คนไม่เยอะ", ipa: "khon mai yoe", en: "Not a lot of people", icon: "👥" },
+            { th: "ปรัชญา", ipa: "prat-ya", en: "philosophy", icon: "📚🤔" },
+            { th: "จ่าย", ipa: "jai", en: "pay", icon: "💸" },
+            { th: "เงินสด", ipa: "ngern-sot", en: "cash", icon: "💵" }
+        ];
+
+        // TTS Function
+        function speak(text) {
+            // Remove icons before speaking if any accidentally passed
+            const cleanText = text.replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F300}-\u{1F5FF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Helper to generate Toggle Component
+        function createThaiElement(thai, ipa, en, icon = "") {
+            const id = Math.random().toString(36).substr(2, 9);
+            const iconHtml = icon ? `<span class="mr-2">${icon}</span>` : '';
+            return `
+                <div class="my-2 w-full">
+                    <div class="flex items-center flex-wrap">
+                        <span class="text-xl font-medium text-gray-800 leading-relaxed">${iconHtml}${thai}</span>
+                        <button onclick="speak('${thai}')" class="tts-btn flex-shrink-0" title="Listen">🔊</button>
+                        <button onclick="toggleDisplay('${id}-ipa')" id="${id}-ipa-btn" class="btn-toggle text-indigo-500 hover:text-indigo-700 flex-shrink-0">IPA</button>
+                        <button onclick="toggleDisplay('${id}-en')" id="${id}-en-btn" class="btn-toggle text-teal-500 hover:text-teal-700 flex-shrink-0">EN</button>
+                    </div>
+                    <div id="${id}-ipa" class="hidden-content text-indigo-600 text-sm italic pl-3 border-l-2 border-indigo-200 ml-2 mt-1">[ ${ipa} ]</div>
+                    <div id="${id}-en" class="hidden-content text-gray-500 text-sm font-light pl-3 border-l-2 border-gray-200 ml-2 mt-1">( ${en} )</div>
+                </div>
+            `;
+        }
+
+        function toggleDisplay(elementId) {
+            const el = document.getElementById(elementId);
+            const btn = document.getElementById(elementId + '-btn');
+            if (el.classList.contains('hidden-content')) {
+                el.classList.remove('hidden-content');
+                el.classList.add('visible-content');
+                btn.classList.add('active');
+            } else {
+                el.classList.remove('visible-content');
+                el.classList.add('hidden-content');
+                btn.classList.remove('active');
+            }
+        }
+
+        // Random Word Logic
+        function pickRandomWord() {
+            const word = lessonVocab[Math.floor(Math.random() * lessonVocab.length)];
+            document.getElementById('random-word-controls').innerHTML = `
+                <div class="flex justify-center mt-4 border-2 border-indigo-100 p-4 rounded-xl bg-white shadow-sm">
+                    ${createThaiElement(word.th, word.ipa, word.en, word.icon)}
+                </div>
+            `;
+        }
+
+        // Initialize Content
+        window.onload = () => {
+            // Main Title & Intro
+            document.getElementById('main-title').innerHTML = createThaiElement(
+                "สถานที่ ต่างๆ", 
+                "sa-than-tee tang-tang", 
+                "Various places"
+            );
+
+            // 1. Review Section
+            document.getElementById('header-review').innerHTML = createThaiElement(
+                "1. เรียน สถานที่", 
+                "rian sa-than-tee", 
+                "1. Learn places"
+            );
+
+            // 2. Guess the place
+            document.getElementById('header-task1').innerHTML = createThaiElement(
+                "2. สถานที่ ที่ไหน?", 
+                "sa-than-tee tee-nai", 
+                "2. Place where?"
+            );
+            document.getElementById('content-task1').innerHTML = `
+                <div class="border-b border-gray-100 pb-4">
+                    ${createThaiElement("1. สถานที่ ตรงข้าม โรงเรียน คนไม่เยอะ ชอบตั้งแต่เด็ก อ่านหนังสือ ปรัชญา ข้างใน", "1. sa-than-tee trong-kham rong-rian, khon mai yoe, chop tang-tae dek, an nang-sue prat-ya khang-nai", "1. Place opposite school, not a lot of people, like since I was a child, read philosophy books inside.")}
+                    <button onclick="document.getElementById('ans1').classList.toggle('hidden')" class="mt-4 text-sm bg-indigo-100 px-4 py-2 rounded-lg text-indigo-700 hover:bg-indigo-200 font-semibold transition">ดู คำตอบ</button>
+                    <div id="ans1" class="hidden mt-3 text-right p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                        ${createThaiElement("ห้องสมุด 📚", "hong-sa-mut", "Library")}
+                    </div>
+                </div>
+                <div class="pt-4">
+                    ${createThaiElement("2. สถานที่ อยู่ ใกล้ ป้ายรถเมล์ จ่าย เงินสด ดู หนัง ข้างใน", "2. sa-than-tee yoo klai pai-rot-may, jai ngern-sot, doo nang khang-nai", "2. Place is near bus stop, pay cash, watch movies inside.")}
+                    <button onclick="document.getElementById('ans2').classList.toggle('hidden')" class="mt-4 text-sm bg-indigo-100 px-4 py-2 rounded-lg text-indigo-700 hover:bg-indigo-200 font-semibold transition">ดู คำตอบ</button>
+                    <div id="ans2" class="hidden mt-3 text-right p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                        ${createThaiElement("โรงหนัง 🎥", "rong-nang", "Cinema")}
+                    </div>
+                </div>
+            `;
+
+            // 3. Dialogue
+            document.getElementById('header-dialogue').innerHTML = createThaiElement(
+                "3. ถาม สถานที่", 
+                "tham sa-than-tee", 
+                "3. Ask places (Dialogue)"
+            );
+            document.getElementById('desc-dialogue').innerHTML = createThaiElement(
+                "ตอนนี้ อยู่ ป้ายรถเมล์ ถาม...", 
+                "ton-nee yoo pai-rot-may, tham...", 
+                "Now at bus stop. Ask..."
+            );
+            document.getElementById('content-dialogue').innerHTML = `
+                <div class="bg-indigo-50 p-4 rounded-xl shadow-inner border border-indigo-100">
+                    <div class="mb-3">👦 A: ${createThaiElement("ห้าง อยู่ ที่ไหน?", "hang yoo tee-nai", "Where is the mall?")}</div>
+                    <div class="mb-3 pl-4 border-l-2 border-indigo-300">👩 B: ${createThaiElement("ห้าง อยู่ ข้างหน้า ใกล้ หัวมุม", "hang yoo khang-na klai hua-mum", "Mall is in front, near the corner.")}</div>
+                    <div class="mb-3">👦 A: ${createThaiElement("ฟิตเนส อยู่ ใกล้ ใช่ไหม?", "fit-net yoo klai chai-mai", "Gym is near, right?")}</div>
+                    <div class="pl-4 border-l-2 border-indigo-300">👩 B: ${createThaiElement("ฟิตเนส อยู่ ข้างบน ห้าง", "fit-net yoo khang-bon hang", "Gym is above the mall.")}</div>
+                </div>
+            `;
+
+            // 4. Discussion (Swapped from 6)
+            document.getElementById('header-questions').innerHTML = createThaiElement(
+                "4. คิดว่า สถานที่ ไหน?", 
+                "kit-wa sa-than-tee nai", 
+                "4. Think which place? (Discussion)"
+            );
+            document.getElementById('content-questions').innerHTML = `
+                <div class="mb-6">
+                    <div class="font-bold text-teal-600 mb-2">🕰️ 1</div>
+                    ${createThaiElement("เมื่อวานนี้ อยู่ ที่ไหน? สถานที่ มี คนไม่เยอะ ใช่ไหม?", "muea-wan-nee yoo tee-nai? sa-than-tee mee khon mai yoe chai-mai?", "Where were you yesterday? The place didn't have a lot of people, right?")}
+                </div>
+                <div class="mb-6">
+                    <div class="font-bold text-teal-600 mb-2">💖 2</div>
+                    ${createThaiElement("ชอบตั้งแต่เด็ก สถานที่ ไหน? ตอนนี้ ไม่เคยไป นาน ใช่ไหม?", "chop tang-tae dek sa-than-tee nai? ton-nee mai-koey-pai nan chai-mai?", "Which place have you liked since childhood? Now you haven't been for a long time, right?")}
+                </div>
+                <div class="mb-6">
+                    <div class="font-bold text-teal-600 mb-2">🛒 3</div>
+                    ${createThaiElement("ไป ตลาด จ่าย เงินสด ใช่ไหม? เอา อะไร?", "pai ta-lat jai ngern-sot chai-mai? ao a-rai?", "Go to market pay cash right? What are you getting?")}
+                </div>
+                <div class="mb-6">
+                    <div class="font-bold text-teal-600 mb-2">💪 4</div>
+                    ${createThaiElement("ฟิตเนส อยู่ ตรงข้าม ที่ไหน? ข้างใน ฟิตเนส มี คนไม่เยอะ ใช่ไหม?", "fit-net yoo trong-kham tee-nai? khang-nai fit-net mee khon mai yoe chai-mai?", "Gym is opposite where? Inside gym not a lot of people right?")}
+                </div>
+                <div>
+                    <div class="font-bold text-teal-600 mb-2">📚 5</div>
+                    ${createThaiElement("ตอนนี้ อ่านหนังสือ ที่ ห้องสมุด ใช่ไหม? มี ปรัชญา ใช่ไหม?", "ton-nee an-nang-sue tee hong-sa-mut chai-mai? mee prat-ya chai-mai?", "Now reading a book at the library right? Have philosophy right?")}
+                </div>
+            `;
+
+            // 5. Debate
+            document.getElementById('header-debate').innerHTML = createThaiElement(
+                "5. คิดว่า ที่ไหน?", 
+                "kit-wa tee-nai", 
+                "5. Think where? (Debate)"
+            );
+            document.getElementById('content-debate').innerHTML = `
+                <div class="bg-red-50 p-4 rounded-xl shadow-inner border border-red-100 flex flex-col md:flex-row gap-4">
+                    <div class="flex-1 p-4 bg-white rounded-lg border border-red-200 text-center shadow-sm">
+                        <div class="text-3xl mb-2">🏬🛍️</div>
+                        <div class="font-bold text-red-600 mb-4 border-b pb-2">ทีม ห้าง</div>
+                        ${createThaiElement("ชอบ ห้าง!", "chop hang", "Like mall!")}
+                        ${createThaiElement("ฟิตเนส อยู่ ข้างบน", "fit-net yoo khang-bon", "Gym is above")}
+                        ${createThaiElement("โรงหนัง อยู่ ข้างใน", "rong-nang yoo khang-nai", "Cinema is inside")}
+                    </div>
+                    <div class="flex-1 p-4 bg-white rounded-lg border border-blue-200 text-center shadow-sm">
+                        <div class="text-3xl mb-2">📚🤔</div>
+                        <div class="font-bold text-blue-600 mb-4 border-b pb-2">ทีม ห้องสมุด</div>
+                        ${createThaiElement("ชอบ ห้องสมุด!", "chop hong-sa-mut", "Like library!")}
+                        ${createThaiElement("คนไม่เยอะ", "khon mai yoe", "Not a lot of people")}
+                        ${createThaiElement("อ่านหนังสือ ปรัชญา", "an nang-sue prat-ya", "Read philosophy")}
+                    </div>
+                </div>
+                <div class="mt-6 text-center font-bold text-lg text-indigo-700">
+                    ${createThaiElement("คิดว่า ที่ไหน ใช่", "kit-wa tee-nai chai", "Think where, right")}
+                </div>
+            `;
+
+            // 6. Story Telling
+            document.getElementById('header-story').innerHTML = createThaiElement(
+                "6. ดู รูป ประโยค", 
+                "doo roop pra-yok", 
+                "6. Look at pictures (Story Telling)"
+            );
+            document.getElementById('desc-story').innerHTML = createThaiElement(
+                "เมื่อวานนี้ ไป ที่ไหน?", 
+                "muea-wan-nee pai tee-nai?", 
+                "Where did you go yesterday?"
+            );
+            document.getElementById('content-story').innerHTML = `
+                <div class="p-6 border-2 border-dashed border-indigo-200 rounded-xl bg-white text-center space-y-4">
+                    <div class="text-4xl mb-6">🏫 ➡️ 🚏🚌 ➡️ 🏬🛍️ ➡️ 🎥🍿</div>
+                    ${createThaiElement("เมื่อวานนี้ อยู่ โรงเรียน... ใกล้ ป้ายรถเมล์...", "muea-wan-nee yoo rong-rian... klai pai-rot-may...", "Yesterday was at school... near bus stop...")}
+                    ${createThaiElement("ไป ห้าง... ตรงข้าม ห้องสมุด...", "pai hang... trong-kham hong-sa-mut...", "Went to mall... opposite library...")}
+                    ${createThaiElement("จ่าย เงินสด ดู หนัง...", "jai ngern-sot doo nang...", "Pay cash, watch movie...")}
+                </div>
+            `;
+            
+            // Initial random word
+            pickRandomWord();
+        };
+    </script>
+</body>
+</html>
