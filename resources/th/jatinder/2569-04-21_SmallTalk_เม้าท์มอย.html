@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เม้าท์มอย</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+Thai:wght@400;600;700&display=swap');
+        body { 
+            font-family: 'Noto Sans Thai', 'Inter', sans-serif; 
+            background-color: #f0fdf4; /* Light green background */
+            -webkit-tap-highlight-color: transparent;
+        }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom scrollbar for vocab box */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    </style>
+</head>
+<body class="p-3 md:p-6 pb-20">
+    <div class="max-w-2xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-green-100 text-center">
+            <h1 class="text-3xl font-black text-green-700 flex items-center justify-center gap-3">
+                💬 เม้าท์มอย 
+                <button onclick="playTTS('เม้าท์มอย')" class="p-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 active:scale-95 transition-all"><i data-lucide="volume-2" class="w-5 h-5"></i></button>
+            </h1>
+            <div class="flex justify-center gap-2 mt-3">
+                <button onclick="toggleGlobal('ipa')" class="px-3 py-1.5 text-sm font-bold rounded-lg bg-sky-100 text-sky-700 hover:bg-sky-200">Toggle All IPA</button>
+                <button onclick="toggleGlobal('en')" class="px-3 py-1.5 text-sm font-bold rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200">Toggle All EN</button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
+            <button onclick="switchTab('review')" id="tab-review" class="whitespace-nowrap px-4 py-3 bg-green-600 text-white font-bold rounded-xl shadow-sm flex-1">1. ทบทวน</button>
+            <button onclick="switchTab('learn')" id="tab-learn" class="whitespace-nowrap px-4 py-3 bg-white text-green-700 font-bold rounded-xl shadow-sm border border-green-100 flex-1">2. เรียนรู้</button>
+            <button onclick="switchTab('tasks')" id="tab-tasks" class="whitespace-nowrap px-4 py-3 bg-white text-green-700 font-bold rounded-xl shadow-sm border border-green-100 flex-1">3. กิจกรรม</button>
+            <button onclick="switchTab('extensions')" id="tab-extensions" class="whitespace-nowrap px-4 py-3 bg-white text-green-700 font-bold rounded-xl shadow-sm border border-green-100 flex-1">4. เพิ่มเติม</button>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area" class="min-h-[500px]">
+            <!-- Rendered by JS -->
+        </div>
+
+    </div>
+
+    <script>
+        // --- Data ---
+        const vocabList = [
+            {th: 'คะ', ipa: 'khá', en: 'Fem ending for questions', em: '❓'},
+            {th: 'ฉัน', ipa: 'chǎn', en: 'Neutral I', em: '👤'},
+            {th: 'ชื่อ', ipa: 'chûe', en: 'Name', em: '🏷️'},
+            {th: 'คุณ', ipa: 'khun', en: 'You / Mx.', em: '👤'},
+            {th: 'อะไร', ipa: 'à-rai', en: 'What', em: '❓'},
+            {th: 'ผม', ipa: 'phǒm', en: 'Masc I', em: '👨'},
+            {th: 'มา', ipa: 'maa', en: 'Come', em: '👋'},
+            {th: 'จาก', ipa: 'jàak', en: 'From', em: '➡️'},
+            {th: 'ประเทศ', ipa: 'prà-thêt', en: 'Country', em: '🌍'},
+            {th: 'ชื่ออะไร', ipa: 'chûe à-rai', en: "What's your name?", em: '🙋'},
+            {th: 'มาจากประเทศอะไร', ipa: 'maa-jàak prà-thêt à-rai', en: 'What country do you come from?', em: '🌍'},
+            {th: 'มาจากประเทศสิงคโปร์', ipa: 'maa jàak bprà têet sì ngók bpoo', en: 'I come from Singapore.', em: '🇸🇬'},
+            {th: 'ชื่อจาทินเดอร์', ipa: 'chʉ̂ʉ jaa tin dəə', en: 'My name is Jatinder.', em: '👋'},
+            {th: 'กินผัดไทย', ipa: 'gin pàt tai', en: 'I eat Pad Thai.', em: '🍜'},
+            {th: 'ทำอาหาร', ipa: 'tam aa hǎan', en: 'To cook (make food)', em: '🍳🍲'},
+            {th: 'หิว', ipa: 'hǐu', en: 'Hungry', em: '🤤'},
+            {th: 'ชอบ', ipa: 'chɔ̂ɔp', en: 'Like', em: '👍❤️'},
+            {th: 'อาหารอินเดีย', ipa: 'aa hǎan in dia', en: 'Indian food', em: '🍛🇮🇳'},
+            {th: 'ข้าวเหนียวมะม่วง', ipa: 'kâao nǐao má mûang', en: 'Mango sticky rice', em: '🥭🍚'},
+            {th: 'สั่ง', ipa: 'Sàng', en: 'order', em: '🛒'},
+            {th: 'จาน', ipa: 'jaan', en: 'plate/dish', em: '🍽️'},
+            {th: 'ใส่', ipa: 'Sài', en: 'put in/add/put on/wear', em: '➕👕'},
+            {th: 'เป็นยังไง', ipa: 'pen-yang-ngai', en: "How's ...?", em: '🤔'},
+            {th: 'เป็น', ipa: 'pen', en: 'Is/am/are (Verb to be)', em: '🟰'},
+            {th: 'ยังไง', ipa: 'yang-ngai', en: 'How', em: '🤔'},
+            {th: 'กับ', ipa: 'gàp', en: 'and/with', em: '🤝'},
+            {th: 'เผ็ด', ipa: 'phèt', en: 'spicy', em: '🌶️🔥'},
+            {th: 'นิดหน่อย', ipa: 'nít-nòi', en: 'a little bit', em: '🤏'},
+            {th: 'ไข่คน', ipa: 'kài kon', en: 'scrambled eggs (to stir)', em: '🍳'},
+            {th: 'ไก่เนย', ipa: 'gài nəəi', en: 'Butter chicken', em: '🍗🧈'},
+            {th: 'ใคร', ipa: 'krai', en: 'Who', em: '❓'},
+            {th: 'ซื้อ', ipa: 'sʉ́ʉ', en: 'Buy', em: '🛒'},
+            {th: 'อิ่ม', ipa: 'ìm', en: 'Full(stomach)', em: '😋🍽️'},
+            {th: 'พอ', ipa: 'pɔɔ', en: 'Enough', em: '👌'},
+            {th: 'คนเสิร์ฟ', ipa: 'konsə̀əp', en: 'Server', em: '🍽️'},
+            {th: 'ลูกค้า', ipa: 'lûukkháa', en: 'Customer (offspring/trade)', em: '👤'},
+            {th: 'ไข่ต้ม', ipa: 'khài tôm', en: 'Boiled eggs', em: '🥚🍳'},
+            {th: 'หมูทอด', ipa: 'mǒu thâwt', en: '(Deep)Fried pork', em: '🍖🔥'},
+            {th: 'ข้าวผัด', ipa: 'khâaw phàt', en: '(Stir)Fried rice', em: '🍚🍳'},
+            {th: 'ไก่ย่าง', ipa: 'gài yâang', en: 'Grilled chicken', em: '🍗🔥'},
+            {th: 'ปลานึ่ง', ipa: 'plaa nûeng', en: 'Steamed fish', em: '🐟♨️'},
+            {th: 'กุ้งทอด', ipa: 'kûng thâwt', en: 'Fried prawns/shrimps', em: '🍤🍤'},
+            {th: 'ข้าวเหนียว', ipa: 'khâaw-nǐaw', en: 'Sticky rice', em: '🍚'},
+            {th: 'ผัดผัก', ipa: 'phàt phàk', en: 'Stir-fried veggies', em: '🥦🍳'},
+            {th: 'บะหมี่', ipa: 'bà mìi', en: 'Egg noodles', em: '🍜'},
+            {th: 'น้ำผัก', ipa: 'nám phàk', en: 'veggie juice', em: '🥬🧃'},
+            {th: 'น้ำผลไม้', ipa: 'nám phǒn-lá-mái', en: 'fruit juice', em: '🧃'},
+            {th: 'น้ำเปล่า', ipa: 'náam bplàao', en: 'plain water', em: '💧🥤'},
+            {th: 'น้ำร้อน', ipa: 'nám rɔ́ɔn', en: 'hot water', em: '💧🔥'},
+            {th: 'น้ำเย็น', ipa: 'nám yen', en: 'iced/cold water', em: '🧊💧'},
+            {th: 'ไม่เย็น', ipa: 'mâi yen', en: 'Room temp', em: '🥤'},
+            {th: 'น้ำแข็ง', ipa: 'nám kɛ̌ng', en: 'Ice', em: '🧊'},
+            {th: 'สั่งอะไร', ipa: 'sàng àray', en: 'What are you ordering?', em: '🍽️❓'},
+            {th: 'เอาอะไรอีกไหม', ipa: 'ao à rai ìik mǎi', en: 'Do you want anything more?', em: '🍽️'},
+            {th: 'จ่ายยังไง', ipa: 'jàai yang ngai', en: 'Pay how?', em: '💳💰'},
+            {th: 'ทั้งหมด ... บาท', ipa: 'tháng mòt ... Bàat', en: "In total, it's ... baht.", em: '💰'},
+            {th: 'เอา', ipa: 'aw ...', en: "I'm getting ...", em: '🍽️'},
+            {th: 'ขอ', ipa: 'khɔ̌ɔ …', en: 'Can I have ...?', em: '🍽️'},
+            {th: 'แค่นี้', ipa: 'kɛ̂ɛ níi', en: "That's all.", em: '✅'},
+            {th: 'เช็คบิล', ipa: 'chék bin', en: 'Check, please.', em: '🧾🙋'},
+            {th: 'ทั้งหมดกี่บาท', ipa: 'tháng mòt kìi bàat', en: 'How many baht in total?', em: '💰'},
+            {th: 'เงินสด', ipa: 'ngən sòt', en: 'Cash (fresh money)', em: '💵💰'},
+            {th: 'มี', ipa: 'mii', en: 'have', em: '✅'},
+            {th: 'เสื้อ', ipa: 'sûea', en: 'shirts / tops', em: '👕'},
+            {th: 'สี', ipa: 'sǐi', en: 'colour', em: '🎨'},
+            {th: 'ได้', ipa: 'dâi', en: 'can', em: '✅'},
+            {th: 'ลด', ipa: 'Lót', en: 'lower/reduce', em: '📉'},
+            {th: 'ลดไม่ได้', ipa: 'lót mâi dâi', en: 'Cannot lower (the price)', em: '💸🙅‍♂️'},
+            {th: 'ลดได้อีกไหม', ipa: 'lót dâi ìik mǎi', en: 'Can you lower the price more?', em: '💸'},
+            {th: 'ลด 150 ได้ไหม', ipa: 'lót 150 dâi mǎi', en: 'Can you lower by 150?', em: '🛍️💸'},
+            {th: 'อีก 3', ipa: 'ìik 3', en: '3 more', em: '➕'},
+            {th: 'ลดได้เหลือ 888 บาท', ipa: 'lót dâi lʉ̌a 888 bàat', en: 'Can lower to 888 baht (remaining).', em: '💸🛍️'},
+            {th: 'ลดเหลือ 88 บาทได้ไหม', ipa: 'lót lʉ̌a 88 bàat dâi mǎi', en: 'Can you lower to 88 baht?', em: '💸🙏'},
+            {th: 'แพง', ipa: 'pɛɛng', en: 'Expensive', em: '💸'},
+            {th: 'ถูก', ipa: 'tùuk', en: 'Cheap / Correct', em: '🛍️💸'},
+            {th: 'แดง', ipa: 'daeng', en: 'red', em: '🔴'},
+            {th: 'เหลือง', ipa: 'Lawng', en: 'yellow', em: '💛'},
+            {th: 'ดำ', ipa: 'dam', en: 'black', em: '⚫️'},
+            {th: 'ฟ้า', ipa: 'fáa', en: 'Sky blue / Sky', em: '🌌'},
+            {th: 'น้ำเงิน', ipa: 'nám ngən', en: 'Dark blue', em: '🔵'},
+            {th: 'ผ้าโพกหัว', ipa: 'pâa pôok hǔa', en: 'Turban (cloth, wrap, head)', em: '🧕'},
+            {th: 'ผ้าเช็ดตัว', ipa: 'pâa chét dtua', en: 'Towel (cloth, wipe, body)', em: '🧻🛁'},
+            {th: 'หรือ', ipa: 'rʉ̌ʉ', en: 'Or', em: '🔀'},
+            {th: 'มากกว่า', ipa: 'mâak gwàa', en: 'More (than)', em: '➕'},
+            {th: 'ผ้าปูที่นอน', ipa: 'pâa bpuu tîi nɔɔn', en: 'Bed sheets (cloth, cover, mattress)', em: '🛏️🧺'},
+            {th: 'ขาว', ipa: 'kǎao', en: 'White', em: '⚪️'},
+            {th: 'น้ำตาล', ipa: 'nám dtaan', en: 'Brown / Sugar', em: '🟤🍬'},
+            {th: 'เก้าอี้', ipa: 'gâo îi', en: 'Chairs', em: '🪑'},
+            {th: 'โต๊ะ', ipa: 'dtó', en: 'Tables', em: '🪑'},
+            {th: 'ตู้', ipa: 'dtûu', en: 'Cabinets', em: '🗄️'},
+            {th: 'ส้ม', ipa: 'sôm', en: 'Orange', em: '🍊'},
+            {th: 'ม่วง', ipa: 'mûang', en: 'Purple', em: '🟣'},
+            {th: 'เทียน', ipa: 'tian', en: 'Candles', em: '🕯️'},
+            {th: 'ที่สุด', ipa: 'tîi sùt', en: 'The most', em: '🏆🔝'},
+            {th: 'ห้องลอง', ipa: 'hɔ̂ɔng lɔɔng', en: 'fitting room', em: '🛍️👗'},
+            {th: 'เอาได้ไหม', ipa: 'ao dâi mǎi', en: 'Can you/I get it? / Can you/I take it?', em: '🛍️'},
+            {th: 'เสื้อสีดำสามตัวเท่าไหร่', ipa: 'sʉ̂a sǐi dam sǎam dtua tâo rài', en: 'How much are 3 black shirts?', em: '🛍️💰'},
+            {th: 'อยาก', ipa: 'yàak', en: 'Want (to)', em: '🙏'},
+            {th: 'ได้', ipa: 'dâai', en: 'get / receive', em: '🎁'},
+            {th: 'หลาย', ipa: 'lǎai', en: 'Many', em: '🔢'},
+            {th: 'เรา', ipa: 'rao', en: 'We', em: '👥'},
+            {th: 'ก็', ipa: 'gâw', en: 'then', em: '➡️'},
+            {th: 'ด้วย', ipa: 'dûay', en: 'also', em: '➕'},
+            {th: 'แน่นอน', ipa: 'nâe nawn', en: 'Certainly', em: '✅'},
+            {th: 'ตรงนี้', ipa: 'dtrong níi', en: 'Here', em: '📍'},
+            {th: 'ตรงนั้น', ipa: 'dtrong nán', en: 'There', em: '📍👉'},
+            {th: 'ดู', ipa: 'duu', en: 'Look / Watch', em: '👀'},
+            {th: 'อื่น', ipa: 'èun', en: 'Other', em: '🧩'},
+            {th: 'แล้ว', ipa: 'láew', en: 'already / and', em: '✅⏱️'},
+            {th: 'อยู่', ipa: 'yùu', en: 'be located', em: '📍'},
+            {th: 'หมด', ipa: 'mòt', en: 'sold out', em: '🛑'},
+            {th: 'กางเกง', ipa: 'gaang-geeng', en: 'Trousers / pants', em: '👖'},
+            {th: 'ตัว', ipa: 'dtua', en: 'classifier for clothes/animals', em: '👕🐾'},
+            {th: 'อากาศ', ipa: 'aa-gàat', en: 'Weather', em: '🌤️'},
+            {th: 'วันนี้', ipa: 'wan−nıˊi', en: 'Today', em: '📅'},
+            {th: 'ร้อน', ipa: 'raˊawn', en: 'Hot', em: '🔥'},
+            {th: 'หนาว', ipa: 'na˘ao', en: 'Cold', em: '🥶'},
+            {th: 'เย็น', ipa: 'yen', en: 'Cool / Chilly', em: '🥶'},
+            {th: 'ฝนตก', ipa: 'fǒn-dtòk', en: 'To rain (lit. "rain falls")', em: '🌧️'},
+            {th: 'แดดออก', ipa: 'dàɛt-ɔ̀ɔk', en: 'Sunny', em: '☀️'},
+            {th: 'ลมแรง', ipa: 'lomraeng', en: 'Windy', em: '💨🌬️'},
+            {th: 'อังกฤษ', ipa: 'ang grìt', en: 'England / the UK', em: '🏴'},
+            {th: 'ไม่เคย', ipa: 'mâi-kəəi', en: 'Never', em: '🚫'},
+            {th: 'กี่', ipa: 'gìi', en: 'How many?', em: '🔢'},
+            {th: 'องศา', ipa: 'ong-sǎa', en: 'Degrees', em: '🌡️'},
+            {th: 'ยัง', ipa: 'yang', en: 'not yet', em: '⏳'},
+            {th: 'ทำไม', ipa: 'tam mai', en: 'Why?', em: '❓'},
+            {th: 'เพราะ', ipa: 'prɔ́', en: 'Because', em: '❓'},
+            {th: 'เหงื่อออก', ipa: 'ngʉ̀a ɔ̀ɔk', en: 'To sweat', em: '💦'},
+            {th: 'ออกไปข้างนอกได้', ipa: 'ɔ̀ɔk bpai kâang-nɔ̂ɔk dâai', en: 'Can go outside', em: '🚶‍♂️🌳'},
+            {th: 'นอน', ipa: 'nɔɔn', en: 'Sleep', em: '😴'},
+            {th: 'เดิน', ipa: 'dəən', en: 'Walk', em: '🚶'},
+            {th: 'วิ่ง', ipa: 'wîng', en: 'Run', em: '🏃'},
+            {th: 'อยู่ข้างใน', ipa: 'yùu kâang nai', en: 'Stay inside', em: '🏠'},
+            {th: 'หนัง', ipa: 'nǎng', en: 'Movies', em: '🎬🍿'},
+            {th: 'หิมะ', ipa: 'hì má', en: 'Snow', em: '❄️'},
+            {th: 'ลบ', ipa: 'lóp', en: 'Negative / Minus', em: '➖'},
+            {th: 'เห็น', ipa: 'hěn', en: 'See', em: '👀'},
+            {th: 'ฤดู', ipa: 'rʉ́ duu', en: 'Season', em: '🌦️🍂'},
+            {th: 'ฤดูร้อน', ipa: 'rʉ́ duu rɔ́ɔn', en: 'Summer', em: '☀️🏖️'},
+            {th: 'ฤดูหนาว', ipa: 'rʉ́ duu nǎao', en: 'Winter', em: '❄️'},
+            {th: 'ฤดูฝน', ipa: 'rʉ́ duu fǒn', en: 'Rainy season', em: '🌧️'},
+            {th: 'ตลอด', ipa: 'dtà lɔ̀ɔt', en: 'Always', em: '🔚⏳'},
+            {th: 'คิดว่า', ipa: 'kít wâa', en: 'Think (that)', em: '🤔💭'},
+            {th: 'แม่', ipa: 'mɛ̂ɛ', en: 'mum', em: '👩‍👧'},
+            {th: 'บอกทาง', ipa: 'bɔ̀ɔk taang', en: 'Tell directions', em: '🧭🗺️'},
+            {th: 'ใกล้', ipa: 'glâi', en: 'Near', em: '📍'},
+            {th: 'บ้าน', ipa: 'bâan', en: 'House', em: '🏠'},
+            {th: 'ห้าง', ipa: 'hâang', en: 'Mall', em: '🛍️🏬'},
+            {th: 'จ่าย', ipa: 'jàai', en: 'to pay', em: '💸'},
+            {th: 'ทะเล', ipa: 'tá-lay', en: 'sea; ocean', em: '🌊'},
+            {th: 'สวน', ipa: 'sǔan', en: 'garden; park', em: '🌳🌿'}
+        ];
+
+        let showAllIpa = false;
+        let showAllEn = false;
+
+        // --- Core UI Component Builder ---
+        function TB(th, ipa, en, em = '✨') {
+            const id = Math.random().toString(36).substr(2, 9);
+            return `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 my-2 transition-all hover:shadow-md">
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl mt-1 shrink-0 bg-slate-50 p-2 rounded-xl">${em}</div>
+                        <div class="flex-grow">
+                            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                <span class="text-xl font-bold text-slate-800">${th}</span>
+                                <button onclick="playTTS('${th}', event)" class="p-1.5 bg-green-100 text-green-700 rounded-full hover:bg-green-200 active:scale-95 transition-all"><i data-lucide="volume-2" class="w-4 h-4"></i></button>
+                                <button onclick="toggleElement('ipa-${id}')" class="px-2 py-1 text-xs font-bold rounded-md bg-sky-100 text-sky-700 hover:bg-sky-200">IPA</button>
+                                <button onclick="toggleElement('en-${id}')" class="px-2 py-1 text-xs font-bold rounded-md bg-emerald-100 text-emerald-700 hover:bg-emerald-200">EN</button>
+                            </div>
+                            <div id="ipa-${id}" class="ipa-content ${showAllIpa ? '' : 'hidden'} text-sky-600 font-semibold tracking-wide mb-1 text-sm bg-sky-50 py-1 px-2 rounded-md inline-block w-full">${ipa}</div>
+                            <div id="en-${id}" class="en-content ${showAllEn ? '' : 'hidden'} text-emerald-600 italic text-sm bg-emerald-50 py-1 px-2 rounded-md inline-block w-full">${en}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Logic ---
+        function playTTS(text, event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleElement(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function toggleGlobal(type) {
+            if (type === 'ipa') {
+                showAllIpa = !showAllIpa;
+                document.querySelectorAll('.ipa-content').forEach(el => showAllIpa ? el.classList.remove('hidden') : el.classList.add('hidden'));
+            } else {
+                showAllEn = !showAllEn;
+                document.querySelectorAll('.en-content').forEach(el => showAllEn ? el.classList.remove('hidden') : el.classList.add('hidden'));
+            }
+        }
+
+        function getRandomVocab() {
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const v = vocabList[randomIndex];
+            const container = document.getElementById('random-vocab-container');
+            container.innerHTML = TB(v.th, v.ipa, v.en, v.em);
+            lucide.createIcons();
+        }
+
+        // --- Pages Render ---
+        function switchTab(tab) {
+            ['review', 'learn', 'tasks', 'extensions'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tab) {
+                    btn.classList.replace('bg-white', 'bg-green-600');
+                    btn.classList.replace('text-green-700', 'text-white');
+                } else {
+                    btn.classList.replace('bg-green-600', 'bg-white');
+                    btn.classList.replace('text-white', 'text-green-700');
+                }
+            });
+
+            const area = document.getElementById('content-area');
+            if (tab === 'review') area.innerHTML = getReviewHtml();
+            if (tab === 'learn') area.innerHTML = getLearnHtml();
+            if (tab === 'tasks') area.innerHTML = getTasksHtml();
+            if (tab === 'extensions') area.innerHTML = getExtensionsHtml();
+            
+            lucide.createIcons();
+            
+            // Generate first random word if on review tab
+            if (tab === 'review') getRandomVocab();
+        }
+
+        function getReviewHtml() {
+            return `
+                <div class="fade-in space-y-6">
+                    ${TB('ทบทวนคำศัพท์', 'tóp-tuan kam-sàp', 'Review Vocabulary', '🧠')}
+                    
+                    <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 text-center">
+                        ${TB('แต่งประโยค', 'dtɛ̀ng bprà-yòok', 'Make a sentence out of this word', '🧩')}
+                        
+                        <div id="random-vocab-container" class="my-6">
+                            <!-- Random word injected here -->
+                        </div>
+
+                        <button onclick="getRandomVocab()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 shadow-md transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="shuffle"></i> สุ่มคำศัพท์ (Random Word)
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getLearnHtml() {
+            return `
+                <div class="fade-in space-y-6">
+                    ${TB('คำถามนำ', 'kam-tǎam nam', 'Lead-in Questions', '🗣️')}
+                    
+                    <div class="pl-4 border-l-4 border-blue-300 space-y-2">
+                        ${TB('วันนี้คุณสบายดีไหมครับ', 'wan-níi khun sà-baai-dii mǎi khráp', 'How are you today?', '😊')}
+                        ${TB('คุณทำงานอะไรครับ', 'khun tam-ngaan à-rai khráp', 'What do you do for work?', '💼')}
+                    </div>
+
+                    <hr class="border-slate-200">
+
+                    ${TB('บทสนทนากับแฟน', 'bòt sǒn-tá-naa gàp fɛɛn', 'Dialogue with Girlfriend', '👩‍❤️‍👨')}
+                    
+                    <div class="bg-pink-50 p-4 rounded-3xl border border-pink-100 space-y-2">
+                        ${TB('เมื่อวานคุณทำงานไหมครับ', 'mûea-waan khun tam-ngaan mǎi khráp', 'Did you work yesterday?', '👨🏽')}
+                        ${TB('เมื่อวานฉันทำงานค่ะ', 'mûea-waan chǎn tam-ngaan khà', 'Yesterday I worked.', '👩🏽')}
+                        ${TB('วันนี้ทำงานไหมครับ', 'wan-níi tam-ngaan mǎi khráp', 'Do you work today?', '👨🏽')}
+                        ${TB('วันนี้ก็ทำงานค่ะ', 'wan-níi gɔ̂ tam-ngaan khà', 'Today I also work.', '👩🏽')}
+                        ${TB('พรุ่งนี้เป็นวันหยุด พรุ่งนี้ไปห้างไหมครับ', 'phrûng-níi bpen wan-yùt. phrûng-níi bpai hâang mǎi khráp', 'Tomorrow is a day off. Do you want to go to the mall tomorrow?', '👨🏽')}
+                        ${TB('ไปค่ะ พรุ่งนี้ฉันไม่ทำงาน', 'bpai khà. phrûng-níi chǎn mâi tam-ngaan', 'Yes, I will go. Tomorrow I do not work.', '👩🏽')}
+                    </div>
+
+                    <hr class="border-slate-200">
+
+                    ${TB('คำศัพท์ใหม่ 5 คำ', 'kam-sàp mài hâa kam', '5 New Vocabulary Words', '✨')}
+                    
+                    <div class="grid grid-cols-1 gap-2">
+                        ${TB('ทำงาน', 'tam-ngaan', 'To work', '💼')}
+                        ${TB('วัน', 'wan', 'Day', '📅')}
+                        ${TB('เมื่อวาน', 'mûea-waan', 'Yesterday', '⏪')}
+                        ${TB('วันนี้', 'wan-níi', 'Today', '🔽')}
+                        ${TB('พรุ่งนี้', 'phrûng-níi', 'Tomorrow', '⏩')}
+                    </div>
+
+                    <hr class="border-slate-200">
+
+                    ${TB('ทดสอบความเข้าใจ', 'tót-sɔ̀ɔp kwaam-kâo-jai', 'Comprehension Questions', '❓')}
+                    
+                    <div class="pl-4 border-l-4 border-orange-300 space-y-2">
+                        ${TB('วันนี้วันอะไรครับ', 'wan-níi wan à-rai khráp', 'What day is today?', '🗓️')}
+                        ${TB('เมื่อวานทำงานไหมครับ', 'mûea-waan tam-ngaan mǎi khráp', 'Did you work yesterday?', '🤔')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getTasksHtml() {
+            return `
+                <div class="fade-in space-y-6 pb-10">
+                    ${TB('กิจกรรมเพื่อการสื่อสาร', 'gìt-jà-gam pʉ̂ea gaan-sʉ̀ʉ-sǎan', 'Communicative Tasks', '💬')}
+                    
+                    <!-- Task 1 -->
+                    <div class="bg-blue-50 border border-blue-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('1. สัมภาษณ์', 'sǎm-pâat', 'Real-life Interview', '🎤')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Ask your partner about their work days.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('พรุ่งนี้คุณทำงานไหมครับ', 'phrûng-níi khun tam-ngaan mǎi khráp', 'Do you work tomorrow?', '💼')}
+                            ${TB('ผมไม่ทำงานครับ', 'phǒm mâi tam-ngaan khráp', 'I do not work.', '🙅‍♂️')}
+                        </div>
+                    </div>
+
+                    <!-- Task 2 -->
+                    <div class="bg-orange-50 border border-orange-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('2. บทบาทสมมติ', 'bòt-bàat sǒm-mút', 'Real-life Role-play', '🎭')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Chatting with a friend about yesterday.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('เมื่อวานคุณทำอะไรครับ', 'mûea-waan khun tam à-rai khráp', 'What did you do yesterday?', '⏪')}
+                            ${TB('เมื่อวานผมทำงานครับ แล้วก็กินผัดไทยครับ', 'mûea-waan phǒm tam-ngaan khráp. lɛ́ɛw-gɔ̂ gin pàt-tai khráp', 'Yesterday I worked. And then I ate Pad Thai.', '🍜')}
+                        </div>
+                    </div>
+
+                    <!-- Task 3 -->
+                    <div class="bg-purple-50 border border-purple-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('3. เกมทายคำ', 'geem taai kam', 'Speaking Game: Guess It!', '🎲')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Describe a day without saying its name.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('เป็นวันครับ ไม่ใช่วันนี้ ไม่ใช่พรุ่งนี้ครับ', 'bpen wan khráp. mâi-châi wan-níi. mâi-châi phrûng-níi khráp.', 'It is a day. Not today. Not tomorrow.', '🤐')}
+                            ${TB('เมื่อวานใช่ไหมครับ', 'mûea-waan châi-mǎi khráp', 'Is it yesterday?', '💡')}
+                        </div>
+                    </div>
+
+                    <!-- Task 4 -->
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('4. เล่าเรื่อง', 'lâo rʉ̂eang', 'Real-life Story-telling', '📖')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Tell a short story about your busy days.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('เมื่อวานผมทำงาน วันนี้ก็ทำงาน พรุ่งนี้ก็ทำงานครับ ผมเหนื่อยมาก!', 'mûea-waan phǒm tam-ngaan. wan-níi gɔ̂ tam-ngaan. phrûng-níi gɔ̂ tam-ngaan khráp. phǒm nʉ̀eay mâak!', 'Yesterday I worked. Today I also work. Tomorrow I also work. I am very tired!', '😫')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getExtensionsHtml() {
+            return `
+                <div class="fade-in space-y-6 pb-10">
+                    ${TB('กิจกรรมเพิ่มเติม', 'gìt-jà-gam pêem-dtəəm', 'Extension Activities', '🚀')}
+                    <p class="text-sm text-slate-600 px-2 font-medium">If you finish early, try these advanced communicative tasks!</p>
+
+                    <!-- Extension 1 -->
+                    <div class="bg-rose-50 border border-rose-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('1. โต้วาที', 'dtôo-waa-tii', 'Real-life Debate', '⚔️')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Argue: Working today vs Working tomorrow.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('ผมคิดว่าทำงานวันนี้ดีกว่าครับ', 'phǒm kít-wâa tam-ngaan wan-níi dii-gwàa khráp', 'I think working today is better.', '👍')}
+                            ${TB('ทำไมครับ พรุ่งนี้ดีกว่าครับ', 'tam-mai khráp? phrûng-níi dii-gwàa khráp', 'Why? Tomorrow is better.', '🤷‍♂️')}
+                        </div>
+                    </div>
+
+                    <!-- Extension 2 -->
+                    <div class="bg-amber-50 border border-amber-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('2. อภิปราย', 'à-pí-bpraai', 'Real-life Discussion', '💬')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Discuss: Your favorite day.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('คุณชอบวันอะไรมากที่สุดครับ', 'khun chɔ̂ɔp wan à-rai mâak tîi-sùt khráp', 'What day do you like the most?', '❤️')}
+                            ${TB('ชอบพรุ่งนี้ครับ เพราะว่าพรุ่งนี้ไม่ทำงานครับ', 'chɔ̂ɔp phrûng-níi khráp. prɔ́-wâa phrûng-níi mâi tam-ngaan khráp', 'Like tomorrow. Because tomorrow I do not work.', '🏖️')}
+                        </div>
+                    </div>
+
+                    <!-- Extension 3 -->
+                    <div class="bg-teal-50 border border-teal-100 rounded-3xl p-5 shadow-sm">
+                        ${TB('3. นำเสนอ', 'nam-sà-nə̌ə', 'Real-life Presentation', '📊')}
+                        <p class="text-sm text-slate-600 mb-3 px-2 font-medium">Present your weekly schedule.</p>
+                        <div class="bg-white/60 p-3 rounded-2xl">
+                            ${TB('สวัสดีครับ ผมชื่อจาทินเดอร์ เมื่อวานผมไปห้าง วันนี้ผมทำอาหาร พรุ่งนี้ผมทำงานครับ ขอบคุณครับ', 'sà-wàt-dii khráp. phǒm chûe Jatinder. mûea-waan phǒm bpai hâang. wan-níi phǒm tam aa-hǎan. phrûng-níi phǒm tam-ngaan khráp. kɔ̀ɔp-khun khráp', 'Hello. My name is Jatinder. Yesterday I went to the mall. Today I cook. Tomorrow I work. Thank you.', '👨‍💼')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Init
+        switchTab('review');
+    </script>
+</body>
+</html>
