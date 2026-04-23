@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In / On / At</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaf2f8; 
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #2980b9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #aed6f1;
+            border-radius: 12px;
+            background-color: #fff;
+        }
+        
+        /* Buttons */
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin: 5px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .btn:hover { background-color: #2980b9; transform: scale(1.05); }
+        .btn-correct { background-color: #2ecc71 !important; color: white !important; }
+        .btn-wrong { background-color: #e74c3c !important; color: white !important; }
+        
+        .control-btn {
+            background: #f8f9fa;
+            border: 1px solid #d5d8dc;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 3px 8px;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+            margin-left: 5px;
+            vertical-align: middle;
+            color: #2c3e50;
+        }
+        .control-btn:hover { background-color: #ebedef; }
+        .speak-btn { color: #e67e22; border-color: #e67e22; }
+        .trans-btn { color: #27ae60; border-color: #27ae60; }
+        
+        .big-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            margin-top: 15px;
+            background-color: #f1c40f;
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .big-btn:hover { background-color: #f39c12; }
+
+        /* Vocab Display */
+        #vocab-card {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #fef9e7;
+            border-radius: 10px;
+            border: 3px dashed #f1c40f;
+            min-height: 160px;
+        }
+        .vocab-text { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; color: #b9770e; }
+        .thai-text { 
+            color: #7f8c8d; 
+            font-size: 1.05rem; 
+            display: none; 
+            margin-top: 5px; 
+            font-style: italic;
+        }
+        .emoji-display { font-size: 3.5rem; margin-bottom: 15px; }
+
+        /* Story/Dialogue Box */
+        .story-box {
+            background-color: #ebf5fb;
+            padding: 20px;
+            border-left: 6px solid #2980b9;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        .highlight {
+            background-color: #d6eaf8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #154360;
+        }
+
+        /* Task Box */
+        .task-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #bdc3c7;
+            line-height: 1.6;
+        }
+
+        .hidden-answer {
+            display: none;
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: bold;
+            background: #eafaf1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px dashed #2ecc71;
+            text-align: left;
+        }
+
+        .rule-line {
+            margin: 10px 0;
+            padding: 10px;
+            border-bottom: 1px dashed #eaecee;
+            background: white;
+            border-radius: 5px;
+        }
+
+        /* Grammar Card */
+        .grammar-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .g-box {
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .ex-choices button { margin: 5px; }
+
+        @media (max-width: 768px) {
+            .grammar-card { grid-template-columns: 1fr; }
+        }
+        
+        .eng-text-block {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        In, On, At! 📍⌚
+        <button class="control-btn speak-btn" onclick="speak('In, On, At!')">🔊</button>
+        <button class="control-btn trans-btn" onclick="toggleTrans('h1-trans')">🇹🇭</button>
+        <div id="h1-trans" class="thai-text">ใน, บน, ที่! (การบอกเวลาและสถานที่)</div>
+    </h1>
+
+    <!-- SECTION 1: WARM UP -->
+    <div class="section">
+        <h2>
+            1. Vocab Roulette 🎰
+            <button class="control-btn speak-btn" onclick="speak('Vocab Roulette')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-1-trans')">🇹🇭</button>
+            <div id="h2-1-trans" class="thai-text">วงล้อคำศัพท์</div>
+        </h2>
+        <div class="eng-text-block" style="text-align:center;">
+            Spin and make a sentence! Try to use past grammar topics!
+            <button class="control-btn speak-btn" onclick="speak('Spin and make a sentence! Try to use past grammar topics!')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('inst-1-trans')">🇹🇭</button>
+            <div id="inst-1-trans" class="thai-text">หมุนและแต่งประโยค! ลองใช้ไวยากรณ์ที่เคยเรียนมานะ!</div>
+        </div>
+        
+        <div id="vocab-card">
+            <div id="v-emoji" class="emoji-display">❓</div>
+            <div id="v-text" class="vocab-text">Ready?</div>
+            <div id="v-thai" class="thai-text">...</div>
+        </div>
+
+        <div style="text-align:center; margin-top: 15px;">
+            <button class="btn" style="background-color:#3498db; color:white; font-weight:bold;" onclick="speakCurrentVocab()">🔊 Listen</button>
+            <button class="btn" style="background-color:#2ecc71;" onclick="toggleVocabThai()">🇹🇭 Translate</button>
+        </div>
+        <button class="big-btn" onclick="spinVocab()">SPIN VOCAB 🔄</button>
+    </div>
+
+    <!-- SECTION 2: HOMEWORK CHECK -->
+    <div class="section" style="background-color: #fdf2e9; border-color: #e67e22;">
+        <h2>
+            2. Homework Check 📺📝
+            <button class="control-btn speak-btn" onclick="speak('Homework Check')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-2-trans')">🇹🇭</button>
+            <div id="h2-2-trans" class="thai-text">ตรวจการบ้านวิดีโอ</div>
+        </h2>
+        
+        <div class="task-box">
+            <div class="eng-text-block" style="font-weight: bold; font-size: 1.1rem; text-align: center; color: #d35400;">
+                Did you watch the YouTube videos? Let's check! 🕵️‍♂️
+                <button class="control-btn speak-btn" onclick="speak('Did you watch the YouTube videos? Let\'s check!')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('hw-intro-trans')">🇹🇭</button>
+                <div id="hw-intro-trans" class="thai-text" style="font-weight: normal; margin-top: 5px;">คุณได้ดูวิดีโอในยูทูปมาไหม? มาเช็คกัน!</div>
+            </div>
+
+            <div class="rule-line" id="hw1">
+                <div class="eng-text-block">
+                    <b>1. Which word do we use for days of the week? (e.g. Monday) 📅</b>
+                    <button class="control-btn speak-btn" onclick="speak('Which word do we use for days of the week? For example, Monday')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('hw1-q-trans')">🇹🇭</button>
+                    <div id="hw1-q-trans" class="thai-text">คำไหนที่เราใช้กับวันในสัปดาห์? (เช่น วันจันทร์)</div>
+                </div>
+                <div class="ex-choices">
+                    <button class="btn" onclick="checkChoice(this, false, 'hw1-ans')">In</button>
+                    <button class="btn" onclick="checkChoice(this, true, 'hw1-ans')">On</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'hw1-ans')">At</button>
+                </div>
+                <div id="hw1-ans" class="hidden-answer">
+                    Correct! 🎉 We use <b>ON</b> for days. (On Monday, On Sunday)
+                    <button class="control-btn speak-btn" onclick="speak('Correct! We use ON for days.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('hw1-ans-trans')">🇹🇭</button>
+                    <div id="hw1-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ถูกต้อง! เราใช้ On สำหรับวัน</div>
+                </div>
+            </div>
+
+            <div class="rule-line" id="hw2">
+                <div class="eng-text-block">
+                    <b>2. Which word do we use for exact time? (e.g. 7:00 AM) ⏰</b>
+                    <button class="control-btn speak-btn" onclick="speak('Which word do we use for exact time? For example, 7 AM')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('hw2-q-trans')">🇹🇭</button>
+                    <div id="hw2-q-trans" class="thai-text">คำไหนที่เราใช้กับเวลาที่แน่นอน? (เช่น 7 โมงเช้า)</div>
+                </div>
+                <div class="ex-choices">
+                    <button class="btn" onclick="checkChoice(this, false, 'hw2-ans')">In</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'hw2-ans')">On</button>
+                    <button class="btn" onclick="checkChoice(this, true, 'hw2-ans')">At</button>
+                </div>
+                <div id="hw2-ans" class="hidden-answer">
+                    Correct! 🎉 We use <b>AT</b> for exact time. (At 7:00 AM, At midnight)
+                    <button class="control-btn speak-btn" onclick="speak('Correct! We use AT for exact time.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('hw2-ans-trans')">🇹🇭</button>
+                    <div id="hw2-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ถูกต้อง! เราใช้ At สำหรับเวลาที่เจาะจง</div>
+                </div>
+            </div>
+
+            <div class="rule-line" id="hw3">
+                <div class="eng-text-block">
+                    <b>3. Which word do we use for enclosed spaces or countries? (e.g. Thailand, a box) 📦🌍</b>
+                    <button class="control-btn speak-btn" onclick="speak('Which word do we use for enclosed spaces or countries? For example, Thailand, or a box')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('hw3-q-trans')">🇹🇭</button>
+                    <div id="hw3-q-trans" class="thai-text">คำไหนที่เราใช้กับพื้นที่ปิด หรือ ประเทศ? (เช่น ประเทศไทย, กล่อง)</div>
+                </div>
+                <div class="ex-choices">
+                    <button class="btn" onclick="checkChoice(this, true, 'hw3-ans')">In</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'hw3-ans')">On</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'hw3-ans')">At</button>
+                </div>
+                <div id="hw3-ans" class="hidden-answer">
+                    Correct! 🎉 We use <b>IN</b> for countries, cities, and inside things.
+                    <button class="control-btn speak-btn" onclick="speak('Correct! We use IN for countries, cities, and inside things.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('hw3-ans-trans')">🇹🇭</button>
+                    <div id="hw3-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ถูกต้อง! เราใช้ In สำหรับประเทศ เมือง หรือสิ่งที่อยู่ข้างใน</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: LEAD IN & NOTICING -->
+    <div class="section" style="background-color: #ebf5fb; border-color: #3498db;">
+        <h2>
+            3. Funny Stories: Notice In/On/At 👀
+            <button class="control-btn speak-btn" onclick="speak('Funny Stories: Notice In, On, At')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-3-trans')">🇹🇭</button>
+            <div id="h2-3-trans" class="thai-text">เรื่องตลก: สังเกตการใช้ In/On/At</div>
+        </h2>
+
+        <!-- Lead-in -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div class="eng-text-block" style="font-size: 1.2rem; font-weight: bold; color: #2980b9;">
+                Lead-in: Where are you right now? What time did you wake up? 🏠⏰
+                <button class="control-btn speak-btn" onclick="speak('Lead in: Where are you right now? What time did you wake up?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('leadin-trans')">🇹🇭</button>
+                <div id="leadin-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">นำเข้าสู่บทเรียน: ตอนนี้คุณอยู่ที่ไหน? วันนี้คุณตื่นกี่โมง?</div>
+            </div>
+        </div>
+
+        <!-- Story -->
+        <div class="story-box" style="background-color: #e8f8f5; border-color: #1abc9c;">
+            <h3>
+                👻 The Ghost on the Roof
+                <button class="control-btn speak-btn" onclick="speak('The Ghost on the Roof')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-title1')">🇹🇭</button>
+                <div id="story-title1" class="thai-text">ผีบนหลังคา</div>
+            </h3>
+            <div class="eng-text-block">
+                Yesterday, there was a ghost <span class="highlight">in</span> my bedroom! 🛏️<br>
+                He wanted to sleep <span class="highlight">on</span> the roof. 🏠<br>
+                <span class="highlight">At</span> midnight, he was very hungry. 🕛<br>
+                He didn't want to eat vegetables. He wanted to eat raw meat <span class="highlight">in</span> the fridge! 🥩<br>
+                So, he went to the kitchen <span class="highlight">on</span> Monday. Wait, ghosts don't know the days! 🤪
+            </div>
+            <div>
+                <button class="btn" style="background-color:#16a085;" onclick="speak('Yesterday, there was a ghost in my bedroom! He wanted to sleep on the roof. At midnight, he was very hungry. He didn\'t want to eat vegetables. He wanted to eat raw meat in the fridge! So, he went to the kitchen on Monday. Wait, ghosts don\'t know the days!')">🔊 Listen</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-trans1')">🇹🇭 Translate</button>
+            </div>
+            <div id="story-trans1" class="thai-text" style="margin-top: 10px;">
+                เมื่อวานนี้ มีผีอยู่ในห้องนอนของฉัน! เขาอยากไปนอนบนหลังคา ตอนเที่ยงคืน เขาหิวมาก เขาไม่อยากกินผัก เขาอยากกินเนื้อดิบในตู้เย็น! เขาเลยไปที่ห้องครัวในวันจันทร์ เดี๋ยวนะ ผีไม่รู้จักวันนี่นา!
+            </div>
+            
+            <div class="rule-line" style="background: none; border: none; padding-left:0; padding-right:0;">
+                <div class="eng-text-block">
+                    <b>Comprehension:</b> Where was the raw meat?
+                    <button class="control-btn speak-btn" onclick="speak('Comprehension: Where was the raw meat?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('comp1-trans')">🇹🇭</button>
+                    <div id="comp1-trans" class="thai-text" style="margin-top:5px; margin-bottom:10px;">คำถาม: เนื้อดิบอยู่ที่ไหน?</div>
+                </div>
+                
+                <button class="btn" style="padding: 3px 10px;" onclick="toggleAnswer('ans-comp1')">Answer</button>
+                <div id="ans-comp1" class="hidden-answer" style="background:white; color: #16a085; border-color:#16a085;">
+                    It was <b>in</b> the fridge! 🥩
+                    <button class="control-btn speak-btn" onclick="speak('It was in the fridge!')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('ans-comp1-th')">🇹🇭</button>
+                    <div id="ans-comp1-th" class="thai-text" style="font-weight:normal; margin-top:5px;">มันอยู่ในตู้เย็น!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dialogue -->
+        <div class="story-box" style="background-color: #fdf2e9; border-color: #e67e22;">
+            <h3>
+                👽 The Lost Alien
+                <button class="control-btn speak-btn" onclick="speak('The Lost Alien')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-title2')">🇹🇭</button>
+                <div id="story-title2" class="thai-text">เอเลี่ยนหลงทาง</div>
+            </h3>
+            <div class="eng-text-block">
+                <b>Mom:</b> Hello? Where are you? Are you <span class="highlight">in</span> the USA? 🇺🇸<br>
+                <b>Alien:</b> No, I am <span class="highlight">in</span> Thailand! 🇹🇭<br>
+                <b>Mom:</b> Are you sitting <span class="highlight">on</span> a chair?<br>
+                <b>Alien:</b> No, I am standing <span class="highlight">on</span> a table! 🧍‍♂️<br>
+                <b>Mom:</b> What time are you coming home?<br>
+                <b>Alien:</b> I want to come home <span class="highlight">in</span> December, <span class="highlight">at</span> 6 PM! 🕕
+            </div>
+            <div>
+                <button class="btn" style="background-color:#d35400;" onclick="speak('Mom: Hello? Where are you? Are you in the USA? Alien: No, I am in Thailand! Mom: Are you sitting on a chair? Alien: No, I am standing on a table! Mom: What time are you coming home? Alien: I want to come home in December, at 6 PM!')">🔊 Listen</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-trans2')">🇹🇭 Translate</button>
+            </div>
+            <div id="story-trans2" class="thai-text" style="margin-top: 10px;">
+                แม่: ฮัลโหล? ลูกอยู่ที่ไหน? ลูกอยู่ในอเมริกาใช่ไหม?<br>เอเลี่ยน: ไม่ ผมอยู่ในประเทศไทย!<br>แม่: ลูกนั่งอยู่บนเก้าอี้หรือเปล่า?<br>เอเลี่ยน: ไม่ ผมยืนอยู่บนโต๊ะ!<br>แม่: ลูกจะกลับบ้านกี่โมง?<br>เอเลี่ยน: ผมอยากกลับบ้านในเดือนธันวาคม ตอน 6 โมงเย็น!
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: GRAMMAR RULES RECAP -->
+    <div class="section">
+        <h2>
+            4. Grammar Rules Recap 📏
+            <button class="control-btn speak-btn" onclick="speak('Grammar Rules Recap')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-4-trans')">🇹🇭</button>
+            <div id="h2-4-trans" class="thai-text">สรุปกฎไวยากรณ์ (In/On/At)</div>
+        </h2>
+        
+        <div class="grammar-card">
+            <!-- IN -->
+            <div class="g-box" style="background-color: #f5eef8; border-color: #9b59b6;">
+                <h3 style="color:#8e44ad;">
+                    📦 IN (ใน)
+                    <button class="control-btn speak-btn" onclick="speak('In')">🔊</button>
+                </h3>
+                <div class="eng-text-block" style="color: #555; font-size:0.9rem;">Biggest / Most General <br>(ใหญ่สุด / กว้างๆ)</div>
+                <hr style="border: 0.5px dashed #ccc;">
+                <p><b>⏰ Time (เวลา):</b><br>Months (เดือน), Years (ปี)<br><i>in May, in 2026</i></p>
+                <p><b>📍 Place (สถานที่):</b><br>Countries, Cities, Inside things<br><i>in Thailand, in London, in a box, in the room</i></p>
+            </div>
+
+            <!-- ON -->
+            <div class="g-box" style="background-color: #eafaf1; border-color: #2ecc71;">
+                <h3 style="color:#27ae60;">
+                    🛹 ON (บน)
+                    <button class="control-btn speak-btn" onclick="speak('On')">🔊</button>
+                </h3>
+                <div class="eng-text-block" style="color: #555; font-size:0.9rem;">Medium / More Specific <br>(ปานกลาง / เฉพาะเจาะจงขึ้นมา)</div>
+                <hr style="border: 0.5px dashed #ccc;">
+                <p><b>⏰ Time (เวลา):</b><br>Days (วัน), Dates (วันที่)<br><i>on Monday, on Sunday, on May 5th</i></p>
+                <p><b>📍 Place (สถานที่):</b><br>Surfaces (พื้นผิว), Streets<br><i>on the table, on the wall, on the roof</i></p>
+            </div>
+
+            <!-- AT -->
+            <div class="g-box" style="background-color: #fdedec; border-color: #e74c3c;">
+                <h3 style="color:#c0392b;">
+                    🎯 AT (ที่)
+                    <button class="control-btn speak-btn" onclick="speak('At')">🔊</button>
+                </h3>
+                <div class="eng-text-block" style="color: #555; font-size:0.9rem;">Smallest / Very Specific <br>(เล็กสุด / เจาะจงจุดนั้นเลย)</div>
+                <hr style="border: 0.5px dashed #ccc;">
+                <p><b>⏰ Time (เวลา):</b><br>Exact times (เวลาเป๊ะๆ)<br><i>at 7:00 AM, at 9 PM, at midnight</i></p>
+                <p><b>📍 Place (สถานที่):</b><br>Specific locations/points<br><i>at school, at home, at the cinema, at the door</i></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 5: INTERACTIVE EXERCISES -->
+    <div class="section" style="background-color: #fdfefe; border-color: #1abc9c;">
+        <h2>
+            5. Exercise Time! 📝
+            <button class="control-btn speak-btn" onclick="speak('Exercise Time!')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-5-trans')">🇹🇭</button>
+            <div id="h2-5-trans" class="thai-text">เวลาทำแบบฝึกหัด!</div>
+        </h2>
+        
+        <!-- Multiple Choice -->
+        <div class="task-box">
+            <h4 style="margin-top:0; color:#16a085;">
+                A. Multiple Choice
+                <button class="control-btn speak-btn" onclick="speak('A. Multiple Choice')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('ex-a-trans')">🇹🇭</button>
+                <span id="ex-a-trans" class="thai-text" style="font-weight:normal;">เลือกคำตอบที่ถูกต้อง</span>
+            </h4>
+            
+            <div class="rule-line" id="mcq1">
+                <div class="eng-text-block">
+                    1. Yesterday, I wanted to buy apples ________ Monday. 🍎
+                    <button class="control-btn speak-btn" onclick="speak('1. Yesterday, I wanted to buy apples blank Monday.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('mcq1-trans')">🇹🇭</button>
+                    <div id="mcq1-trans" class="thai-text">เมื่อวาน ฉันอยากซื้อแอปเปิ้ล ...วันจันทร์</div>
+                </div>
+                <div class="ex-choices">
+                    <button class="btn" onclick="checkChoice(this, false, 'mcq1-ans')">in</button>
+                    <button class="btn" onclick="checkChoice(this, true, 'mcq1-ans')">on</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'mcq1-ans')">at</button>
+                </div>
+                <div id="mcq1-ans" class="hidden-answer">
+                    Correct! "Monday" is a day -> use <b>ON</b>.
+                    <button class="control-btn speak-btn" onclick="speak('Correct! Monday is a day, so use ON.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('mcq1-ans-trans')">🇹🇭</button>
+                    <div id="mcq1-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ถูกต้อง! วันจันทร์คือวัน ต้องใช้ ON</div>
+                </div>
+            </div>
+
+            <div class="rule-line" id="mcq2">
+                <div class="eng-text-block">
+                    2. Do you want to meet me ________ 9:00 AM? ⏰
+                    <button class="control-btn speak-btn" onclick="speak('2. Do you want to meet me blank 9:00 AM?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('mcq2-trans')">🇹🇭</button>
+                    <div id="mcq2-trans" class="thai-text">คุณอยากเจอฉัน ...เก้าโมงเช้าไหม?</div>
+                </div>
+                <div class="ex-choices">
+                    <button class="btn" onclick="checkChoice(this, false, 'mcq2-ans')">in</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'mcq2-ans')">on</button>
+                    <button class="btn" onclick="checkChoice(this, true, 'mcq2-ans')">at</button>
+                </div>
+                <div id="mcq2-ans" class="hidden-answer">
+                    Correct! "9:00 AM" is an exact time -> use <b>AT</b>.
+                    <button class="control-btn speak-btn" onclick="speak('Correct! 9 AM is an exact time, so use AT.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('mcq2-ans-trans')">🇹🇭</button>
+                    <div id="mcq2-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ถูกต้อง! 9 โมงคือเวลาที่เจาะจง ต้องใช้ AT</div>
+                </div>
+            </div>
+
+            <div class="rule-line" id="mcq3">
+                <div class="eng-text-block">
+                    3. She likes sleeping ________ the United States. 🇺🇸
+                    <button class="control-btn speak-btn" onclick="speak('3. She likes sleeping blank the United States.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('mcq3-trans')">🇹🇭</button>
+                    <div id="mcq3-trans" class="thai-text">เธอชอบนอน ...ประเทศอเมริกา</div>
+                </div>
+                <div class="ex-choices">
+                    <button class="btn" onclick="checkChoice(this, true, 'mcq3-ans')">in</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'mcq3-ans')">on</button>
+                    <button class="btn" onclick="checkChoice(this, false, 'mcq3-ans')">at</button>
+                </div>
+                <div id="mcq3-ans" class="hidden-answer">
+                    Correct! "United States" is a country -> use <b>IN</b>.
+                    <button class="control-btn speak-btn" onclick="speak('Correct! United States is a country, so use IN.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('mcq3-ans-trans')">🇹🇭</button>
+                    <div id="mcq3-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ถูกต้อง! อเมริกาคือประเทศ ต้องใช้ IN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Correction -->
+        <div class="task-box" style="background-color: #fff9c4; border-color: #f1c40f;">
+            <h4 style="margin-top:0; color:#d35400;">
+                B. Error Correction 🔧
+                <button class="control-btn speak-btn" onclick="speak('B. Error Correction')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('ex-b-trans')">🇹🇭</button>
+                <span id="ex-b-trans" class="thai-text" style="font-weight:normal;">แก้ไขจุดที่ผิด</span>
+            </h4>
+            
+            <div class="rule-line">
+                <div class="eng-text-block">
+                    ❌ 1. My mom doesn't want to put the juice <u>at</u> the fridge.
+                    <button class="control-btn speak-btn" onclick="speak('My mom doesn\'t want to put the juice at the fridge.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('err1-trans')">🇹🇭</button>
+                    <div id="err1-trans" class="thai-text">แม่ไม่ต้องการเอาน้ำผลไม้ใส่(ใน)ตู้เย็น</div>
+                </div>
+                <button class="btn" style="background:#f39c12;" onclick="toggleAnswer('err1')">Show Fix 👀</button>
+                <div id="err1" class="hidden-answer" style="border-color:#f39c12; color:#d35400;">
+                    ✅ My mom doesn't want to put the juice <b>in</b> the fridge. <br>(Inside a box/fridge = in)
+                    <button class="control-btn speak-btn" onclick="speak('My mom doesn\'t want to put the juice in the fridge.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('err1-ans-trans')">🇹🇭</button>
+                    <div id="err1-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ข้างในตู้เย็นต้องใช้ in</div>
+                </div>
+            </div>
+
+            <div class="rule-line">
+                <div class="eng-text-block">
+                    ❌ 2. The singer likes sleeping <u>in</u> the floor!
+                    <button class="control-btn speak-btn" onclick="speak('The singer likes sleeping in the floor!')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('err2-trans')">🇹🇭</button>
+                    <div id="err2-trans" class="thai-text">นักร้องชอบนอน(บน)พื้น!</div>
+                </div>
+                <button class="btn" style="background:#f39c12;" onclick="toggleAnswer('err2')">Show Fix 👀</button>
+                <div id="err2" class="hidden-answer" style="border-color:#f39c12; color:#d35400;">
+                    ✅ The singer likes sleeping <b>on</b> the floor! <br> (Surface = on)
+                    <button class="control-btn speak-btn" onclick="speak('The singer likes sleeping on the floor!')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('err2-ans-trans')">🇹🇭</button>
+                    <div id="err2-ans-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">พื้นผิวต้องใช้ on</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jumbled Sentences -->
+        <div class="task-box" style="background-color: #e8daef; border-color: #8e44ad;">
+            <h4 style="margin-top:0; color:#8e44ad;">
+                C. Jumbled Sentences 🧩
+                <button class="control-btn speak-btn" onclick="speak('C. Jumbled Sentences')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('ex-c-trans')">🇹🇭</button>
+                <span id="ex-c-trans" class="thai-text" style="font-weight:normal;">เรียงประโยค</span>
+            </h4>
+
+            <div class="rule-line">
+                <div class="eng-text-block">
+                    <b>[ meet / want / I / you / to / 9am / at / . ]</b>
+                    <button class="control-btn speak-btn" onclick="speak('meet, want, I, you, to, 9am, at')">🔊</button>
+                </div>
+                <button class="btn" style="background:#9b59b6;" onclick="toggleAnswer('jum1')">Show Answer 👀</button>
+                <div id="jum1" class="hidden-answer" style="border-color:#9b59b6; color:#8e44ad;">
+                    ✅ I want to meet you at 9am. 🕘
+                    <button class="control-btn speak-btn" onclick="speak('I want to meet you at 9am.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('jum1-trans')">🇹🇭</button>
+                    <div id="jum1-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ฉันอยากเจอคุณตอน 9 โมงเช้า</div>
+                </div>
+            </div>
+
+            <div class="rule-line">
+                <div class="eng-text-block">
+                    <b>[ cinema / The / is / ghost / the / in / . ]</b>
+                    <button class="control-btn speak-btn" onclick="speak('cinema, The, is, ghost, the, in')">🔊</button>
+                </div>
+                <button class="btn" style="background:#9b59b6;" onclick="toggleAnswer('jum2')">Show Answer 👀</button>
+                <div id="jum2" class="hidden-answer" style="border-color:#9b59b6; color:#8e44ad;">
+                    ✅ The ghost is in the cinema. 👻🍿
+                    <button class="control-btn speak-btn" onclick="speak('The ghost is in the cinema.')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('jum2-trans')">🇹🇭</button>
+                    <div id="jum2-trans" class="thai-text" style="font-weight:normal; margin-top:5px;">ผีอยู่ในโรงหนัง</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: SPEAKING PRACTICE -->
+    <div class="section" style="border-color: #e74c3c;">
+        <h2>
+            6. Funny Speaking Practice 🗣️🎙️
+            <button class="control-btn speak-btn" onclick="speak('Funny Speaking Practice')">🔊</button>
+            <button class="control-btn trans-btn" onclick="toggleTrans('h2-6-trans')">🇹🇭</button>
+            <div id="h2-6-trans" class="thai-text">ฝึกพูดแบบตลกๆ</div>
+        </h2>
+
+        <!-- Role Play -->
+        <div class="task-box">
+            <h3>
+                A. Role Play: Crazy Food Delivery 🛵🍕
+                <button class="control-btn speak-btn" onclick="speak('Role Play: Crazy Food Delivery')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-a-title')">🇹🇭</button>
+                <div id="rp-a-title" class="thai-text" style="font-weight:normal;">บทบาทสมมติ: ส่งอาหารสุดป่วน</div>
+            </h3>
+            <div class="eng-text-block" style="margin-bottom: 15px;">
+                <i>Combine: Food ordering, want, in/on/at</i>
+                <button class="control-btn speak-btn" onclick="speak('Combine: Food ordering, want, in, on, at')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-a-inst')">🇹🇭</button>
+                <div id="rp-a-inst" class="thai-text">นำมาผสมกัน: สั่งอาหาร, want, in/on/at</div>
+            </div>
+            
+            <div class="eng-text-block">
+                <b>Delivery:</b> Hello! Do you want me to put the pizza <b>in</b> the house? 🏠
+                <button class="control-btn speak-btn" onclick="speak('Hello! Do you want me to put the pizza in the house?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-d1')">🇹🇭</button>
+                <div id="rp-d1" class="thai-text" style="margin-top:5px;">ฮัลโหล! คุณอยากให้ฉันวางพิซซ่าไว้ในบ้านไหม?</div>
+            </div>
+            <div class="eng-text-block">
+                <b>You:</b> No! I want you to put it <b>on</b> the... <i>(Say a crazy place: e.g., on the roof / on the dog!)</i> 🐕
+                <button class="control-btn speak-btn" onclick="speak('No! I want you to put it on the...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-y1')">🇹🇭</button>
+                <div id="rp-y1" class="thai-text" style="margin-top:5px;">ไม่! ฉันอยากให้คุณวางมันไว้บน... (พูดสถานที่แปลกๆ เช่น บนหลังคา / บนตัวหมา!)</div>
+            </div>
+            <div class="eng-text-block">
+                <b>Delivery:</b> Are you sure? What time do you want to eat?
+                <button class="control-btn speak-btn" onclick="speak('Are you sure? What time do you want to eat?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-d2')">🇹🇭</button>
+                <div id="rp-d2" class="thai-text" style="margin-top:5px;">แน่ใจเหรอ? คุณอยากกินตอนกี่โมง?</div>
+            </div>
+            <div class="eng-text-block">
+                <b>You:</b> I want to eat <b>at</b>... <i>(Say a crazy time: e.g., at 3 AM!)</i> 🕒
+                <button class="control-btn speak-btn" onclick="speak('I want to eat at...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('rp-y2')">🇹🇭</button>
+                <div id="rp-y2" class="thai-text" style="margin-top:5px;">ฉันอยากกินตอน... (พูดเวลาแปลกๆ เช่น ตี 3!)</div>
+            </div>
+        </div>
+
+        <!-- Interview -->
+        <div class="task-box">
+            <h3>
+                B. Funny Interview: Routines 📅
+                <button class="control-btn speak-btn" onclick="speak('Funny Interview: Routines')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('int-title')">🇹🇭</button>
+                <div id="int-title" class="thai-text" style="font-weight:normal;">สัมภาษณ์ตลกๆ: กิจวัตรประจำวัน</div>
+            </h3>
+            <div class="eng-text-block" style="margin-bottom: 15px;">
+                <i>Combine: Adverbs of frequency, In/On/At</i>
+                <button class="control-btn speak-btn" onclick="speak('Combine: Adverbs of frequency, In On At')">🔊</button>
+            </div>
+            
+            <ul style="padding-left: 20px;">
+                <li class="rule-line eng-text-block">
+                    What do you usually do <b>on</b> Sundays? ☀️
+                    <button class="control-btn speak-btn" onclick="speak('What do you usually do on Sundays?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('int-q1')">🇹🇭</button>
+                    <div id="int-q1" class="thai-text" style="margin-top:5px;">ปกติคุณทำอะไรในวันอาทิตย์?</div>
+                </li>
+                <li class="rule-line eng-text-block">
+                    Do you like sleeping <b>in</b> the closet? 🚪👗
+                    <button class="control-btn speak-btn" onclick="speak('Do you like sleeping in the closet?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('int-q2')">🇹🇭</button>
+                    <div id="int-q2" class="thai-text" style="margin-top:5px;">คุณชอบนอนในตู้เสื้อผ้าไหม?</div>
+                </li>
+                <li class="rule-line eng-text-block">
+                    What do you do <b>at</b> 11 PM? Are you an owl? 🦉
+                    <button class="control-btn speak-btn" onclick="speak('What do you do at 11 PM? Are you an owl?')">🔊</button>
+                    <button class="control-btn trans-btn" onclick="toggleTrans('int-q3')">🇹🇭</button>
+                    <div id="int-q3" class="thai-text" style="margin-top:5px;">คุณทำอะไรตอน 5 ทุ่ม? คุณเป็นนกฮูกหรือเปล่า?</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Debate -->
+        <div class="task-box">
+            <h3>
+                C. Debate: Where to live? 🌍🏡
+                <button class="control-btn speak-btn" onclick="speak('Debate: Where to live?')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('deb-title')">🇹🇭</button>
+                <div id="deb-title" class="thai-text" style="font-weight:normal;">โต้วาที: จะอยู่ที่ไหนดี?</div>
+            </h3>
+            <div class="eng-text-block">
+                <b>Team A:</b> I want to live <b>in</b> a mall! Because... 🏬<br>
+                <button class="control-btn speak-btn" onclick="speak('Team A: I want to live in a mall! Because...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('deb-a')">🇹🇭</button>
+                <div id="deb-a" class="thai-text" style="margin-top:5px;">ทีม A: ฉันอยากอยู่ในห้าง! เพราะว่า...</div>
+            </div>
+            <div class="eng-text-block">
+                <b>Team B:</b> I want to live <b>on</b> a mountain! Because... ⛰️
+                <button class="control-btn speak-btn" onclick="speak('Team B: I want to live on a mountain! Because...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('deb-b')">🇹🇭</button>
+                <div id="deb-b" class="thai-text" style="margin-top:5px;">ทีม B: ฉันอยากอยู่บนภูเขา! เพราะว่า...</div>
+            </div>
+        </div>
+
+        <!-- Storytelling -->
+        <div class="task-box">
+            <h3>
+                D. Storytelling: The Crazy Monkey 🐒🍌
+                <button class="control-btn speak-btn" onclick="speak('Storytelling: The Crazy Monkey')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-title2')">🇹🇭</button>
+                <div id="story-title2" class="thai-text" style="font-weight:normal;">เล่าเรื่อง: ลิงจอมป่วน</div>
+            </h3>
+            <div class="eng-text-block" style="margin-bottom: 15px;">
+                <i>Tell a story using: In, On, At, Past Simple</i>
+                <button class="control-btn speak-btn" onclick="speak('Tell a story using: In, On, At, Past Simple')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-inst2')">🇹🇭</button>
+                <div id="story-inst2" class="thai-text">เล่าเรื่องโดยใช้คำว่า: In, On, At และอดีตกาล</div>
+            </div>
+            <div class="eng-text-block">
+                "Yesterday, there was a monkey <b>in</b> my bedroom. 🛏️<br>
+                He jumped <b>on</b> the bed <b>at</b> 6 AM! 🕕<br>
+                He wanted my bananas!..."
+                <button class="control-btn speak-btn" onclick="speak('Yesterday, there was a monkey in my bedroom. He jumped on the bed at 6 AM! He wanted my bananas!...')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('story-text2')">🇹🇭</button>
+                <div id="story-text2" class="thai-text" style="margin-top:5px;">เมื่อวาน มีลิงอยู่ในห้องนอนฉัน เขากระโดดบนเตียงตอน 6 โมงเช้า! เขาต้องการกล้วยของฉัน!...</div>
+            </div>
+        </div>
+
+        <!-- Presentation -->
+        <div class="task-box" style="background-color: #fdf2e9; border-color: #e67e22;">
+            <h3>
+                E. Presentation: My Dream House 🏰✨
+                <button class="control-btn speak-btn" onclick="speak('Presentation: My Dream House')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('pres-title')">🇹🇭</button>
+                <div id="pres-title" class="thai-text" style="font-weight:normal;">การนำเสนอ: บ้านในฝันของฉัน</div>
+            </h3>
+            <div class="eng-text-block" style="margin-bottom: 15px;">
+                Describe your dream house and what you do IN, ON, AT it.
+                <button class="control-btn speak-btn" onclick="speak('Describe your dream house and what you do IN, ON, AT it.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('pres-inst')">🇹🇭</button>
+                <div id="pres-inst" class="thai-text">อธิบายบ้านในฝันของคุณ และสิ่งที่คุณทำใน/บน/ที่ บ้านนั้น</div>
+            </div>
+            
+            <div class="eng-text-block">
+                "Hello! I want to live <b>in</b> a big castle. 🏰<br>
+                <button class="control-btn speak-btn" onclick="speak('Hello! I want to live in a big castle.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('p1')">🇹🇭</button>
+                <div id="p1" class="thai-text" style="margin-top:5px;">สวัสดี! ฉันอยากอยู่ในปราสาทหลังใหญ่</div>
+            </div>
+            <div class="eng-text-block">
+                <b>On</b> Sundays, I will sleep all day. ☀️<br>
+                <button class="control-btn speak-btn" onclick="speak('On Sundays, I will sleep all day.')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('p2')">🇹🇭</button>
+                <div id="p2" class="thai-text" style="margin-top:5px;">ในวันอาทิตย์ ฉันจะนอนทั้งวัน</div>
+            </div>
+            <div class="eng-text-block">
+                <b>At</b> midnight, I will eat a tray of pizza! 🍕<br>
+                <button class="control-btn speak-btn" onclick="speak('At midnight, I will eat a tray of pizza!')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('p3')">🇹🇭</button>
+                <div id="p3" class="thai-text" style="margin-top:5px;">ตอนเที่ยงคืน ฉันจะกินพิซซ่าทั้งถาด!</div>
+            </div>
+            <div class="eng-text-block">
+                And I will put a swimming pool <b>in</b> my bedroom! 🏊‍♂️"
+                <button class="control-btn speak-btn" onclick="speak('And I will put a swimming pool in my bedroom!')">🔊</button>
+                <button class="control-btn trans-btn" onclick="toggleTrans('p4')">🇹🇭</button>
+                <div id="p4" class="thai-text" style="margin-top:5px;">และฉันจะเอาสระว่ายน้ำไว้ในห้องนอน!</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- MASSIVE VOCAB DATA FOR ROULETTE ---
+    const vocabList = [
+        {en: "I'm a student.", th: "เป็นนักเรียน", em: "🎓🎒📝"},
+        {en: "What's your favorite movie?", th: "หนังโปรดชื่ออะไร", em: "🎬💖❓"},
+        {en: "stir-fried basil", th: "ผัดกะเพรา", em: "🌿🍳🍚"},
+        {en: "Juice", th: "น้ำผลไม้", em: "🧃🍹🍊"},
+        {en: "Malls", th: "ห้าง", em: "🛍️🏢🏬"},
+        {en: "In class/school", th: "ในห้องเรียน/โรงเรียน", em: "🏫📖✍️"},
+        {en: "Apps", th: "แอพพลิเคชั่น", em: "📱📲🌐"},
+        {en: "Movies", th: "หนัง", em: "🎞️🍿📽️"},
+        {en: "songs", th: "เพลง", em: "🎵🎧🎶"},
+        {en: "I want to speak with American people.", th: "อยากพูดกับคนอเมริกัน", em: "🗣️🇺🇸💬"},
+        {en: "Vegetarian", th: "มังสวิรัติ", em: "🥦🥗🥕"},
+        {en: "I don't like both. / I like neither of them.", th: "ไม่ชอบทั้งคู่", em: "🚫👥❌"},
+        {en: "make your bed", th: "เก็บที่นอน", em: "🛌✨🧺"},
+        {en: "bookmark", th: "ที่คั่นหนังสือ", em: "🔖📖📍"},
+        {en: "at the cinema", th: "ที่โรงหนัง", em: "🏟️🍿🎞️"},
+        {en: "What was the last movie you watched at the cinema?", th: "ล่าสุดดูหนังอะไรที่โรงหนัง", em: "📽️❓🎞️"},
+        {en: "leave the crust", th: "ทิ้งขอบไว้", em: "🍞🚫🥪"},
+        {en: "skinny jeans", th: "ยีนส์ขาเดฟ", em: "👖🧘‍♂️✨"},
+        {en: "straight jeans", th: "ยีนส์ขากระบอก", em: "👖📏✨"},
+        {en: "go to bed late", th: "นอนดึก", em: "🌙😴🌃"},
+        {en: "get up early", th: "ตื่นเช้า", em: "🌅🏃‍♂️☀️"},
+        {en: "owl", th: "นกฮูก", em: "🦉🌙👀"},
+        {en: "What time do you go to bed?", th: "นอนกี่โมง", em: "🕙❓🛌"},
+        {en: "11pm", th: "5 ทุ่ม", em: "🕚😴💤"},
+        {en: "What time do you get up?", th: "ตื่นกี่โมง", em: "🕗❓🌅"},
+        {en: "7am", th: "7 โมงเช้า", em: "🕖☀️🍳"},
+        {en: "Have you ever wrapped gifts?", th: "เคยห่อของขวัญไหม", em: "🎁🎀❓"},
+        {en: "need", th: "ต้องการ / จำเป็นต้อง", em: "🎯🆘✨"},
+        {en: "want", th: "อยาก", em: "💎✨💖"},
+        {en: "hundred", th: "ร้อย", em: "1️⃣0️⃣0️⃣"},
+        {en: "thousand", th: "พัน", em: "1️⃣0️⃣0️⃣0️⃣"},
+        {en: "ten thousand", th: "หมื่น", em: "1️⃣0️⃣0️⃣0️⃣0️⃣"},
+        {en: "hundred thousand", th: "แสน", em: "1️⃣0️⃣0️⃣0️⃣0️⃣0️⃣"},
+        {en: "million", th: "ล้าน", em: "1️⃣0️⃣0️⃣0️⃣0️⃣0️⃣0️⃣"},
+        {en: "4.53pm", th: "4 โมง 53", em: "🕓🕔🕒"},
+        {en: "What time do you go to school?", th: "ไปโรงเรียนกี่โมง", em: "🏫❓🕙"},
+        {en: "What time do you have breakfast?", th: "กินข้าวเช้ากี่โมง", em: "🍳❓🌅"},
+        {en: "What time do you have lunch?", th: "กินข้าวเที่ยงกี่โมง", em: "🍱❓🕛"},
+        {en: "2pm", th: "บ่าย 2", em: "🕑🍽️✨"},
+        {en: "What time do you have dinner?", th: "กินข้าวเย็นกี่โมง", em: "🥗❓🌆"},
+        {en: "What did you eat?", th: "กินอะไรมา", em: "🍲❓😋"},
+        {en: "Have you watched this video?", th: "ดูวิดีโอนี้ยัง", em: "📹❓👀"},
+        {en: "Watch and tell me what you hear.", th: "ดูแล้วบอกว่า ได้ยินอะไร", em: "👂📽️🗣️"},
+        {en: "What did you hear?", th: "ได้ยินอะไร", em: "👂❓💬"},
+        {en: "Which room has a toaster and a fridge?", th: "ห้องอะไรมีเครื่องปิ้งขนมปังกับตู้เย็น", em: "🍞🚿❓"},
+        {en: "wardrobe", th: "ตู้เสื้อผ้า", em: "👗👔🚪"},
+        {en: "To bake", th: "ทำขนม / อบ", em: "🥖🔥🍪"},
+        {en: "Have you ever used it?", th: "เคยใช้ไหม", em: "🛠️❓✨"},
+        {en: "What do you use it for?", th: "ใช้ทำอะไร", em: "🛠️❓🎯"},
+        {en: "To make the bread", th: "ทำขนมปัง", em: "🍞🍞✨"},
+        {en: "I put milk in the fridge.", th: "ใส่นมในตู้เย็น", em: "🥛❄️🚪"},
+        {en: "What's in your fridge?", th: "อะไรอยู่ในตู้เย็นคุณบ้าง", em: "❄️❓🍲"},
+        {en: "Toasts", th: "ขนมปังปิ้ง", em: "🍞🔥✨"},
+        {en: "I use it to make toasts.", th: "ใช้ทำขนมปังปิ้ง", em: "🍞😋🍴"},
+        {en: "I use it to wash cups and plates.", th: "ใช้ล้างแก้วกับจาน", em: "🧼🧴🍽️"},
+        {en: "Forks", th: "ส้อม", em: "🍴🍴🍴"},
+        {en: "Knives", th: "มีด", em: "🔪🔪🔪"},
+        {en: "What do you like to watch?", th: "ชอบดูอะไร", em: "🎬❓👀"},
+        {en: "What's your favorite?", th: "ชอบอะไรที่สุด", em: "💖❓✨"},
+        {en: "Turn on the light", th: "เปิดไฟ", em: "💡🔛✨"},
+        {en: "How many?", th: "กี่อัน", em: "🔢❓✨"},
+        {en: "closet", th: "ตู้เสื้อผ้า", em: "🚪👕👗"},
+        {en: "pants", th: "กางเกง", em: "👖👖👖"},
+        {en: "What's in your closet?", th: "อะไรอยู่ในตู้เสื้อผ้าคุณบ้าง", em: "👕❓🚪"},
+        {en: "hangers", th: "ไม้แขวนเสื้อ", em: "🧥👗🔗"},
+        {en: "I use it to put the cup on.", th: "ใช้วางแก้ว (บน)", em: "☕📍✨"},
+        {en: "liquid soap", th: "สบู่น้ำ", em: "🧴🧼🚿"},
+        {en: "bar soap", th: "สบู่ก้อน", em: "🧼🧼🧼"},
+        {en: "shower head", th: "ฝักบัว", em: "🚿🚿✨"},
+        {en: "many", th: "หลาย", em: "📈📈📈"},
+        {en: "vegetables", th: "ผัก", em: "🥦🥕🌽"},
+        {en: "What kind?", th: "แบบไหน", em: "🥗❓🥬"},
+        {en: "Every kind of salad", th: "สลัดทุกแบบ", em: "🥗🥗🥗"},
+        {en: "with", th: "กับ", em: "🤝➕🔗"},
+        {en: "What do you like to have fries with?", th: "ชอบกินเฟรนฟรายกับอะไร", em: "🍟❓🍟"},
+        {en: "Anything else?", th: "เอาอะไรอีกไหม", em: "➕❓✨"},
+        {en: "How would you like to pay?", th: "จ่ายยังไง", em: "💸❓💳"},
+        {en: "Cash", th: "เงินสด", em: "💵💵💵"},
+        {en: "Card", th: "บัตร", em: "💳💳💳"},
+        {en: "For here or to go?", th: "กินนี่ หรือกลับบ้าน", em: "🍽️🏠🥡"},
+        {en: "Would you like a bag?", th: "ถุงไหม", em: "🛍️❓🛍️"},
+        {en: "say this line", th: "พูดบรรทัดนี้", em: "🗣️📜✨"},
+        {en: "garlic", th: "กระเทียม", em: "🧄🧂🍳"},
+        {en: "wonton soup", th: "เกี๊ยวน้ำ", em: "🍲🥣🥟"},
+        {en: "fortune cookies", th: "คุกกี้เสี่ยงทาย", em: "🥠🔮✨"},
+        {en: "quick", th: "เร็ว", em: "🏃‍♂️💨⚡"},
+        {en: "That'll do it.", th: "แค่นี้น่าจะพอแล้วล่ะ", em: "✅🏁✨"},
+        {en: "a full slab of baby backs", th: "ซี่โครง", em: "🍖🍖🔥"},
+        {en: "mashed potatoes", th: "มันฝรั่งบด", em: "🥔🥣✨"},
+        {en: "glorious", th: "ทรงเกียรติ", em: "🌟✨🤩"},
+        {en: "Straight up", th: "ไม่ผสม (เหล้า)", em: "🥃🥃✨"},
+        {en: "Did you order food?", th: "สั่งอาหารมาไหม", em: "🍱❓🚚"},
+        {en: "What did you order?", th: "สั่งอะไร", em: "🍱❓🍔"},
+        {en: "pretend", th: "แกล้งเป็น / ทำเป็น", em: "🎭🤥✨"},
+        {en: "soccer player", th: "นักบอล", em: "⚽🏃‍♂️💨"},
+        {en: "singer", th: "นักร้อง", em: "🎤🎶🌟"},
+        {en: "age", th: "อายุ", em: "🎂🔢📅"},
+        {en: "grey", th: "สีเทา", em: "👵🦳🩶"},
+        {en: "bottle", th: "ขวด", em: "🍼🥛🍶"},
+        {en: "spoon", th: "ช้อน", em: "🥄🥄🥄"},
+        {en: "silver", th: "สีเงิน", em: "🥈✨🍴"},
+        {en: "cuddly", th: "ขี้อ้อน", em: "🧸💖🐶"},
+        {en: "loyal", th: "ซื่อสัตย์ / จงรักภักดี", em: "🐕🤝💖"},
+        {en: "parents", th: "พ่อแม่", em: "👨‍👩‍👧‍👦🏠"},
+        {en: "angry", th: "โกรธ", em: "😡💢🔥"},
+        {en: "scared", th: "กลัว", em: "😨😱👻"},
+        {en: "Many minions are together.", th: "มินเนี่ยนหลายตัวอยู่ด้วยกัน", em: "🟡👥👥"},
+        {en: "I'm listening to the teacher.", th: "ฟังครูอยู่", em: "👂👨‍🏫📝"},
+        {en: "My mom is playing with her phone.", th: "แม่เล่นมือถืออยู่", em: "👩‍📱✨"},
+        {en: "Charlie is writing on the wall.", th: "ชาลีกำลังเขียนผนัง", em: "✍️🧱🎨"},
+        {en: "bother", th: "รบกวน", em: "😫💢🚫"},
+        {en: "I'm having breakfast.", th: "กินอาหารเช้าอยู่", em: "🍳🌅🥢"},
+        {en: "He's looking for a book.", th: "เขากำลังหาหนังสือ", em: "📖🔍📚"},
+        {en: "Someone online is gossiping about me.", th: "ใครบางคนออนไลน์กำลังนินทาฉันอยู่", em: "💻🗣️🤫"},
+        {en: "What are you thinking?", th: "คิดอะไรอยู่", em: "💭🧠❓"},
+        {en: "I'm thinking that it's cold here.", th: "กำลังคิดว่าที่นี่หนาว", em: "💭❄️🥶"},
+        {en: "Is it raining?", th: "ฝนตกอยู่ไหม", em: "🌧️❓☔"},
+        {en: "I'm texting.", th: "ส่งข้อความอยู่", em: "📱💬✍️"},
+        {en: "I'm making an omelette.", th: "ทำออมเล็ตอยู่", em: "🍳🍳✨"},
+        {en: "Are you laughing?", th: "หัวเราะอยู่ไหม", em: "😂❓✨"},
+        {en: "Which (soccer) team are you supporting?", th: "เชียร์ทีมบอลอะไร", em: "⚽❓🚩"},
+        {en: "How many hours did you sleep last night?", th: "เมื่อคืนนอนกี่ชั่วโมง", em: "😴🔢🕒"},
+        {en: "They are hugging.", th: "เขากอดกันอยู่", em: "🫂💖✨"},
+        {en: "He's riding a motorcycle.", th: "เขาขี่มอเตอร์ไซค์", em: "🏍️💨🏃‍♂️"},
+        {en: "They're choosing clothes.", th: "เขากำลังเลือกเสื้อผ้า", em: "👗❓🏢"},
+        {en: "It can be both.", th: "ได้ทั้งคู่", em: "🎨👕👖"},
+        {en: "She is going to my uncle's house.", th: "แม่กำลังไปบ้านลุง", em: "👩‍💼🏠🏠"},
+        {en: "He's riding a bicycle.", th: "เขาขี่จักรยานอยู่", em: "🚲💨🏃‍♂️"},
+        {en: "He is singing.", th: "เขาร้องเพลงอยู่", em: "🎤🎶✨"},
+        {en: "He is carrying a basket.", th: "เขาถือตะกร้าอยู่", em: "🧺🧺✨"},
+        {en: "Market", th: "ตลาด", em: "🏪🛒🛍️"},
+        {en: "How much is it?", th: "เท่าไหร่", em: "💰❓🏷️"},
+        {en: "What are you going to have for dinner?", th: "จะกินอะไรเป็นอาหารเย็น", em: "🌆❓🍲"},
+        {en: "When are you going to fly to Thailand?", th: "จะบินไปไทยเมื่อไร", em: "✈️🇹🇭❓"},
+        {en: "What are you going to do tomorrow?", th: "จะทำอะไรพรุ่งนี้", em: "🌅❓🗓️"},
+        {en: "I'm going to the gym this Saturday.", th: "ฉันจะไปฟิตเนสวันเสาร์นี้", em: "🏋️‍♂️🗓️✨"},
+        {en: "I'm going to the dentist's on Sunday.", th: "ฉันจะไปหาหมอฟันวันอาทิตย์", em: "🦷🗓️✨"},
+        {en: "She's going to order food.", th: "เธอจะไปสั่งอาหาร", em: "🍱🚚✨"},
+        {en: "Is it going to be your first day of school?", th: "จะเป็นการเรียนวันแรกไหม", em: "🏫❓🌅"},
+        {en: "When are you gonna have dinner?", th: "จะกินข้าวเย็นเมื่อไหร่", em: "🌆❓🕙"},
+        {en: "plates / dishes", th: "จาน", em: "🍽️🍽️🍽️"},
+        {en: "pairs", th: "คู่", em: "👥👥👥"},
+        {en: "clothes", th: "เสื้อผ้า", em: "👕👗👔"},
+        {en: "pillows", th: "หมอน", em: "🛌☁️✨"},
+        {en: "A/C", th: "แอร์", em: "❄️💨🌬️"},
+        {en: "toothbrushes", th: "แปรงสีฟัน", em: "🪥🦷✨"},
+        {en: "We are walking in pairs to go to the park.", th: "พวกเราเดินเป็นคู่ไปสวน", em: "🚶‍♂️🚶‍♀️🌳"},
+        {en: "I am washing clothes.", th: "ฉันซักผ้าอยู่", em: "🧺🧼👕"},
+        {en: "I am sleeping on a pillow in the bedroom.", th: "ฉันนอนบนหมอนในห้องนอน", em: "🛌😴☁️"},
+        {en: "I'm opening a closet.", th: "ฉันกำลังเปิดตู้เสื้อผ้า", em: "🚪👕👗"},
+        {en: "I turn on an A/C because it's hot.", th: "ฉันเปิดแอร์เพราะมันร้อน", em: "❄️🔛🔥"},
+        {en: "I'm brushing my teeth in the bathroom.", th: "ฉันกำลังแปรงฟันอยู่ในห้องน้ำ", em: "🪥🦷🚿"},
+        {en: "I'm using a toothbrush in the bathroom.", th: "ฉันกำลังใช้แปรงสีฟันอยู่ในห้องน้ำ", em: "🪥🧼🚿"},
+        {en: "My mother puts snacks on a plate.", th: "แม่เอาขนมใส่จาน", em: "👩‍🍳🍪🍽️"},
+        {en: "There is a cabinet.", th: "มีตู้", em: "🗄️📦✨"},
+        {en: "door", th: "ประตู", em: "🚪🚪🚪"},
+        {en: "stairs", th: "บันได", em: "🏠📶⬆️"},
+        {en: "ghosts", th: "ผี", em: "👻😱👻"},
+        {en: "They take us to the park.", th: "พวกเขาพาพวกเราไปสวน", em: "🚌🌳👥"},
+        {en: "We take them to the park.", th: "พวกเราพาพวกเขาไปสวน", em: "👥🚌🌳"},
+        {en: "usually", th: "มักจะ", em: "🔄🗓️✨"},
+        {en: "How often...?", th: "บ่อยแค่ไหน", em: "🕒❓🔄"},
+        {en: "To text", th: "ส่งข้อความ", em: "📱💬✍️"},
+        {en: "I eat 3 times a day.", th: "ฉันกินวันละ 3 ครั้ง", em: "🍽️3️⃣📅"},
+        {en: "sometimes", th: "บางครั้ง", em: "🕒🌓🕒"},
+        {en: "noisy", th: "เสียงดัง", em: "🔊📢💢"},
+        {en: "Have you ever given gifts to your mom?", th: "เคยให้ของขวัญแม่ไหม", em: "🎁👩❓"},
+        {en: "bones", th: "กระดูก", em: "🦴🦴🦴"},
+        {en: "bracelets", th: "กำไล", em: "📿✨💎"},
+        {en: "lawn mower", th: "เครื่องตัดหญ้า", em: "🚜🌱✂️"},
+        {en: "wear", th: "ใส่ (เสื้อผ้า เครื่องประดับ)", em: "👕⌚👞"},
+        {en: "use", th: "ใช้", em: "🛠️📱⚙️"},
+        {en: "I don't like both colors.", th: "ไม่ชอบทั้งสองสี", em: "🎨🚫❌"},
+        {en: "magnificent", th: "อลังการ", em: "🤩🏛️✨"},
+        {en: "comfortable", th: "สบาย", em: "🛋️😌✨"},
+        {en: "I wear a t-shirt every day.", th: "ใส่เสื้อยืดทุกวัน", em: "👕🗓️🔄"},
+        {en: "I used to ride a bicycle.", th: "เคยขี่จักรยาน", em: "🚲⏳⏪"},
+        {en: "How many times a day?", th: "กี่ครั้งต่อวัน", em: "🔢❓📅"},
+        {en: "9pm", th: "สามทุ่ม", em: "🕘🌙💤"},
+        {en: "I'm sometimes angry.", th: "โกรธบางครั้ง", em: "😡❓🔥"},
+        {en: "What makes you angry?", th: "อะไรทำให้โกรธ", em: "😡❓🤔"},
+        {en: "I never work.", th: "ไม่เคยทำงาน", em: "🚫💼🏢"},
+        {en: "I'm an early bird.", th: "ฉันเป็นคนชอบตื่นเช้า", em: "🌅🐦☀️"},
+        {en: "10pm", th: "สี่ทุ่ม", em: "🕙🌙💤"},
+        {en: "lettuce", th: "ผักกาด", em: "🥬🥗🥗"},
+        {en: "discipline", th: "วินัย", em: "📏🧘‍♂️✨"},
+        {en: "I sleep comfortably.", th: "นอน(อย่าง)สบาย", em: "🛌😌💤"},
+        {en: "I watch TV at 9pm.", th: "ฉันดูทีวีตอนสามทุ่ม", em: "📺🕘🌙"},
+        {en: "I play with my phone at 10pm.", th: "ฉันเล่นมือถือตอนสี่ทุ่ม", em: "📱🕙🌙"},
+        {en: "My salad has lettuce.", th: "สลัดของฉันมีผักกาด", em: "🥗🥗🥬"},
+        {en: "I have discipline.", th: "ฉันมีวินัย", em: "🧘‍♂️✨💪"},
+        {en: "I always make my bed.", th: "เก็บที่นอนเสมอ", em: "🛌✨🧺"},
+        {en: "I am an owl every day.", th: "ผมเป็นนกฮูกทุกวัน", em: "🦉🗓️🔄"},
+        {en: "12pm", th: "เที่ยง", em: "🕛🕛🕛"},
+        {en: "many things", th: "หลายอย่าง", em: "📦📦📦"},
+        {en: "How often does Tom play tennis?", th: "ทอมเล่นเทนนิสบ่อยแค่ไหน", em: "🎾❓🎾"},
+        {en: "on Sundays", th: "ทุกวันอาทิตย์", em: "📅☀️⛪"},
+        {en: "Who's your favorite soccer player?", th: "ใครคือนักบอลคนโปรดของคุณ", em: "⚽❓🌟"},
+        {en: "My mom cooks stir-fried basil.", th: "แม่ทำผัดกะเพรา", em: "🌿🍳👩"},
+        {en: "I get up at 10.", th: "ตื่น 10 โมง", em: "🕙🌅✨"},
+        {en: "I don't like both dishes.", th: "ไม่ชอบทั้งสองเมนู", em: "🍲🚫❌"},
+        {en: "I don't like horrors.", th: "ไม่ชอบหนังผี", em: "😱🚫❌"},
+        {en: "It has many cars.", th: "มีรถหลายคัน", em: "🚗🚗🚗"},
+        {en: "It has rivers.", th: "มีแม่น้ำ", em: "🌊🚣‍♂️🏞️"},
+        {en: "I go to school by van.", th: "นั่งรถตู้ไปโรงเรียน", em: "🚐🏫🛣️"},
+        {en: "Dad watches TV at 10.", th: "พ่อดูทีวีตอน 10 โมง", em: "📺🕙🌌"},
+        {en: "I have breakfast at 10:30.", th: "กินข้าวเช้าตอน 10 โมงครึ่ง", em: "🍳🕙🌅"},
+        {en: "She has breakfast at 7am.", th: "เธอกินข้าวเช้าตอน 7 โมง", em: "🍳🕖🌅"},
+        {en: "She goes to work at 8am.", th: "เธอไปทำงาน 8 โมง", em: "💼🕗🌅"},
+        {en: "The cat gets up at 10.", th: "แมวตื่น 10 โมง", em: "🐱🕙🌅"},
+        {en: "An early bird sees the Sun at 6AM.", th: "คนชอบตื่นเช้าเห็นพระอาทิตย์ตอน 6 โมงเช้า", em: "🌅☀️🕕"},
+        {en: "An early bird has breakfast at 7AM.", th: "คนชอบตื่นเช้ากินข้าวเช้า 7 โมงเช้า", em: "🍳☀️🕖"},
+        {en: "A night owl plays games at 11pm.", th: "คนชอบนอนดึกเล่นเกม 5 ทุ่ม", em: "🎮🕚🌙"},
+        {en: "She sees the Sun at 7am.", th: "เธอเห็นพระอาทิตย์ตอน 7 โมงเช้า", em: "☀️🕖🌅"},
+        {en: "She plays games at 10am.", th: "เธอเล่นเกมตอน 10 โมง", em: "🎮🕙🌅"},
+        {en: "colorful t-shirts", th: "เสื้อยืดที่มีสีสันสดใส", em: "👕🎨✨"},
+        {en: "The lawn mower is loud.", th: "เครื่องตัดหญ้าเสียงดัง", em: "🚜🔊💥"},
+        {en: "last Saturday", th: "วันเสาร์ที่แล้ว", em: "🗓️⏪✨"},
+        {en: "next to", th: "ข้าง / ติดกับ", em: "📍🏠📍"},
+        {en: "Do you dance in front of your mom?", th: "เต้นต่อหน้าแม่ไหม", em: "💃👩❓"},
+        {en: "Do you fly to school?", th: "บินไปโรงเรียนไหม", em: "✈️🏫❓"},
+        {en: "I bought a motorbike for 2 million.", th: "ซื้อมอไซค์ 2 ล้าน", em: "🏍️2️⃣💰"},
+        {en: "I'm going to use a shower head to shower.", th: "จะใช้ฝักบัวอาบน้ำ", em: "🚿🚿✨"},
+        {en: "She's going to the mall.", th: "เธอกำลังไปห้าง", em: "🏬🏬🏬"},
+        {en: "He's using a lawn mower.", th: "เขากำลังใช้เครื่องตัดหญ้า", em: "🚜🌿✨"},
+        {en: "I wrapped gifts for my friends.", th: "ห่อของขวัญให้เพื่อนๆ (อดีต)", em: "🎁🎁🤝"},
+        {en: "I ate it all.", th: "กินหมดเลย (อดีต)", em: "😋🍽️✅"},
+        {en: "Routine", th: "กิจวัตร", em: "📅🔄✨"},
+        {en: "Habits", th: "นิสัย (ทำเป็นนิสัย)", em: "🔄🧠✨"},
+        {en: "Fact", th: "ข้อเท็จจริง", em: "📋📍✨"},
+        {en: "at the moment", th: "ณ ขณะนี้", em: "⏰📍✨"},
+        {en: "I'm, at the moment, watching a movie.", th: "ณ ขณะนี้ ฉันกำลังดูหนังอยู่", em: "📽️🕙✨"},
+        {en: "What is it about?", th: "มันเกี่ยวกับอะไร", em: "🎞️❓✨"},
+        {en: "How was it?", th: "มันเป็นยังไง", em: "🎞️❓🤩"},
+        {en: "Scary", th: "น่ากลัว", em: "😨👻👹"},
+        {en: "It took place on earth.", th: "มันเกิดขึ้นบนโลก", em: "🌍📍✨"},
+        {en: "It took place in space, out of earth.", th: "มันเกิดขึ้นบนอวกาศ นอกโลก", em: "🚀🌌🪐"},
+        {en: "It's catchy.", th: "มันติดหู", em: "🎧🎵✨"},
+        {en: "I wrote English vocabulary.", th: "เขียนคำศัพท์ภาษาอังกฤษ (อดีต)", em: "✍️📖✨"},
+        {en: "Weekend", th: "เสาร์อาทิตย์ / สุดสัปดาห์", em: "📅🗓️✨"},
+        {en: "I'm going to turn on the A/C.", th: "กำลังจะเปิดแอร์", em: "❄️💨🔛"},
+        {en: "She can't find the keys.", th: "เธอหากุญแจไม่เจอ", em: "🔑🚫🔍"},
+        {en: "We were playing soccer last Saturday.", th: "พวกเราเล่นฟุตบอลเสาร์ที่แล้ว", em: "⚽🗓️⏪"},
+        {en: "You go to bed late.", th: "คุณนอนดึก", em: "🌙🛌💤"},
+        {en: "cinema", th: "โรงหนัง", em: "🎞️🍿🎬"},
+        {en: "I'm not calling anyone.", th: "ไม่ได้กำลังโทรหาใคร", em: "📞🚫👤"},
+        {en: "travel", th: "เที่ยว / เดินทาง", em: "✈️🌎🗺️"},
+        {en: "all the time", th: "ตลอดเวลา", em: "🕒🔄🔄"},
+        {en: "Do you walk when working?", th: "คุณเดินตอนทำงานหรือเปล่า", em: "🚶‍♂️💼❓"},
+        {en: "Are you standing up on a table?", th: "คุณกำลังยืนบนโต๊ะหรือเปล่า", em: "🧍‍♂️🪑❓"},
+        {en: "Am I old enough to be at a bar?", th: "โตพอที่จะอยู่บาร์ได้ไหม", em: "🍻❓🔞"},
+        {en: "same as usual", th: "เหมือนเดิม", em: "🔄🆗🏠"},
+        {en: "I usually listen to music.", th: "มักจะฟังเพลง", em: "🎧🎶🔄"},
+        {en: "Keep it up!", th: "สู้ๆ", em: "💪✨🏁"},
+        {en: "My friend wrote something and put it in a fortune cookie for me.", th: "เพื่อนเขียนอะไรบางอย่างแล้วก็ใส่ในคุกกี้เสี่ยงทาย", em: "🥠✍️🤝"},
+        {en: "brotherhood", th: "ความเป็นพี่ชายน้องชาย", em: "🤝✨💪"},
+        {en: "I wear clothes all the time.", th: "ฉันใส่เสื้อผ้าตลอด", em: "👕🕰️🔄"},
+        {en: "hairband", th: "ที่คาดผม", em: "🎀💇‍♀️✨"},
+        {en: "hair tie", th: "ยางรัดผม", em: "💇‍♀️✨➰"},
+        {en: "painkiller", th: "ยาแก้ปวด", em: "💊🩹🤕"},
+        {en: "actor", th: "นักแสดง", em: "🎭🎬🌟"},
+        {en: "He is sleeping late like an owl.", th: "เขากำลังนอนดึกเหมือนนกฮูก", em: "🦉🌙😴"},
+        {en: "movie theatre", th: "โรงหนัง", em: "🎥"},
+        {en: "princess", th: "เจ้าหญิง", em: "👸"},
+        {en: "He lives in an igloo.", th: "เขาอยู่ในบ้านหิมะ/บ้านน้ำแข็ง", em: "❄️"},
+        {en: "An elephant lives in Africa.", th: "ช้างอยู่ที่แอฟริกา", em: "🐘"},
+        {en: "They grow an apple tree.", th: "พวกเขาปลูกต้นแอปเปิ้ล", em: "🍎"},
+        {en: "She is eating an ice-cream.", th: "เธอกำลังกินไอติม", em: "🍦"},
+        {en: "If you have an umbrella, you will not get wet.", th: "ถ้ามีร่ม จะไม่เปียก", em: "☔️"},
+        {en: "I'm scared of a mouse.", th: "กลัวหนู", em: "😱🐭"},
+        {en: "Everyone is sitting on a chair.", th: "ทุกคนนั่งอยู่บนเก้าอี้", em: "🪑"},
+        {en: "She buys an egg from a grocery store.", th: "เธอซื้อไข่จากร้านขายของชำ (เป็นปกติ)", em: "🥚"},
+        {en: "She is buying an egg from a grocery store.", th: "เธอกำลังซื้อไข่จากร้านขายของชำ", em: "🥚"},
+        {en: "I'm watching an ant walk.", th: "ฉันกำลังดูมดเดิน", em: "👀🐜"},
+        {en: "He takes a door.", th: "เขาเอาประตูไป", em: "🚪"},
+        {en: "He is using a door.", th: "เขากำลังใช้ประตู", em: "🚪"},
+        {en: "hurt", th: "เจ็บ", em: "🤕"},
+        {en: "I hurt an ear.", th: "ฉันทำให้หูข้างนึงเจ็บ", em: "🤕"},
+        {en: "An ear hurts.", th: "หูข้างนึงเจ็บ", em: "👂🩼"},
+        {en: "A rhino lives in a zoo.", th: "แรดอยู่ในสวนสัตว์", em: "🦏"},
+        {en: "I'm playing games on a computer.", th: "ฉันเล่นเกมอยู่ในคอม", em: "🎮"},
+        {en: "A monkey likes bananas.", th: "ลิงชอบกล้วย", em: "🐒🍌"},
+        {en: "roasted chicken", th: "ไก่อบ", em: "🍗"},
+        {en: "When was the last time you had a cold?", th: "เป็นหวัดครั้งที่แล้วเมื่อไร", em: "⏮️🤧"},
+        {en: "To have a cold", th: "เป็นหวัด", em: "🤧"},
+        {en: "I took medicine.", th: "กินยา (อดีต)", em: "💊"},
+        {en: "waterpark", th: "สวนน้ำ", em: "💦🎢"},
+        {en: "roast", th: "อบ (อาหาร)", em: "🍠"},
+        {en: "bake", th: "อบ (ขนม)", em: "🧁"},
+        {en: "hobbies", th: "งานอดิเรก", em: "🥅"},
+        {en: "Horror", th: "หนังผี / ซีรีส์ผี", em: "👻"},
+        {en: "Last night, I slept late.", th: "เมื่อวานนอนดึก", em: "⏮️😴🫩"},
+        {en: "tidy", th: "เรียบร้อย", em: "🧹"},
+        {en: "How often", th: "บ่อยแค่ไหน", em: "✅❌✅❓"},
+        {en: "Hurry", th: "รีบ", em: "🌀"},
+        {en: "I'm going to travel to Las Vegas.", th: "จะไปเที่ยวลาส เวกัส", em: "🚗🎰"},
+        {en: "I travelled to Las Vegas.", th: "ไปเที่ยวลาส เวกัส (มาแล้ว - อดีต)", em: "⏮️🚗🎰"},
+        {en: "gamble", th: "พนัน", em: "🎰"},
+        {en: "She's using a spoon.", th: "เธอกำลังใช้ช้อน", em: "🥄"},
+        {en: "He goes to the bedroom to turn on the light.", th: "เขาไปห้องนอนเพื่อเปิดไฟ", em: "🛏️💡"},
+        {en: "How was your day today?", th: "วันนี้เป็นยังไงบ้าง", em: "🌤️❓🗣️"},
+        {en: "I was walking in the park.", th: "เดินในสวนมา", em: "🚶🌳🍃"},
+        {en: "both", th: "ทั้งคู่", em: "✌️👯‍♂️"},
+        {en: "entertainment", th: "ความบันเทิง", em: "🎬🍿🎭"},
+        {en: "politics", th: "การเมือง", em: "🏛️🗳️📢"},
+        {en: "I bought a sandwich for lunch.", th: "ซื้อแซนวิชเป็นข้าวเที่ยง (อดีต)", em: "🥪💸🕛"},
+        {en: "I ate roasted chicken yesterday.", th: "กินไก่อบมาเมื่อวาน", em: "🍗😋📅"},
+        {en: "Toaster", th: "เครื่องปิ้งขนมปัง", em: "🍞🔥🔌"},
+        {en: "He bought a pair of skinny jeans.", th: "เขาซื้อกางเกงยีนส์มาตัวหนึ่ง (อดีต)", em: "👖🛒🕺"},
+        {en: "neither of them", th: "ไม่ทั้งคู่", em: "🙅‍♂️🚫2️⃣"},
+        {en: "wash dishes", th: "ล้างจาน", em: "🍽️🧼🧽"},
+        {en: "Sometimes, I walk with my family in the morning.", th: "บางครั้งผมเดินกับครอบครัวตอนเช้า", em: "👨‍👩‍👧‍👦🚶🌅"},
+        {en: "I play with my phone.", th: "เล่นมือถือ", em: "📱🎮👀"},
+        {en: "textbooks", th: "หนังสือเรียน", em: "📚📑✍️"},
+        {en: "vocab(ulary)", th: "คำศัพท์", em: "📖🔤📝"},
+        {en: "topic", th: "หัวข้อ", em: "📌📋💡"},
+        {en: "What happened?", th: "เกิดอะไรขึ้น", em: "❓🧐💥"},
+        {en: "What's your favorite animal?", th: "ชอบสัตว์อะไรที่สุด", em: "🐾❤️❓"},
+        {en: "I've never seen it before.", th: "ไม่เคยเห็นมาก่อน", em: "🚫👀🆕"},
+        {en: "agree", th: "เห็นด้วย", em: "🤝✅🆗"},
+        {en: "I'm used to playing soccer.", th: "ฉันชินกับการเล่นฟุตบอล", em: "⚽🏃‍♂️🔄"},
+        {en: "I used to play soccer.", th: "ฉันเคยเล่นฟุตบอล", em: "⚽🏃‍♂️🕰️"},
+        {en: "Do you have a swimming pool?", th: "มีสระว่ายน้ำไหม", em: "🏡🏊‍♂️❓"},
+        {en: "Do you swim?", th: "ว่ายน้ำไหม", em: "🏊‍♂️🌊❓"},
+        {en: "Curry", th: "แกง", em: "🍛🌶️🍲"},
+        {en: "Sour", th: "เปรี้ยว", em: "🍋😖👅"},
+        {en: "normally", th: "ปกติ", em: "🔄🗓️🕒"},
+        {en: "It's different every day.", th: "ทุกวันต่างกัน", em: "🗓️🔄🌈"},
+        {en: "stir-fried instant noodles", th: "ผัดมาม่า / ผัดบะหมี่กึ่ง", em: "🍳🍜🔥"},
+        {en: "rocks", th: "ก้อนหิน", em: "🪨⛰️🧱"},
+        {en: "The zebra is making a funny face.", th: "ม้าลายทำหน้าตลก", em: "🦓🤪📸"},
+        {en: "arrest", th: "จับกุม", em: "🚔⛓️👮‍♂️"},
+        {en: "illegal", th: "ผิดกฎหมาย", em: "🚫⚖️❌"},
+        {en: "Trump arrested Asians who live in the US illegally.", th: "ทรัมป์จับกุมคนเอเชียที่อยู่อเมริกาแบบผิดกฎหมาย", em: "🚫🛂🚔"},
+        {en: "fear", th: "ความกลัว", em: "😨😰😱"},
+        {en: "lately", th: "ช่วงนี้", em: "⏰"},
+        {en: "memorize", th: "ท่องจำ", em: "🧠📖🔒"},
+        {en: "ox", th: "วัวตัวเมีย (เอกพจน์)", em: "🐂🚜🌾"},
+        {en: "oxen", th: "วัวตัวผู้ (พหูพจน์)", em: "🐂🐂🚜"},
+        {en: "thief", th: "โจร", em: "🥷💰🔦"},
+        {en: "I have boxes in front of the house.", th: "ฉันมีกล่องอยู่หน้าบ้าน", em: "📦🏠🛣️"},
+        {en: "customer", th: "ลูกค้า", em: "👤🛍️💳"},
+        {en: "boat", th: "เรือ", em: "⛵🛶🚤"},
+        {en: "North pole", th: "ขั้วโลกเหนือ", em: "🧊❄️🐻‍❄️"},
+        {en: "I went to watch a movie at a movie theatre.", th: "ฉันไปดูหนังที่โรงหนังมา", em: "🍿🎬🎞️"},
+        {en: "thrilling", th: "ระทึก", em: "😱🎢⚡"},
+        {en: "examples", th: "ตัวอย่าง", em: "📝💡📑"},
+        {en: "She gets on many buses today.", th: "เธอขึ้นรถเมล์หลายคันวันนี้", em: "👩‍💼🚌🚍"},
+        {en: "I use glasses to drink water.", th: "ใช้แก้ว(เพื่อ)กินน้ำ", em: "🥛🧊🚰"},
+        {en: "I want to buy dishes at the market.", th: "อยากซื้อจานที่ตลาด", em: "🍽️🛍️🛒"},
+        {en: "We use brushes to brush our teeth.", th: "เราใช้แปรงแปรงฟัน", em: "🪥🦷✨"},
+        {en: "People use watches when running.", th: "ผู้คนใช้นาฬิกาข้อมือตอนวิ่ง", em: "🏃‍♂️⌚⚡"},
+        {en: "She is ordering sandwiches at the restaurant.", th: "เธอกำลังสั่งแซนวิชที่ร้านอาหาร", em: "🥪👩‍🍳🍽️"},
+        {en: "I put boxes in a trash can.", th: "ใส่กล่องในถังขยะ", em: "📦🗑️❌"},
+        {en: "I saw foxes in the zoo.", th: "เห็นหมาจิ้งจอกในสวนสัตว์ (อดีต)", em: "🦊🦒🦓"},
+        {en: "Last week I bought many tomatoes from a grocery store.", th: "อาทิตย์ที่แล้วฉันซื้อมะเขือเทศหลายลูกจากร้านขายของชำ", em: "🛒🍅📅"},
+        {en: "mice", th: "หนู (พหูพจน์)", em: "🐭🐭🧀"},
+        {en: "singing contest", th: "แข่งร้องเพลง", em: "🎤🏆🎶"},
+        {en: "How was your day?", th: "วันนี้เป็นยังไงบ้าง", em: "📅❓😊"},
+        {en: "sponge", th: "ฟองน้ำ", em: "🧽🧼✨"},
+        {en: "dish soap", th: "น้ำยาล้างจาน", em: "🧴🍽️🧼"},
+        {en: "He hurted his elbow because he fell.", th: "เขาเจ็บศอกเพราะล้ม (อดีต)", em: "🤕💪💥"},
+        {en: "leaves", th: "ใบไม้ (มากกว่า 1)", em: "🍃🍂🍁"},
+        {en: "loaves of bread", th: "ขนมปังแถว (มากกว่า 1)", em: "🍞🥖🍞"},
+        {en: "wives", th: "ภรรยา (มากกว่า 1)", em: "👩‍👩‍👧‍"},
+        {en: "wife", th: "ภรรยา (หนึ่งคน)", em: "👰💍✨"},
+        {en: "Geese", th: "ห่าน (มากกว่า 1)", em: "🦢🦢🦢"},
+        {en: "Geese are running after me.", th: "ห่านวิ่งตามฉัน", em: "🏃‍♂️🦢💨"},
+        {en: "Ox", th: "วัวตัวผู้ (1 ตัว)", em: "🐂🚜🌾"},
+        {en: "The gym has fish.", th: "ฟิตเนสมีปลา", em: "🏋️‍♂️🐟🏢"},
+        {en: "exercise", th: "ออกกำลังกาย", em: "🏃‍♂️🏋️‍♀️💪"},
+        {en: "deer", th: "กวาง", em: "🦌🌲🦌"},
+        {en: "Wolves are out in the dark.", th: "หมาป่าออกมาในที่มืด", em: "🐺🌑🌲"},
+        {en: "nutty", th: "มัน (รสชาติ)", em: "🥜🤪✨"},
+        {en: "this week", th: "อาทิตย์นี้", em: "📅✨🕒"},
+        {en: "shorts", th: "ขาสั้น", em: "🩳☀️🏖️"},
+        {en: "I text my friends every day.", th: "ส่งข้อความหาเพื่อนทุกวัน", em: "📱🤝🗓️"},
+        {en: "Their eyes are sparkly.", th: "ตาเป็นประกาย", em: "👁️✨💎"},
+        {en: "We are going to see dresses at the store.", th: "เราจะไปดูชุดกระโปรงที่ร้าน", em: "👗🏢🛒"},
+        {en: "I brush my teeth.", th: "ฉันแปรงฟัน", em: "🪥🦷✨"},
+        {en: "He picks up the leaves on the street.", th: "เขาเก็บใบไม้จากถนน", em: "🍂🧹🛣️"},
+        {en: "life", th: "ชีวิต", em: "🌱⏳✨"},
+        {en: "We are living our lives.", th: "พวกเรากำลังใช้ชีวิตของเราเอง", em: "👫🌏✨"},
+        {en: "Thieves are in the building.", th: "โจรอยู่ในตึก", em: "🥷🏢🚨"},
+        {en: "fishy", th: "คาว", em: "🐟🤨❓"},
+        {en: "He's looking at a spider. He's scared.", th: "เขากำลังมองแมงมุม เขากลัว", em: "🕵️‍♂️🕷️😨"},
+        {en: "He's looking for a spider.", th: "เขากำลังมองหาแมงมุม", em: "🔍🕵️‍♂️🕷️"},
+        {en: "He wants to meet an actor.", th: "เขาอยากเจอนักแสดง", em: "🙋‍♂️✨🎭"},
+        {en: "Teachers are teaching students how to use laptops.", th: "ครูกำลังสอนนักเรียนใช้โน๊ตบุ๊ค", em: "👨‍🏫💻🎓"},
+        {en: "We are meeting foxes in the forest.", th: "เรากำลังเจอสุนัขจิ้งจอกในป่า", em: "🌲🦊🤝"},
+        {en: "Leaves are falling from the trees.", th: "ใบไม้กำลังหล่นจากต้น", em: "🍃🍂🌳"},
+        {en: "Babies in the house are crying.", th: "เด็กทารกในบ้านกำลังร้อง", em: "🏠👶😭"},
+        {en: "grass", th: "หญ้า", em: "🌱🌿🌾"},
+        {en: "They have black teeth.", th: "เขามีฟันสีดำ", em: "🦷⬛🦷"},
+        {en: "Their teeth are black.", th: "ฟันของเขาสีดำ", em: "🦷⬛🦷"},
+        {en: "Chickens wake up early every day.", th: "ไก่ตื่นเช้าทุกวัน", em: "🐔🌅☀️"},
+        {en: "Roofs are leaking.", th: "หลังคารั่ว", em: "🏠💧🏚️"},
+        {en: "With 10 feet, I can run fast.", th: "ด้วย 10 เท้า ฉันวิ่งเร็วได้", em: "🏃‍♂️💨👣"},
+        {en: "noisy", th: "เสียงดัง", em: "🔊📢💢"},
+        {en: "The women are good at cooking.", th: "ผู้หญิงทำอาหารเก่ง", em: "👩‍🍳🥘✨"},
+        {en: "I'm good at playing badminton.", th: "เล่นแบตเก่ง", em: "🏸🏆💪"},
+        {en: "apart from", th: "นอกจาก", em: "➕🤔✨"},
+        {en: "celebrate", th: "ฉลอง", em: "🎉🥳🎊"},
+        {en: "He doesn't like the blue-colored shirt and the brown shirt either.", th: "เขาไม่ชอบเสื้อสีน้ำเงินและสีน้ำตาลด้วย", em: "👕🚫👕"},
+        {en: "He doesn't like either of them.", th: "เขาไม่ชอบทั้งคู่เลย", em: "🚫1️⃣2️⃣"},
+        {en: "He likes neither of them.", th: "เขาไม่ชอบทั้งคู่เลย", em: "🚫🙅‍♂️❌"},
+        {en: "He likes neither the blue-colored shirt nor the brown shirt.", th: "เขาไม่ชอบทั้งเสื้อสีน้ำเงินหรือสีน้ำตาล", em: "🚫👔👗"},
+        {en: "I usually pick up the pillow before taking a shower.", th: "ฉันมักจะเก็บหมอนก่อนอาบน้ำ", em: "🛌☁️🚿"},
+        {en: "I bought a movie ticket at the cinema.", th: "ฉันซื้อตั๋วหนังที่โรงหนัง", em: "🎟️🎬🍿"},
+        {en: "Before I take a shower, I drink milk.", th: "ก่อนอาบน้ำ กินนม", em: "🥛🥛🚿"},
+        {en: "She sees eggs on the shelf.", th: "เธอเห็นไข่บนชั้น", em: "👀🥚🏢"},
+        {en: "The salt shaker is empty.", th: "ขวดใส่เกลือมันว่างเปล่า", em: "🧂🚫🫙"},
+        {en: "The snack has peas.", th: "ขนมมีถั่ว", em: "🥨🍵🟢"},
+        {en: "We choose to eat vegetables for our bodies to get stronger.", th: "เราเลือกที่จะกินผัก เพื่อให้ร่างกายแข็งแรงขึ้น", em: "🥗💪🥦"},
+        {en: "liquid", th: "ของเหลว", em: "💧🌊🧴"},
+        {en: "messy", th: "เลอะเทอะ", em: "🧹🧺🌀"},
+        {en: "Powder", th: "แป้ง", em: "☁️✨🧴"},
+        {en: "against", th: "สู้กับ/แข่งกับ", em: "🥊🚫🛡️"},
+        {en: "It looks cool.", th: "มันดูเท่", em: "😎✨🔥"},
+        {en: "meat", th: "เนื้อสัตว์", em: "🥩🥩🥩"},
+        {en: "beef", th: "เนื้อวัว", em: "🐄🥩🔥"},
+        {en: "It gives me a headache.", th: "มันทำให้ปวดหัว", em: "🤯🤕💢"},
+        {en: "examples", th: "ตัวอย่าง", em: "💡📝✨"},
+        {en: "research", th: "วิจัย", em: "🔍📚🔬"},
+        {en: "He's doing research about Pandas in the science room.", th: "เขากำลังทำวิจัยเกี่ยวกับแพนด้าในห้องวิทย์", em: "🔬🐼🧪"},
+        {en: "travel", th: "เที่ยว / เดินทาง", em: "✈️🌍🧳"},
+        {en: "We're going to travel to the United Kingdom.", th: "จะไปเที่ยวอังกฤษ", em: "🇬🇧✈️🏰"},
+        {en: "We're going on international travel to the United Kingdom.", th: "จะไปทริปต่างประเทศที่อังกฤษ", em: "🌐✈️🇬🇧"},
+        {en: "accommodation", th: "ที่พัก", em: "🏠🏨🛌"},
+        {en: "She found accommodation.", th: "เธอเจอที่พัก", em: "🔍🏠🛌"},
+        {en: "a tray of pizza", th: "พิซซ่า 1 ถาด", em: "🍕🍕🍕"},
+        {en: "I'm pouring the milk into the glass.", th: "ฉันกำลังเทนมลงแก้ว", em: "🥛🥛🍷"},
+        {en: "She saw the ghost at her own home.", th: "เธอเห็นผีที่บ้าน (อดีต)", em: "👻🏠😱"},
+        {en: "We need manufacturers to increase cars.", th: "เราต้องการให้ผู้ผลิตเพิ่มรถ", em: "🏭📈🚗"},
+        {en: "Last year, the book's sale decreased.", th: "ปีที่แล้วยอดขายหนังสือลดลง", em: "📉📚📅"},
+        {en: "I pretend to cry.", th: "แกล้งร้องไห้", em: "🎭😭🤡"},
+        {en: "He doesn't like vegetables.", th: "เขาไม่ชอบผัก", em: "🚫🥦🤮"},
+        {en: "She doesn't have any apples.", th: "เธอไม่มีแอปเปิ้ลเลย", em: "🚫🍎🤷‍♀️"},
+        {en: "litres", th: "ลิตร", em: "💧🫙🚰"},
+        {en: "per day", th: "ต่อวัน", em: "🗓️🔄☀️"},
+        {en: "meal", th: "มื้อ", em: "🍽️🍲🥗"},
+        {en: "I don't want to do anything.", th: "ไม่อยากทำอะไรเลย", em: "🥱🛋️🚫"},
+        {en: "salt", th: "เกลือ", em: "🧂🧂🧂"},
+        {en: "pepper", th: "พริกไทย", em: "🧂⬛🤧"},
+        {en: "Season", th: "ปรุง (v)", em: "🧂🌿🍳"},
+        {en: "a few", th: "2-3", em: "🤏2️⃣3️⃣"}
+    ];
+
+    let currentVocab = {};
+
+    function spinVocab() {
+        document.getElementById('v-text').innerText = "Spinning...";
+        document.getElementById('v-emoji').innerText = "🎲";
+        document.getElementById('v-thai').style.display = 'none';
+
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            currentVocab = vocabList[randomIndex];
+            
+            document.getElementById('v-text').innerText = currentVocab.en;
+            document.getElementById('v-emoji').innerText = currentVocab.em || "✨";
+            document.getElementById('v-thai').innerText = currentVocab.th;
+        }, 500);
+    }
+
+    function toggleVocabThai() {
+        const thaiEl = document.getElementById('v-thai');
+        thaiEl.style.display = thaiEl.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleTrans(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = el.style.display === 'none' || el.style.display === '' ? (el.tagName === 'DIV' ? 'block' : 'inline') : 'none';
+    }
+
+    function toggleAnswer(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function speakCurrentVocab() {
+        if(currentVocab.en) speak(currentVocab.en);
+        else speak("Please spin first.");
+    }
+
+    function speak(text) {
+        let cleanText = text.replace(/[❌✅👽🔍]/g, '').trim();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function checkChoice(btn, isCorrect, ansId) {
+        const container = btn.parentElement;
+        const btns = container.querySelectorAll('.btn');
+        btns.forEach(b => {
+            b.classList.remove('btn-correct', 'btn-wrong');
+            b.disabled = true;
+        });
+
+        if (isCorrect) {
+            btn.classList.add('btn-correct');
+            document.getElementById(ansId).style.display = 'block';
+            speak("Correct!");
+        } else {
+            btn.classList.add('btn-wrong');
+            document.getElementById(ansId).style.display = 'block';
+            document.getElementById(ansId).style.color = '#e74c3c';
+            document.getElementById(ansId).innerText = "Oops! Look at the correct answer below.";
+            btns.forEach(b => {
+                if(b.onclick.toString().includes('true')) b.classList.add('btn-correct');
+            });
+            speak("Oops!");
+        }
+    }
+
+    // Init the game
+    spinVocab();
+
+</script>
+
+</body>
+</html>
