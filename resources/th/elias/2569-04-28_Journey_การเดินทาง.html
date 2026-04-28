@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การเดินทาง</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            -webkit-font-smoothing: antialiased;
+        }
+        .toggle-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .toggle-content.active {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .vocab-card {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto mb-20">
+
+    <!-- Header Section -->
+    <header class="text-center mb-10 bg-white rounded-3xl shadow-sm p-8 border-t-4 border-indigo-500">
+        <div id="main-title-container"></div>
+    </header>
+
+    <main id="app-container" class="space-y-12">
+        
+        <!-- Section 1: Vocab Review -->
+        <section class="bg-white rounded-3xl shadow-sm p-6 md:p-8 border border-slate-100">
+            <div id="vocab-title-container" class="mb-6"></div>
+            
+            <div class="flex flex-col items-center bg-indigo-50 p-6 rounded-2xl border border-indigo-100 min-h-[250px] justify-center">
+                <div id="random-vocab-display" class="w-full text-center mb-8">
+                    <p class="text-gray-500 text-lg mb-2">กดปุ่มเพื่อสุ่มคำศัพท์</p>
+                </div>
+                <button onclick="pickRandomVocab()" class="bg-indigo-600 text-white hover:bg-indigo-700 px-8 py-4 rounded-xl font-bold text-xl shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                    🎲 สุ่มคำศัพท์
+                </button>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Container -->
+        <div id="dynamic-sections"></div>
+
+    </main>
+
+    <script>
+        // ----------------------------------------------------
+        // DATA STRUCTURES
+        // ----------------------------------------------------
+
+        const vocabList = [
+            { emoji: "⏳", th: "นาน", ipa: "naan", en: "long time" },
+            { emoji: "🎭🎬", th: "นักแสดง", ipa: "nák-sà-daeng", en: "actors; actresses" },
+            { emoji: "🎶📝", th: "เนื้อเพลง", ipa: "nʉ́ʉa-plaeeng", en: "lyrics (meat song)" },
+            { emoji: "📖📝", th: "ความหมาย", ipa: "kwaam-măai", en: "meaning" },
+            { emoji: "🛠️🧩", th: "แก้ปัญหา", ipa: "gâe-bpan-hăa", en: "solve problems" },
+            { emoji: "📅🎄", th: "ธันวา", ipa: "than-waa", en: "December" },
+            { emoji: "📅", th: "สิงหา", ipa: "sǐng-hăa", en: "August" },
+            { emoji: "🎟️", th: "ตั๋ว", ipa: "dtŭa", en: "tickets" },
+            { emoji: "📒💼", th: "บัญชี", ipa: "ban-chee", en: "account(ing)" },
+            { emoji: "🏦💰", th: "ธนาคาร", ipa: "thá-naa-khaan", en: "bank" },
+            { emoji: "👫", th: "เพศตรงข้าม", ipa: "phêet-dtrong-khâam", en: "opposite gender" },
+            { emoji: "🎬🔚", th: "ท้ายรายการ", ipa: "táai-raai-gaan", en: "at the end of the show" },
+            { emoji: "🌟", th: "ดัง", ipa: "dang", en: "famous; well-known" },
+            { emoji: "🗓️⏳", th: "อีกกี่เดือน", ipa: "ìik-gìi-deuuan", en: "In how many months" },
+            { emoji: "🎫📄", th: "ใบ", ipa: "bai", en: "classifier for tickets, paper or sth thin" },
+            { emoji: "📅🌸", th: "เมษา", ipa: "may-săa", en: "April" },
+            { emoji: "🏢↔️", th: "ตึกตรงข้าม", ipa: "dtʉ̀k-dtrong-kâam", en: "opposite building" },
+            { emoji: "⏳📅", th: "ล่วงหน้า", ipa: "lûuang-nâa", en: "in advance (could be before or after time)" },
+            { emoji: "🤷‍♂️", th: "แล้วแต่", ipa: "láew-tàae", en: "it depends" },
+            { emoji: "🎬🍿", th: "หนัง", ipa: "năng", en: "movies" }
+        ];
+
+        const lessonContent = [
+            // Lead-in Questions
+            {
+                type: 'header', emoji: "🤔", th: "คำถามนำ", ipa: "kam-tăam nam", en: "Lead-in Questions"
+            },
+            {
+                type: 'item', emoji: "1️⃣", th: "ปกติเวลาดู หนัง คุณชอบดูจนถึง ท้ายรายการ ไหม", ipa: "bpòk-gà-dtì we-laa doo năng, kun chôp doo jon-tʉ̆ng táai-raai-gaan măi?", en: "Usually when watching a movie, do you like to watch until the end of the show?"
+            },
+            {
+                type: 'item', emoji: "2️⃣", th: "คุณคิดว่า นักแสดง ที่ ดัง มักจะชอบเดินทางไปเที่ยวที่ไหน", ipa: "kun kít wâa nák-sà-daeng tîi dang, mák-jà chôp dəən-taang bpai tîiao tîi-năi?", en: "Where do you think famous actors usually like to travel?"
+            },
+            {
+                type: 'item', emoji: "3️⃣", th: "คุณวางแผนจะไปเที่ยวอีกใน อีกกี่เดือน ข้างหน้า", ipa: "kun waang-păen jà bpai tîiao ìik nai ìik-gìi-deuuan kâang-nâa?", en: "In how many months are you planning to travel again?"
+            },
+
+            // Homework
+            {
+                type: 'header', emoji: "🎒", th: "การบ้าน", ipa: "gaan-bâan", en: "Homework"
+            },
+            {
+                type: 'item', emoji: "✈️", th: "เล่าเกี่ยวกับทริปนึงว่า เดินทางยังไง", ipa: "lâo gìiao-gàp tríp nʉng wâa, dəən-taang yang-ngai", en: "Tell a story about a trip, how you travelled."
+            },
+
+            // Follow-up
+            {
+                type: 'header', emoji: "🗣️", th: "คำถามต่อเนื่อง", ipa: "kam-tăam dtɔ̀ɔ-nʉ̂ʉang", en: "Follow-up Questions"
+            },
+            {
+                type: 'item', emoji: "1️⃣", th: "ทริปนั้นคุณจอง ตั๋ว ล่วงหน้า นาน ไหม", ipa: "tríp nán kun jong dtŭa lûuang-nâa naan măi?", en: "Did you book tickets for that trip a long time in advance?"
+            },
+            {
+                type: 'item', emoji: "2️⃣", th: "คุณต้อง แก้ปัญหา อะไรบ้างไหมระหว่างการเดินทาง", ipa: "kun dtông gâe-bpan-hăa à-rai bâang măi rá-wàang gaan-dəən-taang?", en: "Did you have to solve any problems during the trip?"
+            },
+            {
+                type: 'item', emoji: "3️⃣", th: "คุณชอบทริปนี้ไหม หรือ แล้วแต่ สถานการณ์", ipa: "kun chôp tríp née măi, rʉ̆ʉ láew-tàae sà-tăa-ná-gaan?", en: "Did you like this trip, or does it depend on the situation?"
+            },
+
+            // Discussion
+            {
+                type: 'header', emoji: "💬", th: "คำถามอภิปราย", ipa: "kam-tăam à-pí-bpraai", en: "Discussion Questions"
+            },
+            {
+                type: 'item', emoji: "1️⃣", th: "การเดินทางโดยรถไฟ 🚂 หรือเครื่องบิน ✈️ แบบไหนสนุกกว่ากัน", ipa: "gaan-dəən-taang dooy rót-fai rʉ̆ʉ krʉ̂ʉang-bin, bàep năi sà-nùk gwàa gan?", en: "Traveling by train or airplane, which one is more fun?"
+            },
+            {
+                type: 'item', emoji: "2️⃣", th: "คุณคิดว่าการไปเที่ยวคนเดียว 🚶‍♂️ หรือไปกับเพื่อน 👯‍♀️ ดีกว่ากัน", ipa: "kun kít wâa gaan bpai tîiao kon dieow rʉ̆ʉ bpai gàp pʉ̂ʉan, dee gwàa gan?", en: "Do you think traveling alone or with friends is better?"
+            },
+            {
+                type: 'item', emoji: "3️⃣", th: "มีประเทศไหนที่คุณอยากไปมากที่สุดในตอนนี้ 🌍", ipa: "mee bprà-têet năi tîi kun yàak bpai mâak tîi-sùt nai dton-née?", en: "Which country do you want to visit the most right now?"
+            },
+
+            // Extension Activities
+            {
+                type: 'header', emoji: "🚀", th: "กิจกรรมเสริม", ipa: "gìt-jà-gam sə̆əm", en: "Extension Activities"
+            },
+            {
+                type: 'item', emoji: "🎭", th: "บทบาทสมมติ: ซื้อตั๋วรถไฟไปต่างจังหวัดในเดือน เมษา แต่ตั๋วหมด ต้องหาทางเลือกอื่น", ipa: "bòt-bàat sŏm-mút: sʉ́ʉ dtŭa rót-fai bpai dtàang-jang-wàt nai dʉʉan may-săa dtàae dtŭa mòt, dtông hăa taang-lʉ̂ʉak ʉ̀ʉn", en: "Role-play: Buying a train ticket to a province in April but tickets are sold out. Must find another option."
+            },
+            {
+                type: 'item', emoji: "🎲", th: "เกมฝึกพูด: ทายชื่อเดือนจากคำใบ้เกี่ยวกับการเดินทาง", ipa: "geem fʉ̀k pôot: taai chʉ̂ʉ dʉʉan jàak kam-bâi gìiao-gàp gaan-dəən-taang", en: "Speaking Game: Guess the month from clues about traveling."
+            },
+            {
+                type: 'item', emoji: "⚖️", th: "โต้วาที: เที่ยวต่างประเทศเดือน ธันวา ดีกว่าเที่ยวเดือน สิงหา", ipa: "dtôo-waa-tee: tîiao dtàang-bprà-têet dʉʉan than-waa dee gwàa tîiao dʉʉan sǐng-hăa", en: "Debate: Traveling abroad in December is better than traveling in August."
+            },
+            {
+                type: 'item', emoji: "🎤", th: "สัมภาษณ์: ถามเพื่อนเกี่ยวกับทริปที่แย่ที่สุดและการ แก้ปัญหา", ipa: "săm-pâat: tăam pʉ̂ʉan gìiao-gàp tríp tîi yâae tîi-sùt láe gaan gâe-bpan-hăa", en: "Interview: Ask a friend about their worst trip and problem-solving."
+            },
+            {
+                type: 'item', emoji: "📖", th: "เล่าเรื่อง: การเดินทางไป ตึกตรงข้าม หรือสถานที่ใกล้ๆ แต่หลงทาง", ipa: "lâo-rʉ̂ʉang: gaan-dəən-taang bpai dtʉ̀k-dtrong-kâam rʉ̆ʉ sà-tăan-tîi glâi-glâi dtàae lŏng taang", en: "Story-telling: Traveling to the opposite building or a nearby place, but getting lost."
+            },
+            {
+                type: 'item', emoji: "📊", th: "นำเสนอ: วางแผนทริปในฝัน 1 ทริป (รวมการเดินทางและเดือนที่จะไป)", ipa: "nam-sà-nə̆ə: waang-păen tríp nai făn nʉ̀ng tríp (ruuam gaan-dəən-taang láe dʉʉan tîi jà bpai)", en: "Presentation: Plan 1 dream trip (including transportation and the month to go)."
+            }
+        ];
+
+        let idCounter = 0; // Unique ID generator for toggles
+
+        // ----------------------------------------------------
+        // FUNCTIONS
+        // ----------------------------------------------------
+
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("ขออภัย เบราว์เซอร์ของคุณไม่รองรับระบบเสียง (Sorry, your browser doesn't support Text-to-Speech)");
+            }
+        }
+
+        function toggleVisibility(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('active')) {
+                el.classList.remove('active');
+            } else {
+                el.classList.add('active');
+            }
+        }
+
+        // Universal UI Block Generator (Applies TTS, IPA, EN to any text)
+        function createContentBlock(emoji, th, ipa, en, isHeader = false) {
+            const currentId = idCounter++;
+            const bgClass = isHeader ? 'bg-indigo-100 border-l-4 border-indigo-500 rounded-r-xl p-4' : 'bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow';
+            const textClass = isHeader ? 'text-2xl font-bold text-indigo-900' : 'text-xl font-medium text-slate-800';
+
+            return `
+                <div class="${bgClass} w-full mb-4">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div class="${textClass} leading-relaxed flex-1 flex items-start gap-3">
+                            <span class="text-3xl">${emoji}</span>
+                            <span>${th}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 shrink-0 md:mt-0 mt-2">
+                            <button onclick="speakThai('${th.replace(/'/g, "\\'")}')" 
+                                class="flex items-center justify-center bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800 px-3 py-2 rounded-xl font-semibold transition-colors text-sm">
+                                🔊 ฟัง
+                            </button>
+                            <button onclick="toggleVisibility('ipa-${currentId}')" 
+                                class="flex items-center justify-center bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 px-3 py-2 rounded-xl font-semibold transition-colors text-sm">
+                                🗣️ IPA
+                            </button>
+                            <button onclick="toggleVisibility('en-${currentId}')" 
+                                class="flex items-center justify-center bg-purple-100 text-purple-700 hover:bg-purple-200 hover:text-purple-800 px-3 py-2 rounded-xl font-semibold transition-colors text-sm">
+                                🇬🇧 EN
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 space-y-3">
+                        <div id="ipa-${currentId}" class="toggle-content bg-emerald-50 text-emerald-800 p-4 rounded-xl text-lg border border-emerald-100">
+                            <span class="font-bold mr-2 text-emerald-600">IPA:</span> ${ipa}
+                        </div>
+                        <div id="en-${currentId}" class="toggle-content bg-purple-50 text-purple-800 p-4 rounded-xl text-lg border border-purple-100">
+                            <span class="font-bold mr-2 text-purple-600">EN:</span> ${en}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Random Vocab Logic
+        function pickRandomVocab() {
+            const displayDiv = document.getElementById('random-vocab-display');
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const word = vocabList[randomIndex];
+            
+            // Add a slight fade effect by removing and re-adding content
+            displayDiv.style.opacity = 0;
+            
+            setTimeout(() => {
+                displayDiv.innerHTML = createContentBlock(word.emoji, word.th, word.ipa, word.en, false);
+                displayDiv.style.opacity = 1;
+                displayDiv.style.transition = 'opacity 0.3s ease';
+            }, 150);
+        }
+
+        // Render Initial Page Content
+        function initApp() {
+            // Render Main Title
+            document.getElementById('main-title-container').innerHTML = 
+                createContentBlock("🧭", "การเดินทาง", "gaan-dəən-taang", "Travel / Journey", true);
+
+            // Render Vocab Title
+            document.getElementById('vocab-title-container').innerHTML = 
+                createContentBlock("🧠", "ทบทวนคำศัพท์ (แต่งประโยค)", "tóp-tuuan kam-sàp (dtàeng bprà-yôok)", "Vocabulary Review (Make a sentence)", true);
+
+            // Render Dynamic Sections
+            const container = document.getElementById('dynamic-sections');
+            let htmlContent = '';
+            
+            lessonContent.forEach(item => {
+                if(item.type === 'header') {
+                    if(htmlContent !== '') htmlContent += `</section>`; // Close previous section
+                    htmlContent += `<section class="bg-white rounded-3xl shadow-sm p-6 md:p-8 border border-slate-100 mt-8 mb-6">`;
+                    htmlContent += createContentBlock(item.emoji, item.th, item.ipa, item.en, true);
+                } else {
+                    htmlContent += createContentBlock(item.emoji, item.th, item.ipa, item.en, false);
+                }
+            });
+            htmlContent += `</section>`; // Close last section
+            
+            container.innerHTML = htmlContent;
+        }
+
+        // Run on load
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
