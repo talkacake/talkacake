@@ -6,18 +6,63 @@
     <title>โรงละคร</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
         }
-        .tts-button {
-            transition: transform 0.1s;
+        
+        .ipa-text {
+            color: #0ea5e9;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+        }
+
+        .en-text {
+            color: #d946ef;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        .btn-toggle {
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s;
             cursor: pointer;
+            color: #64748b;
+        }
+        .btn-toggle:hover { background-color: #f1f5f9; }
+        .btn-toggle.active-ipa {
+            background-color: #f0f9ff;
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            font-weight: 600;
+        }
+        .btn-toggle.active-en {
+            background-color: #fdf4ff;
+            border-color: #d946ef;
+            color: #d946ef;
+            font-weight: 600;
+        }
+
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15); }
+        
+        .tts-button {
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: #0284C7;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 4px;
         }
         .tts-button:active { transform: scale(0.9); }
-        .tts-playing { color: #dc2626 !important; animation: pulse 1s infinite; }
+        .tts-button.playing { color: #0369A1; animation: pulse 1s infinite; }
         
         @keyframes pulse {
             0% { opacity: 1; }
@@ -25,939 +70,685 @@
             100% { opacity: 1; }
         }
 
-        .btn-toggle {
-            font-size: 0.75rem;
-            padding: 2px 10px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            background: white;
-            color: #64748b;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-weight: 600;
+        @keyframes splashIn {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
-        .btn-toggle:hover { background-color: #f1f5f9; }
-        .btn-toggle.active { background-color: #e2e8f0; color: #334155; border-color: #94a3b8; box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05); }
+        .animate-splash { animation: splashIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
         .fb-video-container {
             display: flex;
             justify-content: center;
             width: 100%;
             overflow: hidden;
-            border-radius: 12px;
-            background: #000;
-            margin-bottom: 1rem;
+            border-radius: 16px;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .hidden-content { display: none; }
+        .ipa, .en { display: none; margin-top: 0.25rem; font-weight: normal; }
+        .ipa { color: #D97706; font-style: italic; font-size: 0.95em; } 
+        .en { color: #4B5563; font-size: 0.95em; }
+        .reveal { display: block !important; }
+        .controls-row {
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
         }
     </style>
 </head>
 <body class="pb-24">
 
     <!-- Navbar -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b-4 border-red-600">
-        <div class="max-w-4xl mx-auto px-4 py-4 text-center">
-            <h1 class="text-3xl font-bold text-red-700 flex items-center justify-center gap-2">
-                🏛️ <span>โรงละคร</span> 🎭
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-cyan-200">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-cyan-600 flex items-center gap-2">
+                <i class="fas fa-water text-cyan-400"></i>
+                <span>สงกรานต์และซอฟต์พาวเวอร์</span>
             </h1>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-8">
+    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-10">
 
         <!-- 1. Review Section -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🎲</div>
-                <h2 class="text-2xl font-bold text-blue-700">ทบทวนคำศัพท์เก่า</h2>
-                <button onclick="speak('ทบทวนคำศัพท์เก่า', this)" class="tts-button text-blue-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">thóp-thuan kham-sàp gào</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Review old vocabulary</div>
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-2xl shadow-sm">🎲</div>
+                <h2 class="text-2xl font-bold text-blue-700 flex-1 flex items-center">
+                    1. ทบทวนคำศัพท์เก่า
+                    <button class="tts-button" onclick="playTTS('ทบทวนคำศัพท์เก่า', this)">🔊</button>
+                </h2>
             </div>
 
-            <div class="content-block text-center mb-6">
-                <p class="text-gray-700 font-medium inline-flex items-center justify-center gap-2 flex-wrap">
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-blue-50 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl">🧠</div>
+                <p class="text-gray-700 font-medium mb-6 relative z-10">
                     กดปุ่มสุ่มคำศัพท์ แล้วลองแต่งประโยคในบริบทของ "สังคมไทย" หรือ "ชีวิตประจำวัน" 🗣️
-                    <button onclick="speak('กดปุ่มสุ่มคำศัพท์ แล้วลองแต่งประโยคในบริบทของสังคมไทย หรือ ชีวิตประจำวัน', this)" class="tts-button text-blue-500 text-lg">🔊</button>
+                    <button class="tts-button" onclick="playTTS('กดปุ่มสุ่มคำศัพท์ แล้วลองแต่งประโยคในบริบทของสังคมไทย หรือ ชีวิตประจำวัน', this)">🔊</button>
                 </p>
-                <div class="flex justify-center gap-1 mt-2">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                
+                <div id="vocab-card" class="bg-gradient-to-b from-blue-50 to-cyan-50 p-8 rounded-2xl min-h-[160px] flex flex-col items-center justify-center mb-8 border border-cyan-100 shadow-inner">
+                    <p class="text-cyan-500 italic text-lg font-semibold"><i class="fas fa-hand-pointer mr-2 animate-bounce"></i>พร้อมแล้วกดปุ่มด้านล่าง...</p>
                 </div>
-                <div class="ipa hidden text-orange-600 font-mono text-sm mt-1">gòt bpùm sùm kham-sàp láeo lɔɔng dtàeng bprà-yôok nai bɔɔ-rí-bòt khɔ̌ɔng sǎng-khom thai rʉ̌ʉ chii-wít bprà-jam wan</div>
-                <div class="en hidden text-blue-600 italic text-sm mt-1">Press the button to randomly select a word, then try making a sentence in the context of "Thai society" or "daily life".</div>
-            </div>
-            
-            <div id="vocab-display" class="py-10 border-2 border-dashed border-blue-200 rounded-xl bg-blue-50 flex flex-col justify-center items-center mb-6">
-                <p class="text-blue-400 font-medium">พร้อมแล้วกดปุ่มด้านล่าง... ✨</p>
-            </div>
 
-            <button onclick="randomVocab()" class="w-full md:w-auto md:px-12 mx-auto block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-full shadow transition-all active:scale-95 text-lg">
-                สุ่มคำศัพท์ 🔄
-            </button>
+                <button onclick="randomizeWord()" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform active:scale-95 transition-all flex items-center gap-2 mx-auto text-lg relative z-10">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>สุ่มคำศัพท์</span>
+                </button>
+            </div>
         </section>
 
-        <!-- 2. Lead-in Questions -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🤔</div>
-                <h2 class="text-2xl font-bold text-emerald-700">ก่อนเริ่มบทเรียน</h2>
-                <button onclick="speak('ก่อนเริ่มบทเรียน', this)" class="tts-button text-emerald-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">gɔ̀ɔn rə̂əm bòt-riian</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Before starting the lesson</div>
+        <!-- 2. Lead-in Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-500 text-2xl shadow-sm">🤔</div>
+                <h2 class="text-2xl font-bold text-emerald-700 flex-1 flex items-center">
+                    2. ก่อนเริ่มบทเรียน
+                    <button class="tts-button" onclick="playTTS('ก่อนเริ่มบทเรียน', this)">🔊</button>
+                </h2>
             </div>
 
-            <div class="space-y-4">
-                <!-- Q1 -->
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-l-8 border-emerald-400 space-y-6">
                 <div class="content-block bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">1. คุณเคยไปโรงละครในประเทศไทยไหม? 🏛️🇹🇭</p>
-                        <button onclick="speak('คุณเคยไปโรงละครในประเทศไทยไหม', this)" class="tts-button text-emerald-600 text-lg flex-shrink-0">🔊</button>
+                    <p class="text-lg text-gray-800 font-medium">คุณเคยเล่นน้ำสงกรานต์ที่ประเทศไทยไหม? ความรู้สึกตอนนั้นเป็นอย่างไร? <button class="tts-button" onclick="playTTS('คุณเคยเล่นน้ำสงกรานต์ที่ประเทศไทยไหม ความรู้สึกตอนนั้นเป็นอย่างไร', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                     </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khun khoei bpai rohng-lá-khɔɔn nai bprà-thêet thai mǎi?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Have you ever been to a theater in Thailand?</div>
+                    <div class="ipa text-sm">khun khoei lên náam sǒng-graan thîi bprà-thêet thai mǎi? khwaam rúu-sʉ̀k dtɔɔn nán bpen yàang-rai?</div>
+                    <div class="en text-sm">Have you ever celebrated Songkran in Thailand? How did you feel at that time?</div>
                 </div>
-                <!-- Q2 -->
+
                 <div class="content-block bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">2. คุณชอบดูการแสดงแบบไหนมากที่สุด? 💃🎶</p>
-                        <button onclick="speak('คุณชอบดูการแสดงแบบไหนมากที่สุด', this)" class="tts-button text-emerald-600 text-lg flex-shrink-0">🔊</button>
+                    <p class="text-lg text-gray-800 font-medium">เมื่อได้ยินคำว่า "ซอฟต์พาวเวอร์" (Soft Power) ของไทย คุณนึกถึงอะไรเป็นอันดับแรก? <button class="tts-button" onclick="playTTS('เมื่อได้ยินคำว่า ซอฟต์พาวเวอร์ ของไทย คุณนึกถึงอะไรเป็นอันดับแรก', this)">🔊</button></p>
+                    <div class="controls-row mt-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                     </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khun chɔ̂ɔp duu gaan-sà-daeng bàep nǎi mâak thîi sùt?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">What kind of performance do you like to watch the most?</div>
-                </div>
-                <!-- Q3 -->
-                <div class="content-block bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">3. การดูการแสดงสดต่างจากการดูผ่านโทรศัพท์อย่างไร? 📱📽️</p>
-                        <button onclick="speak('การดูการแสดงสดต่างจากการดูผ่านโทรศัพท์อย่างไร', this)" class="tts-button text-emerald-600 text-lg flex-shrink-0">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">gaan duu gaan-sà-daeng sòt dtàang jàak gaan duu phàan thoo-rá-sàp yàang-rai?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">How is watching a live performance different from watching on a phone?</div>
+                    <div class="ipa text-sm">mʉ̂ʉa dâi-yin kham wâa "sɔ́ɔp-phaao-wə̂ə" khɔ̌ɔng thai, khun nʉ́k thʉ̌ng à-rai bpen an-dàp râaek?</div>
+                    <div class="en text-sm">When you hear the word "Soft Power" of Thailand, what comes to mind first?</div>
                 </div>
             </div>
         </section>
 
         <!-- 3. Video Section -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🎬</div>
-                <h2 class="text-2xl font-bold text-red-700">วิดีโอ: โรงละครแห่งชาติโฉมใหม่</h2>
-                <button onclick="speak('วิดีโอ โรงละครแห่งชาติโฉมใหม่', this)" class="tts-button text-red-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">wí-dii-oo: rohng-lá-khɔɔn hàeng-châat chǒom-mài</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Video: The New Look of the National Theater</div>
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-2xl shadow-sm">🎬</div>
+                <h2 class="text-2xl font-bold text-rose-700 flex-1 flex items-center">
+                    3. การฟังจากวิดีโอ
+                    <button class="tts-button" onclick="playTTS('การฟังจากวิดีโอ', this)">🔊</button>
+                </h2>
             </div>
 
-            <!-- Video Embed -->
-            <div class="fb-video-container mb-4">
-                <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D982590078051602&show_text=0&width=560" width="100%" height="315" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
-            </div>
-
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 mb-8 content-block">
-                <div class="flex items-start gap-2">
-                    <p class="font-medium text-gray-800"><span class="font-bold text-gray-500">Caption:</span> กรมศิลปากร เตรียมเปิดทดสอบระบบแสง สี เสียง ของโรงละครแห่งชาติ ให้ชมฟรี 9-10 พ.ค.นี้ กว่า 1,000 ที่นั่ง หลังปิดปรับปรุงครั้งใหญ่มานานกว่า 4 ปี คนแห่จองคิวล้นหลาม จนต้องเพิ่มรอบพิเศษ 🎫</p>
-                    <button onclick="speak('กรมศิลปากร เตรียมเปิดทดสอบระบบแสง สี เสียง ของโรงละครแห่งชาติ ให้ชมฟรี 9-10 พฤษภาคมนี้ กว่า 1,000 ที่นั่ง หลังปิดปรับปรุงครั้งใหญ่มานานกว่า 4 ปี คนแห่จองคิวล้นหลาม จนต้องเพิ่มรอบพิเศษ', this)" class="tts-button text-red-500 flex-shrink-0">🔊</button>
-                </div>
-                <div class="flex gap-1 mt-2 mb-1">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="ipa hidden text-orange-600 font-mono text-sm">grom sǐn-lá-bpaa-gɔɔn dtriiam bpə̀ət thót-sɔ̀ɔp rá-bòp sǎeng sǐi sǐiang khɔ̌ɔng rohng-lá-khɔɔn hàeng-châat hâi chom frii gâao thʉ̌ng sìp phrʉ́k-sà-phaa-khom níi gwàa nʉ̀ng phan thîi-nâng lǎng bpìt bpràp-prung khráng yài maa naan gwàa sìi bpii khon hàe jɔɔng khiu lón-lǎam jon dtɔ̂ng phə̂əm rɔ̂ɔp phǐ-sèet</div>
-                <div class="en hidden text-blue-600 italic text-sm">The Fine Arts Department prepares to open the lighting and sound system testing of the National Theater for free viewing on May 9-10, with over 1,000 seats. After a major renovation closure of over 4 years, people flocked to book queues overwhelmingly until special rounds had to be added.</div>
-            </div>
-
-            <div class="space-y-4 border-t border-gray-100 pt-6">
-                <div class="flex flex-wrap items-center gap-3 mb-4 content-block">
-                    <h3 class="text-xl font-bold text-gray-800">คำถามจากวิดีโอ ❓</h3>
-                    <button onclick="speak('คำถามจากวิดีโอ', this)" class="tts-button text-gray-500">🔊</button>
-                    <div class="flex gap-1 ml-auto">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="w-full ipa hidden text-orange-600 font-mono text-sm">khǎm-thǎam jàak wí-dii-oo</div>
-                    <div class="w-full en hidden text-blue-600 italic text-sm">Questions from the video</div>
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-rose-50">
+                <div class="mb-8 p-6 bg-slate-100 rounded-2xl text-center border border-slate-200 content-block">
+                    <p class="mb-4 font-bold text-slate-800">ดูวิดีโอจาก Facebook 🎬 <button class="tts-button" onclick="playTTS('ดูวิดีโอจากเฟซบุ๊ก', this)">🔊</button></p>
+                    <a href="https://www.facebook.com/watch/?v=1650573303057850" target="_blank" class="inline-block bg-blue-600 text-white font-bold px-8 py-3 rounded-full hover:bg-blue-800 transition shadow-lg active:scale-95">
+                        📘 เปิดวิดีโอ
+                    </a>
                 </div>
 
-                <div class="content-block p-3 hover:bg-gray-50 rounded-lg transition">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium">1. โรงละครแห่งชาติปิดปรับปรุงไปนานเท่าไหร่? 🛠️🕰️</p>
-                        <button onclick="speak('โรงละครแห่งชาติปิดปรับปรุงไปนานเท่าไหร่', this)" class="tts-button text-red-400 flex-shrink-0">🔊</button>
+                <div class="mt-6" id="video-quiz-container">
+                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
+                        📝 ทดสอบการฟัง 
+                        <button class="tts-button" onclick="playTTS('ทดสอบการฟัง', this)">🔊</button>
+                    </h3>
+                    
+                    <div class="content-block mt-4 video-quiz-question">
+                        <p class="font-semibold mb-2">1. กัมพูชาเสนออะไรให้ยูเนสโกพิจารณา? <button class="tts-button" onclick="playTTS('กัมพูชาเสนออะไรให้ยูเนสโกพิจารณา', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-2">gam-phuu-chaa sà-nə̌ə à-rai hâi yuu-néet-gôo phít-jaa-rá-naa?</div>
+                        <div class="en text-sm mb-2">What did Cambodia propose to UNESCO for consideration?</div>
+                        
+                        <div class="pl-4 space-y-2">
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq1" value="a" class="mr-2"> ก. ชุดประจำชาติ <button class="tts-button" onclick="playTTS('ชุดประจำชาติ', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq1" value="b" class="mr-2"> ข. มหาสงกรานต์ ปีใหม่ตามประเพณีเขมร <button class="tts-button" onclick="playTTS('มหาสงกรานต์ ปีใหม่ตามประเพณีเขมร', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq1" value="c" class="mr-2"> ค. มวยเขมร <button class="tts-button" onclick="playTTS('มวยเขมร', this)">🔊</button></label>
+                        </div>
                     </div>
-                    <div class="flex gap-1 mt-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">rohng-lá-khɔɔn hàeng-châat bpìt bpràp-prung bpai naan thâo-rài?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">How long was the National Theater closed for renovation?</div>
-                </div>
 
-                <div class="content-block p-3 hover:bg-gray-50 rounded-lg transition">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium">2. ทำไมเขาถึงต้องเพิ่มรอบพิเศษ? 🎟️📈</p>
-                        <button onclick="speak('ทำไมเขาถึงต้องเพิ่มรอบพิเศษ', this)" class="tts-button text-red-400 flex-shrink-0">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mt-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">tham-mai khǎo thʉ̌ng dtɔ̂ng phə̂əm rɔ̂ɔp phǐ-sèet?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Why did they have to add special rounds?</div>
-                </div>
+                    <div class="content-block border-t border-slate-200 pt-4 video-quiz-question">
+                        <p class="font-semibold mb-2">2. รัฐมนตรีวัฒนธรรมของไทยกล่าวว่าเรื่องนี้จะกระทบสงกรานต์ของไทยหรือไม่? <button class="tts-button" onclick="playTTS('รัฐมนตรีวัฒนธรรมของไทยกล่าวว่าเรื่องนี้จะกระทบสงกรานต์ของไทยหรือไม่', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-2">rát-thà-mon-dtrii wát-thá-ná-tham khɔ̌ɔng thai glàao wâa rʉ̂ʉang níi jà grà-thóp sǒng-graan khɔ̌ɔng thai rʉ̌ʉ mâi?</div>
+                        <div class="en text-sm mb-2">Did the Thai Minister of Culture say this would affect Thailand's Songkran?</div>
 
-                <div class="content-block p-3 hover:bg-gray-50 rounded-lg transition">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium">3. ระบบที่เขาจะทดสอบมีอะไรบ้าง? 🔊💡</p>
-                        <button onclick="speak('ระบบที่เขาจะทดสอบมีอะไรบ้าง', this)" class="tts-button text-red-400 flex-shrink-0">🔊</button>
+                        <div class="pl-4 space-y-2">
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq2" value="a" class="mr-2"> ก. กระทบแน่นอน <button class="tts-button" onclick="playTTS('กระทบแน่นอน', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq2" value="b" class="mr-2"> ข. ไม่ส่งผลต่อสถานะของไทย <button class="tts-button" onclick="playTTS('ไม่ส่งผลต่อสถานะของไทย', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="vq2" value="c" class="mr-2"> ค. ไทยต้องเปลี่ยนชื่อเทศกาล <button class="tts-button" onclick="playTTS('ไทยต้องเปลี่ยนชื่อเทศกาล', this)">🔊</button></label>
+                        </div>
                     </div>
-                    <div class="flex gap-1 mt-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">rá-bòp thîi khǎo jà thót-sɔ̀ɔp mii à-rai bâang?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">What systems are they going to test?</div>
+                    <button onclick="checkVideoQuiz()" class="mt-4 bg-rose-500 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-rose-600 transition">✔️ ตรวจคำตอบ</button>
                 </div>
             </div>
         </section>
 
-        <!-- 4. Target Vocab & Structures -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <!-- Vocab -->
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🎯</div>
-                <h2 class="text-2xl font-bold text-purple-700">คำศัพท์เป้าหมาย</h2>
-                <button onclick="speak('คำศัพท์เป้าหมาย', this)" class="tts-button text-purple-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">kham-sàp bpâo-mǎai</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Target Vocabulary</div>
+        <!-- 4. Target Vocab Section -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 text-2xl shadow-sm">🎯</div>
+                <h2 class="text-2xl font-bold text-purple-700 flex-1 flex items-center">
+                    4. คำศัพท์เป้าหมาย
+                    <button class="tts-button" onclick="playTTS('คำศัพท์เป้าหมาย', this)">🔊</button>
+                </h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                <div class="content-block bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xl">🛠️</span>
-                        <p class="font-bold text-purple-900 text-lg">ปรับปรุง</p>
-                        <button onclick="speak('ปรับปรุง', this)" class="tts-button text-purple-500 text-sm">🔊</button>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="target-vocab-list">
+                <div class="vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-purple-500 transition-all">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-xl text-slate-800">🏛️ มรดก</span>
+                        <button class="tts-button" onclick="playTTS('มรดก', this)">🔊</button>
                     </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                     </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">bpràp-prung</div>
-                    <div class="en hidden text-blue-600 italic text-sm">renovate / improve</div>
+                    <div class="ipa font-medium text-amber-600">mɔɔ-rá-dòk</div>
+                    <div class="en text-slate-500">Heritage</div>
                 </div>
-
-                <div class="content-block bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xl">🌊👥</span>
-                        <p class="font-bold text-purple-900 text-lg">ล้นหลาม</p>
-                        <button onclick="speak('ล้นหลาม', this)" class="tts-button text-purple-500 text-sm">🔊</button>
+                <div class="vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-purple-500 transition-all">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-xl text-slate-800">📝 ขึ้นทะเบียน</span>
+                        <button class="tts-button" onclick="playTTS('ขึ้นทะเบียน', this)">🔊</button>
                     </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                     </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">lón-lǎam</div>
-                    <div class="en hidden text-blue-600 italic text-sm">overwhelming / in huge numbers</div>
+                    <div class="ipa font-medium text-amber-600">kʉ̂n-thá-biian</div>
+                    <div class="en text-slate-500">To register</div>
                 </div>
-
-                <div class="content-block bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xl">🏛️🇹🇭</span>
-                        <p class="font-bold text-purple-900 text-lg">แห่งชาติ</p>
-                        <button onclick="speak('แห่งชาติ', this)" class="tts-button text-purple-500 text-sm">🔊</button>
+                <div class="vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-purple-500 transition-all">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-xl text-slate-800">👯 คล้ายคลึงกัน</span>
+                        <button class="tts-button" onclick="playTTS('คล้ายคลึงกัน', this)">🔊</button>
                     </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                    <div class="controls-row mb-1">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                     </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">hɛ̀ng-châat</div>
-                    <div class="en hidden text-blue-600 italic text-sm">national</div>
-                </div>
-
-                <div class="content-block bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xl">🧪✅</span>
-                        <p class="font-bold text-purple-900 text-lg">ทดสอบ</p>
-                        <button onclick="speak('ทดสอบ', this)" class="tts-button text-purple-500 text-sm">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">thòt-sɔ̀ɔp</div>
-                    <div class="en hidden text-blue-600 italic text-sm">to test</div>
-                </div>
-
-                <div class="content-block bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-xl">🎟️⭐</span>
-                        <p class="font-bold text-purple-900 text-lg">รอบพิเศษ</p>
-                        <button onclick="speak('รอบพิเศษ', this)" class="tts-button text-purple-500 text-sm">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">rɔ̂ɔp phǐ-sèet</div>
-                    <div class="en hidden text-blue-600 italic text-sm">special round / extra show</div>
-                </div>
-            </div>
-
-            <!-- Structures -->
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🧱</div>
-                <h2 class="text-2xl font-bold text-purple-700">โครงสร้างประโยค</h2>
-                <button onclick="speak('โครงสร้างประโยค', this)" class="tts-button text-purple-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">khroong-sâang bprà-yôok</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Sentence Structures</div>
-            </div>
-
-            <div class="space-y-3">
-                <div class="content-block bg-white border border-gray-200 p-4 rounded-lg">
-                    <div class="flex items-start gap-2 mb-1">
-                        <p class="text-lg"><span class="font-bold text-purple-700">1. หลัง...มานาน :</span> หลังปิดปรับปรุงมานาน 4 ปี ⏳</p>
-                        <button onclick="speak('หลังปิดปรับปรุงมานาน 4 ปี', this)" class="tts-button text-purple-400 mt-1">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">lǎng bpìt bpràp-prung maa naan sìi bpii</div>
-                    <div class="en hidden text-blue-600 italic text-sm">After being closed for renovation for 4 years</div>
-                </div>
-
-                <div class="content-block bg-white border border-gray-200 p-4 rounded-lg">
-                    <div class="flex items-start gap-2 mb-1">
-                        <p class="text-lg"><span class="font-bold text-purple-700">2. จนต้อง... :</span> คนจองเยอะจนต้องเพิ่มรอบ 📈</p>
-                        <button onclick="speak('คนจองเยอะจนต้องเพิ่มรอบ', this)" class="tts-button text-purple-400 mt-1">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khon jɔɔng yə́ jon dtɔ̂ng phə̂əm rɔ̂ɔp</div>
-                    <div class="en hidden text-blue-600 italic text-sm">So many people booked until they had to add more rounds</div>
-                </div>
-
-                <div class="content-block bg-white border border-gray-200 p-4 rounded-lg">
-                    <div class="flex items-start gap-2 mb-1">
-                        <p class="text-lg"><span class="font-bold text-purple-700">3. เตรียม...ให้... :</span> เตรียมเปิดให้ชมฟรี 🎁</p>
-                        <button onclick="speak('เตรียมเปิดให้ชมฟรี', this)" class="tts-button text-purple-400 mt-1">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">dtriiam bpə̀ət hâi chom frii</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Preparing to open for free viewing</div>
+                    <div class="ipa font-medium text-amber-600">kláai-klʉng gan</div>
+                    <div class="en text-slate-500">Similar / Alike</div>
                 </div>
             </div>
         </section>
 
         <!-- 5. Reading Section -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">📖</div>
-                <h2 class="text-2xl font-bold text-indigo-700">บทอ่านสั้นๆ</h2>
-                <button onclick="speak('บทอ่านสั้นๆ', this)" class="tts-button text-indigo-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">bòt àan sân sân</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Short Passage</div>
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500 text-2xl shadow-sm">📖</div>
+                <h2 class="text-2xl font-bold text-indigo-700 flex-1 flex items-center">
+                    5. บทอ่าน: ซอฟต์พาวเวอร์และมรดกวัฒนธรรม
+                    <button class="tts-button" onclick="playTTS('บทอ่าน ซอฟต์พาวเวอร์และมรดกวัฒนธรรม', this)">🔊</button>
+                </h2>
             </div>
 
-            <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 mb-8 content-block">
-                <div class="flex items-start gap-2 mb-4">
-                    <p class="text-lg leading-relaxed text-gray-800 font-medium">
-                        โรงละครแห่งชาติเพิ่งเปิด <span class="text-indigo-600 font-bold">ทดสอบ</span> ระบบ <span class="text-indigo-600 font-bold">หลัง</span> จาก <span class="text-indigo-600 font-bold">ปรับปรุง</span> <span class="text-indigo-600 font-bold">มานาน</span> กว่า 4 ปี ที่นี่คือสถานที่สำคัญที่ส่งเสริมศิลปะและการแสดงแบบดั้งเดิมของไทย ในอดีตอาจจะมีคนดูไม่มากนัก แต่ตอนนี้มีคนให้ความสนใจ <span class="text-indigo-600 font-bold">ล้นหลาม</span> <span class="text-indigo-600 font-bold">จนต้อง</span> เพิ่ม <span class="text-indigo-600 font-bold">รอบพิเศษ</span> นี่เป็นสัญญาณที่ดีว่าคนรุ่นใหม่เริ่มกลับมาสนใจวัฒนธรรมไทยมากขึ้น
-                    </p>
-                    <button onclick="speak('โรงละครแห่งชาติเพิ่งเปิดทดสอบระบบหลังจากปรับปรุงมานานกว่า 4 ปี ที่นี่คือสถานที่สำคัญที่ส่งเสริมศิลปะและการแสดงแบบดั้งเดิมของไทย ในอดีตอาจจะมีคนดูไม่มากนัก แต่ตอนนี้มีคนให้ความสนใจล้นหลามจนต้องเพิ่มรอบพิเศษ นี่เป็นสัญญาณที่ดีว่าคนรุ่นใหม่เริ่มกลับมาสนใจวัฒนธรรมไทยมากขึ้น', this)" class="tts-button text-indigo-500 text-xl flex-shrink-0 mt-1">🔊</button>
-                </div>
-                <div class="flex gap-1 mb-2">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="ipa hidden text-orange-600 font-mono text-sm mb-2 leading-relaxed">rohng-lá-khɔɔn hàeng-châat phə̂ng bpə̀ət thót-sɔ̀ɔp rá-bòp lǎng jàak bpràp-prung maa naan gwàa sìi bpii. thîi-nîi khʉʉ sà-thǎan-thîi sǎm-khan thîi sòng-sə̌əm sǐn-lá-bpà láe gaan-sà-daeng bàep dâng-dəəm khɔ̌ɔng thai. nai à-dìit àat jà mii khon duu mâi mâak nák, dtàe dtɔɔn-níi mii khon hâi khwaam sǒn-jai lón-lǎam jon dtɔ̂ng phə̂əm rɔ̂ɔp phǐ-sèet. nîi bpen sǎn-yaan thîi dii wâa khon rûn mài rə̂əm glàp maa sǒn-jai wát-thá-ná-tham thai mâak khʉ̂n.</div>
-                <div class="en hidden text-blue-600 italic text-sm leading-relaxed">The National Theater just opened system testing after being renovated for over 4 years. This is an important place that promotes Thai traditional art and performance. In the past, there might not be many viewers, but now there is overwhelming interest until they had to add special rounds. This is a good sign that the new generation is starting to return to being more interested in Thai culture.</div>
-            </div>
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-l-8 border-indigo-400">
+                <div class="bg-indigo-50 p-6 rounded-2xl text-gray-800 space-y-6 leading-relaxed border border-indigo-100">
+                    <div class="content-block">
+                        <p class="text-lg">ซอฟต์พาวเวอร์ (Soft power) หรืออำนาจละมุน คือการใช้วัฒนธรรมเพื่อสร้างอิทธิพลและดึงดูดใจชาวต่างชาติ ในปัจจุบัน ประเทศไทยพยายามผลักดันวัฒนธรรมไทยให้เป็นที่รู้จักทั่วโลก <button class="tts-button" onclick="playTTS('ซอฟต์พาวเวอร์ หรืออำนาจละมุน คือการใช้วัฒนธรรมเพื่อสร้างอิทธิพลและดึงดูดใจชาวต่างชาติ ในปัจจุบัน ประเทศไทยพยายามผลักดันวัฒนธรรมไทยให้เป็นที่รู้จักทั่วโลก', this)">🔊</button></p>
+                        <div class="controls-row mt-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mt-1">sɔ́ɔp-phaao-wə̂ə rʉ̌ʉ am-nâat lá-mun khʉʉ gaan chái wát-thá-ná-tham phʉ̂ʉa srâang ìt-thí-phon láe dʉng-dùut jai chaao dtàang-châat...</div>
+                        <div class="en text-sm mt-1">Soft power is the use of culture to create influence and attract foreigners. Currently, Thailand is trying to push Thai culture to be known worldwide.</div>
+                    </div>
 
-            <div class="space-y-4">
-                <div class="flex flex-wrap items-center gap-3 mb-4 content-block">
-                    <h3 class="text-xl font-bold text-gray-800">คำถามจากบทอ่าน ❓</h3>
-                    <button onclick="speak('คำถามจากบทอ่าน', this)" class="tts-button text-gray-500">🔊</button>
-                    <div class="flex gap-1 ml-auto">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                    <div class="content-block border-t border-indigo-200 pt-4">
+                        <p class="text-lg">โดยในปี 2566 ประเพณี <strong class="text-indigo-700 font-bold underline">'สงกรานต์'</strong> ได้รับการ <strong class="text-indigo-700 font-bold underline">ขึ้นทะเบียน</strong> เป็น <strong class="text-indigo-700 font-bold underline">มรดก</strong> ทางวัฒนธรรมจากยูเนสโก (UNESCO) ซึ่งช่วยกระตุ้นเศรษฐกิจและการท่องเที่ยวได้เป็นอย่างดี นอกจากสงกรานต์แล้ว รัฐบาลยังเตรียมเสนอ 'ชุดไทย' และ 'มวยไทย' ให้พิจารณาในปีต่อไป <button class="tts-button" onclick="playTTS('โดยในปีสองพันห้าร้อยหกสิบหก ประเพณีสงกรานต์ ได้รับการขึ้นทะเบียนเป็นมรดกทางวัฒนธรรมจากยูเนสโก ซึ่งช่วยกระตุ้นเศรษฐกิจและการท่องเที่ยวได้เป็นอย่างดี นอกจากสงกรานต์แล้ว รัฐบาลยังเตรียมเสนอชุดไทย และมวยไทย ให้พิจารณาในปีต่อไป', this)">🔊</button></p>
+                        <div class="controls-row mt-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mt-1">dooi nai pii 2566 bprà-phee-nii 'sǒng-graan' dâi ráp gaan khʉ̂n-thá-biian bpen mɔɔ-rá-dòk thaang wát-thá-ná-tham...</div>
+                        <div class="en text-sm mt-1">In 2023, the 'Songkran' tradition was registered as cultural heritage by UNESCO, stimulating the economy and tourism well. Besides Songkran, the government prepares to propose 'Thai Dress' and 'Muay Thai' next year.</div>
                     </div>
-                    <div class="w-full ipa hidden text-orange-600 font-mono text-sm">khǎm-thǎam jàak bòt-àan</div>
-                    <div class="w-full en hidden text-blue-600 italic text-sm">Questions from the passage</div>
-                </div>
 
-                <div class="content-block p-3 hover:bg-gray-50 rounded-lg transition border border-transparent hover:border-gray-200">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium">1. โรงละครแห่งชาติเพิ่งทำอะไร? 🎭</p>
-                        <button onclick="speak('โรงละครแห่งชาติเพิ่งทำอะไร', this)" class="tts-button text-indigo-400 flex-shrink-0">🔊</button>
+                    <div class="content-block border-t border-indigo-200 pt-4">
+                        <p class="text-lg">อย่างไรก็ตาม การขึ้นทะเบียนวัฒนธรรมไม่ได้หมายความว่าประเทศนั้นเป็นเจ้าของเพียงผู้เดียว เพราะประเทศในภูมิภาคอาเซียนมักมีประเพณีที่ <strong class="text-indigo-700 font-bold underline">คล้ายคลึงกัน</strong> การขึ้นทะเบียนจึงเป็นเหมือนการแบ่งปันและช่วยกันอนุรักษ์วัฒนธรรมมากกว่าการแข่งขัน <button class="tts-button" onclick="playTTS('อย่างไรก็ตาม การขึ้นทะเบียนวัฒนธรรมไม่ได้หมายความว่าประเทศนั้นเป็นเจ้าของเพียงผู้เดียว เพราะประเทศในภูมิภาคอาเซียนมักมีประเพณีที่คล้ายคลึงกัน การขึ้นทะเบียนจึงเป็นเหมือนการแบ่งปันและช่วยกันอนุรักษ์วัฒนธรรมมากกว่าการแข่งขัน', this)">🔊</button></p>
+                        <div class="controls-row mt-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mt-1">yàang-rai gɔ̂ɔ dtaam, gaan khʉ̂n-thá-biian wát-thá-ná-tham mâi dâi mǎai-khwaam wâa bprà-thêet nán bpen jâo-khɔ̌ɔng phiiang phûu diao phrɔ́ bprà-thêet nai a-sîian mák mii bprà-phee-nii thîi kláai-klʉng gan...</div>
+                        <div class="en text-sm mt-1">However, registering culture doesn't mean that country is the sole owner because ASEAN countries often have similar traditions. Registration is more like sharing and preserving culture rather than competition.</div>
                     </div>
-                    <div class="flex gap-1 mt-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">rohng-lá-khɔɔn hàeng-châat phə̂ng tham à-rai?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">What did the National Theater just do?</div>
                 </div>
 
-                <div class="content-block p-3 hover:bg-gray-50 rounded-lg transition border border-transparent hover:border-gray-200">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium">2. ในอดีตมีคนมาดูการแสดงเยอะไหม? 👀</p>
-                        <button onclick="speak('ในอดีตมีคนมาดูการแสดงเยอะไหม', this)" class="tts-button text-indigo-400 flex-shrink-0">🔊</button>
+                <!-- Reading Quiz -->
+                <div class="mt-6" id="reading-quiz-container">
+                    <h4 class="text-xl font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
+                        📝 ทดสอบการอ่าน 
+                        <button class="tts-button" onclick="playTTS('ทดสอบการอ่าน', this)">🔊</button>
+                    </h4>
+                    
+                    <div class="content-block mt-4 reading-quiz-question">
+                        <p class="font-semibold mb-2">1. ซอฟต์พาวเวอร์มีประโยชน์อย่างไรต่อประเทศไทย? <button class="tts-button" onclick="playTTS('ซอฟต์พาวเวอร์มีประโยชน์อย่างไรต่อประเทศไทย', this)">🔊</button></p>
+                        <div class="pl-4 space-y-2">
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq1" value="a" class="mr-2"> ก. ช่วยกระตุ้นเศรษฐกิจและการท่องเที่ยว <button class="tts-button" onclick="playTTS('ช่วยกระตุ้นเศรษฐกิจและการท่องเที่ยว', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq1" value="b" class="mr-2"> ข. ทำให้คนไทยเก่งภาษาอังกฤษ <button class="tts-button" onclick="playTTS('ทำให้คนไทยเก่งภาษาอังกฤษ', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq1" value="c" class="mr-2"> ค. ช่วยให้เล่นน้ำได้ทุกวัน <button class="tts-button" onclick="playTTS('ช่วยให้เล่นน้ำได้ทุกวัน', this)">🔊</button></label>
+                        </div>
                     </div>
-                    <div class="flex gap-1 mt-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">nai à-dìit mii khon maa duu gaan-sà-daeng yə́ mǎi?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Were there many people coming to watch performances in the past?</div>
-                </div>
 
-                <div class="content-block p-3 hover:bg-gray-50 rounded-lg transition border border-transparent hover:border-gray-200">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium">3. ทำไมเรื่องนี้ถึงเป็นสัญญาณที่ดี? 📈👍</p>
-                        <button onclick="speak('ทำไมเรื่องนี้ถึงเป็นสัญญาณที่ดี', this)" class="tts-button text-indigo-400 flex-shrink-0">🔊</button>
+                    <div class="content-block border-t border-slate-200 pt-4 reading-quiz-question">
+                        <p class="font-semibold mb-2">2. ทำไมการขึ้นทะเบียนวัฒนธรรมจึงไม่ใช่การแข่งขันเพื่อเป็นเจ้าของ? <button class="tts-button" onclick="playTTS('ทำไมการขึ้นทะเบียนวัฒนธรรมจึงไม่ใช่การแข่งขันเพื่อเป็นเจ้าของ', this)">🔊</button></p>
+                        <div class="pl-4 space-y-2">
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq2" value="a" class="mr-2"> ก. เพราะยูเนสโกไม่ให้แข่งขัน <button class="tts-button" onclick="playTTS('เพราะยูเนสโกไม่ให้แข่งขัน', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq2" value="b" class="mr-2"> ข. เพราะประเทศในอาเซียนมีประเพณีคล้ายคลึงกัน <button class="tts-button" onclick="playTTS('เพราะประเทศในอาเซียนมีประเพณีคล้ายคลึงกัน', this)">🔊</button></label>
+                            <label class="block cursor-pointer p-2 rounded-lg hover:bg-slate-100 transition-colors"><input type="radio" name="rq2" value="c" class="mr-2"> ค. เพราะแต่ละประเทศมีวัฒนธรรมไม่เหมือนกันเลย <button class="tts-button" onclick="playTTS('เพราะแต่ละประเทศมีวัฒนธรรมไม่เหมือนกันเลย', this)">🔊</button></label>
+                        </div>
                     </div>
-                    <div class="flex gap-1 mt-1 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">tham-mai rʉ̂ʉang níi thʉ̌ng bpen sǎn-yaan thîi dii?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Why is this a good sign?</div>
+                    <button onclick="checkReadingQuiz()" class="mt-4 bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition">✔️ ตรวจคำตอบ</button>
                 </div>
             </div>
         </section>
 
-        <!-- 6. Discussion Section -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🗣️</div>
-                <h2 class="text-2xl font-bold text-teal-700">ชวนคุย (Discussion)</h2>
-                <button onclick="speak('ชวนคุย', this)" class="tts-button text-teal-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">chuuan khui</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Discussion</div>
+        <!-- 6. Discussion Questions -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-500 text-2xl shadow-sm">🗣️</div>
+                <h2 class="text-2xl font-bold text-teal-700 flex-1 flex items-center">
+                    6. ชวนคุย: แสดงความคิดเห็น
+                    <button class="tts-button" onclick="playTTS('ชวนคุย แสดงความคิดเห็น', this)">🔊</button>
+                </h2>
             </div>
 
-            <div class="space-y-4">
-                <!-- Q1 -->
-                <div class="content-block bg-teal-50 p-4 rounded-xl border border-teal-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">1. คุณคิดว่าโรงละครแห่งชาติสำคัญต่อคนไทยอย่างไร? 🏛️🇹🇭</p>
-                        <button onclick="speak('คุณคิดว่าโรงละครแห่งชาติสำคัญต่อคนไทยอย่างไร', this)" class="tts-button text-teal-600 text-lg flex-shrink-0">🔊</button>
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-teal-400">
+                <div class="space-y-8">
+                    <!-- Q1 -->
+                    <div class="bg-white p-4 rounded-xl border border-teal-100 content-block">
+                        <p class="text-gray-800 font-medium mb-2">1. ทำไมคนไทยและชาวต่างชาติถึงชอบไปเล่นน้ำที่ถนนสีลมหรือข้าวสาร? <button class="tts-button" onclick="playTTS('ทำไมคนไทยและชาวต่างชาติถึงชอบไปเล่นน้ำที่ถนนสีลมหรือข้าวสาร', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-2">tam-mai kon tai lɛ́ chaao dtàang-châat tʉ̌ng chɔ̂ɔp bpai lên náam tîi tà-nǒn sǐi-lom rʉ̌ʉ kâao-sǎan?</div>
+                        <div class="en text-sm mb-4">1. Why do Thai people and foreigners like to play water at Silom or Khaosan road?</div>
                     </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+
+                    <!-- Q2 -->
+                    <div class="bg-white p-4 rounded-xl border border-teal-100 content-block">
+                        <p class="text-gray-800 font-medium mb-2">2. 'ซอฟต์พาวเวอร์' (Soft Power) ของไทย เช่น อาหาร หรือ เทศกาล ดึงดูดนักท่องเที่ยวให้ 'มาไกล' ได้อย่างไร? <button class="tts-button" onclick="playTTS('ซอฟต์พาวเวอร์ ของไทย ดึงดูดนักท่องเที่ยวให้ มาไกล ได้อย่างไร', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-2">'sɔ́ɔp paao-wə̂ə' khɔ̌ɔng thai dʉng-dùut nák-tɔ̂ɔng-tîao hâi 'maa glai' dâi yàang-rai?</div>
+                        <div class="en text-sm mb-4">2. How does Thailand's 'Soft Power' attract tourists to 'come a long way'?</div>
                     </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khun khít wâa rohng-lá-khɔɔn hàeng-châat sǎm-khan dtɔ̀ɔ khon thai yàang-rai?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">How do you think the National Theater is important to Thai people?</div>
+
+                    <!-- Q3 -->
+                    <div class="bg-white p-4 rounded-xl border border-teal-100 content-block">
+                        <p class="text-gray-800 font-medium mb-2">3. ถ้าคุณสามารถเลือก 'มรดก' วัฒนธรรม 1 อย่างจากประเทศของคุณ คุณจะเสนออะไรให้โลกได้รู้จัก? เพราะอะไร? <button class="tts-button" onclick="playTTS('ถ้าคุณสามารถเลือก มรดก วัฒนธรรม หนึ่ง อย่างจากประเทศของคุณ คุณจะเสนออะไรให้โลกได้รู้จัก เพราะอะไร', this)">🔊</button></p>
+                        <div class="controls-row mb-2">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm mb-2">thâa khun sǎa-mâat lʉ̂ʉak 'mɔɔ-rá-dòk' wát-thá-ná-tham nʉ̀ng yàang jàak bprà-thêet khɔ̌ɔng khun...</div>
+                        <div class="en text-sm mb-4">3. If you could choose 1 cultural 'heritage' from your country, what would you propose to the world? Why?</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center border-t border-dashed border-gray-300 pt-6">
+                 <p class="text-gray-400 font-bold tracking-widest text-sm uppercase">--- END OF CORE LESSON ---</p>
+            </div>
+        </section>
+
+        <!-- 7. Extension Activities -->
+        <section class="space-y-4 pt-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-2xl shadow-sm">⏱️</div>
+                <h2 class="text-2xl font-bold text-gray-600 flex-1 flex items-center">
+                    7. กิจกรรมเสริม (Extension Activities)
+                    <button class="tts-button" onclick="playTTS('กิจกรรมเสริม', this)">🔊</button>
+                </h2>
+            </div>
+            
+            <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200 text-gray-600 font-medium text-center">
+                ใช้กิจกรรมเหล่านี้หากมีเวลาเหลือในบทเรียน (Use these if there is extra time in the lesson)
+            </div>
+
+            <!-- Debate -->
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-orange-400 mb-6 content-block">
+                <div class="flex items-center gap-3 mb-6 border-b border-orange-100 pb-4">
+                    <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 text-xl shadow-sm">⚖️</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-orange-800 flex items-center gap-2">
+                            โต้วาที: เล่นสงกรานต์ที่สีลม ดีกว่าเล่นหน้าบ้านตัวเอง จริงไหม?
+                            <button class="tts-button text-lg" onclick="playTTS('โต้วาที เล่นสงกรานต์ที่สีลม ดีกว่าเล่นหน้าบ้านตัวเอง จริงไหม', this)">🔊</button>
+                        </h3>
+                        <div class="controls-row mt-1">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm text-amber-600">dtôo-waa-thii: lên sǒng-graan thîi sǐi-lom dii gwàa lên nâa bâan dtua-eeng jing mǎi?</div>
+                        <div class="en text-sm text-gray-500">Debate: Playing Songkran at Silom is better than playing in front of your own house. True?</div>
+                    </div>
                 </div>
 
-                <!-- Q2 -->
-                <div class="content-block bg-teal-50 p-4 rounded-xl border border-teal-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">2. ในยุคนี้ "โรงละคร" จะแข่งขันกับ "Netflix" ได้อย่างไร? 📺🆚🏛️</p>
-                        <button onclick="speak('ในยุคนี้ โรงละคร จะแข่งขันกับ Netflix ได้อย่างไร', this)" class="tts-button text-teal-600 text-lg flex-shrink-0">🔊</button>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Team A -->
+                    <div class="flex-1 border-2 border-red-200 p-6 rounded-2xl text-center bg-red-50 relative overflow-hidden content-block">
+                        <div class="text-5xl mb-4">🥳💦</div>
+                        <div class="flex justify-center items-center gap-2 mb-1">
+                            <p class="font-bold text-red-800">ทีมเห็นด้วย (ไปสีลมสิ!)</p>
+                            <button class="tts-button text-sm" onclick="playTTS('ทีมเห็นด้วย ไปสีลมสิ', this)">🔊</button>
+                        </div>
                     </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                    
+                    <div class="flex items-center justify-center text-gray-300 font-black text-2xl">VS</div>
+                    
+                    <!-- Team B -->
+                    <div class="flex-1 border-2 border-blue-200 p-6 rounded-2xl text-center bg-blue-50 relative overflow-hidden content-block">
+                        <div class="text-5xl mb-4">🏠😴</div>
+                        <div class="flex justify-center items-center gap-2 mb-1">
+                            <p class="font-bold text-blue-800">ทีมไม่เห็นด้วย (อยู่บ้านสิ!)</p>
+                            <button class="tts-button text-sm" onclick="playTTS('ทีมไม่เห็นด้วย อยู่บ้านสิ', this)">🔊</button>
+                        </div>
                     </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">nai yúk níi rohng-lá-khɔɔn jà khàeng-khǎn gàp Netflix dâi yàang-rai?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">In this era, how can a "theater" compete with "Netflix"?</div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- Story telling -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-l-8 border-gray-300 content-block">
+                    <div class="text-4xl mb-4">📖😂</div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-gray-800">เล่าเรื่อง: ประสบการณ์สุดฮา</h3>
+                        <button class="tts-button text-sm" onclick="playTTS('เล่าเรื่อง ประสบการณ์สุดฮา', this)">🔊</button>
+                    </div>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-sm text-amber-600">lâo rʉ̂ʉang: bprà-sòp-gaan sùt haa</div>
+                    <div class="en text-sm text-gray-500 mb-3">Story-telling: A hilarious experience</div>
                 </div>
 
-                <!-- Q3 -->
-                <div class="content-block bg-teal-50 p-4 rounded-xl border border-teal-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">3. คุณเคยรู้สึก "ประสาทจะกิน" ในที่ที่มีคน "ล้นหลาม" บ้างไหม? 🤯👥</p>
-                        <button onclick="speak('คุณเคยรู้สึก ประสาทจะกิน ในที่ที่มีคน ล้นหลาม บ้างไหม', this)" class="tts-button text-teal-600 text-lg flex-shrink-0">🔊</button>
+                <!-- Presentation -->
+                <div class="bg-white p-6 rounded-2xl card-shadow border-l-8 border-gray-300 content-block">
+                    <div class="text-4xl mb-4">👩‍🏫🥽</div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <h3 class="text-lg font-bold text-gray-800">นำเสนอ: คู่มือเอาตัวรอด</h3>
+                        <button class="tts-button text-sm" onclick="playTTS('นำเสนอ คู่มือเอาตัวรอด', this)">🔊</button>
                     </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+                    <div class="controls-row mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                     </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khun khoei rúu-sʉ̀k bprà-sàat jà gin nai thîi thîi mii khon lón-lǎam bâang mǎi?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Have you ever felt "overstimulated" in a place with an "overwhelming" crowd?</div>
+                    <div class="ipa text-sm text-amber-600">nam-sà-nə̌ə: khûu-mʉʉ ao-dtua-rɔ̂ɔt</div>
+                    <div class="en text-sm text-gray-500 mb-3">Presentation: Survival Guide</div>
                 </div>
+            </div>
 
-                <!-- Q4 -->
-                <div class="content-block bg-teal-50 p-4 rounded-xl border border-teal-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">4. การมี "รอบพิเศษฟรี" เป็นวิธีที่ดีในการดึงดูดนักท่องเที่ยวไหม? 🎟️✨</p>
-                        <button onclick="speak('การมี รอบพิเศษฟรี เป็นวิธีที่ดีในการดึงดูดนักท่องเที่ยวไหม', this)" class="tts-button text-teal-600 text-lg flex-shrink-0">🔊</button>
+            <!-- Role-play -->
+            <div class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-fuchsia-50 mt-8 content-block">
+                <div class="flex items-center gap-3 mb-6 border-b border-fuchsia-100 pb-4">
+                    <div class="w-10 h-10 rounded-full bg-fuchsia-100 flex items-center justify-center text-fuchsia-500 text-xl shadow-sm">🎤</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-fuchsia-800 flex items-center gap-2">
+                            บทบาทสมมติ: สัมภาษณ์ริมถนนช่วงสงกรานต์
+                            <button class="tts-button text-lg" onclick="playTTS('บทบาทสมมติ สัมภาษณ์ริมถนนช่วงสงกรานต์', this)">🔊</button>
+                        </h3>
+                        <div class="controls-row mt-1">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa text-sm text-amber-600">bòt-bàat sǒm-mút: sǎm-phâat rim thà-nǒn chûuang sǒng-graan</div>
+                        <div class="en text-sm text-gray-500">Role-play: Street interview during Songkran</div>
                     </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">gaan mii rɔ̂ɔp phǐ-sèet frii bpen wí-thii thîi dii nai gaan dʉng-dùut nák-thɔ̂ɔng-thîiao mǎi?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Is having "free special rounds" a good way to attract tourists?</div>
-                </div>
-
-                <!-- Q5 -->
-                <div class="content-block bg-teal-50 p-4 rounded-xl border border-teal-100">
-                    <div class="flex items-start gap-2">
-                        <p class="font-medium text-lg text-gray-800">5. ถ้าคุณต้องเขียน "คู่มือเอาตัวรอด" ในกรุงเทพฯ คุณจะเขียนเรื่องอะไร? 📖🛟</p>
-                        <button onclick="speak('ถ้าคุณต้องเขียน คู่มือเอาตัวรอด ในกรุงเทพฯ คุณจะเขียนเรื่องอะไร', this)" class="tts-button text-teal-600 text-lg flex-shrink-0">🔊</button>
-                    </div>
-                    <div class="flex gap-1 mt-2 mb-1">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">thâa khun dtɔ̂ng khǐian khûu-mʉʉ ao dtua rɔ̂ɔt nai grung-thêep khun jà khǐian rʉ̂ʉang à-rai?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">If you had to write a "survival manual" for Bangkok, what would you write about?</div>
                 </div>
             </div>
         </section>
 
-        <!-- 7. Speaking Tasks -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">🎤</div>
-                <h2 class="text-2xl font-bold text-yellow-600">กิจกรรมฝึกพูด</h2>
-                <button onclick="speak('กิจกรรมฝึกพูด', this)" class="tts-button text-yellow-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
+        <!-- 8. Additional Vocabulary -->
+        <section class="mb-12 bg-slate-100 p-6 sm:p-8 rounded-3xl shadow-md border-l-8 border-slate-500">
+            <div class="content-block">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    📚 คำศัพท์เพิ่มเติม
+                    <button class="tts-button" onclick="playTTS('คำศัพท์เพิ่มเติม', this)">🔊</button>
+                </h2>
+                <div class="controls-row mb-4">
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
                 </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">gìt-jà-gam fʉ̀k phûut</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Speaking Activities</div>
+                <div class="ipa">kham-sàp phə̂əm-dtəəm</div>
+                <div class="en">Additional Vocabulary</div>
             </div>
-
-            <div class="space-y-6">
-                <!-- Task 1 -->
-                <div class="content-block bg-yellow-50 p-5 rounded-xl border border-yellow-200">
-                    <div class="flex items-start gap-2 mb-2">
-                        <h3 class="font-bold text-lg text-yellow-800">🎭 เกมใบ้คำ (Speaking Game)</h3>
-                        <button onclick="speak('เกมใบ้คำ', this)" class="tts-button text-yellow-600 text-lg mt-0.5">🔊</button>
-                    </div>
-                    <p class="text-gray-800 mb-2">ครูเลือกคำจาก "คำศัพท์เก่า" แล้วให้นักเรียนอธิบายคำนั้นโดย "ห้ามพูดคำนั้นออกมาตรงๆ" (Taboo Game)</p>
-                    <div class="flex gap-1 mb-2">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khruu lʉ̂ʉak kham jàak kham-sàp gào láeo hâi nák-riian à-thí-baai kham nán dooi hâam phûut kham nán ɔ̀ɔk maa dtrong dtong</div>
-                    <div class="en hidden text-blue-600 italic text-sm">The teacher chooses a word from the "old vocabulary" and the student explains it without "saying the word directly" (Taboo Game).</div>
-                </div>
-
-                <!-- Task 2 -->
-                <div class="content-block bg-yellow-50 p-5 rounded-xl border border-yellow-200">
-                    <div class="flex items-start gap-2 mb-2">
-                        <h3 class="font-bold text-lg text-yellow-800">📖 เล่าเรื่อง (Story-telling)</h3>
-                        <button onclick="speak('เล่าเรื่อง', this)" class="tts-button text-yellow-600 text-lg mt-0.5">🔊</button>
-                    </div>
-                    <p class="text-gray-800 mb-2">เล่าเหตุการณ์ที่คุณไปร่วมงานที่คน "ล้นหลาม" มากๆ (เช่น คอนเสิร์ต, งานสงกรานต์) ใช้คำว่า "ประทับใจ" หรือ "ประสาทจะกิน" ในเรื่องด้วย</p>
-                    <div class="flex gap-1 mb-2">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">lâo hèet-gaan thîi khun bpai rûuam ngaan thîi khon lón-lǎam mâak mâak chên khɔɔn-sə̀ət ngaan sǒng-graan chái kham wâa bprà-tháp-jai rʉ̌ʉ bprà-sàat jà gin nai rʉ̂ʉang dûuay</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Tell a story about an event you attended with an "overwhelming" crowd (e.g., concert, Songkran). Use the words "impressed" or "overstimulated" in your story.</div>
-                </div>
-
-                <!-- Task 3 -->
-                <div class="content-block bg-yellow-50 p-5 rounded-xl border border-yellow-200">
-                    <div class="flex items-start gap-2 mb-2">
-                        <h3 class="font-bold text-lg text-yellow-800">👩‍🏫 นำเสนอ (Presentation)</h3>
-                        <button onclick="speak('นำเสนอ', this)" class="tts-button text-yellow-600 text-lg mt-0.5">🔊</button>
-                    </div>
-                    <p class="text-gray-800 mb-2">ลองแนะนำโรงละครหรือสถานที่ท่องเที่ยวที่คุณ "ประทับใจ" ให้เพื่อนชาวไทยฟัง (ใช้โครงสร้าง: หลัง...มานาน, จนต้อง...)</p>
-                    <div class="flex gap-1 mb-2">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">lɔɔng náe-nam rohng-lá-khɔɔn rʉ̌ʉ sà-thǎan-thîi thɔ̂ng-thîiao thîi khun bprà-tháp-jai hâi phʉ̂ʉan chaao thai fang chái khroong-sâang lǎng maa naan jon dtɔ̂ng</div>
-                    <div class="en hidden text-blue-600 italic text-sm">Try recommending a theater or tourist attraction you are "impressed" by to a Thai friend (Use structures: After... for a long time, Until having to...).</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 8. Extension -->
-        <section class="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-inner border border-gray-200">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-300 content-block">
-                <div class="text-3xl">⏱️</div>
-                <h2 class="text-2xl font-bold text-gray-700">กิจกรรมเพิ่มเติม (Extension)</h2>
-                <button onclick="speak('กิจกรรมเพิ่มเติม', this)" class="tts-button text-gray-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">gìt-jà-gam phə̂əm-dtəəm</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Extension Activities</div>
-            </div>
-
-            <div class="space-y-6">
-                <!-- Debate -->
-                <div class="content-block bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-start gap-2 mb-2">
-                        <h3 class="font-bold text-lg text-gray-800">⚖️ โต้วาที (Real-life Debate)</h3>
-                        <button onclick="speak('โต้วาที', this)" class="tts-button text-gray-500 text-lg mt-0.5">🔊</button>
-                    </div>
-                    <p class="text-gray-800 mb-2 font-medium">"การแสดงแบบดั้งเดิม (เช่น โขน) ควรเปลี่ยนให้ทันสมัย หรือ ควรเก็บแบบเดิมไว้ให้มากที่สุด?"</p>
-                    <div class="flex gap-1 mb-2">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">gaan-sà-daeng bàep dâng-dəəm chên khǒon khuaan bplìian hâi than-sà-mǎi rʉ̌ʉ khuaan gèp bàep dəəm wái hâi mâak thîi sùt?</div>
-                    <div class="en hidden text-blue-600 italic text-sm">"Should traditional performances (like Khon) be modernized, or should they be kept as original as possible?"</div>
-                </div>
-
-                <!-- Roleplay -->
-                <div class="content-block bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-start gap-2 mb-2">
-                        <h3 class="font-bold text-lg text-gray-800">🎭 บทบาทสมมติ (Role-play)</h3>
-                        <button onclick="speak('บทบาทสมมติ', this)" class="tts-button text-gray-500 text-lg mt-0.5">🔊</button>
-                    </div>
-                    <p class="text-gray-800 mb-2">คุณไปจองตั๋วที่โรงละครแต่ตั๋วเต็ม! ลองคุยกับพนักงาน (ครู) เพื่อถามหา "รอบพิเศษ" หรือให้พนักงานช่วย "สื่อสาร" กับหัวหน้าเพื่อหาทางออก</p>
-                    <div class="flex gap-1 mb-2">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-sm">khun bpai jɔɔng dtǔua thîi rohng-lá-khɔɔn dtàe dtǔua dtem! lɔɔng khui gàp phák-nák-ngaan phʉ̂ʉa thǎam hǎa rɔ̂ɔp phǐ-sèet rʉ̌ʉ hâi phák-nák-ngaan chûuay sʉ̀ʉ-sǎan gàp hǔua-nâa phʉ̂ʉa hǎa thaang ɔ̀ɔk</div>
-                    <div class="en hidden text-blue-600 italic text-sm">You went to book a theater ticket but it's full! Try talking to the staff (teacher) to ask for a "special round" or have the staff help "communicate" with their boss to find a solution.</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 9. Additional Vocab -->
-        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-100 content-block">
-                <div class="text-3xl">📚</div>
-                <h2 class="text-2xl font-bold text-pink-700">คำศัพท์เพิ่มเติม</h2>
-                <button onclick="speak('คำศัพท์เพิ่มเติม', this)" class="tts-button text-pink-500 text-xl">🔊</button>
-                <div class="flex gap-1 ml-auto">
-                    <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                    <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                </div>
-                <div class="w-full ipa hidden text-orange-600 font-mono text-sm">kham-sàp phə̂əm-dtəəm</div>
-                <div class="w-full en hidden text-blue-600 italic text-sm">Additional Vocabulary</div>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                <!-- Vocab injected via JS below to keep HTML clean -->
-                <div id="additional-vocab-container" class="contents"></div>
-            </div>
+            
+            <div id="additional-vocab-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
         </section>
 
     </main>
 
     <!-- Footer -->
-    <footer class="mt-12 py-8 text-center bg-white border-t border-gray-200">
-        <p class="text-gray-500 font-medium">สนุกกับการเรียนภาษาไทยนะครับ! 🇹🇭</p>
+    <footer class="mt-20 py-8 text-center bg-white border-t border-cyan-100">
+        <p class="text-cyan-600 text-sm font-medium"><i class="fas fa-water text-cyan-400"></i> Enjoy your Thai lesson! <i class="fas fa-water text-cyan-400"></i></p>
     </footer>
 
     <!-- JAVASCRIPT -->
     <script>
-        const pastVocab = [
-            {th: "เรียงความ", ipa: "riiang-kwaam", en: "essays", emoji: "📝📄"},
-            {th: "เรื่องสั้น", ipa: "rʉ̂ʉang-sân", en: "short stories", emoji: "📚📝"},
-            {th: "หนา", ipa: "nǎa", en: "thick", emoji: "📏🧱"},
-            {th: "งานรับปริญญา", ipa: "ngaan-ráp-bpà-rin-yaa", en: "graduation", emoji: "🎓📸"},
-            {th: "การแสดง", ipa: "gaan-sà-dɛɛng", en: "performance", emoji: "🎭🎬"},
-            {th: "ดนตรีสด", ipa: "don-dtrii-sòt", en: "live music", emoji: "🎶🎤"},
-            {th: "มืออาชีพ", ipa: "mʉʉ-aa-chîip", en: "professional", emoji: "👔"},
-            {th: "จัด", ipa: "jàt", en: "arrange / organise", emoji: "🗂️🧹"},
-            {th: "ระดับเริ่มต้น", ipa: "rá-dàp-rə̂əm-dtôn", en: "beginner level", emoji: "🔰📘"},
-            {th: "ระเบียง", ipa: "rá-biiang", en: "balcony", emoji: "🏙️🏠"},
-            {th: "วง", ipa: "wong", en: "circle / band", emoji: "⭕🎺"},
-            {th: "เงินเดือน", ipa: "ŋən dʉan", en: "salary", emoji: "💵"},
-            {th: "โอกาส", ipa: "ʔoo-gàat", en: "Opportunity", emoji: "🍀🚪✨"},
-            {th: "เสื้อยืด", ipa: "sʉ̂a-yʉ̂ʉt", en: "t-shirt", emoji: "👕"},
-            {th: "เจ้าบ่าว", ipa: "jâo-bàao", en: "groom", emoji: "🤵"},
-            {th: "เจ้าสาว", ipa: "jâo-saao", en: "bride", emoji: "👰💍"},
-            {th: "คู่หมั้น", ipa: "khûu-màn", en: "fiance", emoji: "💍"},
-            {th: "นอกใจ", ipa: "nɔ̂ɔk-jai", en: "cheat on", emoji: "💔🤫"},
-            {th: "หลอก", ipa: "lɔ̀ɔk", en: "To trick", emoji: "🎭🃏"},
-            {th: "สวม", ipa: "sŭuam", en: "Wear / put on", emoji: "👕"},
-            {th: "เขา", ipa: "khǎo", en: "horns", emoji: "🦌📯"},
-            {th: "อย่า", ipa: "yàa", en: "Don't", emoji: "🚫"},
-            {th: "หญ้า", ipa: "yâa", en: "grass", emoji: "🌱"},
-            {th: "แทน", ipa: "thaaen", en: "instead of", emoji: "🔁"},
-            {th: "ตบ", ipa: "dtòp", en: "slap", emoji: "👋💥"},
-            {th: "ปลอบใจ", ipa: "plàawp-jai", en: "to comfort", emoji: "🤗💛"},
-            {th: "บังเอิญ", ipa: "bang-ʉʉan", en: "coincident", emoji: "🎲✨"},
-            {th: "โดยบังเอิญ", ipa: "dooi-bang-ʉʉan", en: "coincidentally", emoji: "🎲✨"},
-            {th: "ปริศนา", ipa: "prìt-sà-nǎa", en: "Mystery", emoji: "🕵️‍♂️🧩"},
-            {th: "หายนะ", ipa: "hǎai-yá-ná", en: "Disaster", emoji: "💥🌪️"},
-            {th: "สาเหตุ", ipa: "sǎa-hèet", en: "Cause", emoji: "❓🔍"},
-            {th: "บรรณาธิการ", ipa: "ban-naa-tí-gaan", en: "editor", emoji: "📝"},
-            {th: "วิธีการวิจัย", ipa: "wí-tii gan wí-jai", en: "research methods", emoji: "📚🔬"},
-            {th: "หัวข้อ", ipa: "hŭua-kâw", en: "Topics", emoji: "🗂️"},
-            {th: "การมีส่วนร่วม", ipa: "gaan mii-sùan-rûam", en: "participation", emoji: "🤝🙋"},
-            {th: "โกง", ipa: "goong", en: "cheat", emoji: "🕵️‍♂️🎭"},
-            {th: "โดดเดี่ยว", ipa: "dòht-dìao", en: "isolated", emoji: "😔🏝️"},
-            {th: "คุณภาพ", ipa: "kun-ná-pâap", en: "Quality", emoji: "✅"},
-            {th: "การขนส่งสาธารณะ", ipa: "gaan kǒn-sòhng sǎa-taa-rá-ná", en: "public transportation", emoji: "🚌🚆🚇"},
-            {th: "ชุมชน", ipa: "chum-chon", en: "communities", emoji: "🏘️👥"},
-            {th: "สังคมผู้สูงอายุ", ipa: "sǎng-kom pûu sǔung-aa-yú", en: "aging society", emoji: "👵👴"},
-            {th: "วันครบรอบ", ipa: "wan-króp-râawp", en: "Anniversary", emoji: "🎉💍"},
-            {th: "วงดนตรี", ipa: "wong don-dtrii", en: "(music) band", emoji: "🎵🎸"},
-            {th: "การแข่งขัน", ipa: "gaan kàeng-kǎn", en: "competition", emoji: "🏆🎯"},
-            {th: "ดำเนินการ", ipa: "dam-nəən-gaan", en: "facilitate / proceed", emoji: "⚙️🏃"},
-            {th: "สมบัติ", ipa: "sǒm-bàt", en: "treasure", emoji: "💎🪙"},
-            {th: "จม", ipa: "jom", en: "To sink / drown", emoji: "🌊🫧"},
-            {th: "อัญมณี", ipa: "an-yá-má-nii", en: "gems", emoji: "💎"},
-            {th: "กลไก", ipa: "gon-gai", en: "mechanism", emoji: "⚙️"},
-            {th: "ไว้อาลัย", ipa: "wái-aa-lai", en: "mourning", emoji: "🕯️🖤"},
-            {th: "การประกาศ", ipa: "gaan bprà-gàat", en: "announcement", emoji: "📢📰"},
-            {th: "เพื่อนร่วมงาน", ipa: "pêuan-rûam-ngaan", en: "co-worker", emoji: "👥💼"},
-            {th: "มีอะไรให้ทำเยอะ", ipa: "mii-à-rai-hâi-tam-yóe", en: "There are lots to do.", emoji: "📝⏳"},
-            {th: "น้ำท่วมถนนหลายเส้น", ipa: "náam-tûam-tá-nŏn-lăai-sên", en: "Many roads were flooded.", emoji: "🌊🚧🛣️"},
-            {th: "ค่าดำเนินการสอบ", ipa: "khâa-dam-nern-gaan-sòob", en: "Test processing fees", emoji: "🧾💰"},
-            {th: "ภูมิศาสตร์", ipa: "puum-mí-sàat", en: "Geography", emoji: "🗺️🌍"},
-            {th: "โครงสร้างพื้นฐาน", ipa: "kroong-sâang-pěun-thăan", en: "Infrastructure", emoji: "🏗️🛣️"},
-            {th: "มูลค่า", ipa: "muun-láa-kaâ", en: "value", emoji: "💰📈"},
-            {th: "บันได", ipa: "ban-dai", en: "stairs", emoji: "🪜"},
-            {th: "เส้นศูนย์สูตร", ipa: "sên-sŭun-sùut", en: "equator", emoji: "🌍"},
-            {th: "พลังงาน", ipa: "pá lang-ŋaan", en: "energy", emoji: "⚡🔋"},
-            {th: "อำนาจ", ipa: "am-nâat", en: "power", emoji: "👑💪"},
-            {th: "ที่ราบ", ipa: "têe-râap", en: "plains", emoji: "🏞️🌾"},
-            {th: "ปณิธาน", ipa: "bpà-ní-taan", en: "resolutions", emoji: "😇"},
-            {th: "ตั้งใจ", ipa: "dtâng-jai", en: "determined", emoji: "🧐"},
-            {th: "เป้าหมาย", ipa: "bpâo-mǎai", en: "goals", emoji: "🥅"},
-            {th: "ยืดหยุ่น", ipa: "yʉ̂ʉt-yùn", en: "flexible", emoji: "🙆"},
-            {th: "จำเป็น", ipa: "jam-bpen", en: "obligatory", emoji: "💉"},
-            {th: "ปรารถนา", ipa: "bpràat-tà-nǎa", en: "desire", emoji: "🙏"},
-            {th: "ประหยัด", ipa: "bprà-yàt", en: "frugal / To save", emoji: "💾💸"},
-            {th: "มีวินัย", ipa: "mii wí-nai", en: "disciplined", emoji: "👍⏰"},
-            {th: "เด็ดขาด", ipa: "dèt-kàat", en: "definitive", emoji: "💯"},
-            {th: "มีความคิดสร้างสรรค์", ipa: "mii kwaam-kít sâang-sǎn", en: "creative", emoji: "🧑‍🎨"},
-            {th: "เจือจาง", ipa: "jʉʉa-jaang", en: "dilute", emoji: "💧➕🧪"},
-            {th: "อุณหภูมิ", ipa: "un-hà-pum", en: "temperature", emoji: "🌡️📉📈"},
-            {th: "ความหนาแน่น", ipa: "kwaam-nǎa-nɛ̂ɛn", en: "density", emoji: "🧱📦⚖️"},
-            {th: "ลอย", ipa: "lɔɔi", en: "float", emoji: "🎈🌊🆙"},
-            {th: "แร่ธาตุ", ipa: "rɛ̂ɛ-tâat", en: "mineral", emoji: "💎⛰️🧪"},
-            {th: "ธรณีวิทยา", ipa: "tɔɔ-rá-nii-wít-tá-yaa", en: "Geology", emoji: "🌋⛏️🗺️"},
-            {th: "โครงสร้างผลึก", ipa: "kroong-sâang pà lùek", en: "Crystal structure", emoji: "💎⚛️🧊"},
-            {th: "เฉพาะ", ipa: "chà-pɔ́", en: "specific", emoji: "🎯🔍📍"},
-            {th: "สถานะ", ipa: "sà-tǎa-ná", en: "status; state", emoji: "🧪🧊💧"},
-            {th: "ลักษณะเฉพาะ", ipa: "lák-sà-nà chà-pɔ́", en: "characteristic", emoji: "✨📝🧬"},
-            {th: "ลูกเห็บ", ipa: "lûuk-hèp", en: "hail", emoji: "🌨️🧊☄️"},
-            {th: "ขี้เลื่อย", ipa: "kîi-lʉ̂ai", en: "sawdust", emoji: "🪵🪚🍂"},
-            {th: "ฉนวนกันความร้อน", ipa: "chà-nǔuan gan kwaam rɔ́ɔn", en: "insulation", emoji: "🏠🔥🛡️"},
-            {th: "ละลาย", ipa: "lá-laai", en: "melt", emoji: "🧊🫠🔥"},
-            {th: "สงสัย", ipa: "sǒng-sǎi", en: "wonder", emoji: "🤔❓🧐"},
-            {th: "ทำให้เสียหาย", ipa: "tam-hâi-sǐa-hǎai", en: "make damaged", emoji: "🔨⚠️❌"},
-            {th: "ทูต", ipa: "tûut", en: "ambassador", emoji: "🕊️🤝🌐"},
-            {th: "เมืองหลวง", ipa: "mʉʉang-lǔang", en: "capital city", emoji: "🏛️🏢👑"},
-            {th: "โรงงาน", ipa: "roong-ngaan", en: "factory", emoji: "🏭🏗️💨"},
-            {th: "ส่งออก", ipa: "sòng-ɔ̀ɔk", en: "export", emoji: "🚢📦🌎"},
-            {th: "ก้อน", ipa: "gɔ̂n", en: "lump", emoji: "🪨🧊🧱"},
-            {th: "ขนาด", ipa: "kà-nàat", en: "size", emoji: "📐📏📦"},
-            {th: "ลื่น", ipa: "lʉ̂ʉn", en: "slippery", emoji: "⛸️🍌💦"},
-            {th: "วิชาการ", ipa: "wí-chaa-gaan", en: "academic", emoji: "🎓📚"},
-            {th: "วิศวกร", ipa: "wí-sà-wá-gawn", en: "engineer", emoji: "🧑‍💻🛠️"},
-            {th: "ยืนยัน", ipa: "yeun-yan", en: "confirm", emoji: "✅"},
-            {th: "แรงสั่นสะเทือน", ipa: "raeng-sàn-sa-thʉ̄an", en: "tremors", emoji: "🌋📳"},
-            {th: "กระทบ", ipa: "grà-thóp", en: "affect", emoji: "🎯💥"},
-            {th: "รอยเลื่อน", ipa: "rooi-lʉ̂an", en: "fault", emoji: "🪨⚠️"},
-            {th: "ความมั่นคง", ipa: "kwaam-mân-khong", en: "stability", emoji: "🛡️🏛️"},
-            {th: "เขื่อน", ipa: "kèuuan", en: "dam", emoji: "🏞️🌊"},
-            {th: "ติดตาม", ipa: "dtìt-dtaam", en: "follow", emoji: "👣👀"},
-            {th: "ลักษณะ", ipa: "lák-sà-nà", en: "characteristic", emoji: "🔍📌"},
-            {th: "ถล่ม", ipa: "tà-lòhm", en: "collapse", emoji: "🏚️💥"},
-            {th: "คำสรรพนาม", ipa: "kum-sàp-naam", en: "pronouns", emoji: "🧑‍🤝‍🧑"},
-            {th: "ตัวเอง", ipa: "dtua-eng", en: "self", emoji: "🫵🙂"},
-            {th: "ข้า", ipa: "kâa", en: "I (polite old)", emoji: "🙋"},
-            {th: "เอ็ง", ipa: "aeng", en: "You (polite old)", emoji: "👉"},
-            {th: "เรา", ipa: "rao", en: "we / I", emoji: "🙋"},
-            {th: "สถานการณ์", ipa: "sa-thăan-ná-gaan", en: "situations", emoji: "🌏📌"},
-            {th: "แสดงความเคารพ", ipa: "sà-daeng-kwaam-kâao-róp", en: "show respect", emoji: "🙇‍♂️🙏"},
-            {th: "กันเอง", ipa: "gan-eeng", en: "casual", emoji: "😎🤝"},
-            {th: "ความสัมพันธ์", ipa: "kwaam-sam-pan", en: "relationships", emoji: "🤝🔗"},
-            {th: "ภาษาบอกความสนิท", ipa: "paa-săa-bòk-kwaam-sà-nìt", en: "Language signals closeness", emoji: "🤝🗣️"},
-            {th: "ฟิสิกส์อนุภาค", ipa: "fí-sìk-à-nú-pâak", en: "Particle Physics", emoji: "⚛️🔬"},
-            {th: "อุโมงค์", ipa: "ù-mohng", en: "tunnel", emoji: "🚇🕳️"},
-            {th: "เครื่องเร่งอนุภาค", ipa: "krʉ̂ang-rêeng-à-nú-phâak", en: "Particle Accelerator", emoji: "⚛️🔬"},
-            {th: "ทฤษฎี", ipa: "trít-sà-dee", en: "theory", emoji: "🧠📚"},
-            {th: "แห่", ipa: "hàae", en: "To flock", emoji: "👥🏃‍♂️"},
-            {th: "ผลกระทบ", ipa: "pŏn-grà-tóp", en: "effects", emoji: "💥📉"},
-            {th: "ขนส่ง", ipa: "kŏn-sòng", en: "transport", emoji: "🚚🚛"},
-            {th: "ช่องแคบ", ipa: "chɔ̂ng-khàep", en: "strait", emoji: "🌊🗺️"},
-            {th: "ถ่านหิน", ipa: "tàan-hĭn", en: "coal", emoji: "⛏️🪨"},
-            {th: "มีประสิทธิภาพ", ipa: "mii-bprà-sìt-tí-pâap", en: "efficient", emoji: "⚙️🚀"},
-            {th: "วิธี", ipa: "wí-thee", en: "methods", emoji: "🛠️🧠"},
-            {th: "การขยายตัว", ipa: "gaan-kà-yǎai-dtua", en: "expansion", emoji: "📈🌱"},
-            {th: "แก้", ipa: "gâe", en: "fix; edit", emoji: "🛠️✏️"},
-            {th: "ค่าดำเนินการ", ipa: "kâa-dam-neern-gaan", en: "processing fees", emoji: "💸🧾"},
-            {th: "ยกเลิก", ipa: "yók-lə̂erk", en: "cancel", emoji: "❌"},
-            {th: "มรสุม", ipa: "mon-rá-sùm", en: "monsoon", emoji: "🌧️🌬️"},
-            {th: "ตุน", ipa: "dtun", en: "stock up", emoji: "📦🛒"},
-            {th: "พยากรณ์", ipa: "phá-yaa-gawn", en: "forecast", emoji: "🔮📈"},
-            {th: "คนจัดงาน", ipa: "kon-jàt-ngaan", en: "organizer", emoji: "🧑‍💼📋"},
-            {th: "งานอดิเรก", ipa: "ngaan-à-dì-rèek", en: "hobbies", emoji: "🎨📚🎮"},
-            {th: "สรุป", ipa: "sà-rùp", en: "summarize", emoji: "📝"},
-            {th: "จิตวิทยา", ipa: "jìt-wít-thá-yaa", en: "psychology", emoji: "🧠📚"},
-            {th: "สถาปัตย์", ipa: "sà-thăa-bpàt", en: "architecture", emoji: "🏛️📐"},
-            {th: "คำนาม", ipa: "kam-nahm", en: "noun", emoji: "📝"},
-            {th: "นิทรรศการ", ipa: "nít-tát-sà-gǎan", en: "exhibition", emoji: "🖼️🎟️"},
-            {th: "ความมุ่งมั่น", ipa: "kwaam-mûng-màn", en: "determination", emoji: "💪🎯"},
-            {th: "ความเรียบง่าย", ipa: "kwaam-rîap-ngâai", en: "simplicity", emoji: "✨🧘"},
-            {th: "เลื่อน", ipa: "lêuuaen", en: "scroll", emoji: "🖱️📜"},
-            {th: "ไถ", ipa: "tăi", en: "plow / scroll", emoji: "🪏📜"},
-            {th: "ชำนาญ", ipa: "cham-naan", en: "skilled", emoji: "🎯🧠💪"},
-            {th: "โต้วาที", ipa: "dtôh-waa-tii", en: "debate", emoji: "🗣️⚖️"},
-            {th: "ศาล", ipa: "săan", en: "shrine; court", emoji: "🏛️🙏"},
-            {th: "พัฒนา", ipa: "pát-tá-naa", en: "develop", emoji: "🛠️🌱"},
-            {th: "นิเทศ", ipa: "ní-tâet", en: "Comm Arts", emoji: "🎙️📺"},
-            {th: "จุดธูป", ipa: "jùt-tûup", en: "light incense", emoji: "🕯️🙏"},
-            {th: "คำร้อง", ipa: "kam-róong", en: "petition", emoji: "📝📣"},
-            {th: "ปกป้อง", ipa: "bpòk-bpông", en: "protect", emoji: "🛡️🔒"},
-            {th: "ศรัทธา", ipa: "sàt-thaa", en: "faith", emoji: "🙏✨"},
-            {th: "พิทักษ์", ipa: "pí-ták", en: "guard", emoji: "🛡️👮"},
-            {th: "คดีความ", ipa: "ká-dee-kwaam", en: "lawsuit", emoji: "⚖️📄"},
-            {th: "แบบสำรวจ", ipa: "bàep-sǎm-rùat", en: "survey", emoji: "📝📋"},
-            {th: "รื้อถอน", ipa: "rʉ́ʉ-thŏn", en: "demolish", emoji: "🏚️🧨"},
-            {th: "เสนอ", ipa: "sà-nə̌ə", en: "propose", emoji: "🤝💡"},
-            {th: "รัฐมนตรี", ipa: "rát-tha-mon-dtrii", en: "minister", emoji: "🧑‍⚖️🏛️"},
-            {th: "ยืนกราน", ipa: "yeun-graan", en: "confirm", emoji: "✋✅"},
-            {th: "ภูมิภาค", ipa: "poo-mí-pâak", en: "region", emoji: "🗺️🌏"},
-            {th: "กระโดด", ipa: "gra-dòht", en: "jump", emoji: "🦘⬆️"},
-            {th: "ต่อรอง", ipa: "dtòr-rɔɔng", en: "negotiate", emoji: "🤝💬"},
-            {th: "ขึ้นทะเบียน", ipa: "kêun-thá-bian", en: "register", emoji: "📝📋"},
-            {th: "ลงทะเบียน", ipa: "long-thá-bian", en: "sign up", emoji: "📝✅"},
-            {th: "ความเหลื่อมล้ำ", ipa: "khwaam-lʉ̀am-láam", en: "inequality", emoji: "⚖️📉"},
-            {th: "ผู้อพยพ", ipa: "pûu-òp-phá-yóp", en: "immigrants", emoji: "🧳🌍"},
-            {th: "วงจรต่อเนื่อง", ipa: "wong-jon-dtàaw-nʉ̂ʉang", en: "perpetuating cycle", emoji: "🔁🔄"},
-            {th: "เชื่อถือไม่ได้", ipa: "chêua-thĕuue-mâi-dâai", en: "not reliable", emoji: "🚫🤥"},
-            {th: "แก้ไข", ipa: "gâae-kǎi", en: "solve; fix", emoji: "🛠️"},
-            {th: "เร่งด่วน", ipa: "rêng-dùan", en: "urgent", emoji: "🚨⏱️"},
-            {th: "สาธารณสุข", ipa: "sàa-thaa-rá-ná-sùk", en: "healthcare", emoji: "🏥🩺"},
-            {th: "เชื่อม", ipa: "chʉ̂ʉam", en: "connect", emoji: "🔗"},
-            {th: "ศูนย์ดูแลผู้สูงอายุ", ipa: "sǔun-doolae-phûu-sǔung-aa-yú", en: "nursing home", emoji: "🏥👵"},
-            {th: "บ้านพักคนชรา", ipa: "bâan-phák-kon-chraa", en: "retirement home", emoji: "👵🏠"}
-        ];
-
-        const additionalVocab = [
-            {th: "สื่อสาร", ipa: "sʉ̀ʉ-sǎan", en: "communicate", emoji: "🗣️"},
-            {th: "รู้เรื่อง", ipa: "rúu rʉ̂ʉang", en: "make sense", emoji: "🧠"},
-            {th: "ชม", ipa: "chom", en: "look; compliment", emoji: "👀"},
-            {th: "รปภ.", ipa: "rɔɔ-bpɔɔ-phɔɔ", en: "security", emoji: "👮"},
-            {th: "ตม.", ipa: "dtɔɔ-mɔɔ", en: "immigration", emoji: "🛂"},
-            {th: "ประทับใจ", ipa: "bprà-tháp-jai", en: "impressed", emoji: "🤩"},
-            {th: "ประสาทจะกิน", ipa: "bprà-sàat jà gin", en: "overstimulated", emoji: "🤯"},
-            {th: "คู่มือ", ipa: "khûu-mʉʉ", en: "manual", emoji: "📖"},
-            {th: "เอาตัวรอด", ipa: "ao dtua rɔ̂ɔt", en: "survive", emoji: "🏃‍♂️"}
-        ];
-
-        // Ensure voices are loaded
-        window.speechSynthesis.getVoices();
-        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
-
-        function speak(text, btnElement) {
-            window.speechSynthesis.cancel();
-            
-            // Revert any currently playing buttons
-            document.querySelectorAll('.tts-playing').forEach(el => el.classList.remove('tts-playing'));
-            if(btnElement) btnElement.classList.add('tts-playing');
-
-            // Strip Emojis for robust TTS
-            const cleanText = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
-
-            const msg = new SpeechSynthesisUtterance(cleanText);
-            msg.lang = 'th-TH';
-            msg.rate = 0.9;
-            
-            msg.onend = () => { if(btnElement) btnElement.classList.remove('tts-playing'); };
-            msg.onerror = () => { if(btnElement) btnElement.classList.remove('tts-playing'); };
-            
-            window.speechSynthesis.speak(msg);
-        }
-
-        function toggleTarget(btn, typeClass) {
-            const container = btn.closest('.content-block');
-            const targets = container.querySelectorAll('.' + typeClass);
-            targets.forEach(t => t.classList.toggle('hidden'));
-            btn.classList.toggle('active');
-        }
-
-        function randomVocab() {
-            const display = document.getElementById('vocab-display');
-            if(!display) return;
-            const randomWord = pastVocab[Math.floor(Math.random() * pastVocab.length)];
-            
-            display.innerHTML = `
-                <div class="content-block text-center w-full">
-                    <div class="text-4xl mb-3">${randomWord.emoji}</div>
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <span class="text-3xl font-bold text-blue-700">${randomWord.th}</span>
-                        <button onclick="speak('${randomWord.th}', this)" class="tts-button text-blue-500 text-2xl">🔊</button>
-                    </div>
-                    <div class="flex justify-center gap-2 mb-2">
-                        <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                        <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                    </div>
-                    <div class="ipa hidden text-orange-600 font-mono text-base mb-1">/${randomWord.ipa}/</div>
-                    <div class="en hidden text-blue-600 italic text-base">${randomWord.en}</div>
-                </div>
-            `;
-        }
-
-        // Initialize additional vocab dynamically
-        window.onload = function() {
-            const vocabContainer = document.getElementById('additional-vocab-container');
-            let vocabHTML = '';
-            additionalVocab.forEach(v => {
-                vocabHTML += `
-                    <div class="content-block p-4 border border-gray-100 rounded-lg bg-gray-50 flex flex-col justify-center">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-bold text-gray-800 text-lg">${v.emoji} ${v.th}</span>
-                            <button onclick="speak('${v.th}', this)" class="tts-button text-pink-500">🔊</button>
-                        </div>
-                        <div class="flex gap-1 mb-2">
-                            <button onclick="toggleTarget(this, 'ipa')" class="btn-toggle">IPA</button>
-                            <button onclick="toggleTarget(this, 'en')" class="btn-toggle">EN</button>
-                        </div>
-                        <div class="ipa hidden text-orange-600 font-mono text-sm">${v.ipa}</div>
-                        <div class="en hidden text-blue-600 italic text-sm">${v.en}</div>
-                    </div>
-                `;
+        // Check Quizzes
+        function checkVideoQuiz() {
+            const correctAnswers = { vq1: 'b', vq2: 'b' };
+            const questions = document.querySelectorAll('.video-quiz-question');
+            questions.forEach(question => {
+                const radios = question.querySelectorAll('input[type="radio"]');
+                if (radios.length === 0) return;
+                const questionName = radios[0].name;
+                
+                radios.forEach(radio => {
+                    const label = radio.parentElement;
+                    label.classList.remove('bg-green-200', 'bg-red-200');
+                    const selectedValue = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedValue) {
+                        if (selectedValue.value === correctAnswers[questionName]) {
+                            if (radio.checked) label.classList.add('bg-green-200');
+                        } else {
+                            if (radio.checked) label.classList.add('bg-red-200');
+                        }
+                    }
+                });
             });
-            if(vocabContainer) vocabContainer.innerHTML = vocabHTML;
         }
+
+        function checkReadingQuiz() {
+            const correctAnswers = { rq1: 'a', rq2: 'b' };
+            const questions = document.querySelectorAll('.reading-quiz-question');
+            questions.forEach(question => {
+                const radios = question.querySelectorAll('input[type="radio"]');
+                if (radios.length === 0) return;
+                const questionName = radios[0].name;
+                
+                radios.forEach(radio => {
+                    const label = radio.parentElement;
+                    label.classList.remove('bg-green-200', 'bg-red-200');
+                    const selectedValue = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedValue) {
+                        if (selectedValue.value === correctAnswers[questionName]) {
+                            if (radio.checked) label.classList.add('bg-green-200');
+                        } else {
+                            if (radio.checked) label.classList.add('bg-red-200');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Toggle Local Logic
+        function toggleLocal(btn, type) {
+            const block = btn.closest('.content-block');
+            if (block) {
+                const targets = block.querySelectorAll('.' + type);
+                targets.forEach(t => t.classList.toggle('reveal'));
+                btn.classList.toggle('active');
+            }
+        }
+
+        // Randomize Words
+        const reviewVocab = [
+            {th: "เรียงความ", en: "essays", ipa: "riiang-kwaam"}, {th: "เรื่องสั้น", en: "short stories", ipa: "rʉ̂ʉang-sân"}, {th: "หนา", en: "thick", ipa: "nǎa"},
+            {th: "งานรับปริญญา", en: "graduation", ipa: "ngaan-ráp-bpà-rin-yaa"}, {th: "การแสดง", en: "performance", ipa: "gaan-sà-dɛɛng"}, {th: "ดนตรีสด", en: "live music", ipa: "don-dtrii-sòt"},
+            {th: "มืออาชีพ", en: "professional", ipa: "mʉʉ-aa-chîip"}, {th: "จัด", en: "arrange/hold", ipa: "jàt"}, {th: "ระดับเริ่มต้น", en: "beginner level", ipa: "rá-dàp-rə̂əm-dtôn"},
+            {th: "ระเบียง", en: "balcony", ipa: "rá-biiang"}, {th: "วง", en: "circle/band", ipa: "wong"}, {th: "เงินเดือน", en: "salary", ipa: "ŋən dʉan"},
+            {th: "โอกาส", en: "opportunity", ipa: "ʔoo-gàat"}, {th: "เสื้อยืด", en: "t-shirt", ipa: "sʉ̂a-yʉ̂ʉt"}, {th: "เจ้าบ่าว", en: "groom", ipa: "jâo-bàao"},
+            {th: "เจ้าสาว", en: "bride", ipa: "jâo-saao"}, {th: "คู่หมั้น", en: "fiance", ipa: "khûu-màn"}, {th: "นอกใจ", en: "cheat on", ipa: "nɔ̂ɔk-jai"},
+            {th: "หลอก", en: "to trick", ipa: "lɔ̀ɔk"}, {th: "สวม", en: "wear", ipa: "sŭuam"}, {th: "เขา", en: "horns", ipa: "khǎo"},
+            {th: "อย่า", en: "don't", ipa: "yàa"}, {th: "หญ้า", en: "grass", ipa: "yâa"}, {th: "แทน", en: "instead of", ipa: "thaaen"},
+            {th: "ตบ", en: "slap", ipa: "dtòp"}, {th: "ปลอบใจ", en: "to comfort", ipa: "plàawp-jai"}, {th: "บังเอิญ", en: "coincident", ipa: "bang-ʉʉan"},
+            {th: "โดยบังเอิญ", en: "coincidentally", ipa: "dooi-bang-ʉʉan"}, {th: "ปริศนา", en: "mystery", ipa: "prìt-sà-nǎa"}, {th: "หายนะ", en: "disaster", ipa: "hǎai-yá-ná"},
+            {th: "สาเหตุ", en: "cause", ipa: "sǎa-hèet"}, {th: "บรรณาธิการ", en: "editor", ipa: "ban-naa-tí-gaan"}, {th: "วิธีการวิจัย", en: "research methods", ipa: "wí-tii gan wí-jai"},
+            {th: "หัวข้อ", en: "topics", ipa: "hŭua-kâw"}, {th: "การมีส่วนร่วม", en: "participation", ipa: "gaan mii-sùan-rûam"}, {th: "โกง", en: "cheat", ipa: "goong"},
+            {th: "โดดเดี่ยว", en: "isolated", ipa: "dòht-dìao"}, {th: "คุณภาพ", en: "quality", ipa: "kun-ná-pâap"}, {th: "การขนส่งสาธารณะ", en: "public transport", ipa: "gaan kǒn-sòhng sǎa-taa-rá-ná"},
+            {th: "ชุมชน", en: "communities", ipa: "chum-chon"}, {th: "สังคมผู้สูงอายุ", en: "aging society", ipa: "sǎng-kom pûu sǔung-aa-yú"}, {th: "วันครบรอบ", en: "anniversary", ipa: "wan-króp-râawp"},
+            {th: "วงดนตรี", en: "music band", ipa: "wong don-dtrii"}, {th: "การแข่งขัน", en: "competition", ipa: "gaan kàeng-kǎn"}, {th: "ดำเนินการ", en: "facilitate/run", ipa: "dam-nəən-gaan"},
+            {th: "สมบัติ", en: "treasure", ipa: "sǒm-bàt"}, {th: "จม", en: "sink/drown", ipa: "jom"}, {th: "อัญมณี", en: "gems", ipa: "an-yá-má-nii"},
+            {th: "กลไก", en: "mechanism", ipa: "gon-gai"}, {th: "ไว้อาลัย", en: "mourning", ipa: "wái-aa-lai"}, {th: "การประกาศ", en: "announcement", ipa: "gaan bprà-gàat"},
+            {th: "เพื่อนร่วมงาน", en: "co-worker", ipa: "pêuan-rûam-ngaan"}, {th: "ภูมิศาสตร์", en: "geography", ipa: "puum-mí-sàat"}, {th: "โครงสร้าง", en: "infrastructure", ipa: "kroong-sâang"},
+            {th: "มูลค่า", en: "value", ipa: "muun-láa-kaâ"}, {th: "บันได", en: "stairs", ipa: "ban-dai"}, {th: "เส้นศูนย์สูตร", en: "equator", ipa: "sên-sŭun-sùut"},
+            {th: "พลังงาน", en: "energy", ipa: "pá lang-ŋaan"}, {th: "อำนาจ", en: "power", ipa: "am-nâat"}, {th: "ที่ราบ", en: "plains", ipa: "têe-râap"},
+            {th: "ปณิธาน", en: "resolutions", ipa: "bpà-ní-taan"}, {th: "ตั้งใจ", en: "determined", ipa: "dtâng-jai"}, {th: "เป้าหมาย", en: "goals", ipa: "bpâo-mǎai"},
+            {th: "ยืดหยุ่น", en: "flexible", ipa: "yʉ̂ʉt-yùn"}, {th: "จำเป็น", en: "obligatory", ipa: "jam-bpen"}, {th: "ปรารถนา", en: "desire", ipa: "bpràat-tà-nǎa"},
+            {th: "ประหยัด", en: "frugal/save", ipa: "bprà-yàt"}, {th: "มีวินัย", en: "disciplined", ipa: "mii wí-nai"}, {th: "เด็ดขาด", en: "definitive", ipa: "dèt-kàat"},
+            {th: "สร้างสรรค์", en: "creative", ipa: "mii kwaam-kít sâang-sǎn"}, {th: "เจือจาง", en: "dilute", ipa: "jʉʉa-jaang"}, {th: "อุณหภูมิ", en: "temperature", ipa: "un-hà-pum"},
+            {th: "หนาแน่น", en: "density", ipa: "kwaam-nǎa-nɛ̂ɛn"}, {th: "ลอย", en: "float", ipa: "lɔɔi"}, {th: "แร่ธาตุ", en: "mineral", ipa: "rɛ̂ɛ-tâat"},
+            {th: "ธรณีวิทยา", en: "geology", ipa: "tɔɔ-rá-nii-wít-tá-yaa"}, {th: "โครงสร้างผลึก", en: "crystal structure", ipa: "kroong-sâang pà lùek"}, {th: "เฉพาะ", en: "specific", ipa: "chà-pɔ́"},
+            {th: "สถานะ", en: "status", ipa: "sà-tǎa-ná"}, {th: "ลักษณะเฉพาะ", en: "characteristic", ipa: "lák-sà-nà chà-pɔ́"}, {th: "ลูกเห็บ", en: "hail", ipa: "lûuk-hèp"},
+            {th: "ขี้เลื่อย", en: "sawdust", ipa: "kîi-lʉ̂ai"}, {th: "ฉนวนกันความร้อน", en: "insulation", ipa: "chà-nǔuan gan kwaam rɔ́ɔn"}, {th: "ละลาย", en: "melt", ipa: "lá-laai"},
+            {th: "สงสัย", en: "wonder", ipa: "sǒng-sǎi"}, {th: "เสียหาย", en: "damaged", ipa: "tam-hâi...sǐa-hǎai"}, {th: "ทูต", en: "ambassador", ipa: "tûut"},
+            {th: "เมืองหลวง", en: "capital city", ipa: "mʉʉang-lǔang"}, {th: "โรงงาน", en: "factory", ipa: "roong-ngaan"}, {th: "ส่งออก", en: "export", ipa: "sòng-ɔ̀ɔk"},
+            {th: "ก้อน", en: "lump", ipa: "gɔ̂n"}, {th: "ขนาด", en: "size", ipa: "kà-nàat"}, {th: "ลื่น", en: "slippery", ipa: "lʉ̂ʉn"},
+            {th: "วิชาการ", en: "academic", ipa: "wí-chaa-gaan"}, {th: "วิศวกร", en: "engineer", ipa: "wí-sà-wá-gawn"}, {th: "ยืนยัน", en: "confirm", ipa: "yeun-yan"},
+            {th: "แรงสั่นสะเทือน", en: "tremors", ipa: "raeng-sàn-sa-thʉ̄an"}, {th: "รอยเลื่อน", en: "fault", ipa: "rooi-lʉ̂an"}, {th: "ความมั่นคง", en: "stability", ipa: "kwaam-mân-khong"},
+            {th: "เขื่อน", en: "dam", ipa: "kèuuan"}, {th: "ติดตาม", en: "follow", ipa: "dtìt-dtaam"}, {th: "ถล่ม", en: "collapse", ipa: "tà-lòhm"},
+            {th: "ตัวเอง", en: "self", ipa: "dtua-eng"}, {th: "ข้า", en: "I (polite old)", ipa: "kâa"}, {th: "เอ็ง", en: "You (polite old)", ipa: "aeng"},
+            {th: "เรา", en: "we/I", ipa: "rao"}, {th: "แก", en: "you (casual)", ipa: "gɛɛ"}, {th: "สถานการณ์", en: "situations", ipa: "sa-thăan-ná-gaan"},
+            {th: "เคารพ", en: "respect", ipa: "sà-daeng-kwaam-kâao-róp"}, {th: "กันเอง", en: "casual", ipa: "gan-eeng"}, {th: "ความสัมพันธ์", en: "relationships", ipa: "kwaam-sam-pan"},
+            {th: "ฟิสิกส์อนุภาค", en: "particle physics", ipa: "fí-sìk-à-nú-pâak"}, {th: "อุโมงค์", en: "tunnel", ipa: "ù-mohng"}, {th: "เครื่องเร่งอนุภาค", en: "accelerator", ipa: "krʉ̂ang-rêeng-à-nú-phâak"},
+            {th: "ทฤษฎี", en: "theory", ipa: "trít-sà-dee"}, {th: "แห่", en: "flock", ipa: "hàae"}, {th: "ผลกระทบ", en: "effects", ipa: "pŏn-grà-tóp"},
+            {th: "ขนส่ง", en: "transport", ipa: "kŏn-sòng"}, {th: "ช่องแคบ", en: "strait", ipa: "chɔ̂ng-khàep"}, {th: "ถ่านหิน", en: "coal", ipa: "tàan-hĭn"},
+            {th: "มีประสิทธิภาพ", en: "efficient", ipa: "mii-bprà-sìt-tí-pâap"}, {th: "วิธี", en: "methods", ipa: "wí-thee"}, {th: "การขยายตัว", en: "expansion", ipa: "gaan-kà-yǎai-dtua"},
+            {th: "แก้", en: "fix", ipa: "gâe"}, {th: "ค่าดำเนินการ", en: "processing fees", ipa: "kâa-dam-neern-gaan"}, {th: "ยกเลิก", en: "cancel", ipa: "yók-lə̂erk"},
+            {th: "มรสุม", en: "monsoon", ipa: "mon-rá-sùm"}, {th: "ตุน", en: "stock up", ipa: "dtun"}, {th: "พยากรณ์", en: "forecast", ipa: "phá-yaa-gawn"},
+            {th: "คนจัดงาน", en: "organizer", ipa: "kon-jàt-ngaan"}, {th: "งานอดิเรก", en: "hobbies", ipa: "ngaan-à-dì-rèek"}, {th: "สรุป", en: "summarize", ipa: "sà-rùp"},
+            {th: "จิตวิทยา", en: "psychology", ipa: "jìt-wít-thá-yaa"}, {th: "สถาปัตย์", en: "architecture", ipa: "sà-thăa-bpàt"}, {th: "ปัญหาสังคม", en: "social issues", ipa: "bpan-hăa-săng-khom"},
+            {th: "นิทรรศการ", en: "exhibition", ipa: "nít-tát-sà-gǎan"}, {th: "ความมุ่งมั่น", en: "determination", ipa: "kwaam-mûng-màn"}, {th: "ความเรียบง่าย", en: "simplicity", ipa: "kwaam-rîap-ngâai"},
+            {th: "เลื่อน", en: "scroll", ipa: "lêuuaen"}, {th: "ไถ", en: "scroll/plow", ipa: "tăi"}, {th: "ชำนาญ", en: "proficient", ipa: "cham-naan"},
+            {th: "โต้วาที", en: "debate", ipa: "dtôh-waa-tii"}, {th: "ศาล", en: "shrine", ipa: "săan"}, {th: "พัฒนา", en: "develop", ipa: "pát-tá-naa"},
+            {th: "นิเทศ", en: "comm arts", ipa: "ní-tâet"}, {th: "จุดธูป", en: "light incense", ipa: "jùt-tûup"}, {th: "คำร้อง", en: "petition", ipa: "kam-róong"},
+            {th: "ปกป้อง", en: "protect", ipa: "bpòk-bpông"}, {th: "ศรัทธา", en: "faith", ipa: "sàt-thaa"}, {th: "พิทักษ์", en: "guard", ipa: "pí-ták"},
+            {th: "คดีความ", en: "lawsuit", ipa: "ká-dee-kwaam"}, {th: "แบบสำรวจ", en: "survey", ipa: "bàep-sǎm-rùat"}, {th: "รื้อถอน", en: "demolish", ipa: "rʉ́ʉ-thŏn"},
+            {th: "เสนอ", en: "propose", ipa: "sà-nə̌ə"}, {th: "รัฐมนตรี", en: "minister", ipa: "rát-tha-mon-dtrii"}, {th: "ยืนกราน", en: "confirm", ipa: "yeun-graan"},
+            {th: "ภูมิภาค", en: "region", ipa: "poo-mí-pâak"}, {th: "กระโดด", en: "jump", ipa: "gra-dòht"}, {th: "ต่อรอง", en: "negotiate", ipa: "dtòr-rɔɔng"},
+            {th: "ขึ้นทะเบียน", en: "register", ipa: "kêun-thá-bian"}, {th: "ลงทะเบียน", en: "sign up", ipa: "long-thá-bian"}, {th: "ความเหลื่อมล้ำ", en: "inequality", ipa: "khwaam-lʉ̀am-láam"},
+            {th: "ผู้อพยพ", en: "immigrants", ipa: "pûu-òp-phá-yóp"}, {th: "วงจรต่อเนื่อง", en: "perpetuating cycle", ipa: "wong-jon-dtàaw-nʉ̂ʉang"}, {th: "เชื่อถือไม่ได้", en: "not reliable", ipa: "chêua-thĕuue-mâi-dâai"},
+            {th: "แก้ไข", ipa: "gâae-kǎi", en: "solve; fix"},
+            {th: "เร่งด่วน", ipa: "rêng-dùan", en: "urgent"},
+            {th: "สาธารณสุข", ipa: "sàa-thaa-rá-ná-sùk", en: "healthcare"},
+            {th: "เชื่อม", ipa: "chʉ̂ʉam", en: "connect"},
+            {th: "ศูนย์ดูแลผู้สูงอายุ", ipa: "sǔun-doolae-phûu-sǔung-aa-yú", en: "nursing home"},
+            {th: "บ้านพักคนชรา", ipa: "bâan-phák-kon-chraa", en: "retirement home"}
+        ];
+
+        const additionalVocabList = [
+            { emoji: "🤯", th: "ประสาทจะกิน", ipa: "bprà-sàat jà gin", en: "overstimulated" },
+            { emoji: "📖", th: "คู่มือ", ipa: "khûu-mʉʉ", en: "manual" },
+            { emoji: "🏃‍♂️", th: "เอาตัวรอด", ipa: "ao dtua rɔ̂ɔt", en: "survive" },
+            { emoji: "📝👩‍🏫", th: "คุมสอบ", ipa: "kum-sàawp", en: "To proctor an exam" },
+            { emoji: "📝📄", th: "ออกข้อสอบ", ipa: "òk-khɔ̂ɔ-sɔ̀ɔp", en: "To make the test (paper)" },
+            { emoji: "⛏️🪨", th: "แร่", ipa: "râae", en: "minerals (from mines)" },
+            { emoji: "🎯🔍📍", th: "เฉพาะ", ipa: "chà-pɔ́", en: "specific; unique" },
+            { emoji: "🏛️🎨", th: "กรมศิลปากร", ipa: "grom-sĭn-lá-bpà-gorn", en: "Fine Arts Department" },
+            { emoji: "⚙️💻", th: "ระบบ", ipa: "ráb-bòp", en: "system" },
+            { emoji: "🛠️🏗️", th: "ปรับปรุง", ipa: "bpràp-bproong", en: "renovate; improve" },
+            { emoji: "🌊📈", th: "ล้นหลาม", ipa: "lón-lăam", en: "overwhelming; in huge numbers" },
+            { emoji: "↔️⏳", th: "ระหว่าง", ipa: "rá-wàang", en: "during; between" },
+            { emoji: "🏛️", th: "...แห่งชาติ", ipa: "hàeng-châat", en: "national" },
+            { emoji: "🧪✅", th: "ทดสอบ", ipa: "tót-sòop", en: "to test out" },
+            { emoji: "🎭✨", th: "รอบพิเศษ", ipa: "râawp-phí-sèet", en: "extra show; special round" },
+            { emoji: "🩺📄", th: "ใบรับรองแพทย์", ipa: "bai-ráp-rong-phêt", en: "medical certificate" },
+            { emoji: "🚪↩️", th: "ถอนตัว", ipa: "tŏn-tua", en: "withdraw (pull self out)" },
+            { emoji: "🛡️🌿", th: "อนุรักษ์", ipa: "à-nú-rák", en: "preserve; conserve" },
+            { emoji: "🎙️", th: "อัด", ipa: "àt", en: "record" },
+            { emoji: "🦻🔇", th: "ที่อุดหู", ipa: "têe-ùt-huu", en: "earplugs" },
+            { emoji: "📉🗑️", th: "เสีย", ipa: "sĭa", en: "to lose; waste" }
+        ];
+
+        window.onload = () => {
+            const additionalVocabContainer = document.getElementById('additional-vocab-container');
+            if (additionalVocabContainer) {
+                additionalVocabList.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "vocab-card bg-white p-5 rounded-2xl shadow-sm content-block border-l-4 border-slate-500 transition-all";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xl text-slate-800">${item.emoji} ${item.th}</span>
+                            <button class="tts-button" onclick="playTTS('${item.th}', this)">🔊</button>
+                        </div>
+                        <div class="controls-row mb-1">
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                            <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                        </div>
+                        <div class="ipa font-medium text-amber-600">${item.ipa}</div>
+                        <div class="en text-slate-500">${item.en}</div>
+                    `;
+                    additionalVocabContainer.appendChild(div);
+                });
+            }
+        };
+
+        function randomizeWord() {
+            const displayArea = document.getElementById('vocab-card'); 
+            const word = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            displayArea.innerHTML = `
+                <div class="text-center w-full animate-splash content-block">
+                    <h3 class="text-4xl font-bold text-blue-600">${word.th}</h3>
+                    <div class="controls-row justify-center mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleLocal(this, 'en')">EN</button>
+                    </div>
+                    <div class="ipa text-lg text-amber-600 font-medium">${word.ipa}</div>
+                    <div class="en text-lg text-slate-500 font-medium">${word.en}</div>
+                    <div class="mt-4">
+                        <button class="tts-button bg-blue-100 p-2 rounded-full" onclick="playTTS('${word.th}', this)">🔊</button>
+                    </div>
+                </div>`;
+        }
+
+        // --- Text-to-Speech (TTS) Logic using Browser Native ---
+        function playTTS(text, btn) {
+            window.speechSynthesis.cancel();
+            if (btn) btn.classList.add('playing');
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH' || voice.lang === 'th_TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+            else utterance.lang = 'th-TH';
+            utterance.rate = 0.95;
+            utterance.onend = () => { if (btn) btn.classList.remove('playing'); };
+            utterance.onerror = () => { if (btn) btn.classList.remove('playing'); };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
     </script>
 </body>
 </html>
