@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท้ายหน้า 62 ถึงต้นหน้า 63</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #334155; /* Slate 700 */
+        }
+        .hidden-content {
+            display: none;
+        }
+        .show-content {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .interactive-block {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid #3b82f6; /* Blue 500 */
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-24 max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-2">ท้ายหน้า 62 ถึงต้นหน้า 63 📖</h1>
+    </header>
+
+    <!-- Section 1: Vocab Review -->
+    <section class="mb-12 bg-blue-50 p-6 rounded-2xl shadow-sm border border-blue-100">
+        <h2 class="text-2xl font-bold text-blue-800 mb-4">🔄 ทบทวนคำศัพท์เก่า (แต่งประโยค)</h2>
+        <p class="text-gray-700 mb-6">คลิกปุ่มด้านล่างเพื่อสุ่มคำศัพท์ ให้นักเรียนฝึกอ่านด้วยตัวเองก่อนกดปุ่มเสียง 🔊 แล้วแต่งประโยคจากคำที่ได้ 💬</p>
+        
+        <div id="vocab-display-area" class="text-center bg-white p-8 rounded-xl shadow-inner mb-6 min-h-[150px] flex flex-col items-center justify-center">
+            <p class="text-gray-400 italic">คำศัพท์จะแสดงที่นี่...</p>
+        </div>
+
+        <div class="text-center">
+            <button onclick="generateRandomVocab()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform active:scale-95 transition-transform text-lg">
+                🎲 สุ่มคำศัพท์
+            </button>
+        </div>
+    </section>
+
+    <!-- Section 2: Lead-in Questions -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">🤔 ก่อนเริ่มอ่าน (ชวนคุย)</h2>
+        <div id="leadin-container"></div>
+    </section>
+
+    <!-- Section 3: Reading Text -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-purple-700 mb-4">📖 เนื้อเรื่อง: ท้ายหน้า 62 ถึงต้นหน้า 63</h2>
+        <div id="reading-container" class="space-y-4"></div>
+    </section>
+
+    <!-- Section 4: Comprehension & Discussion -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">❓ คำถามความเข้าใจ และ คำถามอภิปราย</h2>
+        
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 mt-4">คำถามเกี่ยวกับเนื้อเรื่อง</h3>
+        <div id="comprehension-container"></div>
+        
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 mt-8">คำถามชวนคิด (Discussion)</h3>
+        <div id="discussion-container"></div>
+    </section>
+
+    <!-- Section 5: Target Vocabulary -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-yellow-600 mb-4">🔑 คำศัพท์หลักจากเรื่อง (5 คำ)</h2>
+        <div id="target-vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- Section 6: Real-life Production Tasks -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-indigo-600 mb-4">🎭 กิจกรรมฝึกพูดและการนำไปใช้จริง</h2>
+        <div id="production-container"></div>
+    </section>
+
+    <!-- Section 7: Extension Activities -->
+    <section class="mb-12 border-t-2 border-dashed border-gray-300 pt-8 mt-8">
+        <h2 class="text-2xl font-bold text-teal-600 mb-4">✨ กิจกรรมเพิ่มเติม (หากมีเวลาเหลือ)</h2>
+        <div id="extension-container"></div>
+    </section>
+
+    <footer class="text-center text-gray-500 mt-12 mb-8">
+        <p>🎉 จบบทเรียน ขอให้สนุกกับการเรียนภาษาไทยครับ 🎉</p>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // --- 1. TTS Setup ---
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียง (TTS)");
+            }
+        }
+
+        // --- 2. Toggle Functionality ---
+        function toggleContent(buttonElement, targetClass) {
+            const container = buttonElement.closest('.interactive-block');
+            const targetElement = container.querySelector(`.${targetClass}`);
+            
+            if (targetElement.classList.contains('hidden-content')) {
+                targetElement.classList.remove('hidden-content');
+                targetElement.classList.add('show-content');
+                buttonElement.classList.add('active');
+            } else {
+                targetElement.classList.remove('show-content');
+                targetElement.classList.add('hidden-content');
+                buttonElement.classList.remove('active');
+            }
+        }
+
+        // --- 3. Component Generator ---
+        function generateBlockHTML(emoji, thaiText, ipaText, enText, isVocabCard = false) {
+            const extraClass = isVocabCard ? 'bg-yellow-50 border-yellow-400' : 'bg-white border-blue-400';
+            return `
+                <div class="interactive-block ${extraClass}">
+                    <div class="flex items-start justify-between mb-3">
+                        <p class="text-lg text-gray-800 font-medium leading-relaxed flex-1">
+                            <span class="mr-2 text-xl">${emoji}</span> ${thaiText}
+                        </p>
+                        <button onclick="speakThai('${thaiText.replace(/'/g, "\\'")}')" class="ml-4 p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition shrink-0">
+                            🔊
+                        </button>
+                    </div>
+                    <div class="flex gap-3 mb-2">
+                        <button onclick="toggleContent(this, 'ipa-content')" class="btn-toggle text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 px-4 py-1.5 rounded-full border border-gray-300">IPA</button>
+                        <button onclick="toggleContent(this, 'en-content')" class="btn-toggle text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 px-4 py-1.5 rounded-full border border-gray-300">EN</button>
+                    </div>
+                    <div class="ipa-content hidden-content mt-3 p-2 bg-gray-50 rounded text-blue-800 font-mono text-sm">
+                        🗣️ ${ipaText}
+                    </div>
+                    <div class="en-content hidden-content mt-2 p-2 bg-gray-50 rounded text-green-800 text-sm italic">
+                        🇬🇧 ${enText}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 4. Render Functions ---
+        function renderSection(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = dataArray.map(item => 
+                generateBlockHTML(item.emoji, item.th, item.ipa, item.en)
+            ).join('');
+        }
+        
+        function renderVocabCards(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = dataArray.map(item => 
+                generateBlockHTML(item.emoji, item.th, item.ipa, item.en, true)
+            ).join('');
+        }
+
+        // --- 5. Lesson Data ---
+        const leadInQuestions = [
+            { emoji: '🕵️‍♂️', th: 'ถ้าตำรวจมีหลักฐานแต่จับคนร้ายไม่ได้ คุณคิดว่าเป็นเพราะอะไร?', ipa: 'tâa dtam-rùat mii làk-tǎan dtɛ̀ɛ jàp kon ráai mâi dâai, kun kít wâa bpen prɔ́ à-rai?', en: 'If the police have evidence but can\'t catch the criminal, why do you think that is?' },
+            { emoji: '🫣', th: 'คุณคิดว่าคนร้ายจะรู้สึกอย่างไรเวลาที่ต้องหลบซ่อนตัวจากตำรวจ?', ipa: 'kun kít wâa kon ráai jà rúu-sʉ̀k yàang-rai wee-laa tîi dtɔ̂ng lòp sɔ̂ɔn dtua jàak dtam-rùat?', en: 'How do you think a criminal feels when they have to hide from the police?' }
+        ];
+
+        const readingData = [
+            { emoji: '😌', th: 'จ้อยเริ่มผ่อนคลายมากขึ้นแล้ว มนัสเล่าเรื่องฆ่าสังหารคนให้จ้อยฟังเหมือนกะเป็นเรื่องตลกหรือเรื่องสนุก', ipa: 'jɔ̂ɔi rə̂əm pɔ̀ɔn-klaai mâak kʉ̂n lɛ́ɛo. má-nát lâo rʉ̂ʉang kâa sǎng-hǎan kon hâi jɔ̂ɔi fang mʉ̌ʉan-gà bpen rʉ̂ʉang dtà-lòk rʉ̌ʉ rʉ̂ʉang sà-nùk', en: 'Joy started to relax more. Manus told the story of assassinating someone to Joy as if it was a funny or fun story.' },
+            { emoji: '👀', th: 'จ้อยมองตาของมนัส ทำท่าทีแสดงว่าสนใจและชวนให้เล่าต่อ:', ipa: 'jɔ̂ɔi mɔɔng dtaa kɔ̌ɔng má-nát, tam tâa-tii sà-dɛɛng wâa sǒn-jai lɛ́ chuuan hâi lâo dtɔ̀ɔ:', en: 'Joy looked into Manus\'s eyes, acting as if she was interested and inviting him to continue:' },
+            { emoji: '🚓🖐️', th: '"ตามที่กูพูดเมื่อกี้ ตำรวจมันยังจับกูไม่ได้ แม้ว่ามันจะมีลายพิมพ์นิ้วมือและปืนของกูแล้วก็ตาม"', ipa: '"dtaam tîi guu pûut mʉ̂ʉa-gíi, dtam-rùat man yang jàp guu mâi dâai mɛ́ɛ-wâa man jà mii laai pim níu mʉʉ lɛ́ bpʉʉn kɔ̌ɔng guu lɛ́ɛo gɔ̂ɔ dtaam"', en: '"As I said just now, the police still couldn\'t catch me even though they already had my fingerprints and gun."' },
+            { emoji: '💸🤷', th: '"เรื่องตำรวจนะ กูไม่ต้องเกรงมากเท่าไรหรอก แต่ว่า กูก็ยังคงมีปัญหาเต็มไปหมดเลย เงินกูหาย แล้วนายจ้างของกูก็เสือกมาตายอีก แล้วจะให้กูทำยังไงดี"', ipa: '"rʉ̂ʉang dtam-rùat ná, guu mâi dtɔ̂ng greeng mâak tâo-rài rɔ̀ɔk, dtɛ̀ɛ wâa, guu gɔ̂ɔ yang kong mii bpan-hǎa dtem bpai mòt ləəi. ngən guu hǎai lɛ́ɛo naai jâang kɔ̌ɔng guu gɔ̂ɔ sʉ̀ʉak maa dtaai ìik, lɛ́ɛo jà hâi guu tam yang-ngai dii"', en: '"About the police, I don\'t have to fear them that much, but I still have a lot of problems. My money is gone, and my employer f***ing died too. What am I supposed to do?"' },
+            { emoji: '🥷⏳', th: '"กูจึงต้องหลบหน้าหายตัวไปจนกว่าตำรวจจะปิดคดี หรือต้องรอไปอีกนานจนกว่าพวกมันจะลืมเรื่องกูไป"', ipa: '"guu jʉng dtɔ̂ng lòp nâa hǎai dtua bpai jon-gwàa dtam-rùat jà bpìt ká-dii, rʉ̌ʉ dtɔ̂ng rɔɔ bpai ìik naan jon-gwàa pûuak man jà lʉʉm rʉ̂ʉang guu bpai"', en: '"So I had to lay low and disappear until the police closed the case, or wait a long time until they forgot about me."' },
+            { emoji: '👩ปิด', th: '"แต่จินตนารู้ไหม... แม่สาวสะอาง... น้องคงรู้จักนิสัยไอ้พวกตำรวจของเราดีนะ แม้ว่าจะมีคนตายถึงสองคนแล้ว ตำรวจมันน่าจะ... มันน่าจะปิดคดี"', ipa: '"dtɛ̀ɛ jin-dtà-naa rúu mǎi... mɛ̂ɛ sǎao sà-aang... nɔ́ɔng kong rúu-jàk ní-sǎi âi pûuak dtam-rùat kɔ̌ɔng rao dii ná, mɛ́ɛ wâa jà mii kon dtaai tʉ̌ng sɔ̌ɔng kon lɛ́ɛo, dtam-rùat man nâa jà... man nâa jà bpìt ká-dii"', en: '"But do you know, Jintana... pretty girl... you probably know the nature of our police well. Even though two people have already died, the police should... they should close the case."' },
+            { emoji: '🧠🔫', th: '"แต่ไอ้พวกตำรวจมันดันรู้อีกว่า ไอ้สมใจไม่ได้ฆ่าไอ้บัญชาด้วยมือของมันเองเพียงแต่คงเป็นแค่ผู้สั่งฆ่าเท่านั้น เพราะลายพิมพ์นิ้วมือกับปืนของกูยังอยู่บนโต๊ะทำงานตำรวจ"', ipa: '"dtɛ̀ɛ âi pûuak dtam-rùat man dan rúu ìik wâa, âi sǒm-jai mâi dâai kâa âi ban-chaa dûuai mʉʉ kɔ̌ɔng man eeng piiang dtɛ̀ɛ kong bpen kɛ̂ɛ pûu sǎng kâa tâo nán, prɔ́ laai pim níu mʉʉ gàp bpʉʉn kɔ̌ɔng guu yang yùu bon dtó tam-ngaan dtam-rùat"', en: '"But those police somehow knew that Somjai didn\'t kill Bancha with his own hands; he was probably just the one who ordered the hit, because my fingerprints and gun were still on the police\'s desk."' },
+            { emoji: '📅🙅', th: '"ในเวลาสองสามเดือนหลังจากที่เกิดคดีขึ้น ไอ้พวกตำรวจมันไม่ได้พยายามหาหลักฐานใหม่เลย"', ipa: '"nai wee-laa sɔ̌ɔng sǎam dʉʉan lǎng jàak tîi gə̀ət ká-dii kʉ̂n, âi pûuak dtam-rùat man mâi dâai pá-yaa-yaam hǎa làk-tǎan mài ləəi"', en: '"In the two or three months after the case happened, those police didn\'t try to find new evidence at all."' },
+            { emoji: '📝สรุป', th: '"ในที่สุดพวกมันก็คงจะถือว่า น่าจะปิดคดีได้แล้ว มันก็เลยสรุปสำนวนคดีว่า:"', ipa: '"nai tîi sùt pûuak man gɔ̂ɔ kong jà tʉ̌ʉ wâa, nâa jà bpìt ká-dii dâai lɛ́ɛo. man gɔ̂ɔ ləəi sà-rùp sǎm-nuuan ká-dii wâa:"', en: '"In the end, they probably considered that the case should be closed. So they concluded the case summary as:"' },
+            { emoji: '💀🚔', th: '"ไอ้สมใจได้ฆ่าไอ้บัญชา แล้วตำรวจก็ได้ยิงไอ้สมใจตายขณะที่เข้าทำการจับกุม แต่ว่ามันขัดขืน เพราะฉะนั้นก็เลยถูกไอ้พวกตำรวจจัดการวิสามัญฆาตกรรมให้ตาย"', ipa: '"âi sǒm-jai dâai kâa âi ban-chaa, lɛ́ɛo dtam-rùat gɔ̂ɔ dâai ying âi sǒm-jai dtaai kà-nà tîi kâo tam gaan jàp-gum. dtɛ̀ɛ wâa man kàt-kʉ̌ʉn. prɔ́ chà-nán gɔ̂ɔ ləəi dtòok âi pûuak dtam-rùat jàt-gaan wí-sǎa-man kâat-dtà-gam hâi dtaai"', en: '"Somjai killed Bancha, and then the police shot Somjai dead while attempting to arrest him because he resisted. Therefore, he was extrajudicially killed by the police."' }
+        ];
+
+        const targetVocab = [
+            { emoji: '😌', th: 'ผ่อนคลาย', ipa: 'pɔ̀ɔn klaai', en: 'To relax' },
+            { emoji: '🥷', th: 'หลบหน้า / หายตัว', ipa: 'lòp nâa / hǎai dtua', en: 'To lay low / To disappear' },
+            { emoji: '📁', th: 'ปิดคดี', ipa: 'bpìt ká-dii', en: 'To close the case' },
+            { emoji: '🙅‍♂️', th: 'ขัดขืน', ipa: 'kàt kʉ̌ʉn', en: 'To resist / defy' },
+            { emoji: '🔫💀', th: 'วิสามัญฆาตกรรม', ipa: 'wí sǎa man kâat dtà gam', en: 'Extrajudicial killing (Usually shot dead by police during arrest)' }
+        ];
+
+        const comprehensionQuestions = [
+            { emoji: '❓', th: 'มนัสต้องหลบหน้าและหายตัวไปเพื่ออะไร?', ipa: 'má-nát dtɔ̂ng lòp nâa lɛ́ hǎai dtua bpai pʉ̂ʉa à-rai?', en: 'Why did Manus have to lay low and disappear?' },
+            { emoji: '❓', th: 'ในที่สุดตำรวจสรุปสำนวนคดีนี้ว่าอย่างไร?', ipa: 'nai tîi sùt dtam-rùat sà-rùp sǎm-nuuan ká-dii níi wâa yàang-rai?', en: 'How did the police conclude this case summary in the end?' }
+        ];
+
+        const discussionQuestions = [
+            { emoji: '💭', th: 'คุณคิดว่าทำไมตำรวจถึง "ปิดคดี" ทั้งที่รู้ว่ามีมือปืนอีกคนที่มีลายนิ้วมืออยู่?', ipa: 'kun kít wâa tam-mai dtam-rùat tʉ̌ng "bpìt ká-dii" táng tîi rúu wâa mii mʉʉ bpʉʉn ìik kon tîi mii laai níu mʉʉ yùu?', en: 'Why do you think the police "closed the case" even though they knew there was another hitman with fingerprints left behind?' },
+            { emoji: '📺', th: 'ข่าว "วิสามัญฆาตกรรม" (ตำรวจยิงคนร้ายตายตอนที่คนร้ายขัดขืน) เป็นเรื่องที่เกิดขึ้นบ่อยไหมในประเทศของคุณ?', ipa: 'kàao "wí-sǎa-man kâat-dtà-gam" (dtam-rùat ying kon ráai dtaai dtɔɔn tîi kon ráai kàt-kʉ̌ʉn) bpen rʉ̂ʉang tîi gə̀ət kʉ̂n bɔ̀oi mǎi nai bprà-têet kɔ̌ɔng kun?', en: 'Is the news of "extrajudicial killing" (police shooting a criminal dead when they resist) something that happens often in your country?' },
+            { emoji: '😨', th: 'ถ้าคุณเป็นจ้อย คุณจะ "ผ่อนคลาย" ตอนที่นั่งฟังเรื่องการฆ่าคนไหม? เพราะอะไร?', ipa: 'tâa kun bpen jɔ̂ɔi, kun jà "pɔ̀ɔn-klaai" dtɔɔn tîi nâng fang rʉ̂ʉang gaan kâa kon mǎi? prɔ́ à-rai?', en: 'If you were Joy, would you "relax" while sitting and listening to a story about killing people? Why?' }
+        ];
+
+        const productionTasks = [
+            { emoji: '👮‍♂️🎤', th: 'บทบาทสมมติ (Role-play): คุณเป็นตำรวจกำลังแถลงข่าว "ปิดคดี" ให้นักข่าว (ครู) ฟังว่าเกิดอะไรขึ้นกับสมใจและบัญชา', ipa: 'bòt-bàat sǒm-mút: kun bpen dtam-rùat gam-lang tà-lɛ̌ɛng kàao "bpìt ká-dii" hâi nák kàao (kruu) fang wâa gə̀ət à-rai kʉ̂n gàp sǒm-jai lɛ́ ban-chaa', en: 'Role-play: You are the police giving a press conference "closing the case" to a reporter (the teacher), explaining what happened to Somjai and Bancha.' },
+            { emoji: '🎲🗣️', th: 'เกมแต่งเรื่อง (Story-telling Game): เลือกคำศัพท์ที่เรียนไป 3 คำ แล้วแต่งเรื่องสั้นๆ 1 เรื่อง', ipa: 'geem dtɛ̀ng rʉ̂ʉang: lʉ̂ʉak kam-sàp tîi riian bpai sǎam kam, lɛ́ɛo dtɛ̀ng rʉ̂ʉang sân sân nʉ̀ng rʉ̂ʉang', en: 'Story-telling Game: Choose 3 vocabulary words you learned and make up a short story.' },
+            { emoji: '🎤👧', th: 'สัมภาษณ์ (Interview): ครูเป็นนักข่าวสัมภาษณ์ "จ้อย" (นักเรียน) ว่ารู้สึกอย่างไรตอนที่มือปืนเล่าเรื่องให้ฟัง แล้วทำไมถึงทำท่าทีสนใจ', ipa: 'sǎm-pâat: kruu bpen nák kàao sǎm-pâat "jɔ̂ɔi" (nák-riian) wâa rúu-sʉ̀k yàang-rai dtɔɔn tîi mʉʉ bpʉʉn lâo rʉ̂ʉang hâi fang. lɛ́ɛo tam-mai tʉ̌ng tam tâa-tii sǒn-jai', en: 'Interview: The teacher is a reporter interviewing "Joy" (the student) about how she felt when the hitman told the story, and why she acted interested.' }
+        ];
+
+        const extensionTasks = [
+            { emoji: '⚖️', th: 'โต้วาที (Debate): การที่ตำรวจ "ปิดคดี" แบบง่ายๆ แบบนี้ ถือว่าให้ความยุติธรรมกับคนตายหรือไม่?', ipa: 'dtôo waa-tii: gaan tîi dtam-rùat "bpìt ká-dii" bàɛp ngâai ngâai bàɛp níi tʉ̌ʉ wâa hâi kwaam yút-dtì-tam gàp kon dtaai rʉ̌ʉ mâi?', en: 'Debate: Is the police "closing the case" easily like this considered giving justice to the dead?' },
+            { emoji: '📊', th: 'นำเสนอ (Presentation): สรุปคดีของ "บัญชา-สมใจ-มนัส" เป็นภาษาไทยด้วยคำพูดของคุณเอง', ipa: 'nam sà-nə̌ə: sà-rùp ká-dii kɔ̌ɔng "ban-chaa - sǒm-jai - má-nát" bpen paa-sǎa tai dûuai kam pûut kɔ̌ɔng kun eeng', en: 'Presentation: Summarize the "Bancha-Somjai-Manus" case in Thai in your own words.' }
+        ];
+
+        // Render all sections on load
+        renderSection('leadin-container', leadInQuestions);
+        renderSection('reading-container', readingData);
+        renderSection('comprehension-container', comprehensionQuestions);
+        renderSection('discussion-container', discussionQuestions);
+        renderVocabCards('target-vocab-container', targetVocab);
+        renderSection('production-container', productionTasks);
+        renderSection('extension-container', extensionTasks);
+
+        // --- 6. Giant Vocab List Logic ---
+        const rawVocabString = `🏃‍♂️🔄✨	ขยับ	kà-yàp	move a little
+⛓️👤💂‍♂️	เชลย	chá-loie	prisoner; hostage
+🎯🧠💪	ตั้งใจ	dtâng-jai	pay attention
+⛓️🕴️🪝	ถูกห้อย	tòok hôi	To be hanged
+⏳⏱️✨	ไม่กี่นาที	mâi-gìi naa-tee	not a lot of minutes (a few minutes)
+📈🪴🌳	โต	dtooh	grow in size (grow up); big (collocates with ตัว, ตา)
+🎯➡️📍	โดยตรง	doie dtrong	directly
+🙏👤👑	ท่าน	tâan	people who we respect or of higher rank/position
+🏆👏✨	ให้มันได้ยังงี้สิ	hâi man dâai yang-ngée sì	It's gotta be like this.
+😨🫣🏠	ขี้กลัว	kêe-glua	scaredy cat
+💡➡️🏁	ถ้างั้น	tâa-ngán	If so
+😱⚡️‼️	ขี้ตกใจ	kêe dtòk-jai	get surprised easily
+👉✨🤔	ยังงี้	yang-ngée	อย่างนี้
+🎭🤳✨	ทำท่า	tam tâa	To act
+✅🎯✨	ได้ผล	dâai pǒn	get result (it works)
+⚡️👁️✨	ทันตาเห็น	tan dtaa hěn	keep up with eyes to see (immediately; ทันที)
+🗣️🔄✅	ตอบสนอง	dtòp-sà-nǒng	respond
+🐱🥺💕	ออดอ้อน	òt-ôn	plead; beg
+🥣🔄🌀	ปน	bpon	mixed
+👣🌫️📍	รอย	roi	trace; mark
+✨👁️🌟	ประกาย	bprà-gaai	sparkle
+🧍‍♂️⬆️✨	ลุกขึ้น	lúk-kêun	stand up
+🤝🧗‍♂️⬅️	ดึง	deung	pull
+💀⚰️🥀	ศพ	sòp	corpse; dead body
+🛌☁️😴	ฟูกนอน	fôok norn	mattress
+📈✨‼️	แสนจะ	sǎen jà	so...
+👶🐈🍎	ลูก	lôok	measure word for mattresses, sth round
+💩🧹🤢	สกปรก	sòk-gà-bpròk	dirty
+👿🧠😨	มนัสอยากให้จ้อยกลัวมากกว่า	Má-nát yàak hâi Jôi glua mâak-gwàa	Manus prefers that Joy is afraid of him.
+👤💬🆔	พูดแทนตัวว่า	pôot taen dtua wâa	represents self as
+👁️🔍🔎	สังเกต	sǎng-gèet	notice
+🧂🌶️	เครื่องเทศ	khrʉ̂ang-thêet	Seasonings / spices
+👀⬆️	เงย	ngəəi	look up
+💋😏	เจ้าชู้	jâo-chúu	womanizer
+🏚️🔞	ซ่อง	sɔ̂ng	whorehouse
+🈵	เต็ม	dtem	full
+📝📊	ให้คะแนน	hâi ká-nnaen	To grade (give scores)
+🥣	ผสม	phà-sǒm	mix
+🤷‍♂️	ทั้งที่	táng-tîi	Even though
+🛣️	ถนน	thà-nǒn	street/road
+🤢	คลื่นไส้	khlʉ̂un-sâi	nausea
+🤕	ปวดหัว	bpùat-hǔua	To have a headache
+🛣️	ทาง	taang	way / side
+🏆	สมควร	sǒm-khuuan	deserve
+💬	หมายถึง	mǎai-thʉ̌ng	To mean
+⚖️	สิทธิ	sìt(-thí)	rights
+🏞️	แผ่นดิน	phàaen-din	land
+📈	สูงขึ้น	sǔung khʉ̂n	higher than before
+🧑	มนุษย์	má-nút	human
+➕🙅‍♂️	...อีกต่างหาก	... ìik dtàang-hàak	apart from (negative sentence...not...also...)
+😎💪	มั่นใจ	mân-jai	confident
+🕵️‍♂️	ล้วง	lúang	delve 
+😈🙃	ซุกซน	súk-son	naughty
+✅	พอจะ	pɔɔ jà	To have enough capacitty to do sth
+🏛️	ทางการ	taang-gaan	the authority
+🧍‍♂️	ร่างกาย	râang-gaai	body
+❌	ข้อผิดพลาด	khɔ̂ɔ-pìt-plâat	mistakes
+✅	อย่างแน่นอน	yàang-nâae-nɔ̂n	certainly
+⏳🗓️	ล่วงหน้า	lûang-nâa	in advance
+🗣️	เอ่ย	ə̀əi	utter / vocalise / remark
+🤔	ถ้ายังงั้น	tâa yang-ngán	ถ้าอย่างนั้น If that's so
+⛔️🏠	ถูกกักบริเวณ	tùuk-gàk-bɔɔ-rí-ween	To get grounded (detain area)
+📌	ส่วนใหญ่	sùan yài	Mostly (big part)
+🤗	กอด	gɔ̀t	hug
+😌	ค่อยยังชั่ว	khɔ̂i-yang-chùa	That's relief.
+🤢👃	เหม็น	mĕn	Stinky
+⏳	นานแล้ว	naan-lɛ́ɛo	long time ago
+🤔	ถึงแม้ว่า	thʉ̌ng-mɛ́ɛ-wâa	even though
+✅	ยืนยัน	yʉʉn-yan	confirm
+🏁	ในที่สุด	nai-thîi-sùt	finally / in the end
+🏛️🌆	เมืองหลวง	mʉʉang-lǔuang	capital city
+🤔💡	รู้คำตอบได้ยังไง	rúu kham-dtàwp dâai yang-ngai	How did you know the answer?
+📝🚨	ข้อสอบรั่ว	khɔ̂ɔ-sòp rûa	Test leaking
+📄	กระดาษ	grà-dàat	paper
+🕵️‍♂️🤨	น่าสงสัย	nâa sǒng-sǎi	suspicious
+🏁	เลิกงาน	lôoek-ngaan	get off work
+🧮	เหลือ...	lʉ̌ʉa	remaining
+📚📝	ไม่มีงานพอให้นักเรียนเพิ่มเกรด	mâi-mii ngaan paaw hâi nák-riian pə̂əm grèet	not enough work for the student to improve their grades
+🌍	ทั่วโลก	tûua-lôok	all over the world / throughout the world
+📅	วันธรรมดา	wan-tam-má-daa	weekdays
+📚✏️	ติว	dtiu	To tutor
+🧹🧼	ขอให้คนทำความสะอาดทำความสะอาดให้	kɔ̌ɔ hâi kon tam-kwaam-sà-àat tam-kwaam-sà-àat hâi	Ask the cleaner to clean for me
+🛠️	ฝีมือ	fǐi-mʉʉ	work (of the suspect)
+🤬	ไอ้บัดซบ	âi-bàt-sòp	bastard
+🌅	เมื่อเช้านี้	mʉ̂ʉa-cháao-níi	this morning
+📁🗂️	แฟ้ม	fɛ́ɛm	folders / files
+🏆	เยี่ยม	yîiam	visit
+☕️	โอเลี้ยง	oo-líiang	(Sweet) black coffee
+✅	อนุญาต	à-nú-yâat	permission
+🚻🙏	ขออนุญาตครูไปห้องน้ำ	kɔ̌ɔ à-nú-yâat kruu bpai hɔ̂ng-náam	Someone asks for permission (from the teacher) to go to the toilet.
+🔁	อีกแล้ว	ìik-lɛ́ɛo	again
+😤	ดื้อ	dʉ̂ʉ	stubborn
+🕵️	ผู้ต้องสงสัย	pûu-dtɔ̂ng-sǒng-sǎi	suspect (n)
+🤝🔍	เจอ	jəə	Find out / discover / Meet / Experience
+🦘	กระโดด	grà dòot	jump
+📐➗	พีชคณิต	pii-chá-ká-nít	Algebra
+🕯️🎂	เป่าเทียน	bpào tian	blow candles
+⏳	ตั้งแต่	dtâng-dtàɛ	Since
+⏳	ตอนแรก	dtɔɔn-râɛk	At first
+🦜	นกต่อ	nók-dtɔ̀ɔ	decoy
+🗡️🩸	ถูกแทง	tùuk tɛɛng	get stabbed
+🐐🧑‍⚖️	แพะรับบาป	pɛ́ ráp bàap	scape goat (take sin)
+📹🎥	ตากล้อง	dtaa glɔ̂ɔng	Cameraman
+↔️	กว้าง	gwâang	Wide / Broad
+📸	ช่างถ่ายรูป	châng tàai rûup	Photographer
+💄✨	ช่างแต่งหน้า	châang dtɛ̀ng nâa	makeup artist
+🛠️📋	จัดการ	jàt-gaan	Manage / Handle
+💇‍♂️✂️	ช่างทำผม	châang tam pǒm	hairdresser
+⚡️🔧	ช่างไฟ	châng fai	electrician
+✅⏱️	ได้ + V	dâai	Got to ... already
+🏢🪂	กระโดดตึก	grà dòot dtʉ̀k	Jump off the building
+🧷	ถูก + V	tùuk	Passive voice
+💸📆	หนี้รายวัน	nîi raai wan	Daily debts
+💸📄	หนี้นอกระบบ	nîi nɔ̂ɔk rá bòp	Debts outside system
+👊💥	ทุบตี	túp dtii	Beat hit = Beat someone up
+👮📄	ใบแจ้งความ	bai jɛ̂ɛng kwaam	Police report
+📰👀	เห็นข่าวนั้นแล้ว	hěn kàao nán lɛ́ɛo	I've seen that news.
+⚖️	กระทำ	grà tam	commit / do
+☎️📞	ติดต่อ	dtìt-dtɔ̀ɔ	contact
+🔑	เข้าถึง	kâo-tʉ̌ng	access
+⚙️	ระบบ	rá-bòp	system
+👮‍♂️🛡️	ตำรวจสร้างความมั่นใจให้คนอื่นว่า จ้อยจะปลอดภัย	dtam rûat sâang kwaam mân jai hâi kon ʉ̀ʉn wâa jɔ̂ɔi jà bplɔ̀ɔt pai	Police makes sure to others that Joy will be safe
+🛡️🤝	เพื่อนจะทำอะไรให้จ้อยปลอดภัย	pʉ̂an jà tam à rai hâi jɔ̂ɔi bplɔ̀ɔt pai	What a friend will do to keep Joy safe?
+🤕⚖️	ทำร้าย	tam ráai	to harm/hurt
+🔁	แต่ละ	dtàɛ-lá	each
+⚔️🪖	สงครามกลางเมือง	sǒng kraam glaang mʉang	Civil war
+⚖️🔥	ขัดแย้งกัน	kàt yɛ́ɛng gan	Controversial
+😱😰	แตกตื่น	dtɛ̀ɛk dtʉ̀ʉn	panicked
+🚔⚖️	อาชญากรรม	àat-chá-yaa-gam	crime
+👤✨	ปรากฏตัว	bpraa gòt dtua	appear
+🎖️🏛️	เอกอัครราชทูต	èek àk krá râat chá tûut	Ambassador
+👑🏰	ราชอาณาจักร	râat chá aa naa jàk	Kingdom
+🏠📄	หมดสัญญา	mòt sǎn-yaa	The lease/contract ends
+🏥🧑‍⚕️	คนไข้	kon-kâi	Patients
+🔮	หมอดู	mɔ̌ɔ-duu	Fortune teller
+⚠️	เตือน	dtuuan	Warn
+😰🏠⏳	กลัวว่า จะย้ายบ้านไม่ทัน	glua wâa jà yáai bâan mâi tan	Afraid that won't move (out) in time.
+😭	ร้องไห้	rɔ́ɔng-hâi	cry
+👫	ทั้งคู่	táng-kûu	Both
+➡️	ถัดไป	tàt-bpai	Next ...
+🛣️	ทางเดียวกัน	taang diiao gan	same route
+🎉	งาน	ngaan	Events
+👄	อ้าปาก	âa bpàak	open mouth
+🗣️	กล่าว	glàao	To state
+🕵️‍♂️🔒	ข้อมูลลับ	kɔ̂ɔ-muun láp	secret information
+⛓️	ถูกบีบบังคับ	tùuk bìip-bang-káp	to be forced to do sth
+🤝	เผชิญหน้า	pà-chəən-nâa	confront
+🕶️🔫	นักเลง	nák-leeng	gangster
+➕	ยิ่งกว่านั้น	yîng-gwàa-nán	Furthermore
+✋⏸️	เดี๋ยวก่อน	dǐiao-gɔ̀ɔn	Hold up
+🗣️✋	สอด	sɔ̀ɔt	To interrupt / interject
+❓	สาเหตุ	sǎa-hèet	cause
+📝📚	แบบฝึกหัด	bàɛp-fʉ̀k-hàt	Exercises (in workbooks, forms)
+⏸️📚	พักการเรียน	pák-gaan-riian	suspension (rest)
+🎬	ผู้กำกับ	pûu-gam-gàp	Director (Films/Series)
+🎓📚	คนที่เรียนใน​โรงเรียน เรียกว่าอะไร	kon-tîi-riian-nai-roong-riian-rîiak-wâa-à-rai	What are students who studies in school called?
+👩‍🏫	ครูคนนี้	kruu-kon-níi	this teacher
+🔀	ต่างๆ	dtàang dtàang	Other / different
+✂️	แยก	yâɛk	separate
+📊	คะแนน	ká-nɛɛn	scores
+🏺	ดั้งเดิม	dâng-dəəm	traditional
+🧠🤔	คิดอย่างมีเหตุผล	kít-yàang-mii-hèet-pǒn	think reasonably
+⏮️	V + ก่อน	gɔ̀ɔn	...first
+💪	กล้าม	glâam	Muscles
+🥶✨	ขนลุก	kǒn lúk	getting goose bumps
+🎓🔎	คุณพอลทำยังไงให้นักเรียนมองหาคำตอบ	kun-pɔɔn-tam-yang-ngai-hâi-nák-riian-mɔɔng-hǎa-kam-dtɔ̀ɔp	you do how make students look for answers? -> How do you make students look for answers?
+🤝	กัน	gan	each other
+🚫🙅	ทำเองไม่ได้	tam-eeng-mâi-dâai	can't do it by themself alone
+🏗️📚	พื้นฐาน	pʉ́ʉn-tǎan	foundation / basic (skills)
+📚	ยังเรียนอยู่ไหม	yang-riian-yùu-mǎi	Still learning, right?
+💥	เกิดขึ้น	gə̀ət kʉ̂n	Happen
+⚡️🐇	เร็วเกินไป	reo-gəən-bpai	too fast
+📏	ขนาด	kà nàat	size
+❓	ข้อ	kɔ̂ɔ	classifier for questions, points, problems
+🏫👩‍🏫	โรงเรียนส่วนใหญ่ไม่มีบ้านพักครู	roong-riian-sùuan-yài-mâi-mii-bâan-pák-kruu	Most schools don't have accommodation for teachers.
+🤝✅	เลือกให้	lʉ̂ʉak-hâi	choose for (someone)
+🤏	ขนาดนี้	kà nâat níi	this much
+📝	อีกตัวอย่าง	ìik dtua yàang	Another example
+🔁	สลับ	sà làp	swap
+👨‍🏫👩‍🏫📚	คุณพอลกับครูอีกสองคนช่วยนักเรียน	kun pɔɔn gàp kruu ìik sɔ̌ɔng kon chûai nák rian	Khun Paul and (an)other 2 teachers help students.
+👥🤝	จับกลุ่ม	jàp glùm	form team (catch group)
+✅	คือ	kʉʉ	is/am/are
+🚪➡️	เข้า	kâo	enter / go in
+📝➗	โจทย์	jòot	(Maths/Social) problem questions (in assignments/tests) / quest / challenge
+👀🧠	มุมมอง	mum mɔɔng	perspective
+📚	ต้องใช้เรื่องที่อ่าน 2 เรื่อง	dtɔ̂ɔng chái rʉ̂ang tîi àan sɔ̌ɔng rʉ̂ang	Have to use 2 stories/texts that they read
+🎓📚	คนที่เรียนใน​มหาวิทยาลัยเรียกว่าอะไรในภาษาไทย	kon-tîi-riian-nai-má-hǎa-wít-tá-yaa-lai-rîiak-wâa-à-rai-nai-paa-sǎa-tai	What do we call people who are studying at the university in Thai?
+🔁	ต่อเนื่อง	dtɔ̀ɔ-nʉ̂ʉang	Continuous
+🧮✅	ทำโจทย์ได้	tam-jòot-dâai	Can solve the math problem
+😐	เฉยๆ	chə̌əi chə̌əi	Poker face / Regularly / Normally (without much thoughts)
+⭕️	วงกลม	wong-glom	Circle
+🚀💨	ความเร็ว	kwaam-reo	Velocity
+⚖️📄	คดี	ká-dii	(crime)case
+📈	อนุพันธ์ุ	à-nú-pan	Derivative
+📝	เช่น	chên	such as
+📈💹	ตราสารอนุพันธ์	dtraa-sǎan-à-nú-pan	Derivatives
+🏎️💨	ความเร่ง	kwaam-rêng	Acceleration
+📏	คงที่	kong-tîi	 constant
+🐢	ช้าลง	cháa-long	Slower than before
+✅📌	ควร	kuuan	should
+↔️	สวนทาง	sǔuan-taang	go in the opposite direction
+📍🛠️	ตั้ง	dtâng	to set / to place / to be located
+📍	ติดกับ	dtìt gàp	Next to
+🚔🔒	ติดคุก	dtìt kúk	(Stuck) in jail
+🎁👨‍👩‍👧‍👦	ซื้อของขวัญให้หลาน	sʉ́ʉ kɔ̌ɔng kwǎn hâi lǎan	Buy gifts for nephews and nieces
+🥛🍵	ถ้วย	tûai	Cups
+👨‍👩‍👧‍👦🍳	ทำอาหารให้พ่อแม่	tam aa hǎan hâi pɔ̂ɔ mɛ̂ɛ	Cook for parents
+🍽️	ถาด	tàat	Tray
+🧹🧼	พ่อแม่อยากให้ลูกทำความสะอาด	pɔ̂ɔ mɛ̂ɛ yàak hâi lûuk tam kwaam sà àat	Parents want children to clean.
+🧾	เป็นหลักฐาน	bpen làk tǎan	as evidence
+🤲	ถือ	tʉ̌ʉ	Carry / Hold
+👩‍🎓🇹🇭	นักเรียนไทยทุกคน	nák rian tai túk kon	Every Thai student
+✊🔥	กบฎ	gà bòt	rebel
+🗣️💬	คุย	kui	talk
+🧠📊	พฤติกรรม	prʉ́ dtì gam	Behavior
+🪑	นั่ง	nâng	sit
+🎓📅	จบปีการศึกษา	jòp bpii gaan sʉ̀k sǎa	end of academic year
+🧑	นาย	naai	Mr. / You (for friends, a bit more polite than เอ็ง)
+🧠	ความจำไม่ดี	kwaam jam mâi dii	bad memory
+😵‍💫📚	ครูอธิบายงง	kruu à tí baai ngong	The teacher explains things in a cofusing way.
+📰	นิตยสาร	nít dtà yá sǎan	magazine
+👩‍🏫🤔	ครูอธิบายให้นักเรียนงง	kruu à tí baai hâi nák rian ngong	The teacher explains to confuse the students.
+🎓🏛️	อธิการบดี	à tí gaan bà dii	Provost
+⏳	บ้าง	bâang	from time to time
+🛡️	ปกป้อง	bpòk bpɔ̂ɔng	Protect
+🙅‍♂️	ปฏิเสธ	bpà dtì sèet	Reject/Refuse/Decline
+📚🚫	ไม่เรียนแล้ว	mâi rian lɛ́ɛo	not study anymore
+🏢	เอกชน	èek gà chon	Private
+😰	เครียด	krîat	stressed
+⚙️📋	สภาพ	sà pâap	conditions
+👨‍🏫👪	วันพบผู้ปกครอง	wan póp pûu-bpòk-krɔɔng	Meeting Guardians' Day
+🧘‍♂️🎯	สมาธิ	sà-maa-tí	focus / concentration
+✅	ทำตาม	tam-dtaam	Follow / act accordingly
+🤬	สบถ	sà-bòt	Cuss / curse / swear
+👩‍🎓🤝👨‍🎓	เพื่อนร่วมชั้น	pʉ̂an rûam chán	classmate
+🔪	ฆ่า	kâa	kill
+👶✨	ดูเด็ก	duu-dèk	Look young
+💸💍	อยากได้เงินภรรยา	yàak-dâai-ngən-pan-rá-yaa	Want to get wife's money
+😰🆘	หมดหนทาง	mòt-hǒn-taang	desperate
+🔫🕵️	มือปืน	mʉʉ bpʉʉn	gunman
+🧙‍♂️👻	หมอผี	mɔ̌ɔ-pǐi	sorcerer / ghost hunter
+🎖️	ยศ	yót	rank
+🤝	ยอม	yɔɔm	Be willing to / surrender
+🔁🧬	ชาติที่แล้ว	châat-tîi-lɛ́ɛo	Last life (before reincarnation)
+👥	คนดู	kon-duu	audience
+👤🔁	คนเดียวกัน	kon-diiao-gan	Exact same person
+⏳	รอ	rɔɔ	wait
+🕵️‍♂️📝	จดหมายปลอม	jòt-mǎai-bplɔɔm	Fake letters
+↔️	ระหว่าง	rá wàang	between
+🌌🪐	อีกภพนึง	ìik-póp-nʉng	Another world (not human world)
+😎✨	เก๋	gě	chic / cool
+🔎🧩	หายาก	hǎa-yâak	Hard to find
+🧪	ลอง	lɔɔng	Try / Experiment
+🔞	หนังโป๊	nǎng-bpóo	Porn
+🔮🏠	ไปบ้านหมอดูกัน	bpai-bâan-mɔ̌ɔ-duu-gan	Go to the fortune teller's house together
+📚🇫🇷	หนังสือฝรั่งเศสทุกเล่ม	nǎng-sʉ̌ʉ-fà-ràng-sèet-túk-lêm	Every French book
+📚🇫🇷	หนังสือฝรั่งเศสมีสองอย่างตลอด	nǎng-sʉ̌ʉ-fà-ràng-sèet-mii-sɔ̌ɔng-yàang-dtà-lɔ̀ɔt	French books always have 2 things.
+🎶🏆	นักดนตรีคนไหนประสบความสำเร็จที่สุด	nák don dtrii kon nǎi bprà sòp kwaam sǎm rét tîi sùt	Which musician is the most successful?
+🎩✨	มายากล	maa yaa gon	Magic
+🤠🎶	ลูกทุ่ง	lûuk tûng	Country
+✋👮	จับ	jàp	Catch / Arrest
+👥	ผู้ติดตาม	pûu dtìt dtaam	Follower
+☠️💊	วางยา	waang yaa	To poison
+😈	นางมาร	naang maan	Devil
+❤️	หัวใจ	hǔa jai	heart
+👵	อายุมาก	aa yú mâak	a lot of age (old)
+👶	อายุน้อย	aa yú nɔ́ɔi	less age (young)
+📏⬆️	สูง	sǔung	high / tall
+📌🗓️	สิ่งที่เกิดขึ้น	sìng tîi gə̀ət kʉ̂n	Things that happened
+😖	แย่จัง	yâɛ-jang	So terrible / awful
+💔😢	ใจสลาย	jai-sà-lǎai	Broken heart (feeling devastated)
+🤔❓	หรือ	rʉ̌ʉ	or / question word when put at the end of the sentence
+💔😢	อกหัก	òk-hàk	have a broken heart from a breakup
+🔗🤝	ทั้ง...และ...	táng...lɛ́...	Both...and...
+⏳	ขณะที่	kà-nà-tîi	While / As
+⏳↔️	ระหว่างที่	rá-wàang-tîi	In between ... 
+📈	น่าจะมีมากขึ้น	nâa jà mii mâak kʉ̂n	Likely to have more than before
+💰✨	คุ้ม	kúm	Worth it
+⏳	อยู่	yùu	-ing
+🙈💘	คนแอบชอบ	kon ɛ̀ɛp chɔ̂ɔp	secret(ly) admirer
+🕊️	เสียชีวิต	sǐa chii wít	pass away
+🔑🏠	เป็นเจ้าของ	bpen jâo kɔ̌ɔng	To own
+🎭🎬	เอเย่นต์นักแสดง	ee yên nák sɛ̌ɛ dong	Agency for actors
+🙏✨	ไถ่บาป	tài bàap	make up for the sin you did 
+🪪	ชื่อจริง	chʉ̂ʉ jing	Real name / First name
+🥺	เดียวดาย	diao daai	alone
+🤷‍♀️	ไม่รู้พ่อทำยังไง	mâi-rúu-pɔ̂ɔ-tam-yang-ngai	Don't know how her dad did it
+🤷‍♂️	ทำเหมือนพ่อไม่ได้	tam-mʉ̌ʉan-pɔ̂ɔ-mâi-dâai	Can't do like her dad
+🐋💸	วาฬอยากให้คนจ่ายเลย	waan-yàak-hâi-kon-jàai-ləəi	Whale wants people to pay immediately.
+🐢	ค่อยๆ	kɔ̂ɔi kɔ̂ɔi	Slowly
+🐋🤷‍♂️	วาฬไม่รู้วัฒนธรรมชุมชน	waan-mâi-rúu-wát-tá-ná-tam-chum-chon	Whale doesn't know the culture of the community.
+🛒🐋	คนก็เลยไม่อยากซื้อของจากร้านของวาฬ	kon-gɔ̂ɔ-ləəi-mâi-yàak-sʉ́ʉ-kɔ̌ɔng-jàak-ráan-kɔ̌ɔng-waan	So, people don't want to buy stuff from Whale's store.
+🗿	รูปปั้น	rûup bpân	Statue
+🤷‍♀️💬	ไม่รู้ว่า ทำไมเขาไม่บอกแม่ว่า มีแฟน	mâi-rúu-wâa-tam-mai-kǎo-mâi-bɔ̀ɔk-mɛ̂ɛ-wâa-mii-fɛɛn	Don't know why she doesn't tell her mom that she has a partner.
+🎵	ดนตรี	don dtrii	Music
+🚬	สูบ	sùup	To smoke
+😜	ล้อเล่น	lɔ́ɔ lên	Kidding
+🧠⏳	จำได้ว่า เมื่อ	jam dâi wâa mʉ̂a	Can remember when ...
+🤝	เขาต้องการให้จ้อยช่วย	kǎo dtɔ̂ɔng gaan hâi jɔ̂ɔi chûai	He needs her to help him.
+🗣️🔍	เปิดเผย	bpə̀ət-pə̌əi	Disclose / Reveal
+😊	พอใจ	pɔɔ-jai	Satisfied
+📣	ดัง	dang	Famous / loud
+📸	เคยถ่ายแบบไหม	kəəi tàai bɛ̀ɛp mǎi	Have you done model shooting? / Have you ever been a model?
+☕️😡	สาดกาแฟใส่หน้า	sàat gaa fɛɛ sài nâa	Splash coffee onto the face
+👏🔥	ต้องอย่างนี้สิ	dtɔ̂ng-yàang-níi-sì	It has to be like this. / That's what I'm talking about.  (it's what is expected) / I know that's right.
+👕👟	ถอด	tɔ̀ɔt	take off
+💅	เล็บ	lép	Nails (body part)
+🔛	บน	bon	on
+🙅‍♂️	เขาไม่ชอบอะไรเลย	kǎo-mâi-chɔ̂ɔp-à-rai-ləəi	They don't like anything at all.
+➡️	เพราะฉะนั้น	prɔ́-chà-nán	Therefore
+👋🏠	มาหา	maa-hǎa	come visit
+📉	ถูกลดตำแหน่ง	tùuk lót dtam nɛ̀ng	get position lowered (demoted)
+🎭	ตัวเอก	dtua èek	main character
+🔬📚	นักวิจัย	nák wí jai	researcher
+🚶	เดิน	dəən	Walk
+🛡️	บัง	bang	cover / shield
+📝📰	บก.	bɔɔ-gɔɔ	Editors (journalism)
+🧑‍💼	เลขา	lee-kǎa	secretary
+🔒⛓️	คุก	kúk	jail
+🥇	คนแรก	kon rɛ̂ɛk	The first person
+🥇	คนที่หนึ่ง	kon tîi nʉ̀ng	The first person
+🧭🌏	ภาคใต้	pâak dtâai	Southen region
+🏙️🚗	นอกเมือง	nɔ̂ɔk mʉang	Outside the city
+🧑	แก	gɛɛ	pronoun for older people
+🎶📀	เครื่องเล่นแผ่นเสียง	krʉ̂ang lên pɛ̀n sǐang	record player
+💀🖤	ฆ่าตัวตาย	kâa dtua dtaai	commit a suicide (die)
+👉	ชี้	chíi	point (v)
+😱	ตกใจ	dtòk jai	heart sank (fall heart)
+📺	โทรทัศน์	too rá tát	Television
+💵🧾	ธนบัตร	tá ná bàt	bills / bank notes
+🥃💵	ใบ	bai	measure word for glass, bottle, bill, bank notes
+✊📣	ประท้วง	bprà túang	protest
+✊📣	นักกิจกรรม	nák gìt jà gam	Activists
+✅	ปรกติ	bpròk gà dtì	Normal / usual (ปกติ)
+😴	นอน	nɔɔn	sleep
+🚪🛏️	ห้อง	hɔ̂ng	room
+⭐️	สำคัญ	sǎm-kan	important
+🛋️🙅	ไม่ทำอะไรเลย	mâi-tam-à-rai-ləəi	do nothing
+🫵	เอง	eeng	by yourself
+✅🤝	รับ	ráp	accept/take in
+💔🤫	การล่วงประเวณี	gaan-lûuang-bprà-wee-nii	affairs
+💔	เรื่องชู้สาว	rʉ̂ʉang-chúu-sǎao	affairs
+📛	คำนำหน้า	kam-nam-nâa	prefix (titles)
+🤦‍♂️📜	มีข้อบังคับไม่ค่อยมีเหตุผล	mii-kɔ̂ɔ-bang-káp-mâi-kɔ̂i-mii-hèet-pǒn	there're nonsense requirements
+⏳	ตลอด	dtà lɔ̀ɔt	always / throughout
+🕵️‍♂️🔎	สืบสวน	sʉ̀ʉp sǔan	interrograte / investigate
+🤬	หยาบคาย	yàap kaai	Rude
+🙇	ก้มหน้า	gôm nâa	tilt head down
+👁️	ตา	dtaa	eyes
+⚠️🛑	ความรุนแรง	kwaam run rɛɛng	violence
+👴🕰️	เก่างั่ก	gào ngâk	Super old
+⏱️	ขณะนั้น	kà nà nán	at that moment
+📝🧠	การเขียนช่วยให้จำ	gaan-kǐian-chûuai-hâi-jam	Writing helps me remember.
+📚📝	การบ้าน	gaan-bâan	homework
+📝📚	การสอบ	gaan-sɔ̀ɔp	examination
+🎯📝	กิจกรรม	gìt-jà-gam	activity
+📏	เข้มงวด	kêm-ngûuat	strict
+🏁📈	แข่งขันสูง	kɛ̀ng-kǎn-sǔung	compete high
+🙏	ขอรับ	kɔ̌ɔ ráp	masc ending in the past
+🎤🎶	ขับร้อง	kàp rɔ́ɔng	sing
+📥🏠	ข้างใน	kâang nai	Inside
+🏌️🏠	คลับ	klàp	Clubhouses = accommodation on a golf course
+✅🗣️	คำตอบ	kam-dtɔ̀ɔp	answer
+🧮	คำนวณ	kam-nuuan	calculation
+😊	ความพอใจ	kwaam pɔɔ jai	satisfaction
+🗜️	คั้น	kán	pressed
+🎓✅	จบ	jòp	graduate / end
+🎓	เฉพาะทาง	chà-pɔ́-taang	specialised
+🏫📚	เด็กต้องไปโรงเรียนไหม	dèk-dtɔ̂ng-bpai-roong-riian-mǎi	Do kids have to go to school?
+🎯	ตรงกลาง	dtrong-glaang	middle (ground)
+🗣️📚	ตะโกนใส่นักเรียน	dtà-goon-sài-nák-riian	yell at students
+📚✍️	ติวเข้มขึ้น	dtiu-kêm-kʉ̂n	more intense tutorials
+🌆🌙	ค่ำ	kâm	twilight / nightfall
+👩‍🏫🇺🇸	ที่อเมริกาเรียกครูสอนในโรงเรียนว่าอะไร	tîi-à-mee-rí-gaa-rîiak-kruu-sɔ̌ɔn-nai-roong-riian-wâa-à-rai	In USA, what are teachers in school called?
+👣	ตาม	dtaam	follow
+🚩	ธง	tong	flag
+😈🏫	นักเรียนเกเร	nák-riian-gee-ree	misbehaved students
+👩‍🎓📚	นักเรียนเรียบร้อย	nák-riian-rîiap-rɔ́ɔi	well-behaved students
+🎓	นักศึกษา	nák-sʉ̀k-sǎa	university student
+🎓	นิสิต 	ní-sìt	university student
+🗣️	บอก	bɔ̀ɔk	tell
+📇📚	บัตรคำศัพท์	bàt-kam-sàp	flashcards
+📜👩‍🏫	ใบประกอบวิชาชีพครู	bai-bprà-gɔ̀ɔp-wí-chaa-chîip-kruu	teaching license
+🏫	ประถม	bprà-tǒm	primary (school)
+📝📊	ประเมิน	bprà-məən	assess/evaluate
+👨‍👩‍👧‍👦	ผู้ปกครอง	pûu-bpòk-krɔɔng	guardians / chaperones
+🎓🏫	ผู้อำนวยการ	pûu-am-nuuai-gaan	Principal / Director
+📍	ตำแหน่ง 	dtam-nɛ̀ng	Position
+👉	พา	paa	take
+✨	พิเศษ	pí-sèet	speical
+🤫💭	คิดในใจ	kít nai jai	Think to self
+😕🤔	งุนงง	ngun-ngong	confused
+👩‍🏫📚	รู้จักครูคนนี้ดี	rúu-jàk-kruu-kon-níi-dii	I know this teacher well.
+👩‍🏫🤔	รู้จักครูคนนี้ไม่ค่อยดีเท่าไหร่	rúu-jàk-kruu-kon-níi-mâi-kɔ̂i-dii-tâo-rài	I don't really know this teacher.
+📚🧠	เรียนอะไรที่น่าสนใจมา	riian-à-rai-tîi-nâa-sǒn-jai-maa	What's interesting that you've learned?
+🏫🎒	โรงเรียนทางเลือก	roong-riian-taang-lʉ̂ʉak	alternative school
+🏫🛏️	โรงเรียนประจำ	roong-riian-bprà-jam	boarding school
+⏳	จนกว่า	jon gwàa	until
+👀	จ้องมอง	jɔ̂ɔng mɔɔng	ogle / stare
+⏰	ตื่น	dtʉ̀ʉn	wake up
+📅✨	วันพิเศษ	wan-pí-sèet	special days
+🎓	วิทยาลัย	wít-tá-yaa-lai	college
+🛠️📚	วิธี	wí-tii	way/method/how to
+📓	สมุด	sà-mùt	notebook
+🎨💡	สร้างสรรค์	sâang-sǎn	creative
+👥	ส่วนน้อย	sùuan-nɔ́ɔi	minority (small part)
+👨‍🏫	สอน	sɔ̌ɔn	teach
+🎓📚	หน่วยกิต	nùuai-gìt	uni credits 
+🏫	ห้องพักครู	hɔ̂ng-pák-kruu	Teacher's room
+📝	อธิบาย	à-tí-baai	explain / describe
+📚	อยากให้เค้กเอาหนังสือเรียนมาสอนไหม	yàak-hâi-kêek-ao-nǎng-sʉ̌ʉ-riian-maa-sɔ̌ɔn-mǎi	Do you want me to take the textbook to teach you?
+👨‍🏫🎓	อาจารย์	aa-jaan	university lecturer
+👩‍🏫🤝📚	อาสาสอน	aa-sǎa-sɔ̌ɔn	volunteer teaching
+👮‍♂️👩‍💼	เจ้าหน้าที่	jâo nâa tîi	staff
+⚔️	โจมตี	joom dtii	attack
+🏷️📝	ฉลาก	chà làak	label
+🌊💧	ฉิว	chǐu	continuously flowing
+👗💄	แต่งตัว	dtɛ̀ng dtua	dress up (decorate body)
+👥🏙️	สังคม	sǎng kom	society / social
+❓	ถ้า	tâa	if
+👵🧓	ชรา	chá raa	old age
+💀🕯️	ชีวิตหลังความตาย	chii wít lǎng kwaam dtaai	Life after death
+🧱	ฐาน	tǎan	Base
+🔊📈	ดังขึ้นเรื่อยๆ	dang kʉ̂n rʉ̂ai rʉ̂ai	Getting louder
+👀	ดูสิ	duu-sì	Look at it!
+🌟💪	เก่ง	gèng	Talented
+🙌	ต้อนรับ	dtɔ̂ɔn ráp	To welcome
+🪣🚿	ตักอาบ	dtàk àap	get a bowl to take water to rinse yourself
+➡️	ต่างหาก	dtàang hàak	Instead (put at the end of the sentence)
+🏆✅	ประสบความสำเร็จ	bprà sòp kwaam sǎm rèt	succeed
+👁️‍🗨️	ตาไม่ดี	dtaa mâi dii	not have good eyes / cannot see well
+📏	เตี้ย	dtîa	short (height)
+📚✍️	เรียนเอง	rian eeng	self-study
+📣	ตะโกน	dtà goon	yell
+📋🗂️	ทะเบียน	tá bian	Registry
+🏛️	รัฐบาล	rát tà baan	Public
+✊🏿🚫	การเหยียดเชื้อชาติ	gaan-yìiat-chʉ́ʉa-châat	racism
+📏📋	เกณฑ์	geen	criteria
+📍	ใกล้ 	glâi	Near / Close
+🌍🧳	ชาวต่างชาติ 	chaao-dtàang-châat	Foreigners
+🌈	ความหลากหลาย	kwaam-làak-lǎai	variety
+🏆🎉	ชนะ 	chá-ná	win
+📜⚖️	ฎีกา	dii-gaa	Bill (which is supreme)
+⛔️🚫	ต้องห้าม	dtɔ̂ng-hâam	forbidden
+🧑‍💼	ผู้แทน	pûu-tɛɛn	representative
+⚖️	ผู้พิพากษา 	pûu-pí-pâak-sǎa	Judge
+🪖⚔️	พล	pon	force / troops / army
+🗳️	มติ	má-dtì	resolution
+🏛️🗂️	ราชการ	râat-chá-gaan	government agencies
+⚖️	ศาล 	sǎan	Court
+🏛️	สภา	sà-paa	congress
+👤	สมาชิก	sà-maa-chík	member
+👑	หม่อม	mɔ̀ɔm	Lady/Lord
+🏛️🧠	หัวเก่า 	hǔua-gào	Conservative minds (old minds)
+🧾	ทั้งหมด	táng mòt	all / total / entirely
+😈	ทะลึ่ง	tá lʉ̂ng	perverted
+🪖⚔️	ทัพ	táp	Troops
+🛣️↩️	ทางโค้ง	taang kóong	the curve (road)
+🚮	ทิ้ง	tíng	leave
+⏳	แทบ	tɛ̂ɛp	almost
+🤝🗣️	โน้มน้าว	nóom náao	Convince
+🏍️	รถจักรยานยนต์	rót-jàk-grà-yaan-yon	motorcycle (formal)
+🌉	สะพาน	sà-paan	bridge
+📦	สิ่ง	sìng	thing
+📍	เสา	sǎo	pole
+🚇	อุโมงค์	ù-moong	tunnel
+🚪🚶	เดินผ่านประตู	dəən-pàan-bprà-dtuu	walk through the door
+🚌	รถทัวร์	rót-tuua	intercity bus
+🥤🧃	น้ำผลไม้คั้น	náam pǒn lá mái kán	cold-pressed juice
+➗	แบ่งเป็น	bɛ̀ng-bpen	divided into
+🦷	ทันตแพทยศาสตร์	tan-dtà-pɛ̂ɛt-tá-yá-sàat	Dentistry
+🎙️📣	นิเทศศาสตร์	ní-têet-sàat	Communication Arts
+🩺👩‍⚕️	พยาบาลศาสตร์	pá-yaa-baan-sàat	Nursing
+🩺	แพทยศาสตร์	pɛ̂ɛt-tá-yá-sàat	Medicine
+💊	เภสัชศาสตร์	pee-sàt-chá-sàat	Pharmacy
+🏛️📚	รัฐศาสตร์	rát-tà-sàat	Political Science
+🏃‍♂️🏋️‍♀️	วิทยาศาสตร์การกีฬา (วิทย์กีฬา)	wít-tá-yaa-sàat-gaan-gii-laa (wít-gii-laa)	Sports Science
+🛠️📐	วิศวกรรมศาสตร์	wít-sà-wá-gam-má-sàat	Engineering
+🧪⚗️	วิศวะเคมี	wít-sà-wá-kee-mii	Chemical Engineer
+🎨🏛️	ศิลปกรรมศาสตร์	sǐn-lá-bpà-gam-sàat	Fine and Applied Arts
+📈📚	เศรษฐศาสตร์	sèet-tà-sàat	Economics
+🏛️📐	สถาปัตยกรรมศาสตร์	sà-tǎa-bpàt-dtà-yá-gam-má-sàat	Architecture
+🐾🩺	สัตวแพทยศาสตร์	sàt-dtà-wá-pɛ̂ɛt-tá-yá-sàat	Veterinary
+🎨📚	อักษรศาสตร์	àk-sɔ̌ɔn-sàat	Arts
+📚🎓	ครุศาสตร์ 	ká-rú-sàat	Education
+⚖️📜	นิติศาสตร์	ní-dtì-sàat	Laws
+➖	น้อยกว่า 	nɔ́ɔi-gwàa	Less than
+🧸	นิ่ม	nîm	soft 
+➖	ลบ 	lóp	Minus
+📈	นิยม	ní yom	commonly
+0️⃣	ศูนย์ 	sǔun	0
+🤢🦠	เน่าเปื่อย	nâo bpʉ̀ai	rotten / perished / decay
+🛎️	บริการ	bɔɔ rí gaan	service (n/v)
+🎀✨	ประดับ	bprà dàp	decorate
+🧱🏗️	ปูน	bpuun	cement
+🤔	แปลกจัง	bplɛ̀ɛk jang	so strange
+🙇‍♂️	ผงกหัว	pà ngòk hǔa	nod
+↔️	ตรงข้าม 	dtrong-kâam	opposite
+🧵👘	ผ้าขาวม้า	pâa kǎao máa	loincloth
+↩️🔙	ถอย 	tɔ̌ɔi	Reverse
+👑🏛️	เจ้าพระยา 	jâo-prá-yaa	nobleman of the highest rank
+👑🧑‍💼	นางข้าหลวง	naang-kâa-lǔuang	lady in waiting
+👑🙇	นางสนองพระโอษฐ์ 	naang-sà-nɔ̌ɔng-prá-òot	follower (of the queen)
+👑	เจ้า	jâo	you
+👸	เจ้าฟ้าหญิง 	jâo-fáa-yǐng	princess
+🍽️	เสวย	sà-wə̌əi	eat
+🍽️	พระกระยาหาร 	prá-grà-yaa-hǎan	meal / food
+👑📜	คำราชาศัพท์ 	kam-raa-chaa-sàp	royal terms
+🙏	เจ้าค่ะ 	jâo-kâ	feminine ending particle
+🙏👑	องค์	ong	classifier for monks and persons of royal
+➕	นอกจากนี้	nɔ̂ɔk-jàak-níi	except / apart from this
+👻🍽️	ผีเปรต	pǐi bprèet	hungry ghosts
+🤝	ด้วยกัน	dûuai-gan	together
+ℹ️	เกี่ยวกับ	gìiao-gàp	about
+🟰	ปกติ	bpòk-gà-dtì	normally
+💻	เทคโนโลยี	ték-noo-loo-yii	Technolgy
+✅	ต้อง	dtɔ̂ng	must/need
+🔗	ทำให้	tam-hâi	make someone be sth
+🤞✨	หวังว่า 	wǎng-wâa	hope that
+💬🗣️	พูดถึง 	pûut-tʉ̌ng	speaking of
+🚫➡️	เว้นแต่ว่า	wén-dtɛ̀ɛ-wâa	except
+🪧📄	แผ่น	pɛ̀n	classifier for signs / paper
+🟰	เท่ากับ	tâo gàp	 Equal
+🚶‍♂️🏠	ไปหา	bpai-hǎa	Visit
+🙏	อยาก	yàak	Want to
+🔎	พบ	póp	find
+🔸	อัน	an	Universal classifier for everything (if can't remember)
+💔	เลิกกัน	lə̂ək gan	break up
+💐🙏	พวงมาลัย	puang maa lai	garlands
+🎈	พอง	pɔɔng	swell
+🤩	เพลิน	pləən	get carried away
+🛶	แพ	pɛɛ	raft
+📖	นิยาย	ní-yaai	novel
+📰	ข่าว	kàao	news
+📖	อ่าน	àan	read
+📚🕯️	เล่ม	lêm	measure word for books, candles
+⏩⏪	กรอ	grɔɔ	moving the video forward/backward
+🎉🥳	เฉลิมฉลอง	chà-lə̌əm-chà-lɔ̌ɔng	celebrate
+🎵	เพลง	pleeng	song
+😤🙄	มนุษย์ป้า	má-nút-bpâa	human auntie (Karen)
+👨‍🦳👤	มนุษย์ลุง	má-nút-lung	human uncle (Karen - masculine version)
+🤝	ร่วม	rûuam	join
+🤝👥	รวมตัว	ruuam-dtuua	gather
+🎶✨	ไพเราะ	pai rɔ́	Beautiful (songs/music)
+🖼️📷	รูป(ภาพ)	rûup	picture
+📷	รูปถ่าย	rûup-tàai	photo
+🤝❤️	คู่กัน	kûu-gan	together
+👂	ฟังสิ	fang sì	Listen (here)!
+🌅	รุ่ง	rûng	rising
+🎪🤸‍♂️	กระโดดลอดห่วง	grà-dòot-lɔ̂ɔt-hùuang	jump through the hoop
+✏️🎨	วาด	wâat	draw
+👂💬	ฟังเหมือน	fang mʉ̌an	sounds like
+😵‍💫✨	ฟื้นคืนสติ	fʉ́ʉn kʉʉn sà dtì	get themself back together (revive return consciousness)
+👾👹	สัตว์ประหลาด	sàt bprà làat	Monster
+👌	ธรรมดา	tam má daa	Normal
+💰	มัดจำ	mát jam	deposit
+📐	มุม	mum	corner
+😠	โหด	hòot	aggressive
+🦹‍♂️	ตัวร้าย	dtua ráai	villain
+🌳🪵	ไม้สัก	mái sàk	Teak
+🥊	นักมวย	nák muai	Boxer
+🏋️‍♂️	ยก	yók	lift / raise
+🤨	ยังกะ	yang gà	as if
+🤷	ยังไงก็ช่าง	yang ngai gɔ̂ɔ châang	however
+😉💘	จีบ	jìip	Flirt
+💍👰🤵	แต่งงาน	dtɛ̀ng ngaan	Get married
+⏳	ยุค	yúk	Era
+😱👻	น่ากลัว	nâa glua	Scary / Creepy
+🌙😴	ราตรีสวัสดิ์	raa dtrii sà wàt	Good night
+💭🥺	รำพึง	ram pʉng	คิดถึง / To miss / reminisce
+👔	ผู้จัดการ	pûu jàt gaan	Manager
+🌅	รุ่งขึ้น	rûng kʉ̂n	the next day (dawn up)
+🎨🧵	ลายๆ	laai laai	patterned
+⏳✋	เดี๋ยว	dǐao	Wait!
+🔊	ลำโพง	lam poong	speakers
+🚶‍♂️🏠	แวะ	wɛ́	stop by / drop by
+🧔	ไว้หนวด	wái nùat	grow / keep a mustache
+🧩🗂️	เศษ	sèet	remainder / remains
+🧱🟤	สนิม	sà nǐm	rust
+🛠️🚗💥	สลักหักพัง	sà lák hàk pang	broken / malfunctioned (carve break into pieces malfunctioned)
+✨💖	สวยกว่าอีก	sǔai gwàa ìik	even more beautiful
+😎✨	หล่อ	lɔ̀ɔ	Handsome
+😱	สะดุ้ง	sà dûng	gasp
+👀	เสือก	sʉ̀ak	Being nosy
+🤔✨	สนใจ	sǒn jai	Interested in
+💡🌞	แสง	sɛ̌ɛng	(natural) light
+🎥📹	อัดวิดีโอ	àt wí dii oo	Record video
+😤😣	หงุดหงิด	ngùt ngìt	Frustrated
+🧑‍🤝‍🧑	หนุ่มสาว	nùm sǎao	Youth / adolescents
+🌤️	บรรยากาศ	ban yaa gàat	atmosphere
+💯🔥	สุดขีด	sùt kìit	extremely
+🗣️	พูดถึง ...	pûut-tʉ̌ng ...	talking about ...
+💰📈	ได้เงินเยอะ	dâai-ngən-yə́	Make a lot of money.
+💰🤑	รวยเลย	ruuai-ləəi	He's rich now!
+🛠️💪	ทำได้หลายอย่าง	tam-dâai-lǎai-yàang	Can do a lot of things.
+⏳	ไม่ค่อยมีเวลา	mâi-kɔ̂i-mii-wee-laa	i don't really have time
+💻🌍	ทำงานที่ไหนก็ได้	tam-ngaan-tîi-nǎi-gɔ̂ɔ-dâai	can work anywhere
+🏢🙅‍♀️	ไม่ต้องเข้าออฟฟิศ	mâi-dtɔ̂ng-kâo-ɔ́ɔp-fít	don't have to go into the office
+📋⚙️	การจัดการ	gaan-jàt-gaan	management
+💰	เงินเดือน	ngən-dʉʉan	salary
+💰	หาเงิน	hǎa-ngən	make money
+🏺📜	โบราณ	boo raan	archaic
+🏢	บริษัท	bɔɔ-rí-sàt	company
+🏢	องค์กร	ong-gɔɔn	organization
+📈✅	มีความคืบหน้า	mii-kwaam-kʉ̂ʉp-nâa	have progress
+🏖️	ลา	laa	take a leave
+🤝💼	เพื่อนร่วมงาน	pʉ̂an rûam ngaan	Co-worker
+👴🏻🏖️	เกษียณ	gà sǐan	Retired
+💡	หลอดไฟฟ้า	lɔ̀ɔt fai fáa	(light) bulb
+🏠	หลังคา	lǎng kaa	roof
+📅	มกราคม	mók-gà-raa-kom	January
+🗓️	กุมภาพันธ์	gum-paa-pan	February
+📅	มีนาคม	mii-naa-kom	March
+📅	เมษายน	mee-sǎa-yon	April
+📅	พฤษภาคม	prʉ́t-sà-paa-kom	May
+🗓️	มิถุนายน	mí-tù-naa-yon	June
+📅	กรกฎาคม	gà-rá-gà-daa-kom	July
+🗓️	สิงหาคม	sǐng-hǎa-kom	August
+📅	กันยายน	gan-yaa-yon	September
+📅	ตุลาคม	dtù-laa-kom	October
+🗓️	พฤศจิกายน	prʉ́t-sà-jì-gaa-yon	November
+📅❄️	ธันวาคม	tan-waa-kom	December
+🔢	ตัวเลข	dtuua-lêek	number
+🤔🎯	เดา	dao	guess
+⚖️	เท่า	tâo	equal
+🪢🧗	ห้อย	hɔ̂ɔi	hang(ing)
+📰	หัวเรื่อง	hǔa rʉ̂ang	Headline
+🏛️	ชาติ	châat	nation
+🏞️🌾	ต่างจังหวัด	dtàang-jang-wàt	countryside
+🌍✈️	ต่างประเทศ 	dtàang-bprà-têet	overseas / international
+🫥💨	หายไป	hǎai bpai	disappear
+🗺️❓	ไหน	nǎi	which
+📍	จาก	jàak	from
+⏳	อดีตกาล	à dìit dtà gaan	past (time)
+😄😂	อย่างขบขัน	yàang kòp kǎn	humorously
+📷	กล้อง	glɔ̂ng	camera
+💻📊	ภาษาคอมอะไรที่นิยมที่สุดตอนนี้	paa-sǎa-kɔm-à-rai-tîi-ní-yom-tîi-sùt-dtɔɔn-níi	What computer language is the most popular now?
+🎮💻	ถ้าอยากสร้างเกม ควรเรียนภาษาอะไร	tâa-yàak-sâang-geem-kuuan-riian-paa-sǎa-à-rai	if wanting to create games, should learn what language?
+😮	อย่างประหลาดใจ	yàang bprà làat jai	surprisingly
+🗄️	ฐานข้อมูล	tǎan-kɔ̂ɔ-muun	database
+🖥️	หน้าจอ	nâa-jɔɔ	screen
+⌨️🎵	กดคีย์บอร์ดให้ถูกจังหวะ	gòt-kii-bɔ̀ɔt-hâi-tùuk-jang-wà	press the keyboard at the correct rhythm
+🎮🕹️	เกมสั้นๆ	geem-sân-sân	game short short
+🎮1️⃣	เกมที่ 1	geem-tîi-nʉ̀ng	game No. 1
+🎮🥇	เกมแรก	geem-râɛk	the first game
+🚧🏁	ผ่านหลายด่าน	pàan-lǎai-dàan	pass many stages
+🧱	ขอบ	kɔ̀ɔp	border
+🧳✈️	การเดินทาง	gaan-dəən-taang	travel / go on a journey
+⏳🔄	กำลัง...อยู่ 	gam-lang...yùu	-ing
+🤥	โกหก	goo-hòk	lie (tell lies)
+😴	ขี้เกียจ	kîi-gìiat	lazy
+😠	ขึงขัง 	kʉ̌ng-kǎng	angry and strict
+🤝	เข้าข้างกัน 	kâo-kâang-gan	get along / on the same side
+🤍🙏	ความบริสุทธิ์ใจ	kwaam-bɔɔ-rí-sùt-jai	pure intentions (pureness of heart)
+💑❤️	คู่รัก	kûu-rák	lovers
+👥	ใครๆ	krai-krai	whoever / people
+✅	ง่าย	ngâai	easy
+🤷	ไง 	ngai	ending particle meaning similar to duhh
+🤝	จริงใจ	jing-jai	sincere / real
+🗺️	จังหวัด	jang-wàt	province
+💭✨	จินตนาการ	jin-dtà-naa-gaan	imagine
+🔧🛠️	ช่างกล	châng-gon	mechanic
+🏖️	ชายหาด	chaai-hàat	beach
+😜	แซว 	sɛɛo	tease
+↔️	ด้าน	dâan	side
+🎯🔍	โดยเฉพาะ	dooi-chà-pɔ́	particularly / especially / specifically
+😍💘	ตกหลุมรัก 	dtòk-lǔm-rák	fall in love
+👤	ตน	dton	ฉัน = self / I 
+🧩➡️	ต่อ	dtɔ̀ɔ	assemble / continue
+✂️🔪	ตัด 	dtàt	cut
+📜	ประวัติศาสตร์	bprà wàt sàat	History
+🎭	ท่าที 	tâa-tii	acting
+⛽️	น้ำมัน	nám-man	oil / petrol / gas / fuel
+🗣️👂	นินทา	nin-taa	gossip
+👀	เนี่ยะ	nîa	นี่ + อ่ะ
+✅	แน่ใจ 	nâɛ-jai	sure
+⏳	ในระหว่างที่ 	nai-rá-wàang-tîi	while / in between
+🚚📦	บรรทุก	ban-túk	load / carry
+✨	บริสุทธิ์	bɔɔ-rí-sùt	pure
+🪶	เบา 	bao	soft
+📣⚠️	ประจาน 	bprà-jaan	denounce
+🛠️🏠	ปรับปรุงซ่อมแซม	bpràp-bprung-sɔ̂m-sɛɛm	renovate
+🎓📜	ปริญญา	bpà-rin-yaa	degree
+🎓📜	ปริญญาเอก	bpà-rin-yaa-èek	PhD
+😟	ปัญหา	bpan hǎa	problems
+🧠👩‍🏫	ผู้เชี่ยวชาญ	pûu-chîiao-chaan	expert
+🤝	พร้อม 	prɔ́ɔm	and
+🤥🗣️	พูดจริง	pûut-jing	tell the truth
+🗣️	พูดตรงไปตรงมา	pûut-dtrong-bpai-dtrong-maa	speak frankly
+😜	พูดเล่น 	pûut-lên	joking/kidding
+👌	เพียงแค่ 	piiang-kɛ̂ɛ	only/just
+🗺️	ภาค	pâak	region
+🥜🛢️	มัน	man	oily/nutty
+🗓️	เมื่อปีก่อน	mʉ̂ʉa-bpii-gɔ̀ɔn	when it was the year before
+🔓	เปิด	bpə̀ət	open / turn on
+🚀	ลุย	lui	let's roll
+🗣️	เล่าให้ฟัง	lâo-hâi-fang	tell
+👷‍♂️	วิศวกร	wít-sà-wá-gɔɔn	engineer
+🤔	แปลก	bplɛ̀ɛk	Strange
+✨👑	สง่า	sà-ngàa	elegant
+📍🏛️	สถานที่	sà-tǎan-tîi	place
+🧓	ผมหงอก	pǒm ngɔ̀ɔk	gray hair
+✅	สามารถ	sǎa-mâat	ได้ = can
+🔌	เสียบ 	sìiap	insert
+✅👌	เหมาะสม 	mɔ̀-sǒm	suitable / appropriate
+👉	อย่างนี้	yàang-níi	(if it's) like this
+❓	อย่างไร	yàang-rai	how
+🗣️	เอ่ยวาจา 	ə̀əi-waa-jaa	utter words
+🙇	ก้ม	gôm	Tilt head down
+😮	อย่างแปลกใจ	yàang bplɛ̀ɛk jai	surprisingly
+🌙	กลางคืน	glaang kʉʉn	night
+👃	กลิ่น	glìn	smell
+🙏	อย่างอ่อนน้อม	yàang ɔ̀ɔn nɔ́ɔm	humbly
+🦷	กัด	gàt	bite
+😋✨	อร่อยผิดปรกติ	à rɔ̂ɔi pìt bpròk dtì	unusally good
+🪶	อ่อน	ɔ̀ɔn	light / soft / weak
+❓	เกิดอะไรขึ้น	gə̀ət-à-rai-kʉ̂n	What happened?
+⏱️	พอ	pɔɔ	when / as soon as
+👵	แก่	gɛ̀ɛ	old(age)
+🍛	แกง	gɛɛng	curry
+🥛	แก้ว	gɛ̂ɛo	glass/cup (for drinks)
+😴🛌	พัก	pák	rest
+🧱	อิฐ	ìt	Bricks
+🌳🚪	ข้างนอก	kâang nɔ̂ɔk	Outside
+🤝	ประสบ	bprà sòp	experience / encounter / face
+😴	หลับ	làp	fall asleep
+📍	ภายใน	paai nai	within
+💥😱	พินาศ	pí nâat	disastrous
+🤔	ไหง	ngǎi	how come
+🧮	คิด	kít	calculate
+🔄	ย้อนกลับ	yɔ́ɔn glàp	to reverse
+↩️	คืน	kʉʉn	Return
+👀	มอง	mɔɔng	look
+🔁	เคย	kəəi	used to / ever
+🤝	รวมกัน	ruam gan	included
+🔸	กว่าๆ	gwàa gwàa	-ish
+🔹	เท่านั้นเอง	tâo nán eeng	only
+🏁✅	ฟันธง	fan tong	hit the flag = Certainly
+🅿️🚗	จอด	jɔ̀ɔt	park (v)
+🗂️🧹	จัด	jàt	Organise
+💸	จ่าย	jàai	pay
+🍂	หล่น	lòn	fall off
+🤦‍♂️	ไม่น่า	mâi nâa	shouldn't have
+🫥	หายตัว	hǎai dtua	disappear
+😱⚡	เสียวตัว	sǐao dtua	feel a thrill of fear
+👗🤔	ไม่รู้ว่า ต้องแต่งตัวยังไง	mâi-rúu-wâa-dtɔ̂ng-dtɛ̀ng-dtuua-yang-ngai	Don't know how to dress
+⚖️	ตัวกลาง	dtuua-glaang	medium
+⭕️🤝	วงการ	wong-gaan	circle / syndicate
+💼	รับจ้าง	ráp-jâang	Get hired
+😬	เกร็ง	greng	Tense
+🙅	ไม่ค่อย	mâi-kɔ̂i	Not really
+🙂	ยิ้มเฉยๆ	yím-chə̌əi-chə̌əi	only smile
+📝✅	มอบงาน	mɔ̂ɔp-ngaan	assign tasks
+🔎📄	เราพอมีหลักฐานอยู่บ้าง	rao-pɔɔ-mii-làk-tǎan-yùu-bâang	We have a bit of evidence.
+⏱️	เดี๋ยวนี้	dǐao níi	right now
+😈	ระยำ	rá-yam	evil
+✅	ได้	dâi	ได้ + Verb = get to
+🌳🌲	ต้นไม้	dtôn mái	trees
+➡️	ตรง	dtrong	directly 
+💊	ยา	yaa	drugs/medicine
+🙋‍♂️📨	เชิญ	chəən	Invite
+🌆	ตอนเย็น	dtɔɔn yen	Evening
+✨	เป็นไปได้	bpen-bpai-dâai	possible
+⛔️	ขาดตอน	kàat-dtɔɔn	discontinue (lack)
+👤	ตัว	dtua	body / self
+🔤✍️	ตัวอักษร	dtua àk sɔ̌ɔn	letters / characters / alphabet
+🧍	ยืน	yʉʉn	stand
+📏🔢	จำนวน	jam-nuuan	Amount / Quantity
+🎤😱	ร้อง	rɔ́ɔng	sing / scream
+🔢🤔	ขาดตอนการนับ	kàat-dtɔɔn-gaan-náp	lost count
+💔🪟	แตก	dtɛ̀ɛk	(physically) broken (glass)
+🎺	แตร	dtrɛɛ	trumpet
+🪑	โต๊ะ	dtó	table
+🪣	ถัง	tǎng	bucket
+🏨	ที่พัก	tîi-pák	accommodation
+🏢	หน่วยงาน	nùuai-ngaan	units / agencies
+🧮	ทั้ง	táng	all
+💼	สายงาน	sǎai-ngaan	line of work
+🕴️🔫	เจ้าพ่อ	jâo-pɔ̂ɔ	mogul / mafia master
+⚡️	ทันใดนั้น	tan dai nán	Suddenly
+👔💼	เถ้าแก่	tâo-gɛ̀ɛ	boss 
+🎨	ทา	taa	paint
+🕵️‍♂️🔫	อั้งยี่	âng-yîi	Chinese secret society / gangster
+🍽️	ทาน	taan	polite word for eat
+🏆👥	พวกผู้ยิ่งใหญ่	pûuak-pûu-yîng-yài	the big names
+🧼✨	ทำความสะอาด	tam kwaam sà àat	To clean (make cleanliness)
+📝	กล่าวโดยย่อ	glàao-dooi-yɔ̂ɔ	State in brief
+🔫💀	ผู้รับจ้างฆ่า	pûu-ráp-jâang-kâa	Hired killers
+🌿🌳	ธรรมชาติ	tam má châat	nature
+➕🚫	นอกจาก	nɔ̂ɔk jàak	apart from (outside from)
+😴🛌	นอนหลับ	nɔɔn làp	lie down and fall alseep
+🧊	น้ำแข็ง	nám kɛ̌ng	ice
+📰	กองบรรณาธิการ	gɔɔng ban naa tí gaan	editorial
+📅🤝	การประชุม	gaan bprà chum	meetings
+⛓️	กุญแจมือ	gun jɛɛ mʉʉ	handcuff
+🙏	เกรงใจ	greeng jai	be considerate of someone
+🔗	เกี่ยวข้องกับ	gìao kɔ̂ɔng gàp	Related to 
+🧑	ข้า	kâa	I (used with close friends, a bit more polite than กู)
+📝	ร่าง	râang	draft / body
+😒😤	ขี้อิจฉา	kîi ìt chǎa	Full of jealousy
+🛠️	ปรับ	bpràp	adjust
+⏳	ปัจจุบัน	bpàt jù ban	current
+🧹	ปัด	bpàt	to dust
+🪧	ป้าย	bpâai	sign
+👌👍	เข้าท่า	kâo tâa	To work / make sense / be appropriate / sound good
+💧	เปียก	bpìak	wet
+✅	เลือก	lʉ̂ak	choose
+⚖️🚓	คดีอาญา	ká dii aa yaa	criminal case
+💛🙏	ความเต็มใจ	kwaam dtem jai	Wholeheartedness
+🤞	คาดหมาย	kâat mǎai	expect
+💇	ผม	pǒm	hair
+🍎🍌	ผลไม้	pǒn lá mái	fruit
+🧵🧣	ผ้า	pâa	cloth
+😐	เคร่งขรึม	krêng krʉ̌m	serious
+👗👚	เครื่องแต่งกาย	krʉ̂ang dtɛ̀ng gaai	Clothing (tools decorate body)
+😅	งุ่มง่าม	ngûm ngâam	awkward
+🚿	ฝักบัว	fàk bua	shower
+🤔	จะทำยังไงดี	jà tam yang ngai dii	What should we do?
+🫴	จำเป็น	jam bpen	need
+👥	พวก	pûak	A group of ...
+🧠✨	ฉลาดเฉียบแหลม	chà lâat chìap lɛ̌ɛm	Intelligent (sharp)
+🚪🔥	ไล่ออก	lâi-ɔ̀ɔk	Drive them out. / Fire someone
+🧑‍🎓👩‍🎓	วัยรุ่น	wai rûn	teenagers
+📸	ช่างถ่ายภาพ	châng tàai pâap	Photographer
+🎯🧠	ชำนาญ	cham naan	Skillful / Expert
+➖	เพียง	piang	only
+🎯	เพื่อ	pʉ̂a	in order to / for
+👉	เชิญๆ	chəən chəən	Invite invite / Go ahead
+💀🤬	ซวยตายห่า	suai dtaai hàa	f****** doomed
+🤦‍♂️	ซุ่มซ่าม	sûm sâam	clumsy
+🤦‍♂️	เซ่อซ่า	sə̂ə sâa	clumsy
+🌌	ฟ้า	fáa	sky
+⚠️😰	เดือดร้อน	dʉ̀at rɔ́ɔn	in trouble
+⏳	คอย	kɔɔi	Wait / continuous
+😮‍💨	ถอนหายใจหนักๆ	tɔ̌ɔn hǎai jai nàk nàk	sigh heavily
+📸👗	ถ่ายแบบ	tàai bɛ̀ɛp	model shooting
+📈	มากขึ้น	mâak kʉ̂n	More than before
+🎓👩‍🏫	ศาสตราจารย์	sàat-sà-dtraa-jaan	professor
+🌙	เมื่อคืน	mʉ̂a kʉʉn	last night
+⛓️	ถูกขังอยู่	tùuk kǎng yùu	is still detained
+👩‍🎤	นางแบบ	naang bɛ̀ɛp	model (fem)
+🕺📸	นายแบบ	naai bɛ̀ɛp	model (masc)
+🎨🖼️	ศิลปะ	sǐn-lá-bpà	Art
+🧍‍♂️🛑	นิ่งๆ	nîng nîng	Still
+👅🍽️	รส	rót	taste/flavour
+✅	นี่แหละ	nîi lɛ̀	This is it
+⏳	ในขณะที่	nai kà nà tîi	While / As
+👣	ประกบ	bprà gòp	follow closely
+👥	ประชาชน	bprà chaa chon	people / the general public
+🔁	เป็นประจำ	bpen bprà jam	regularly
+📄🔖	รุ่น	rûn	version
+😌🧘	ผ่อนคลาย	pɔ̀ɔn klaai	relax
+👑	ผู้ดี	pûu dii	noble
+📏	เล็ก	lék	small
+📻	วิทยุ	wít tá yú	radio
+🚔👮	ผู้ต้องหา	pûu dtɔ̂ng hǎa	criminals
+👮‍♂️	พันตำรวจโท	pan dtam rùat too	Police lieutenant colonel
+🧼✨	สด	sòt	fresh
+💰	สตางค์	sà dtaang	Thai cents
+📏	มากขนาดนี้	maa gòk nâat níi	this much
+🏗️🛠️	สร้าง	sâang	Build / Create
+🌟	มีชื่อเสียง	mii chʉ̂ʉ sǐang	famous (have name sound)
+➡️	ส่วน	sùan	as for
+🥵💓	มีอารมณ์	mii aa rom	have (sexual) emotions
+🤔	ไม่น่าจะ	mâi nâa jà	not likely
+😵‍💫	สั่น	sàn	shaky
+😒🙅‍♀️	ไม่อยากสนใจเขาเท่าไร	mâi à yâak sǒn jai kǎo tâo rai	don't really want to be interested in him that much
+📏	สั้น	sân	short
+🛠️💔	เสีย	sǐa	broken
+👚	เสื้อ	sʉ̂a	top (n)
+🙇‍♂️	ยอมทำตาม	yɔɔm tam dtaam	Willing to follow (do as you asked)
+👕	เสื้อผ้า	sʉ̂a pâa	Clothes
+😕🤔	ยังงงอยู่	yang ngong yùu	still confused
+💯	แสน	sɛ̌ɛn	so + adj
+🚌	รถเมล์	rót mee	Bus
+🩶	สีเทา	sǐi tao	grey
+🩹	รอยแผลเป็น	rɔɔi plɛ̌ɛ bpen	scar marks
+🧮	หมด	mòt	ทั้งหมด total
+💯	หมื่น	mʉ̀ʉn	Ten thousand
+👄	ริมฝีปาก	rim fǐi bpàak	Lips
+😂	เรื่องเล่นๆ	rʉ̂ang lên lên	jokes
+🤷‍♀️🗣️	ลองถามเธอเองก็ได้	lɔɔng tǎam təə eeng gɔ̂ɔ dâi	Can try and ask her yourself
+🫳💨	ลาก	lâak	drag
+🗣️	หัว	hǔa	head / tip
+👁️	ลูกตา	lûuk dtaa	eyeball
+🧑‍💼	เลขา(นุการ)	lee kǎa (nú gaan)	Secretary
+👀❓	เห็นไหม	hěn mǎi	You see?
+🫠	เหลือ	lʉ̌a	remain
+🧵	เส้น	sên	string / strand / line
+🏜️💨	แห้ง	hɛ̂ɛng	dry
+👎😖	เลว	leeo	bad / horrible
+😤	แล้วดันเสือก	lɛ́ɛo dan sʉ̀ak	and f****** happen to
+🫳📌	วางไว้	waang wái	lay down and leave it
+💇‍♂️✂️	ไว้ผมทรงสั้นๆ	wái pǒm song sân sân	Leave hair style short
+💇‍♂️	ไว้ผมยาว	wái pǒm yaao	Leave hair long
+💬🗣️	สนทนา	sǒn tá naa	To converse
+👭	สาวๆ	sǎao sǎao	young ladies
+🏢	สำนักงาน	sǎm nák ngaan	office
+👉	สิ	sì	Used when suggesting or pushing someone to do sth
+🤝	หนุน	nǔn	support
+👦👦	หนุ่มๆ	nùm nùm	young guys
+🤔	น่าจะ	nâa jà	Probably
+😤🙄	หยิ่ง	yìng	arrogant
+🎬	เหตุการณ์	hèet gaan	situation
+📸📷	ช่างภาพ	châng pâap	Photographer
+🔊	เสียง	sǐang	sound
+😟	ห่วง	hùang	Worry
+⚡️	อย่างฉับพลัน	yàang chàp plan	Suddenly
+🙂	หน้า	nâa	in front of / face
+⏳	สมัย	sà mǎi	era / generation
+📏	มหา	má hǎa	ใหญ่ Big
+🪟	หน้าต่าง	nâa dtàang	window
+🎨📐	ออกแบบ	ɔ̀ɔk bɛ̀ɛp	Design
+🤷	อะไรสักอย่าง	à rai sàk yàang	something
+🧠📈	อิทธิพล	ìt tí pon	influence
+🗣️📖	เล่าเรื่อง	lâo rʉ̂ang	Tell a story
+🌅	เมื่อเช้า	mʉ̂a cháao	this morning
+📦🤲	เอามา	ao maa	bring
+👀🫣	แอบมอง	ɛ̀ɛp mɔɔng	peek (secretly)
+✨	ใสแจ๋ว	sǎi jɛ̌ɛo	Clear
+🔄	หัน	hǎn	turn (the face)
+🤔📌	เหตุผล	hèet pǒn	reasons (cause effect)
+🤝	เห็นด้วย	hěn dûai	agree
+😠	บึ้งตึง	bʉ̂ng dtʉng	Frown / Sulky / Serious
+👤👥	แต่ละคน	dtɛ̀ɛ lá kon	each person
+👗✅	เสื้อผ้าที่เหมาะสม	sʉ̂ʉa-pâa-tîi-mɔ̀-sǒm	clothes that are appropriate
+👜💍	เครื่องประดับ	krʉ̂ʉang-bprà-dàp	accessories
+🐒	ชะนี	chá-nii	Gibbons / chicks (slang)
+🛍️🏬	ห้าง 	hâang	Mall
+🛏️🧣	ผ้าห่ม 	pâa-hòm	Blankets
+👖	กางเกงยีนส์	gaang geeng yiin	Jeans
+📐📊	คณิต(ศาสตร์)	ká-nít(-sàat)	Mathematics
+💻	คอม(พิวเตอร์)	kɔm(-piu-dtə̂ə)	Computers
+🧪⚗️	เคมี	kee-mii	Chemistry
+🧠📚	จิตวิทยา	jìt-dtà-wít-tá-yaa	Psychology
+🧬	ชีว(วิทยา)	chii-wá(-wít-tá-yaa)	Biology
+🏃‍♂️🏐	พล(ศึกษา)	pá-lá(-sʉ̀k-sǎa)	PE
+⚛️📐	ฟิสิกส์	fí-sìk	Physics
+🔬🧪	วิทยาศาสตร์	wít-tá-yaa-sàat	Science
+📚🏛️	สังคม(ศึกษา)	sǎng-kom(-sʉ̀k-sǎa)	Social Studies
+📒💼	บัญชี	ban-chii	Accounting
+📍🗺️	แห่ง	hɛ̀ng	formal measure word for places / of
+❓	ใดๆ	dai dai	at all
+😴🛌	พัก 	pák	Rest / Stay
+😫	ทนไม่ไหวแล้ว	ton mâi wǎi lɛ́ɛo	Can't stand it anymore (endure, cannot go on)
+⬇️	ใต้ 	dtâi	Under
+🤰👶	ให้กำเนิด 	hâi-gam-nə̀ət	Give birth
+🚬	บุหรี่	bù rìi	Cigarette 
+✅	ชัดเจน	chát jeen	Clear
+🎨✏️	ผู้ออกแบบ	pûu ɔ̀ɔk bɛ̀ɛp	Designer
+👗	ชุด 	chút	Outfit
+⏪	แต่ก่อน 	dtɛ̀ɛ-gɔ̀ɔn	In the past / Back in the days
+👴	แก่ 	gɛ̀ɛ	old(age)
+✅	แน่เลยค่ะ	nâɛ-ləəi-kâ	That must be it!
+🎆🎇	พลุ 	plú	Fireworks
+🔫	ยิง 	ying	Shoot
+🔥	จุด 	jùt	To light
+😤🙄	เยอะ	yə́	not content with anything at all (describing a person)
+✍️	การันต์	gaa-ran	silent symbol (placed above consonant)
+🏛️🎎	ประเพณี	bprà-pee-nii	tradition
+⌨️🖨️	พิมพ์	pim	type / print (old-fashioned)
+🗣️📖	สำนวน	sǎm-nuuan	expressions / idioms
+💬🗣️	บทสนทนา 	bòt-sǒn-tá-naa	dialogue
+🎵📜	คำคล้องจอง 	kam-klɔ́ɔng-jɔɔng	Rhymes
+📄	หน้า 	nâa	Page
+📄	ย่อหน้า 	yɔ̂ɔ-nâa	Paragraph
+💊🚬	เล่นยา	lèn-yaa	Do drugs.
+🙏😊	ดีใจที่ปลอดภัย	dii-jai-tîi-bplɔ̀ɔt-pai	I'm glad you're safe.
+🎉👏	ยินดีด้วยนะ	yin-dii-dûuai-ná	Congrats
+🧠	นั่นคือ เหตุผล	nân-kʉʉ-hèet-pǒn	That's the reason.
+👌	ทำแค่นี้	tam-kɛ̂ɛ-níi	that's all they do
+🔁	เช่นเคย	chên-kəəi	as usual
+👀	มาดูกัน	maa-duu-gan	Let's have a look! / Let's see!
+⚠️🎲	ความเสี่ยงสูง	kwaam-sìiang-sǔung	The stakes are high.
+😌	ปล่อยมันไปแบบนี้แหละ 	bplɔ̀i-man-bpai-bàɛp-níi-lɛ̀	Leave it like this.
+🙅‍♂️	ไม่ปล่อยมันเป็นแบบนี้หรอก 	mâi-bplɔ̀i-man-bpen-bàɛp-níi-rɔ̀ɔk	Definitely won't let it be like this
+🦴👻	ผอมเป็นไม้เสียบผี	pɔ̌ɔm-bpen-mái-sìiap-pǐi	As skinny as a stick impaling ghost 
+🦐🥢	ผอมเป็นกุ้งแห้ง	pɔ̌ɔm-bpen-gûng-hɛ̂ɛng	As thin as dry shrimps
+👌	แค่นี้	kɛ̂ɛ níi	Only this = That's it.
+🗓️⏮️	อาทิตย์ที่แล้ว	aa-tít-tîi-lɛ́ɛo	last week/a week ago
+🤔	ถ้ามันรู้เรื่องขนาดที่คุณพูด	tâa-man-rúu-rʉ̂ʉang-kà-nàat-tîi-kun-pûut	If he knows as much as you said
+⏳	ที่แล้ว	tîi-lɛ́ɛo	ago/last
+⏳	เมื่อก่อน	mʉ̂ʉa-gɔ̀ɔn	in the past / back then (when before)
+⏳	เสมอ	sà-mə̌ə	always
+⏰	ประจำ	bprà-jam	always
+⏰🌅	หกโมงเช้า	hòk-moong-cháao	6:00 am
+🗓️	เม.ย. 	mee-yɔɔ	Apr
+⏰🌅	ตีห้า	dtii-hâa	5:00 am
+🕒	ประมาณ	bprà-maan	about / approximately
+⏳	แปป	bpɛ́p	a bit (a period of time)
+⏱️🤝	พร้อมกัน	prɔ́ɔm-gan	at the same time
+⏳🔜	เร็วๆนี้	reo-reo-níi	soon
+⏳	ครั้งนึง	kráng-nʉng	once
+½	ครึ่ง	krʉ̂ng	half
+🤔	เราจะทำอย่างไรดีน๊า	rao-jà-tam-yàang-rai-dii-náa	What should we do (to resolve it)?
+🙅‍♂️	ไม่ได้หรอก	mâi-dâai-rɔ̀ɔk	Of course not
+😡	เกลียด	glìiat	hate
+👌	เท่านี้เอง	tâo-níi-eeng	Only this much
+⏪⏳	ย้อนเวลา	yɔ́ɔn wee laa	Go back in time
+⏳🕰️	ตลอดเวลา	dtà lɔ̀ɔt wee laa	Throughthought the time
+🤔	อาจจะ	àat-jà	Probably
+🐃	ควาย	kwaai	buffalo
+🦘	จิงโจ้	jing-jôo	kangaroo
+🦤	นกกระจอกเทศ	nók-grà-jɔ̀ɔk-têet	ostrich
+🐄	วัว	wuua	cow
+🐾	สัตว์	sàt	animal
+🐶💛	ชอบที่หมามันภักดี	chɔ̂ɔp-tîi-mǎa-man-pák-dii	I like that the dogs are loyal.
+📦	กล่อง	glɔ̀ng	box
+🕰️	เก่า	gào	old
+😠	โกรธ	gròot	angry
+👴👵	คนแก่	kon-gɛ̀ɛ	old people
+🧍	ตัวเอง	dtuua-eeng	themselves
+😤	บ่น	bòn	complain
+⛽	ปั๊ม	bpám	pump
+😶‍🌫️	อารมณ์	aa rom	emotions
+🔒	ปิด	bpìt	Close / turn off
+🦠🤒	โรค	rôok	disease / disorder
+🩺	ไปหาหมอ	bpai hǎa mɔ̌ɔ	Visit the doctor
+🍈	หน้าอก	nâa òk	Breast
+🚀	จรวด	jà-rùuat	rocket
+🚀🌌	ทะยานขึ้นฟ้า	tá-yaan-kʉ̂n-fáa	launch to the sky
+🔭✨	ดาราศาสตร์	daa-raa-sàat	astronomy
+🚀🧑‍🚀💰	หารายได้ไปทำภารกิจอวกาศ	hǎa-raai-dâai-bpai-tam-paa-rá-gìt-à-wá-gàat	raise fund to do the space mission
+🍂🍁	ฤดูใบไม้ร่วง	rʉ́-duu-bai-mái-rûuang	autumn / autumn (season leave fall)
+🌸	ฤดูใบไม้ผลิ	rʉ́-duu-bai-mái-plì	spring
+☀️⏰	ชอบที่มันมีวันนานกว่า	chɔ̂ɔp-tîi-man-mii-wan-naan-gwàa	I like that it has longer days.
+☀️✨	สว่างนาน	sà-wàang-naan	Bright for a long time
+🌇	ตอนสามทุ่มก็ยังสว่างอยู่	dtɔɔn-sǎam-tûm-gɔ̂ɔ-yang-sà-wàang-yùu	It's still bright at 9pm.
+🌙🌃	หนองคายมืดเร็ว	nɔ̌ɔng-kaai-mʉ̂ʉt-reo	Nong Khai gets dark early.
+🌑	ความมืด	kwaam-mʉ̂ʉt	darkness
+🚀	เริ่ม 	rə̂əm	Start
+☀️	พระอาทิตย์ 	prá-aa-tít	the Sun
+🍂⬇️	ตก	dtòk	Fall
+🌡️	อุณหภูมิ 	un-hà-puum	Temperature
+🌡️	องศา 	ong-sǎa	Degrees
+❄️	หิมะ 	hì-má	Snow
+🧊☕️	ชงกาแฟเย็นต้องใช้เวลานาน	chong-gaa-fɛɛ-yen-dtɔ̂ng-chái-wee-laa-naan	Making iced coffee takes a long time.
+🍫🥣	กินเวเฟอร์ธัญพืช	gin-wee-fə̂ə-tan-yá-pʉ̂ʉt	Eat musli bars.
+🌿😵‍💫	กินกัญชา แล้วเมา	gin-gan-chaa-lɛ́ɛo-mao	Had cannabis and then got high/drunk.
+🥛	นม	nom	milk
+🍅	ซอสมะเขือเทศ	sɔ́ɔt-má-kʉ̌ʉa-têet	tomato sauce
+🍜👩‍🍳	คนขายอาหาร	kon-kǎai-aa-hǎan	person who sells food
+🚨👤	ผู้ร้าย	pûu ráai	Criminals / Perpetrators
+⏱️	เมื่อกี้นี้	mʉ̂a gîi níi	Just before this / Recently / A short momoment ago
+⏳	ยังคง	yang kong	Still
+🌀	รอบๆ	rɔ̂ɔp rɔ̂ɔp	around
+💦	เหงื่อออก	ngʉ̀ʉa-ɔ̀ɔk	To sweat out
+🪖	ทหาร	tá-hǎan	soldier
+😊	สุขใจ	sùk jai	happy
+👨‍🌾🏘️	ผู้ใหญ่บ้าน	pûu-yài-bâan	Chief of the village
+🏠👶	สถานสงเคราะห์	sà-tǎan-sǒng-krɔ́	Orphanage
+👶🧒	เด็กกำพร้า	dèk-gam-práa	Orphans
+🤝🏠	อุปถัมภ์	ùp-bpà-tǎm	Foster
+💔	หัก	hàk	Broken
+📚	วรรณคดี	wan ná ká dii	Literature
+⏭️	หลังจากนั้น	lǎng jàak nán	After that
+🗓️	สองอาทิตย์ครั้ง	sɔ̌ɔng-aa-tít-kráng	once every two weeks
+🎲	พอดี...	pɔɔ-dii...	(Someone) happened to...
+➕🤝	เสริม	sə̌əm	support / add
+📅	ต้นเดือน	dtôn dʉan	the beginning of the month
+🤔	ถึงแม้	tʉ̌ng-mɛ́ɛ	Even though
+📅	กลางเดือน	glaang dʉan	middle of the month
+✅🤝	ยอมรับ	yɔɔm-ráp	accept/admit
+📅⏳	ปลายเดือน	bplaai dʉan	towards the end of the month
+📅	สิ้นเดือน	sîn dʉan	end of the month
+⏳	40 กว่า	40 gwàa	40ish
+💔🚑	หัวใจวาย	hǔua-jai-waai	Have a heart attack
+ℹ️🗣️	ให้ข้อมูล	hâi-kɔ̂ɔ-muun	To inform (give information)
+⚖️	ทำโทษ	tam-tôot	punish
+🚔⚖️	ก่ออาชญากรรม	gɔ̀ɔ-àat-chá-yaa-gam	Do crime
+👶	เด็กทารก	dèk taa-rók	baby
+⚖️😠	โทษ	tôot	blame
+⏳	พลาง	plaang	while (written)
+👏😍	ชื่นชม	chʉ̂ʉn-chom	admire
+🎬⭐️	ดาราหนัง	daa-raa nǎng	Movie stars
+👥	สาธารณชน	sǎa-taa-rá-ná-chon	the (general) public
+🖼️	กรอบ	grɔ̀ɔp	Frames
+🛕🙏	หิ้ง	hîng	Shrine
+🖼️🧱	แขวนติดผนังบ้าน	kwɛ̌ɛn dtìt pà-nǎng bâan	Hang (attach) it on the wall of the house
+💭	มโนภาพ	má-noo-pâap	imagine
+🎵✨	เพราะ	prɔ́	beautiful (songs)
+🍳🧂	ปรุง	bprung	To flavour
+🎭	ทำตัว	tam dtua	To act
+📊	เฉลี่ย	chà-lìa	average / mean (n)
+📈📚	เพิ่มเกรด	pə̂rm grèet	Improve/increase grades
+🎒🏫	เลิกเรียน	lə̂rk rian	get off school
+🏃‍♂️💨	ตามเพื่อนไม่ทัน	dtaam pʉ̂an mâi tan	can't keep up with friends
+🎓🔁	เรียนซ้ำ	rian sám	repeat the grade
+🔁	มัก	mák	tend to
+🚫	ยกเว้น	yók-wén	except
+😤	ตามตื๊อ	dtaam dtʉ́ʉ	pester / bother / harass
+🤔💭	คิดดูสิ	kít duu sì	Think about it
+🧑‍💼	ตัวแทน	dtua-tæn	representative
+😈🍑	บ้ากาม	bâa-gaam	perverted
+⛓️🚔	ติดตะราง	dtìt dtà-raang	in jail
+📥	ได้รับ	dâi-ráp	get / receive
+⚖️💀	โทษประหาร	tôht bprà-hăan	capital punishment
+⚡💨	ไว	wai	fast
+⚠️☠️	อันตราย	an-dtà-raai	dangerous
+🧠🫠	สมองเน่า	sà-mɔ̌ng nâo	brain rot
+📖	ความหมาย	kwaam-măai	meaning
+💭	หมายความ	măai-kwaam	To mean
+🤔✅	ตัดสินใจ	dtàt-sǐn-jai	decide
+💭	นึกถึง	nʉ́k tʉ̌ng	think of
+🤔🛠️	ทำอย่างไร	tam yàang-rai	How(they) would they do to resolve sth?
+🤔	สมมุติ	sǒm-mút	what if
+💪🦁	กล้า	glâa	To dare to do sth / brave
+😮‍💨	ถอนใจออก	tɔ̌n-jai ɔ̀k	To sigh (people say ถอนหายใจ more)
+🎤📝	สัมภาษณ์	sǎm-pâat	interview
+⏩	ต่อไปนี้	dtɔ̀r-bpai-níi	from now on
+⛔️	ห้าม	hâam	Forbid
+✅	โดยเด็ดขาด	doi-dèt-kàat	completely / absolutely
+📅	ไตรมาส	dtrai-mâat	Quarter
+🧠	ทางจิต	taang jìt	mental
+🕰️	ช่วงนี้	chûang-níi	Lately / Recently
+⏩	กว่าเดิม	gwàa dərm	more than before
+📉⏳	แก่ลง	gæ̀-long	older than before (negative trend)
+💪🌿	เฮลตี้ขึ้น	hel-dtîi kʉ̂n	healthier than before (positive trend)
+👥	ลูกน้อง	lûuk-nɔ́ɔng	Subordinates / crew members / people under supervision
+💎	พลอย	plɔɔi	Follow along naturally
+🎯✅	แม่น	mæ̂n	accurate
+⛓️🔒	จำคุกตลอดชีวิต	jam-kúk dtà-lɔ̀t chii-wít	Lifetime imprisonment
+⚖️🪓	ประหาร	bprà-hăan	execution
+😖	อึดอัด	ʉ̀t-àt	uncomfortable
+🤗💛	ห่วงใย	hùang-yai	care / worry
+😟	กังวลใจ	gang-won-jai	anxious
+⚖️🗣️	ฟ้อง	fɔ́ɔng	report / tell on / sue
+🗣️🌸	เสียงอ่อนโยน	sǐang ɔ̀n-yohn	gentle voice
+😁😄	ยิ้มระรื่น	yím rá-rʉ̂n	wide smile
+👥	คนวงนอก	kon wong-nɔ̂k	outsiders
+🤫🔒	รักษาความลับ	rák-sǎa kwaam-láp	keep secrets
+😱💔	ใจหาย	jai-hăai	frightening (heart disappear)
+📅	วันรุ่งขึ้น	wan rûng-kʉ̂n	The day after
+🚔🏢	สถานีกลางตำรวจปราบปรามอาญา	sà-tăa-nii glaang dtam-rùat bpràap-bpraam aa-yaa	Crime Suppression Division Central Station
+🏙️	เขต	kèet	district
+🥸🕵️	ปลอมตัว	bplɔɔm-dtua	disguise
+🪖🫥	พรางตา	praang-dtaa	Camouflage
+🕵️	สอดแนม	sɔ̀ɔt-nɛɛm	To spy
+🧍	เดี่ยว	dìao	solo
+👓	แว่นตา	wâen-taa	(eye)glasses
+👗	กระโปรง	grà-bproong	skirts
+🧦	ถุงน่อง	tǒong-nông	stockings
+👠	ส้นสูง	sôn-sǔung	high heels
+🔀	คนละ	kon-lá	different / each
+🫡	รักษาการณ์	rák-sǎa-gaan	on duty
+🏛️	ห้องโถง	hông-tǒhng	hall
+😞	พลาด	plâat	miss out
+🧱🏠	ฝาผนัง	fǎa pà nǎng	interior walls
+🏷️	ยี่ห้อ	yîi hɔ̂ɔ	Brand
+👋	ทักทาย	ták-taai	To greet
+❗️	อุทาน	ù-taan	interject / exclaim
+🏠🌿	ระเบียง	rá biang	Balcony
+🤔	ที่แท้	têe-táae	actually
+🚗🚦	รถติด	rót-dtìt	traffic jam
+⏱️	ทัน	tan	in time
+🛠️	วิธีการ	wí-têe-gaan	how to
+✅	ปฏิบัติ	bpà-dtì-bàt	act / proceed / execute
+📝	แผนการ	pláaen-gaan	plan / alibi
+🪟🏠	ห้องกระจก	hông grà-jòk	glass window room
+🚶‍♂️➡️	ทะลุ	tá-lú	go through
+🚶‍♂️🛣️	ช่องทางเดิน	chông-taang-dern	walkway
+📍	แถว	tǎaeo	in the area of
+🏢	ที่ทำการ	têe-tam-gaan	office
+🩺	ศัลยแพทย์	sǎn-lá-yá-pâaet	surgeon
+🟰	แต่	dtàae	only
+💃	หุ่น	hùn	body shape
+🔪🩸	ถูกเฉือน	tòok chěuan	get slashed
+🔪	แล่	lâae	To Peel
+🧴	ผิว	pǐu	skin
+🔪🫀	ผ่าชำแหละ	pàa-cham-làe	dissect / cut open
+👀	ชำเลือง	cham-leuuang	To glance
+👈	เหล่านั้น	lǎo-nán	those
+🥸👗	ชุดปลอมตัว	chút bplɔɔm tua	disguised clothes (outfit)
+🕵️	คนที่ต้องสงสัย	kon tîi dtâwng sǒng-sǎi	suspect (n)
+↔️🌊	คนละฝั่ง	kon lá fàng	on different sides (coasts)
+🧑‍💼🛍️	แม่ค้า	mâae káa	seller (fem)
+🪖	ถูกปลด	tòok bplòt	get discharged / released
+🪖	ประจำการ	bprà-jam gaan	active duty
+🪖	กองพัน	gɔɔng pan	battalion
+🏅	เกียรติ	gìat	honor
+🏘️	เพื่อนบ้าน	pʉ̂an bâan	neighbors
+😱👻	น่าสยดสยอง	nâa sà-yòt sà-yɔ̌ɔng	horrifying
+😷🤧	ไอ	ai	cough
+👹	ยักษ์	yák	giant
+🐎	ขี่ม้า	kìi-máa	ride a horse
+🐎🏁	แข่งม้า	kɛ̀ng-máa	compete horses
+🧱	ก้อน	gɔ̂ɔn	classifier for sth in lumps
+🥤🫧	น้ำอัดลม	náam-àt-lom	soft drinks (pump, gas/wind)
+⏳	ต่อมา...	dtɔ̀ɔ maa	...later
+©️📜	ลิขสิทธิ์	lík-kà-sìt	copyrights
+💞	คู่จิ้น	kûu-jîn	Ship pairing
+🔁	ย้อน	yɔ́ɔn	Reverse
+🪞🏙️	สะท้อนสังคม	sà-thɔ́ɔn-sǎng-khom	reflect society
+🦠	เชื้อ	chʉ́a	infection
+🎮🤝	ทั้งสี่คนเคยเล่นด้วยกันแล้ว	tháng sìi khon kəəi lên dûai gan lɛ́ɛo	The 4 of them have played together before.
+🚲	จักรยาน	jàk-grà-yaan	Bicycle
+🧼	สบู่	sà-bùu	soap
+🏙️🚶	ที่สาธารณะ	têe sǎa-taa-rá-ná	public spaces
+🛍️	ซื้อให้ตัวเอง	seú hâi dtua-eeng	buy (things) for themselves
+👨‍👩‍👧	คนโต	kon dtooh	the eldest one (child/sibling)
+👶	คนเล็ก	kon lék	the youngest one (child/sibling)
+😅🤣	มุกแป้ก	múk bpɛ̂k	dad jokes / lame jokes
+🪨	หิน	hǐn	stone / difficult
+😮‍💨	ถอนใจ	tɔ̌ɔn-jai	sigh
+🧩	ชิ้น	chín	pieces
+🚶‍♂️💨	ไปกันเถอะ	bpai-gan-tə̀	Let's go
+🚔🔒	ตะราง	dtà-raang	jail / cell
+🕳️🏚️	ใต้ดิน	dtâi din	underground
+💧🌫️	ชื้น	cheún	humid
+💡	หลอดไฟ	lɔ̀ɔt fai	light bulbs
+💡	ดวง	duang	classifier for light bulbs
+🔗	ซึ่ง	sʉ̂ng	which/that
+✨	ส่องสว่าง	sɔ̀ɔng sà-wàang	To shine
+🔒	ส่วนตัว	sùan dtua	private
+🛁	อ่างน้ำ	àang náam	basin
+🕳️	รู	ruu	hole
+🚽	ส้วม	sûam	toilet
+🛏️	ฟูก	fôok	mattress
+🪵	ไม้	mái	wood
+📍	ประชิด	bprà-chít	right next to
+👉	ผลัก	plàk	To push
+🤏	แน่น	nɛ̂n	tight / tightly
+💎✨	หรู	rǔu	luxurious
+🛋️	เบาะ	bɔ̀	cushion
+📝	ดังกล่าว	dang glàao	mentioned
+📻📡	วิทยุรับส่งมือถือ	wít-tá-yú ráp-sòng meu-teǔ	walkie talkie
+💡✨	แสงสว่าง	sɛ̌ɛng-sà-wàang	bright light
+✨👓	ชัดแจ๋ว	chát jɛ̌o	crystal clear
+🌍	ทั่ว	tûa	all over
+👀	กระพริบตา	grà-príp dtaa	To blink
+🙈	หลับตา	làp dtaa	close eyes
+😌	ชิน	chin	get used to / accustomed to
+🏁🏃	แข่ง	kàeng	compete / race
+🏆💪	เอาชนะ	ao-chá-ná	beat / win over
+🤔	แหละ	làe	obviously, must be (assumption)
+🎄😺	กรินช์เรียนรู้ที่จะชอบคริสมาสต์	Grín riian-rúu têe ja chôp Krít-mâat	Grinch is learning to like Christmas.
+⛔🏠	กักบริเวณ	gàk-bò-rí-ween	To ground (limit space)
+👦	หนุ่ม	nùm	young (used for masculine-looking people)
+✋	มือ	meuu	hands
+🧴	กร้าน	grâan	rough (skin)
+💪	ไหล่	lài	shoulders
+👀✨	หน้าตา	nâa dtaa	appearance
+🔪💀	ฆาตกร	kâat-dtà-gon	killer; murderer
+🧑‍💼💰	พ่อค้า	pâw-káa	merchant (masc)
+🌐	ทั่วไป	tûua-bpai	in general
+🛍️	ตลาดนัด	dtà-làat-nát	flea market
+👷	คนงาน	kon-ngaan	worker
+🏗️🚧	บริเวณก่อสร้าง	bò-rí-ween-gàw-sâang	construction site
+🛠️	ช่าง	châang	so + (adj)
+🍵	ชา	chaa	numb
+🚫	ไร้	rái	without
+👻	วิญญาณ	win-yaan	souls
+🐯	เสือ	seǔa	tiger
+🤷	ไม่มีอะไรเกิดขึ้น	mâi-mee-à-rai-gêrt-kêun	Nothing happened
+🤔🔫	เกี่ยวกับว่า จ้อยคิดยังไงกับมือปืน	gìao-gàp-wâa jâwy-kít-yang-ngai-gàp-meuu-bpeun	It's about the fact that what Joy thinks of the gunman.
+🦁🦈	ผู้ล่า	pôo-lâa	predator
+💔😣	ทำให้คนอื่นเจ็บ	tam-hâi-kon-èun-jèp	make people hurt
+🌡️	อุณหภูมิ	un-hà-poom	temperature
+🌇🏙️	คนละเมือง	kon-lá-meuuang	different cities
+💱	แลก	lâek	exchange
+🎁	ของขวัญ	kǎawng-kwǎn	gifts / presents
+🧥	เสื้อไหมพรหม	seûua-mǎi-prom	cardigan
+🌌	คืนดาวเต็มฟ้า	keuun-daao-dtem-fáa	starry night (night stars full sky)
+🌃	องค์ประกอบ	ong-bprà-gàawp	component / Composition
+👍🧑‍🎓	ไม่เคยขาดเรียน	mâi-kooei-kàat-rian	To never be absent
+🏆	ให้รางวัล	hâi-rang-wan	give awards/prizes
+🧑‍🏭	พันโท	pan-toh	Lieutenant Colonel
+🔋🤑	อำนาจ	am-nâat	power
+🗣️	ห้วนๆ	hûuan-hûuan	impolite (without ending particles) / bluntly
+👀	พอจะเห็นแล้วว่า	paw-jà-hěn-láaeo-wâa	starting to see already that
+🤯	จิตใจ	jìt-jai	minds
+😷	อาการ	aa-gaan	symptoms / actions
+❌😷	ไม่มีอาการ	mâi-mee-aa-gaan	doesn't seem to
+⛔️	ไม่...ใดๆ	mâi...dai-dai	not at all
+✅☝️	ได้แต่	dâai-dtàae	only
+🌚	มืด	meûut	dark
+🥶	เยือกเย็น	yeûuak-yen	cold/icy
+🔞	เพียง...เท่านั้น	piang...tâo-nán	only
+🩳	สั้นๆ	sân-sân	shortly / concisely
+🙈	แฝง	fǎaeng	connote / disguise / behind / hide / conceal
+🗣️	พูดออกมา	pôot-ook-maa	speak out
+😮	แปลกใจ	bplàaek-jai	To feel surprised
+🥳	ตื่นเต้น	dtèuun-dtên	excited
+⛔️	แม้นแต่น้อย	máaen-dtàae-náwy	even one bit
+💈💇	ช่างตัดผม	châang dtàt pŏm	hairdresser / hair stylist
+🎆	พลุ	plú	fireworks
+⬆️	เหนือ	nʉ̌ʉa	above / north
+🔥	ไฟ	fai	fire / lights
+🚬🎇	จุดพลุ	jùt plú	light up fireworks
+🆑	ชัด	chát	clear
+🕋	ตึก	dtʉ̀k	buildings
+🎩	นักการเมือง	nák gaan mʉang	politicians
+🚻🪆	บุคคลสำคัญทางการเมือง	bùk-kon sǎm-kan taang gaan-meuueang	political figures
+🗯️	ความเห็น	kwaam hěn	opinion
+🗣️👎	กล่าวโทษ	glàao tôht	accuse / blame
+🤥	โกง	gohng	corrupted
+🧑‍🧑‍🧒‍🧒👭👬👫🧑‍🤝‍🧑	พรรคการเมือง	pák gaan-meuueang	political party
+🤯	หัวหน้า	hŭa-nâa	Head / boss / leader
+😵‍💫	โรคจิต	rôhk jìt	mental illness (disease)
+⚜️	อย่าง	yàang	"= adv
+in a way / -ly 
+things
+like (not so positive example)"
+😓	แรง	raeng	strong
+🩻	กรง	grong	cage
+⛔️👯	ต่าง	dtàang	different
+😰	มันจะทำอะไรเธอได้	man jà tam a-rai tuuhr dâi	What can it do to her?
+📤	ธุระ	tú-rá	errands / matters
+😩	ครวญคราง	kruuan kraang	whine
+⛔️😫	ฟังไม่ออก	fang mâi òk	can't make out what's said
+👔🎴	กระเป๋าเสื้อ	grà-bpǎo seûua	shirt pocket
+🤲	ยื่น	yêun	hand over
+⛅️	ด้านหลัง	dâan lăng	behind / back side
+🚪	ประตู	bprà dtuu	door
+🚪	บาน	baan	classifier for doors
+⏭️	จนถึง	jon tĕung	until / so much that
+🤝	สัมผัส	sǎm-pàt	touch
+😷	ปลอดภัย	bplòt pai	safe
+🪡	คุกคาม	kúk kaam	harass
+🔜	ทันที	tan tee	immediately
+🪤🎣	ล่อ	lâw	To entrap / bait
+🎭🔓	เปิดโปง	bpə̀ət-bpoong	unmask
+🛐🗣️	สารภาพ	sǎa-rá-phâap	confess
+👁️👁️	สบตา	sòp dtaa	meet the eyes
+⛓️🙍‍♂️	นักโทษ	nák-tôot	prisoner
+👋💥	ตบ	tòp	slap
+✉️📂	ซอง	saawng	case / envelope
+🔫	ปืนพก	bpeun póhk	Handgun
+🔫👜	ซองปืน	saawng bpeun	holster
+📎👖	เหน็บ	nèp	attach
+⬅️➡️	ข้าง	kâang	Sides / next to / on the side
+🧍💪	กาย	gaai	body
+👁️✨	แววตา	wɛɛo dtaa	eye expression
+🤝❤️	วางใจ	waang jai	trust
+👀⚡	เหลือบ	leùap	glimpse
+🔗➡️	จึง	jʉng	hence
+↔️🆚	ตรงกันข้าม	dtrong gan kâam	opposite
+║║║	ลูกกรง	lôok grong	bars
+🎭😐	สีหน้า	sěe nâa	facial expression
+💃🕺	ท่าทาง	tâa taang	posture; gesture
+👺😤	ยังมีหน้า	yang mee nâa	To have the nerve
+😱⚡	ตกตะลึง	dtòk dtà-leung	shocked
+👄🗣️	ปาก	bpàak	mouth
+😊🤏	แก้ม	gâaem	cheek
+🤨〰️	คิ้ว	kíw	eyebrows
+👀	สายตา	sǎai-dtaa	sight / gaze
+🧊😒	เย็นชา	yen chaa	ice-cold
+🤔💭	นึก	nʉ́k	think
+🧘🛑	นั่งอยู่เฉยๆ	nâang yùu chóoei-chóoei	sit still
+🧗‍♂️💦	พยายาม	pá yaa yaam	Try / Attempt / Put effort
+🤝🥰	ผูกมิตร	pùuk mít	make friends; establish rapport
+🙄👄	แหม	mǎae	Oh my!
+👀👍	ชม	chom	view / admire
+🛑😫	เกินไป	geern bpai	Too much
+👉👨	อย่างพี่	yàang pêe	like you, brother
+🥀🙍	เหงาหงอย	ngǎo ngɔ̌i	lonely
+🚫🛂	เนรเทศ	nee-rá-tâyt	deport
+⚖️🚫	ผิดกฎหมาย	pìt-gòt-măai	illegal
+⚖️✅	ถูกกฎหมาย	thùuk-gòt-măai	legal
+📄⬇️	ท้ายหน้า	tâai-nâa	bottom of the page
+😮	ทึ่ง	tûeng	amazed
+🤝💬	อยู่เป็นเพื่อน	yòo-bpen-pêuuan	keep somebody company
+🚶‍♂️🏠	แวะมาหา	wáe-maa-hăa	drop by; stop by
+🙏	บอกให้เอาบุญ	bɔ̀ɔk-hâi-ao-boon	telling you for the sake of yourself
+🕳️	ว่างเปล่า	wâang-bplàao	empty
+🛋️😊	ทำตัวให้สบาย	tham-dtua-hâi-sà-baai	make yourself comfortable
+👂🗣️	ข่าวลือ	khàao-lʉʉ	rumor
+❌🙅	หรอก	ràawk	definitely (insensifier for negative sentences)
+🗣️💬	พูดลอยๆ	pôot-lɔɔi-lɔɔi	saying without expecting any response / put it out there
+🙏💗	ความกรุณา	kwaam-gà-rú-naa	mercy; kindness
+🤷‍♂️	ยักไหล่	yák-lài	shrug (lift shoulders)
+🦁🛡️	กล้าหาญ	glâa-hăan	courageous
+⏳➡️	...ต่อมา	dtàaw-maa	...later
+🛡️📄	ประกัน	bprà-gan	insurance
+🥡🍲	ของเหลือ	kŏng-lĕua	leftovers
+🚶‍♂️➡️	ผ่าน	phàan	pass; go past
+🆕🙋	น้องใหม่	nóng-mài	newbie
+📄	ต้นฉบับ	dtôn-chà-bàp	original (the prototype)
+📝👨‍👩‍👧‍👦	ถ้านักเรียนสอบไม่ผ่าน เดือดร้อนพ่อแม่	tâa-nák-rian-sàawp-mâi-pàan-dʉ̀ʉat-ráawn-phâaw-mâe	If students don't pass the test, parents will be in trouble.
+🚫👧👦	เด็กต้องไม่ดูหนังโป๊	dèk-dtông-mâi-doo-năng-bpóo	Children must not watch porns.
+🔪	คม	kom	sharp
+💧✨	ใส	săi	(crystal) clear (water/transparent)
+🦸	วีรบุรุษ	wee-rá-buu-rùt	hero
+✅🎉	สำเร็จ	sǎm-rèt	successfully
+😂	หัวเราะ	hŭa-ráw	laugh
+🦹‍♂️🔪	อาชญากร	aaht-chá-yaa-gawn	criminal
+🔁	เอาใหม่	ao-mài	another round; (do/say) again 
+👥🏫	คณะ	ká-ná	group; faculty
+⏳	กว่า...	gwàa	until
+😇🤝	อยากให้จ้อยคิดว่า เขาเป็นคนไม่อันตราย	yàak-hâi jôi khít wâa kháo bpen khon mâi an-dta-raai	Wants Joy to think that he's not a dangerous person
+📖	บท	bòt	chapter
+💾📝	บันทึก	ban-thʉ́k	save; record
+🎙️	เครื่องบันทึกเสียง	krêuuang-ban-thʉ́k-sĭang	voice recorder
+👀	ละสายตา	lá-săai-dtaa	leave the sight
+⏳	ยัง	yang	still / not yet
+✅👍	เป็นอย่างดี	bpen-yàang-dee	well (in a way that is good)
+👤🔑	เจ้าของ	jâo-kŏng	owner
+🚤	ลำ	lam	classfier for vessels, boats
+🎣🐟	ชาวประมง	chaao-bprà-mong	fisherman
+💀🚗	ตายโหง	dtaai-hǒhng	die in accidents (unnatural causes)
+🔥	ดับ	dàp	put out
+🌱	ชีพ	chêep	life
+🔪💀	ดับชีพ	dàp-chîip	kill
+⏳📅	ทุกวันนี้	túk wan níi	these days
+🎯	...จะได้...	jà-dâai	so that
+🤨	กังขา	gang-kăa	skeptical
+🔊	ลั่น	lân	loudly
+⏳	ตั้งนาน	dtâng-naan	long time
+🤪😵‍💫	บ้า	bâa	crazy
+🙃	เอาเถอะ	ao-thèr	nevermind
+🚶‍♂️👋	ละ	lá	abondon; leave
+👀	สาดตา	sàat-dtaa	sweep eyes
+🏠	เพดาน	bpeh-daan	ceiling
+🚔🔒	ห้องขัง	hôong-kăng	jail
+😮‍💨	ถอนหายใจ	tǒhn-hǎai-jai	sigh
+🕳️	ลึก	lʉ́k	deep
+👔🤝	จ้าง	jâang	hire
+🚤🎣	เรือประมง	rʉa̰-bprà-mong	fishing boat
+🏘️	หมู่บ้าน	mòo-bâan	village
+🤔	ถ้าหาก	tâa-hàak	if
+📄✍️	สัญญา	sǎn-yaa	contract; promise
+👪	ญาติ	yâat	relatives
+✅	แน่นอน	nɛ̂ɛ-nɔɔn	certainly / definitely
+🗺️📝	แผน	păen	plans
+✅	ถูก	tùuk	correct; cheap; get (passive voice)
+🎯🙏	สมใจนึก	sŏm-jai-néuk	as they wish; as expected
+🎙️	อัด	ʔàt	To record
+🔄🌱	ให้โอกาสปรับปรุงตัว	hâi-oo-gàat-bpràp-bprung-dtua	give an opportunity to improve self (not good -> better than before)
+🛠️📈	พัฒนา	pát-tá-naa	develop
+🔄⏳	ทำแทนไปก่อน	tam-taen-bpai-gòrn	do it instead(sub) in the meantime first 
+💼	มีประสบการณ์	mee-prà-sòp-gaan	have experience; experienced
+☀️🕒	ระหว่างวัน	rá-wàang-wan	during the day
+🪝	แขวน	kwăen	To hang
+📎	ติด	dtìt	stuck/attach
+🧱	ผนัง	pà nǎng	interior walls
+🕳️💧	บ่อ	bò	well; pond
+🚻🚿	ห้องน้ำรวม	hâawng-náam-ruuam	shared bathroom
+⚠️☠️	อันตรายถึงชีวิต	an-dtà-raai tĕung chii-wít	life-threatening
+💰	ราคา	raa kaa	price
+💰	ค่า	kâa	cost / expense / price
+💰	ค่าตอบแทน	kâa-dtàawp-taen	compensation (fees/cost)
+✨	งาม	ngaam	Beautiful
+🔫	ปืน	bpuen	gun
+🤝	เพื่อนยาก	pêuan-yâak	true friends
+🤝👯	คู่หู	kôo-hǒo	buddy; partner
+🔫	ยิง	ying	To shoot
+🔢	นับ	náp	Count
+💵🏦	แบ๊งค์	báeng	bank notes; bills; banks
+🈵📍	เต็มไปหมด	dtem-bpai-mòt	all over (full)
+👶⏳	เกิดได้โตมา	gèert-dâai-dtoo-maa	since I was born (born get to grow up already)
+💰	รวย	ruay	rich
+💥🤬	ฉิบหาย	chìp-hăai	มาก (slang)
+👀	โผล่	plòh	turn up; appear
+😕	งง	ngong	confused
+🔮☁️💭	คง	kong	probably
+😲	คาดไม่ถึง	kâat-mâi-thěung	didn't expect (didn't reach expectation)
+🖊️📏	ขีดเส้น	kìit-sên	draw the line
+📏📝	กำหนด	gam-nòt	determine / assign / direct / draw the line
+🔮	ดวง(ชะตา)	duuang(chá-dtaa)	fate
+🖊️📏	ขีดเส้นเอาไว้แล้ว	kìit-sên-ao-wái-láew	already drawn the line (and leave it; it's definite)
+❌🔌	ขาด	kàat	disconnect; lack
+💀	ชะตาขาด	chá-dtaa-kàat	die
+🚧🧱	ขอบเขต	khàawp-khèt	boundaries
+⬇️	ข้างล่าง	kâang-lâang	downstairs
+🏢	ชั้น	chán	floor; storey
+⬆️🏠	ข้างบน	kâang-bon	upstairs
+📜🗞️📑	ฉบับ	chà-bàp	a copy
+➡️	โดย	dooi	by
+⏳	ก่อน	gɔ̀ɔn	before / verb + ก่อน = First
+🐦	ตัวของมันไม่โตนัก	dtua-khǎawng-man-mâi-dtoh-nák	Its body isn't that big.
+🦶	เท้า	táo	feet
+🔗	คล้าย	kláai	similar
+🗣️🐦	ปากนกปากกา	pàak-nók-pàak-gaa	gossipy
+⬇️	ใต้	dtâi	under
+🌍	ทวีป	ta-wêep	continent
+🛠️	ใช้	chái	use
+🚜🌾	ไถนา	thăi-naa	plow the field
+🐃🛒	ลากเกวียน	lâak-gwian	pull a cart
+💪	แข็งแรง	kăeng-raeng	strong
+🏋️‍♂️	หนัก	nàk	heavy
+🧴	หนัง	nǎng	skin
+👜🐃	กระเป๋าหนัง	grà-bpăo-năng	leather bags
+👟	รองเท้า	rong-táo	shoes
+🦴	กระดูก	grà-dòok	bones
+👔🧵	กระดุม	grà-dum	buttons (shirt)
+🧰🧺	ของใช้ต่างๆ	kŏng-chái-dtàang-dtàang	other items
+✨	กระ	grà	freckles; spot
+📝	สรุป	sà rùp	Summarise
+🎛️👮	คุม	kum	monitor; control
+🚪🧭	ไม่อยู่ถูกห้อง	mâi-yùu-tòok-hông	They are not in the correct room.
+✅🔒	ให้แน่ใจว่า	hâi-nâe-jai-wâa	make sure that; ensure that
+🎯	เน้น	nén	emphasize / focus
+🎬📽️	ฉายหนัง	chăai-năng	screen a movie
+🥺🤝	เห็นใจ	hěn-jai	symphatise
+🎬🙅‍♀️	ไม่อยากให้ครูฉายหนัง	mâi-yàak-hâi-kroo-chăai-năng	don't want teachers to screen movies
+😮‍💨🔋	หมดแรง	mòt-rɛɛng	out of energy
+📝	ตัวอย่าง	dtua-yàang	example
+😜	ล้อ	ló	make fun of
+📝	กริยา	grì-yaa	verb
+💻💥	ทำคอมพัง	tam-kom-phang	make a computer broken/ruined
+🔫	ชักปืน	chák-bpeuun	pull out the gun
+👀	ลืมตา	leum-dtaa	open eyes (by yourself; by nature)
+🙏	ยกมือไหว้	yók-mueu-wâai	raise hand to Wai
+🐶	ลูกหมา	lûuk-măa	puppy
+👯‍♂️	เหมือน...ไม่มีผิด	mĕuuan...mâi-mii-phìt	look exactly(so much) ike ...
+🔒	เท่านั้น	tâo nán	only
+🔪☠️	ฆ่าอยู่ดี	khâa-yùu-dii	kill anyway
+⬆️	ขึ้น	kʉ̂n	are on / get on
+🏷️	ขึ้นชื่อว่า	kêun-chêu-waâ	known as
+👎👀	ดูถูก	duu tòok	look down on
+💔😣	รักยาก	rák-yâak	hard to love
+🖤🥶	ใจดำ	jai-dam	black-hearted; cold-hearted
+🪲	ด้วง	dûuang	beetle
+🐞	เต่าทอง	dtào-tawng	ladybird
+🏷️	ตั้งชื่อ	dtâng-chʉ̂ʉ	Give(set) a name
+🎨🧑‍🎤	ศิลปิน	sìn lá bpin	artist
+🤝❤️	สนิท	sa-nìt	close-knit
+🧸✨	นุ่ม	nûm	soft; smooth
+⚠️😠	ขู่	kùu	threaten
+📜⚖️	กฎ	gòt	rules
+🛕✨	ขลัง	klăng	sacred
+🎯🩸	เหยื่อ	yùea	victim
+☠️⚡	ถ้าเหยื่อตายเร็วเท่าไร	thâa-yùea-dtaai-reo-thâo-rài	the faster the victim dies
+😈🩸	โหดเหี้ยม	hòht-hîam	ruthless
+😱😨	สยองขวัญ	sà-yŏng-kwăn	horrified
+😱🔪	โหดเหี้ยมสยองขวัญมากแค่ไหน	hòot-hîam-sà-yŏng-kwăan-mâak-khâe-năi	the more ruthless and horrified
+💪📈	ทำได้มากเท่าไร	tam-dâai-mâak-thâo-rài	the more you can do
+🎯➡️	ส่งผลให้	sòng-pŏn-hâi	affect
+🏆📊	อันดับ	an-dàp	ranking
+📜🗒️	ทำเนียบ	tam-nîiap	list; record
+🛝➡️	เลื่อน	lêuan	move; slide
+🛡️⚔️	แนวหน้า	naew-nâa	front(line)
+📈🔁	...มากเท่าไร ...มากเท่านั้น	mâak-tâo-rài mâak-tâo-nán	the more ..., the more ...
+📈🔁	...มากแค่ไหน ...มากเท่านั้น	mâak-kâe-năi-mâak-thâo-nán	the more ..., the more ...
+😒😤	รำคาญ	ram-khaan	annoyed
+🔫	กระสุน	grà-sŭn	bullet
+🫁	อก	òk	chest
+🔫💥	นัด	nát	classifier for bullets; gunshots
+🤸‍♂️⬇️	ล้มลง	lóm-long	fall down
+🤬	แม่ง	mâaeng	แม่ + มึง
+🐟	ปลาช่อน	plaa-chɔ̂ɔn	Snakehead murrel
+🪱😖	ดิ้น	dîn	wriggle; squirm
+🔨💥	ทุบ	túp	smash
+🤬	ไอ้ห่า	âi-hàa	damn it
+🇹🇭🏛️	ประธานาธิบดี	bprà-taa-naa-tí-bɔɔ-dii	President
+📄	เนื้อหา	nʉ́ʉa-hăa	content
+🐛	คลาน	klaan	crawl
+🏃💨	หนี	nǐi	escape
+🔦🔒	ส่อง	sòng	project; lock
+↔️	กลาง	glaang	in the middle
+🔙	หลัง	lǎng	back / behind / classifier for accommodation
+🧩	แบบ	bàep	type; kind
+🗂️	ชนิด	chá nít	Type / Kind / Sort
+🎯🔫	เผาขน	phǎo-kŏn	ใกล้มาก; point blank
+💩🤬	ไอ้ฉิบหาย	âi-chìp-hǎai	shit (slang)
+🩸	เลือด	lʉ̂at	blood
+🌊	ไหล	lăi	flow
+🌊💦	นอง	nɔɔng	overflowing
+🏠🧱	พื้น	pʉ́ʉn	floor / ground
+🧍‍♂️✋	นิ่ง	nîng	stay still
+🤫🔇	เงียบ	ngîap	Quiet
+🙅‍♂️	ส่ายหน้า	sàai-nâa	shake head
+📌	วาง	waang	To place / paste
+⬇️	ลง	long	(go) down
+📦🥪	ยัด	yát	cram; stuff
+👖	กางเกง	gaang-geng	pants
+🤔	...มั้ง	máng	maybe
+🏃💨	รีบ	rîip	hurriedly
+🎴	ดาดฟ้า	dàat fáa	rooftop / deck
+😨	กลัว	glua	scared
+🦴	คอ	kɔɔ	neck
+🕒✨	เพิ่ง	pə̂əng	just (recently)
+➕	นอกจากนั้น	nâwk-jàak-nán	apart from that
+🫥💨	หาย	hǎai	disappear
+👥🎓	ชมรม	chom-rom	club; society
+👔🏢	ผู้บริหาร	pôo-bò-ri-hăan	executives; people in the management
+🍽️↔️🍽️	คนละโต๊ะ	kon-lá-tó	different tables (one on one and another on the other)
+🧩📍	วางของไม่ถูกที่	waang-khǎawng-mâi-thùuk-thîi	To misplace sth (place things not right place)
+👩‍🏫⚠️	ปัญหาในฐานะครู	bpan-hăa-nai-thăa-ná-kruu	problem as a teacher (status)
+🌐⚠️	สถานการณ์	sà-thăa-ná-gaan	situation
+⏳	สักครู่	sàk-krûu	a moment
+⏳👌	เกือบ	gèuuap	almost
+🏁	ถึง	tĕung	arrive; to
+💡🤔	นึกออก	núek-òrk	realize
+⏱️	พอ...	paw	as soon as; when
+⏰	สาย	săai	late (during the day); string
+😠🗣️	ด่า	dàa	scold
+🤬	...ฉิบหาย	chìp-hăai	dang it; sh*t; f***ing
+🤪🙄	โง่	ngôo	stupid; silly
+🤬	โคตร...	kôht	f***ing
+😖	ซวย	suay	screwed
+💪🛡️	ทน	ton	tough
+📝📣	แจ้ง	jâeng	report
+🤔🕵️	สงสัย	sŏng-săi	to suspect
+😲📏	ถึงขนาด	tĕung-kà-nàat	so much that (to the size that)
+🫳🍂	หลุด	lùt	come out; fall off
+🧑‍💼	มืออาชีพ	meuu-aachêep	professional
+🧾🔍	หลักฐาน	làk-thăan	evidence
+🤝👇	หยิบ	yìp	grab; pick up
+🙄🤥	อ้าง	âang	make an excuse
+⏳🛑🏁	จน	jon	until / so much that
+➡️	ตรง	dtrong	where; at
+➡️	ส่วน	sùan	part; section
+🎬	ผู้กำกับ	pûu-gam-gàp	director
+🔁😑	จำเจ	jam-jay	repetitive; of routines
+➕	นอกจากนั้น	nâwk-jàak-nán	apart from that
+🙅	ไม่ค่อย	mâi-kɔ̂i	not really; not quite
+🏳️‍🏴‍☠️🙌	มอบตัว	mɔ̂ɔp-dtua	surrender; give oneself up; turn oneself in
+😕🧳	ทำหาย	tam-hăai	To lose something (ทำ + Object + หาย)
+🚧🛂	ชายแดน	chaai-dɛɛn	border
+🫴✅	เก็บได้	gèp-dâai	found it (เก็บ + Object + ได้)
+📝	สรุป	sà rùp	summarise
+💭🗣️	ความคิดเห็น	kwaam-kít-hĕn	opinions
+⚖️🚨	ข้อหา	kâw-hăa	the charge (crime)
+🔁💬	ตอบโต้	dtàwp-dtôh	exchange; back and forth
+💰	ค่า	kâa	fees
+🔄	กลายเป็น	glaai-bpen	become
+🦄✨	เรื่องเพ้อฝัน	reûuang-pér-făn	fantasy
+💔😴	ฝันค้าง	făn-káang	shattered dream
+➕📈	หนักเข้าไปอีกต่างหาก	nàk-kâo-bpai-ìik-dtàang-hàak	even more
+🔪🩸	สังหาร	sǎng-hăan	assissinate
+🛢️	ทรงกระบอก	song-grà-bàwk	cylinder
+🫆🖐️🔍	ลายนิ้วมือ	laai-níu-meuu	fingerprints
+🤬	โคตร...	kôht	f***ing
+🧩🌀	ซับซ้อน	sáp-sŏn	compliicated
+🍀😵‍💫	ซวยซับซวยซ้อน	suay-sáp-suay-sáwn	unlucky over and over
+🪢🕸️	ซ่อนเงื่อน	sâwn-ngêuuan	hidden knots; untangled web
+🤦‍♂️❌	ทำพลาด	tam-plâat	make mistakes
+✨	เป็นไปได้	bpen-bpai-dâai	possible
+⏳	กว่าที่จะ	gwàa-thîi-jà	Until
+🔜	ทันที	tan tee	immediately
+🎬	เหตุการณ์	hèet gaan	incident`;
+
+        const parsedVocabList = rawVocabString.trim().split('\n').map(line => {
+            const parts = line.split('\t');
+            if(parts.length >= 4) {
+                return { emoji: parts[0].trim(), th: parts[1].trim(), ipa: parts[2].trim(), en: parts[3].trim() };
+            }
+            return null;
+        }).filter(item => item !== null);
+
+        // --- 7. Random Vocab Generator ---
+        function generateRandomVocab() {
+            if(parsedVocabList.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * parsedVocabList.length);
+            const word = parsedVocabList[randomIndex];
+            
+            const displayArea = document.getElementById('vocab-display-area');
+            displayArea.innerHTML = generateBlockHTML(word.emoji, word.th, word.ipa, word.en, false);
+        }
+
+    </script>
+</body>
+</html>
