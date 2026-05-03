@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇹🇭 กิจกรรมฝึกทักษะภาษาไทยแบบโต้ตอบ 🇹🇭</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        max-width: 800px;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            background-color: #fafbfc;
+        }
+        /* Thai Text Block Styles */
+        .t-block {
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff;
+            border-left: 5px solid #3498db;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .t-thai {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2980b9;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        .t-emoji {
+            font-size: 1.3em;
+            margin-right: 10px;
+        }
+        .btn {
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background-color: #d5dbdb;
+        }
+        .btn-tts {
+            background-color: #ffeaa7;
+            border-color: #fdcb6e;
+        }
+        .t-ipa, .t-en {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: #fdfefe;
+            border: 1px dashed #bdc3c7;
+            border-radius: 5px;
+            display: none;
+        }
+        .t-ipa {
+            color: #e67e22;
+            font-family: monospace;
+            font-size: 1.1em;
+        }
+        .t-en {
+            color: #27ae60;
+            font-style: italic;
+        }
+        /* Interactive Elements */
+        .interactive-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #2ecc71;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .interactive-btn:hover {
+            background-color: #27ae60;
+        }
+        #random-vocab-display, #tone-words-grid {
+            margin-top: 20px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="dynamic-content"></div>
+</div>
+
+<script>
+    // --- Data Definitions ---
+
+    const rawVocab = [
+        ["ชอบไปที่ไหน", "châawp-bpai-têe-năi", "Where do you like to go?", "🗺️🚶"],
+        ["ชอบหนังสือหรือหนังมากกว่ากัน", "chôrp-năng-sĕu rĕu năng mâak-gwàa gan", "Do you like books or movies more?", "📚🎬"],
+        ["ดาวอังคาร", "daao-ang-kaan", "Mars", "🔴🪐"],
+        ["ต่อย", "dtòi", "punch", "🥊👊"],
+        ["ต่อยมวย", "dtòi-muay", "do boxing", "🥊"],
+        ["กัน", "gan", "together", "👫"],
+        ["แค่ไหน", "kâe-năi", "How bad / How much (quantity of liquid)", "😬💧"],
+        ["ขนาดไหน", "khà-nàat-năi", "How bad", "😬🤔"],
+        ["เคย", "kəəi", "ever / used to", "🕰️"],
+        ["ทำไม", "tam-mai", "why", "🤔❓"],
+        ["ที่สุด", "tîi-sùt", "the most", "🏆✨"],
+        ["ทุก", "túk", "every", "🔁"],
+        ["เท่านั้น", "thâo-nán", "only", "🫥"],
+        ["น่าจะ", "nâa-jà", "should", "✅🤔"],
+        ["ควรจะ", "kuan-jà", "should", "✅"],
+        ["บ้าง", "bâang", "expecting more than 1 answer", "➕💬"],
+        ["เป็น", "bpen", "be", "🟰"],
+        ["เพิ่ง", "pêung", "just", "⏱️"],
+        ["เมื่อไร", "mʉ̂a rài", "when", "⏰❓"],
+        ["ไม่ค่อย", "mâi-khôi", "not really", "🤷‍♂️"],
+        ["แล้ว", "láew", "already", "✅⏳"],
+        ["ต้อง", "dtông", "must / have to / need", "✅"],
+        ["มาก", "mâak", "very / a lot", "🔝💯"],
+        ["มากกว่า", "mâak-gwàa", "more", "➕📈"],
+        ["ไร", "rai", "อะไร = what?", "❓🤔"],
+        ["อย่างไร", "yàang-rai", "how", "🤔❓"],
+        ["ยังไง", "yang-ngai", "how", "🤔"],
+        ["อีก", "èek", "more / again", "➕🔁"],
+        ["อื่น", "èun", "other", "🔀"],
+        ["ทำ", "tam", "make/do", "🛠️✍️"],
+        ["ไหน", "năi", "which", "❓"],
+        ["รู้อะไรเกี่ยวกับ", "rúu-à-rai-gìeow-gàp", "What do you know about …?", "🤔💬"],
+        ["กลัว", "gluaa", "afraid / scared", "😨😱"],
+        ["เฉยๆ", "chŏoey-chŏoey", "so so", "😐"],
+        ["เบื่อ", "bùea", "bored", "😒🥱"],
+        ["เหนื่อย", "nèuay", "tired", "😩😴"],
+        ["ซื้ออย่างอื่นออนไลน์", "súue-yàang-èun-online", "buy anything else online / buy other things online", "🛒💻"],
+        ["อยากได้ขนาดอะไร", "yàak-dâi-khà-nàat-à-rai", "What size do you want?", "🛍️📏"],
+        ["โรงงาน", "roong-gaan", "factory", "🏭"],
+        ["แนะนำ", "nɛ́-nam", "recommend", "👍✨"],
+        ["แนะนำตัวหน่อยได้ไหม", "náe-nam-dtua-nòi-dâi-măi", "Can you introduce yourself?", "🙋‍♂️👋"],
+        ["ชื่อเล่น", "chêuu-lên", "nickname", "🏷️🗣️"],
+        ["มาจากประเทศอะไรนะคะ", "maa-jàak-bprà-thêet-à-rai-ná-ká", "Where do you come from again?", "🌍❓"],
+        ["อยู่ประเทศไทยนานเท่าไรแล้ว", "yòo-bpràh-thâyt-tai-naan-thâo-rài-láew", "How long have you been in Thailand?", "⏳🇹🇭"],
+        ["อายุเท่าไรนะคะ", "aa-yú thâo-rài ná-khá", "How old are you again?", "🎂❓"],
+        ["นามสกุล", "naam-sà-gun", "name family = family name", "🪪"],
+        ["วิศวกร", "wí-sà-wá-gawn", "engineer", "🧑‍💻🛠️"],
+        ["มีเพื่อนคนไทยหลายคน", "mii-pêuan-khon-thai-lăai-khon", "I have many Thai friends.", "🇹🇭👫"],
+        ["ตะวันออกกลาง", "dtà-wan-òork-glaang", "middle east", "🗺️🌍"],
+        ["ก่อน", "gòon", "before", "⏳"],
+        ["ตอนนี้", "dtaawn-níi", "when this = now", "⏰"],
+        ["ช่าง", "châng", "never mind / welder / mechanic / handyman", "🧑‍🔧🔧"],
+        ["พรุ่งนี้", "prûng-níi", "tomorrow", "🗓️⏭️"],
+        ["เมื่อวาน", "mêua-waan", "yesterday", "📅"],
+        ["ดึก", "dùek", "late at night", "🌙🕛"],
+        ["ดนตรี", "don-dtrii", "music", "🎶🎵"],
+        ["กระเพาะอาหาร", "grà-phràw-aa-hăan", "Stomach", "🫃🩺"],
+        ["กินชาดำร้อนมา", "gin-chaa-dam-róon-maa", "I drank black tea.", "🫖☕️"],
+        ["กุ้ง", "gûng", "shrimp / prawn", "🍤"],
+        ["ขนม", "kà-nŏm", "desserts/snacks", "🍪🍰"],
+        ["ขม", "khŏm", "bitter", "😖"],
+        ["ขวด", "kùuat", "bottle", "🍼"],
+        ["ขาย", "kăai", "sell", "💰🛒"],
+        ["ขายเนื้อหมา", "kăai-néua-măa", "sell dog meat", "🐕🥩💰"],
+        ["ค่าเสียเวลา", "kâa-sĭa-wee-laa", "the cost of wasting time", "⏳💸"],
+        ["เค็ม", "kem", "salty", "🧂"],
+        ["ฆ่า", "khâa", "kill", "🔪☠️"],
+        ["เงินสด", "ngern-sòt", "cash", "💵"],
+        ["จะทอน", "jà-thawn", "will give you the change", "💸"],
+        ["จาน", "jaan", "plate / dish", "🍽️"],
+        ["จืด", "jèut", "bland / tasteless", "😐🍽️"],
+        ["จุด", "jùt", "point", "📍"],
+        ["เช็คบิล", "chék-bin", "check the bill", "🧾💵"],
+        ["ดื่มชาร้อนมา", "dʉ̀ʉm-chaa-rɔ́ɔn-maa", "drank hot tea", "🍵🔥"],
+        ["ดื่มชาร้อนแล้ว", "dùuem-chaa-ráawn-láew", "drank hot tea already", "🍵😋"],
+        ["เด็กเสิร์ฟ", "dèk-sêrp", "server / caterer / waiter", "🧑‍🍳🍽️"],
+        ["เดา", "dao", "guess", "🤔🎲"],
+        ["เดี๋ยว", "dĭeo", "wait", "⏳✋"],
+        ["ได้รับ", "dâi-ráp", "receive / get", "📥"],
+        ["ได้", "dâi", "can / get", "✅🤝"],
+        ["ต้องรออีกนานเท่าไร", "dtông-ror-ìik-naan-thâo-rai", "How long do I have to wait?", "⏳"],
+        ["ตอนเด็กๆ กินป็อกกี้", "dtaawn-dèk-dèk gin bpáwk-gîi", "When I was young/a child, I ate Pocky.", "🍫🍪"],
+        ["ตอนผู้ใหญ่ ไม่ชอบหวาน", "dton-phûu-yài mâi-chôrp wăan", "in adulthood, don’t like sweet (things)", "🍬🚫"],
+        ["ตัวเอง", "dtua-eng", "self", "🪞🧍"],
+        ["ถูก", "tòok", "correct / cheap", "✅💸"],
+        ["ทอน", "tawn", "give the change", "💱💰"],
+        ["ทั้งคู่", "tháng-khûu", "both", "👫"],
+        ["ทั้งหมด", "táng-mòt", "altogether", "🧩"],
+        ["เท่านี้แหละ", "thâo-níi-làe", "That’s it.", "✅👌"],
+        ["เท่าไร", "thâo-rài", "How (long/much)?", "💰❓"],
+        ["นั่ง", "nâng", "sit", "🪑"],
+        ["น้ำผึ้ง", "nám-pêung", "honey", "🍯"],
+        ["น้ำร้อนหมด", "náam-róon-mòt", "We’re out of hot water.", "🚿🥵"],
+        ["เนื้อวัว", "nʉ́ʉa-wua", "beef", "🥩🐄"],
+        ["เนื้อสัตว์", "nʉ́ʉa-sàt", "meat", "🥩🍖"],
+        ["บังขายถั่ว", "bang-kăai-tùua", "South Asian guys selling nuts", "🥜🛒"],
+        ["เป็นอย่างไรบ้าง", "bpen-yàang-rai-bâang", "How was it?", "🤔"],
+        ["เปลี่ยนใจ", "bplìian-jai", "change heart (change my mind)", "🤔💔"],
+        ["พริก", "phrík", "chillies", "🌶️"],
+        ["แพ้", "páae", "allergic to / have allergies", "🤧🌿"],
+        ["แพง", "paeng", "expensive", "💸"],
+        ["มะนาว", "má-naao", "lemon / lime", "🍋"],
+        ["ไม่กินอาหารไทย เพราะกลัวแพ้", "mâi-gin-aa-hăan-tai phráw-gluaa-pháe", "Don't eat Thai food because I'm afraid I'll be allergic to it.", "🍲🤧"],
+        ["ไม่ต้องติ๊ป", "mâi-dtông-dtíp", "no need to tip", "💸🙅"],
+        ["ไม่ต้องทอน", "mâi-dtông-ton", "keep the change", "💸"],
+        ["ไม่เป็นไร", "mâi-bpen-rai", "It’s ok.", "👌"],
+        ["ยังไม่ทำอาหาร", "yang-mai-tham-aa-hăan", "not yet cook", "🍳⏳"],
+        ["ยืน", "yʉʉn", "stand", "🧍"],
+        ["แย่", "yâae", "terrible", "😖"],
+        ["รอ", "raw", "wait", "⏳"],
+        ["ราด", "râat", "on top of / top (v)", "🥣🍛"],
+        ["ร้านอื่น", "ráan-ùen", "other resutaurants", "🍽️🏪"],
+        ["โรคกระเพาะ", "rook grà-pó", "gastritis", "🤢🩺"],
+        ["โรงอาหาร", "roong-aa-hăan", "canteen", "🍽️🏫"],
+        ["ลืม", "leum", "forget", "🤦‍♂️"],
+        ["ลูกค้า", "lûuk-káa", "customer", "🧑‍💼🛍️"],
+        ["เลือก", "lʉ̂ʉak", "choose", "✅👉"],
+        ["วิตามิน", "wí-dtaa-min", "vitamins", "💊"],
+        ["สั่ง", "sàng", "order", "📝🍽️"],
+        ["เสร็จ", "sèt", "finish", "✅"],
+        ["หน่อย", "nòi", "please", "🙏"],
+        ["หมด", "mòt", "sold out / no longer have", "🚫🛒"],
+        ["หลอด", "làawt", "straw", "🥤"],
+        ["หัวหอม", "hŭa-hŏm", "onion", "🧅"],
+        ["เห็ด", "hèt", "mushroom", "🍄"],
+        ["เหมือนเดิม", "mĕuan-deerm", "same as before", "🔁"],
+        ["เหลือ", "lĕua", "remain", "🔚"],
+        ["อบเชย", "òp-cheeuy", "cinnamon", "🧂🌿"],
+        ["อาหารได้ยัง", "aa-hăan-dâi-yang", "Do I get the food yet?", "🍽️🥡"],
+        ["อาหารได้แล้ว", "aa-hăan-dâai-láew", "Here is the food.", "🍽️😋"],
+        ["ผู้ใหญ่", "pûu-yài", "adult", "🧑"],
+        ["แก่", "gàe", "old(age)", "👵"],
+        ["ค้างแรม", "káang-rɛɛm", "spend the night", "🛏️🌙"],
+        ["โรงแรม", "rohng-raem", "hotel", "🏨🛎️"],
+        ["นาน", "naan", "long time", "⏳🕰️"],
+        ["ช่างทำผม", "châng-tam-pǒm", "hairstylist", "💇‍♀️✂️"],
+        ["ชิง", "ching", "fight for sth", "⚔️🥊"],
+        ["ตาย", "dtaai", "dead", "💀"],
+        ["เตียงนอน", "dtiiang-nɔɔn", "bed", "🛏️"],
+        ["ใต้", "dtâi", "south", "⬇️🧭"],
+        ["ที่", "têe", "place", "📍"],
+        ["โทรศัพท์มือถือ", "too-rá-sàp-mʉʉ-tʉ̌ʉ", "phone", "📱"],
+        ["ไทย", "tai", "Thai", "🇹🇭"],
+        ["เนื้อเพลง", "nʉ́ʉa-pleeng", "lyrics", "🎵📝"],
+        ["บทบาทสมมุติ", "bòt-bàat-sǒm-mút", "role play", "🎭🗣️"],
+        ["บัตร", "bàt", "card", "💳"],
+        ["บัลลังก์", "ban-lang", "throne", "👑"],
+        ["โบราณ", "boo-raan", "ancient", "🏺📜"],
+        ["ปัญหา", "bpan-hăa", "problems", "⚠️😣"],
+        ["ปัญหางาน", "bpan-hǎa-ngaan", "problems at work", "😣💼"],
+        ["มหา", "má-hăa", "grand", "🏛️"],
+        ["มหาศึกชิงบัลลังก์", "mà-hǎa-sʉ̀k-ching-ban-lang", "A song of ice and fire", "👑⚔️🔥"],
+        ["มุก", "múk", "joke", "😄😂🤣"],
+        ["เมือง", "mueang", "city", "🏙️"],
+        ["ศึก", "sʉ̀k", "war", "⚔️🪖💥"],
+        ["สนาม", "sà-nǎam", "field/stadium", "🏟️🌾"],
+        ["สี", "sǐi", "colour", "🎨🌈"],
+        ["สูง", "sǔung", "tall", "📏🦒"],
+        ["สูงกว่า", "sǔung-gwàa", "taller", "📏⬆️"],
+        ["เสีย", "sǐia", "damaged", "💔🔧"],
+        ["อยู่กับคนอื่น เก็บที่นอน", "yùu-gàp-kon-ʉ̀ʉn-gèp-tîi-nɔɔn", "with other people, make bed", "🛏️👥"],
+        ["อยู่คนเดียว ไม่เก็บที่นอน", "yùu-kon-diiao-mâi-gèp-tîi-nɔɔn", "alone, not make bed", "🛏️🙋‍♂️"],
+        ["ออก", "ɔ̀ɔk", "exit/leave", "🚪🏃"],
+        ["ไม่เห็นพระอาทิตย์", "mâi-hěn-prá-aa-tít", "Don't see the Sun.", "🌥️"],
+        ["อยาก", "yàak", "Want to", "🙏✨"],
+        ["นักมวย", "nák-muuai", "Boxer", "🥊"],
+        ["บ้อง", "bɔ̂ng", "hookah / bong", "🚬💨"],
+        ["กัญชา", "gan-chaa", "Cannabis", "🌿🚬"],
+        ["ถูกใจ", "tùuk-jai", "To be pleasing", "❤️👍"],
+        ["จ๋า", "jǎa", "dear or honey", "💗"],
+        ["ใน", "nai", "in", "📍"],
+        ["ห้อง", "hɔ̂ng", "room", "🏠🛏️"],
+        ["ดัง", "dang", "Famous / Loud", "📣⭐"],
+        ["ห้าม", "hâam", "To forbid, to stop", "🚫⛔️"],
+        ["จัง", "jang", "So ...", "✨"],
+        ["ใช่ ...", "châi", "Not that ...", "🙅‍♂️"],
+        ["สำหรับ", "sǎm ràp", "For ... (someone)", "🎁➡️"],
+        ["ทำให้", "tam hâi", "make someone be sth", "🛠️➡️"],
+        ["มากที่สุด", "mâak tîi sùt", "the most", "🏆🔝"],
+        ["วันหยุด", "wan yùt", "holiday/day off", "🏖️🎉"],
+        ["รายการ", "raai-gaan", "TV shows", "📺📻"],
+        ["บ่อย", "bòi", "Often", "⏰🔁"],
+        ["ดั้งเดิม", "dâng dəəm", "traditional", "🏛️📜"],
+        ["ของ", "khǎwng", "of (possessive)", "🔗📎"],
+        ["งู", "nguu", "snake", "🐍"],
+        ["ชื่อ", "chʉ̂ʉ", "Name", "🏷️🪪"],
+        ["น้ำเปล่า", "nám-bplàao", "Plain water", "💧🥤"],
+        ["เลิกงาน", "lə̂ək-ngaan", "get off work", "🏢⏰"],
+        ["ไม่ ... หรอก", "mâi ... rɔ̀ɔk", "of course not", "🙅‍♂️"],
+        ["ทอง", "tɔɔng", "gold", "🪙✨"],
+        ["ลอง", "long", "try out", "🧪🔍"],
+        ["วันที่", "wan-tîi", "Date", "📅"],
+        ["ย้าย", "yáai", "move", "📦🚚"],
+        ["ดื่มได้มากกว่า", "dʉ̀ʉm dâai mâak gwàa", "Can drink more", "🥤"],
+        ["เฮลตี้กว่า", "hen-dtîi gwàa", "Healthier", "🥗💪"],
+        ["ชาดำร้อน", "chaa-dam-rɔ́ɔn", "hot black tea", "🍵🔥"],
+        ["เท่ากัน", "tâo-gan", "equal", "⚖️🟰"],
+        ["ฝนตก ไปไหนไม่ได้", "fǒn-dtòk bpai nǎi mâi dâai", "It's raining; I can't go anywhere.", "🌧️🚫🚶"],
+        ["สร้าง", "sâang", "build / construct", "🏗️🛠️"],
+        ["ให้", "hâi", "give", "🎁🤲"],
+        ["ตลก", "dtà-lòk", "funny", "😂"],
+        ["หัวเราะ", "hǔua-rɔ́", "laugh", "😂"],
+        ["ฉี่", "chìi", "pee", "🚽💦"],
+        ["อึ", "ʉ̀", "poop", "💩"],
+        ["ไม่มีอะไรเลย", "mâi mii à-rai ləəi", "have nothing at all", "🈳🙅‍♂️"],
+        ["เบาหวาน", "bao-wǎan", "diabetes", "🩸🩺"],
+        ["รับ", "ráp", "receive / get", "📥"],
+        ["ถาด", "tàat", "Tray", "🍽️"],
+        ["แถม", "tɛ̌ɛm", "give away for free", "🎁🆓"],
+        ["พยายาม", "pá-yaa-yaam", "try / attempt", "🎯💪"],
+        ["ลองได้ไหม", "lɔɔng dâi mǎi", "Can I try it on?", "🛍️👕"],
+        ["แมวน้ำ", "mɛɛo-nám", "sealion", "🦭"],
+        ["พร", "pɔɔn", "wish", "🙏✨🍀"],
+        ["ขอให้ได้เที่ยวเยอะๆ", "kɔ̌ɔ hâi dâi tîao yə́-yə́", "I wish that I get to travel a lot.", "✈️🧳🌍"],
+        ["ลดได้ไหม", "lôt dâi mǎi", "Can you lower the price?", "💸🛍️"],
+        ["มหา(วิทยา)ลัย", "má-hǎa-(wít-thá-yaa)-lai", "University", "🎓🏫"],
+        ["แบบ", "bàaep", "type / kind / way", "🔤🧩"],
+        ["ของหวาน", "khɔ̌ɔng-wǎan", "desserts", "🍰🍩"],
+        ["บูด", "bùut", "spoiled", "🤢🍞"],
+        ["เปรี้ยว", "bprîao", "sour", "🍋"],
+        ["จ่าย", "jàai", "pay", "💸"],
+        ["ออกกำลังกาย", "òk gam-lang gaai", "Exercise", "🏋️‍♂️🏃‍♀️"],
+        ["หน้าท้อง", "nâa tóng", "abs", "💪"],
+        ["เดือน", "deuan", "Month", "📅🗓️"],
+        ["ลบ", "lóp", "Minus / negative", "➖"],
+        ["ไม่เจอนาน", "mâi jer naan", "Long time no see", "👋😊"],
+        ["เที่ยว", "tîao", "travel", "✈️🧳"],
+        ["มี", "mee", "have", "🈶"],
+        ["เย็น", "yen", "cool", "🆒❄️"],
+        ["ผัก", "pàk", "veggies", "🥦🥕"],
+        ["ต้ม", "dtôm", "boil", "🍲🔥"],
+        ["นม", "nom", "milk", "🥛"],
+        ["เต้น", "dtên", "dance", "💃🕺"],
+        ["สอน", "sɔ̌ɔn", "Teach", "👨‍🏫📚"],
+        ["ใช้", "chái", "use", "🛠️"],
+        ["เพราะ", "pró", "because", "🔗🤔"],
+        ["บิน", "bin", "fly", "🛫🪽"],
+        ["โรงเรียน", "rohng-riian", "school", "🏫📚"],
+        ["พี่", "pêe", "older sibling", "👨‍👩‍👧"],
+        ["น้อง", "náwng", "younger sibling", "👶🧒"],
+        ["หลาย", "lăai", "many", "🔢📈"],
+        ["แล้วแต่", "láaeo-tàae", "It depends", "🤷‍♂️🤷‍♀️"],
+        ["หรือ", "rĕu", "or", "🔀❓"],
+        ["เริ่ม", "rôem", "start", "▶️"],
+        ["เลิก", "lôek", "finish", "🛑✅"],
+        ["หนัก", "nàk", "heavy", "🏋️‍♂️💪"],
+        ["บางครั้ง", "baang-kráng", "sometimes", "⏳"],
+        ["เยอะ", "yə́", "a lot", "🔢📚"],
+        ["เร็ว", "reo", "Fast", "⚡💨"],
+        ["สนใจ", "sǒn-jai", "interested", "👀💡"],
+        ["ตำรวจ", "dtam-rùat", "police", "👮"],
+        ["เพื่อ", "pʉ̂a", "in order to", "👈"]
+    ];
+
+    const tonePracticeWords = [
+        ["ชอบ", "chɔ̂ɔp", "like", "👍"], ["ดาว", "daao", "star/mars", "⭐"], ["ต่อย", "dtòi", "punch", "🥊"],
+        ["มวย", "muuai", "boxing", "🥊"], ["ขม", "khǒm", "bitter", "😖"], ["ขวด", "kùuat", "bottle", "🍼"],
+        ["ขาย", "kǎai", "sell", "💰"], ["เค็ม", "kem", "salty", "🧂"], ["ฆ่า", "kâa", "kill", "🔪"],
+        ["จาน", "jaan", "plate", "🍽️"], ["จืด", "jʉ̀ʉt", "bland", "😐"], ["จุด", "jùt", "point", "📍"],
+        ["เช็ค", "chék", "check", "🧾"], ["ดื่ม", "dʉ̀ʉm", "drink", "🍵"], ["เด็ก", "dèk", "child", "👦"],
+        ["เดา", "dao", "guess", "🤔"], ["ได้", "dâai", "can/get", "✅"], ["ถูก", "tùuk", "correct/cheap", "💸"],
+        ["ทอน", "tɔɔn", "change (money)", "💱"], ["นั่ง", "nâng", "sit", "🪑"], ["น้ำ", "náam", "water", "💧"],
+        ["เนื้อ", "nʉ́ʉa", "meat", "🥩"], ["พริก", "prík", "chilli", "🌶️"], ["แพ้", "pɛ́ɛ", "lose/allergic", "🤧"],
+        ["แพง", "pɛɛng", "expensive", "💸"], ["รอ", "rɔɔ", "wait", "⏳"], ["แย่", "yɛ̂ɛ", "terrible", "😖"],
+        ["ร้าน", "ráan", "shop", "🏪"], ["ลืม", "lʉʉm", "forget", "🤦"], ["เลือก", "lʉ̂ʉak", "choose", "👉"],
+        ["สั่ง", "sàng", "order", "📝"], ["เสร็จ", "sèt", "finish", "✅"], ["ใส่", "sài", "put on", "👕"],
+        ["หมด", "mòt", "empty/out", "🚫"], ["หลอด", "lɔ̀ɔt", "straw", "🥤"], ["หอม", "hɔ̌ɔm", "fragrant/onion", "🧅"],
+        ["เห็ด", "hèt", "mushroom", "🍄"], ["เหลือ", "lʉ̌ʉa", "remain", "🔚"], ["อึ", "ʉ̀", "poop", "💩"],
+        ["ฉี่", "chìi", "pee", "🚽"], ["แก่", "gɛ̀ɛ", "old", "👵"], ["ตาย", "dtaai", "die", "💀"],
+        ["บัตร", "bàt", "card", "💳"], ["สี", "sǐi", "color", "🎨"], ["สูง", "sǔung", "tall", "📏"],
+        ["เสีย", "sǐia", "broken", "💔"], ["ออก", "ɔ̀ɔk", "exit", "🚪"], ["ห้าม", "hâam", "forbid", "⛔"],
+        ["จัง", "jang", "so/very", "✨"], ["ลอง", "lɔɔng", "try", "🔍"]
+    ];
+
+    // --- Helper Functions ---
+
+    function createBlock(thai, ipa, en, emoji = "") {
+        return `
+        <div class="t-block">
+            ${emoji ? `<span class="t-emoji">${emoji}</span>` : ''}
+            <span class="t-thai">${thai}</span>
+            <button class="btn btn-tts" onclick="speakText('${thai}')">🔊</button>
+            <button class="btn" onclick="toggleDisplay(this, 'ipa')">IPA</button>
+            <button class="btn" onclick="toggleDisplay(this, 'en')">EN</button>
+            <div class="t-ipa hidden">${ipa}</div>
+            <div class="t-en hidden">${en}</div>
+        </div>`;
+    }
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Sorry, your browser doesn't support Text-To-Speech!");
+        }
+    }
+
+    function toggleDisplay(btn, type) {
+        const block = btn.parentElement;
+        const target = block.querySelector(`.t-${type}`);
+        if (target.classList.contains('hidden')) {
+            target.classList.remove('hidden');
+            target.style.display = 'block';
+        } else {
+            target.classList.add('hidden');
+            target.style.display = 'none';
+        }
+    }
+
+    function getRandomVocab() {
+        const randomIndex = Math.floor(Math.random() * rawVocab.length);
+        const item = rawVocab[randomIndex];
+        const container = document.getElementById('random-vocab-display');
+        container.innerHTML = createBlock(item[0], item[1], item[2], item[3]);
+        
+        // Auto-play TTS on random select for immersion
+        speakText(item[0]);
+    }
+
+    // --- Render Content ---
+    
+    function renderApp() {
+        const content = document.getElementById('dynamic-content');
+        
+        let html = "";
+
+        // Title
+        html += `<h1>🇹🇭 <span>กิจกรรมฝึกทักษะภาษาไทยแบบโต้ตอบ</span> 🇹🇭</h1>`;
+        
+        // 1. Vocab Review Section
+        html += `<div class="section">
+            <h2>🎲 ${createBlock('ทบทวนคำศัพท์', 'tóp-tuuan kam-sàp', 'Review Vocabulary')}</h2>
+            ${createBlock('สุ่มคำศัพท์หนึ่งคำ แล้วแต่งประโยคให้ครูฟังหน่อยค่ะ!', 'sùm kam-sàp nʉ̀ng kam láaeo dtàeng bprà-yòok hâi kruu fang nɔ̀i kâ!', 'Randomly select a word and make a sentence for the teacher!', '🗣️')}
+            <button class="interactive-btn" onclick="getRandomVocab()">🎲 สุ่มคำศัพท์ (Random Word)</button>
+            <div id="random-vocab-display"></div>
+        </div>`;
+
+        // 2. Tone Practice Section
+        html += `<div class="section">
+            <h2>🎵 ${createBlock('ทายเสียงวรรณยุกต์', 'taai sǐiang wan-ná-yúk', 'Tone Guessing Game')}</h2>
+            ${createBlock('อ่านคำศัพท์ ดูพยัญชนะต้นและสระว่าเป็นคำเป็นหรือคำตาย บอกว่าเป็นเสียงอะไร แล้วตั้งคำถามให้ครูตอบค่ะ!', 'àan kam-sàp, duu pá-yan-chá-ná dtôn láe sà-rà wâa bpen kam-bpen rʉ̌ʉ kam-dtaai, bɔ̀ɔk wâa bpen sǐiang à-rai, láaeo dtâng kǎm-tǎam hâi kruu dtɔ̀ɔp kâ!', 'Read the word, look at the initial consonant and vowel to see if it\'s a live or dead syllable, tell what tone it is, and ask the teacher a question using it!', '🎯')}
+            <div class="grid-container">`;
+        
+        tonePracticeWords.forEach(word => {
+            html += createBlock(word[0], word[1], word[2], word[3]);
+        });
+        
+        html += `</div></div>`;
+
+        // 3. Communicative Activities
+        html += `<div class="section">
+            <h2>🗣️ ${createBlock('กิจกรรมพูดคุยในชีวิตจริง', 'gìt-jà-gam pûut-kui nai chii-wít jing', 'Real-life Communicative Activities')}</h2>
+            
+            <h3>🎭 Role-Play</h3>
+            ${createBlock('คุณเป็นลูกค้าที่หิวมาก และครูเป็นเด็กเสิร์ฟที่ร้านอาหารที่บริการแย่ที่สุด สั่งอาหารและแก้ปัญหาเลย!', 'kun bpen lûuk-káa tîi hǐu mâak, láe kruu bpen dèk-sə̀əp tîi ráan aa-hǎan tîi bɔɔ-rí-gaan yɛ̂ɛ tîi sùt. Sàng aa-hǎan láe gɛ̂ɛ bpan-hǎa ləəi!', 'You are a very hungry customer and the teacher is a waiter at the worst restaurant. Order food and solve the problems!', '🍽️')}
+            
+            <h3>⚔️ Real-life Debate</h3>
+            ${createBlock('โต้วาที: ทำงานที่โรงงาน หรือ เป็นวิศวกร แบบไหนดีกว่ากัน? ทำไม?', 'dtôo-waa-tii: tam-ngaan tîi roong-ngaan rʉ̌ʉ bpen wít-sà-wá-gɔɔn, bàaep nǎi dii gwàa gan? tam-mai?', 'Debate: Working in a factory or being an engineer, which is better? Why?', '⚖️')}
+
+            <h3>💬 Real-life Discussion</h3>
+            ${createBlock('คุณชอบไปเที่ยวที่ไหนมากที่สุด? แล้วที่ไหนที่คุณไม่ชอบไปเลย เพราะอะไร?', 'kun chɔ̂ɔp bpai tîao tîi nǎi mâak tîi sùt? láaeo tîi nǎi tîi kun mâi chɔ̂ɔp bpai ləəi? prɔ́ à-rai?', 'Where do you like to travel the most? And where do you not like to go at all? Why?', '🗺️')}
+
+            <h3>🎤 Real-life Interview</h3>
+            ${createBlock('สัมภาษณ์ครู! สมมติว่าครูเป็นนักมวยชื่อดัง ถามคำถามเกี่ยวกับชีวิตของนักมวย', 'sǎm-pâat kruu! sǒm-mút wâa kruu bpen nák-muuai chʉ̂ʉ-dang. tǎam kǎm-tǎam gìiao-gàp chii-wít kɔ̌ɔng nák-muuai.', 'Interview the teacher! Pretend the teacher is a famous boxer. Ask questions about a boxer\'s life.', '🥊')}
+
+            <h3>📖 Story-Telling</h3>
+            ${createBlock('เล่าเรื่องตลกหรือเรื่องแปลกๆ ที่เคยเกิดขึ้นตอนคุณไปเที่ยว', 'lâo rʉ̂ang dtà-lòk rʉ̌ʉ rʉ̂ang bplɛ̀ɛk-bplɛ̀ɛk tîi kəəi gə̀ət-kʉ̂n dtɔɔn kun bpai tîao.', 'Tell a funny or weird story that happened when you went traveling.', '🤣')}
+
+            <h3>💼 Presentation</h3>
+            ${createBlock('แนะนำตัวและบอกครูเกี่ยวกับเพื่อนร่วมงานของคุณ พวกเขาเป็นคนยังไง?', 'nɛ́-nam dtua láe bɔ̀ɔk kruu gìiao-gàp pʉ̂an-rûam-ngaan kɔ̌ɔng kun. pûuak-kǎo bpen kon yang-ngai?', 'Introduce yourself and tell the teacher about your co-workers. What kind of people are they?', '👨‍💼')}
+        </div>`;
+
+        // 4. Extension Activities
+        html += `<div class="section">
+            <h2>🚀 ${createBlock('กิจกรรมเพิ่มเติม', 'gìt-jà-gam pə̂əm-dtəəm', 'Extension Activities')}</h2>
+            ${createBlock('เล่นเกม สองความจริง หนึ่งเรื่องโกหก', 'lên geem: sɔ̌ɔng kwaam-jing, nʉ̀ng rʉ̂ang goo-hòk', 'Play game: Two Truths and One Lie', '🤥')}
+            ${createBlock('บอกประโยค 3 ประโยคเกี่ยวกับตัวเอง ให้ครูเดาว่าอันไหนไม่จริง!', 'bɔ̀ɔk bprà-yòok sǎam bprà-yòok gìiao-gàp dtua-eeng, hâi kruu dao wâa an-nǎi mâi jing!', 'Say 3 sentences about yourself, let the teacher guess which one is not true!', '🎲')}
+        </div>`;
+
+        content.innerHTML = html;
+    }
+
+    // Initialize the app when the DOM is ready
+    document.addEventListener("DOMContentLoaded", renderApp);
+
+</script>
+</body>
+</html>
