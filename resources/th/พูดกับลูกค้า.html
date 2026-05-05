@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>พูดกับลูกค้า</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Small fix to hide elements cleanly */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans p-4 md:p-8 min-h-screen">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <header class="mb-10 text-center flex justify-center">
+            <div class="thai-block-mount w-full" 
+                 data-thai="พูดกับลูกค้า" 
+                 data-ipa="pûut gàp lûuk-káa" 
+                 data-en="Speaking with Customers" 
+                 data-emoji="🏦💬" 
+                 data-large="true"></div>
+        </header>
+
+        <!-- 1. Review Section -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-4 border-yellow-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-yellow-100">
+                <span class="text-3xl">🔄</span>ทบทวนคำศัพท์
+            </h2>
+            
+            <div class="thai-block-mount" 
+                 data-thai="เรามาทบทวนคำศัพท์กันเถอะ" 
+                 data-ipa="rao maa thóp-thuan kham-sàp gan thòe" 
+                 data-en="Let's review the vocabulary." 
+                 data-emoji="🧠"></div>
+            
+            <div class="bg-yellow-50 rounded-xl p-6 flex flex-col items-center justify-center my-6 border-2 border-yellow-100 text-center">
+                <button id="random-btn" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-3 px-6 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 mb-6 text-lg flex items-center gap-2">
+                    🎲 สุ่มคำศัพท์ (Random Word)
+                </button>
+
+                <!-- Random word will be injected here -->
+                <div id="random-word-container" class="w-full max-w-lg min-h-[100px] flex items-center justify-center">
+                    <p class="text-slate-400 italic">กดปุ่มเพื่อสุ่มคำศัพท์</p>
+                </div>
+                
+                <div class="mt-4 w-full">
+                    <div class="thai-block-mount" 
+                         data-thai="แต่งประโยค 1 ประโยคจากคำนี้" 
+                         data-ipa="dtàeng bprà-yòok nʉ̀ng bprà-yòok jàak kham níi" 
+                         data-en="Make 1 sentence from this word." 
+                         data-emoji="✏️"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Target Vocabulary -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-4 border-green-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-green-100">
+                <span class="text-3xl">✨</span>โครงสร้างประโยคใหม่
+            </h2>
+            <div class="thai-block-mount" 
+                 data-thai="วันนี้เรามีโครงสร้างประโยคใหม่ 5 รูปแบบ" 
+                 data-ipa="wan-níi rao mii kroong-sâang bprà-yòok mài hâa rûup-bàep" 
+                 data-en="Today we have 5 new sentence structures." 
+                 data-emoji="🏗️"></div>
+            
+            <!-- Target vocab dynamically injected here -->
+            <div id="target-vocab-container" class="grid grid-cols-1 gap-2 mt-4"></div>
+        </section>
+
+        <!-- 3. Lead-in -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-4 border-blue-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-blue-100">
+                <span class="text-3xl">💭</span>นำเข้าสู่บทเรียน
+            </h2>
+            <div class="space-y-4">
+                <div class="thai-block-mount" 
+                     data-thai="เวลาลูกค้ามีปัญหา คุณอธิบายอย่างไร?" 
+                     data-ipa="wee-laa lûuk-káa mii bpan-hǎa, khun à-thí-baai yàang-rai" 
+                     data-en="When customers have problems, how do you explain?" 
+                     data-emoji="🤷‍♀️"></div>
+                <div class="thai-block-mount" 
+                     data-thai="คุณคิดว่าการอธิบายเรื่องยากๆ ให้ลูกค้าฟัง ยากไหม?" 
+                     data-ipa="khun khít wâa gaan à-thí-baai rʉ̂ang yâak-yâak hâi lûuk-káa fang, yâak mǎi" 
+                     data-en="Do you think explaining difficult things to customers is hard?" 
+                     data-emoji="🧠"></div>
+            </div>
+        </section>
+
+        <!-- 4. Role-play Scenarios -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-4 border-purple-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-purple-100">
+                <span class="text-3xl">🎭</span>บทบาทสมมติ
+            </h2>
+            
+            <div class="bg-purple-50 rounded-xl p-5 mb-6 border border-purple-100">
+                <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
+                    <span>🎬</span> สถานการณ์ที่ 1 (Scenario 1)
+                </h3>
+                <div class="thai-block-mount" 
+                     data-thai="ลูกค้าอยากได้ผลตอบแทนสูง แต่ไม่อยากเสี่ยง" 
+                     data-ipa="lûuk-káa yàak dâai pǒn-dtòop-thaen sǔung, dtàe mâi yàak sìang" 
+                     data-en="The customer wants high returns but doesn't want to risk." 
+                     data-emoji="📈🛡️"></div>
+                <div class="thai-block-mount" 
+                     data-thai="คุณต้องอธิบายว่ามัน 'ขึ้นอยู่กับ' อะไรบ้าง" 
+                     data-ipa="khun dtông à-thí-baai wâa man 'kʉ̂n yùu gàp' à-rai bâang" 
+                     data-en="You have to explain what it 'depends on'." 
+                     data-emoji="⚖️🗣️"></div>
+                <div class="thai-block-mount" 
+                     data-thai="และ 'ยกตัวอย่างเช่น' กองทุนต่างๆ" 
+                     data-ipa="láe 'yók dtua-yàang chên' goong-thun dtàang-dtàang" 
+                     data-en="And 'for example' various mutual funds." 
+                     data-emoji="💡📊"></div>
+            </div>
+
+            <div class="bg-indigo-50 rounded-xl p-5 border border-indigo-100">
+                <h3 class="text-xl font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                    <span>🎬</span> สถานการณ์ที่ 2 (Scenario 2)
+                </h3>
+                <div class="thai-block-mount" 
+                     data-thai="ลูกค้าถามว่าทำไมต้องจ่ายค่าธรรมเนียมเยอะ" 
+                     data-ipa="lûuk-káa thǎam wâa tham-mai dtông jàai khâa-tham-niam yóe" 
+                     data-en="The customer asks why they have to pay a lot of fees." 
+                     data-emoji="💸❓"></div>
+                <div class="thai-block-mount" 
+                     data-thai="อธิบายเหตุผลโดยใช้คำว่า 'เพื่อที่จะ' และ 'นอกจากนี้'" 
+                     data-ipa="à-thí-baai hèt-pǒn dooi chái kham wâa 'pʉ̂ʉa thîi jà' láe 'nôok jàak níi'" 
+                     data-en="Explain the reason using 'in order to' and 'furthermore'." 
+                     data-emoji="🎯➕"></div>
+            </div>
+        </section>
+
+        <!-- 5. Comprehension Questions -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-4 border-red-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-red-100">
+                <span class="text-3xl">✅</span>ตรวจสอบความเข้าใจ
+            </h2>
+            <div class="space-y-4">
+                <div class="thai-block-mount" 
+                     data-thai="เราใช้คำว่า 'ในกรณีนี้' ตอนไหน?" 
+                     data-ipa="rao chái kham wâa 'nai goo-rá-nii níi' dtoon nǎi" 
+                     data-en="When do we use the word 'in this case'?" 
+                     data-emoji="🤔"></div>
+                <div class="thai-block-mount" 
+                     data-thai="ช่วยแต่งประโยคที่ใช้คำว่า 'ยกตัวอย่างเช่น' 1 ประโยค" 
+                     data-ipa="chûai dtàeng bprà-yòok thîi chái kham wâa 'yók dtua-yàang chên' nʉ̀ng bprà-yòok" 
+                     data-en="Please make 1 sentence using the word 'for example'." 
+                     data-emoji="✏️"></div>
+            </div>
+        </section>
+
+        <!-- 6. Speaking Activities -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-8 border-t-4 border-teal-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-teal-100">
+                <span class="text-3xl">🎙️</span>กิจกรรมฝึกพูด
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="p-4 border-l-4 border-teal-500 bg-slate-50 rounded-r-xl">
+                    <h4 class="font-bold text-teal-800 mb-2 flex items-center gap-2">🎤 สัมภาษณ์ (Interview)</h4>
+                    <div class="thai-block-mount" 
+                         data-thai="สัมภาษณ์ลูกค้าเพื่อหาความต้องการที่แท้จริง" 
+                         data-ipa="sǎm-pâat lûuk-káa pʉ̂ʉa hǎa khwaam dtông-gaan thîi tháe-jing" 
+                         data-en="Interview the customer to find their true needs." 
+                         data-emoji="🕵️‍♀️"></div>
+                </div>
+
+                <div class="p-4 border-l-4 border-teal-500 bg-slate-50 rounded-r-xl">
+                    <h4 class="font-bold text-teal-800 mb-2 flex items-center gap-2">📖 เล่าเรื่อง (Story-telling)</h4>
+                    <div class="thai-block-mount" 
+                         data-thai="เล่าเหตุการณ์ที่ลูกค้าโกรธ และคุณแก้ปัญหาอย่างไร" 
+                         data-ipa="lâo hèt-gaan thîi lûuk-káa gròot láe khun gâe bpan-hǎa yàang-rai" 
+                         data-en="Tell a story of when a customer was angry and how you solved the problem." 
+                         data-emoji="😡🛠️"></div>
+                    <div class="thai-block-mount" 
+                         data-thai="(พยายามใช้คำว่า 'ในกรณีนี้')" 
+                         data-ipa="(pá-yaa-yaam chái kham wâa 'nai goo-rá-nii níi')" 
+                         data-en="(Try to use the word 'in this case')" 
+                         data-emoji="📁"></div>
+                </div>
+
+                <div class="p-4 border-l-4 border-teal-500 bg-slate-50 rounded-r-xl">
+                    <h4 class="font-bold text-teal-800 mb-2 flex items-center gap-2">🗣️ อธิบาย (Explanation)</h4>
+                    <div class="thai-block-mount" 
+                         data-thai="อธิบายข้อดีของการทำงานที่ธนาคารของคุณ" 
+                         data-ipa="à-thí-baai khôo-dii khǒong gaan tham-ngaan thîi thá-naa-khaan khǒong khun" 
+                         data-en="Explain the pros of working at your bank." 
+                         data-emoji="🏦👍"></div>
+                    <div class="thai-block-mount" 
+                         data-thai="(ใช้คำว่า 'นอกจากนี้')" 
+                         data-ipa="(chái kham wâa 'nôok jàak níi')" 
+                         data-en="(Use the word 'furthermore')" 
+                         data-emoji="➕"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Extension Activities -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 border-t-4 border-orange-400">
+            <h2 class="text-2xl font-bold flex items-center gap-3 mb-6 pb-2 border-b-4 border-orange-100">
+                <span class="text-3xl">🚀</span>กิจกรรมเสริม
+            </h2>
+            <p class="text-slate-500 mb-6 italic text-center text-sm px-4">
+                If you finish early, try these extra challenges! 🌟
+            </p>
+            
+            <div class="space-y-6">
+                <div class="p-4 border-2 border-dashed border-orange-200 rounded-xl">
+                    <h4 class="font-bold text-orange-800 mb-2 flex items-center gap-2">🎲 เกมต่อประโยค (Sentence Chain Game)</h4>
+                    <div class="thai-block-mount" 
+                         data-thai="ผลัดกันแต่งประโยคโดยใช้คำเชื่อมที่เรียนไป" 
+                         data-ipa="plàt gan dtàeng bprà-yòok dooi chái kham-chʉ̂am thîi rian bpai" 
+                         data-en="Take turns making sentences using the connector words you learned." 
+                         data-emoji="🔗🗣️"></div>
+                </div>
+
+                <div class="p-4 border-2 border-dashed border-orange-200 rounded-xl">
+                    <h4 class="font-bold text-orange-800 mb-2 flex items-center gap-2">⚖️ ดีเบต (Debate)</h4>
+                    <div class="thai-block-mount" 
+                         data-thai="ลูกค้าถูกเสมอ จริงหรือไม่?" 
+                         data-ipa="lûuk-káa thùuk sà-mǒe, jing rʉ̌ʉ mâi" 
+                         data-en="The customer is always right, true or false?" 
+                         data-emoji="🧑‍💼✅"></div>
+                    <div class="thai-block-mount" 
+                         data-thai="คุณเห็นด้วยไหม? อธิบายเหตุผล" 
+                         data-ipa="khun hěn-dûai mǎi, à-thí-baai hèt-pǒn" 
+                         data-en="Do you agree? Explain the reason." 
+                         data-emoji="🤷‍♀️"></div>
+                </div>
+
+                <div class="p-4 border-2 border-dashed border-orange-200 rounded-xl">
+                    <h4 class="font-bold text-orange-800 mb-2 flex items-center gap-2">📊 นำเสนอ (Presentation)</h4>
+                    <div class="thai-block-mount" 
+                         data-thai="สรุปปัญหาที่พบบ่อยและวิธีแก้ไข ให้หัวหน้าฟัง 2 นาที" 
+                         data-ipa="sà-rùp bpan-hǎa thîi póp bòi láe wí-thii gâe-kǎi hâi hǔa-nâa fang sǒong naa-thii" 
+                         data-en="Summarize frequent problems and solutions to your boss for 2 minutes." 
+                         data-emoji="⏱️👨‍💼"></div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- DATA ---
+        const reviewVocab = [
+            { thai: 'ลูกค้า', ipa: 'lûuk-káa', en: 'customer', emoji: '🧑‍💼' },
+            { thai: 'ใหญ่', ipa: 'yàai', en: 'big', emoji: '📏' },
+            { thai: 'นี่คือเหตุผลที่', ipa: 'nîi-kʉʉ-hèt-phon-thîi', en: 'This is the reason that', emoji: '🧠🔎' },
+            { thai: 'คำ', ipa: 'kam', en: 'word', emoji: '📝' },
+            { thai: 'ตราสารหนี้', ipa: 'dtraa-sǎan-hnîi', en: 'bond', emoji: '📜💵' },
+            { thai: 'ทอง', ipa: 'tong', en: 'gold', emoji: '🥇' },
+            { thai: 'ใบอนุญาต', ipa: 'bai-à-nú-yâat', en: 'permit', emoji: '🪪✅' },
+            { thai: 'เศร้า', ipa: 'sâo', en: 'sad', emoji: '😢' },
+            { thai: 'สั้น', ipa: 'sân', en: 'short', emoji: '📏' },
+            { thai: 'ได้เงินเยอะ', ipa: 'dâi-ngern-yé', en: 'earn a lot of money', emoji: '💰🤑' },
+            { thai: 'ได้เรียนรู้จากลูกค้า', ipa: 'dâai-rian-róo-jàak-lûuk-káa', en: 'get to learn from customers', emoji: '📚🤝' },
+            { thai: 'โรงงาน', ipa: 'roong-ngaan', en: 'factory', emoji: '🏭' },
+            { thai: 'หลากหลาย', ipa: 'làak-lăai', en: 'diverse', emoji: '🌈🧩' },
+            { thai: 'ให้บริการ', ipa: 'hâi-baw-ri-gaan', en: 'provide services', emoji: '🛎️🧰' },
+            { thai: 'ค่าธรรมเนียม', ipa: 'kâa-tham-neeam', en: 'custom fees', emoji: '💸🧾' },
+            { thai: 'สูงสุด', ipa: 'sǔung-sùt', en: 'maximum', emoji: '🔝' },
+            { thai: 'ต่ำสุด', ipa: 'dtàm-sùt', en: 'minimum', emoji: '🔻' }
+        ];
+
+        const newVocab = [
+            { thai: 'ในกรณีนี้', ipa: 'nai goo-rá-nii níi', en: 'in this case', emoji: '📁' },
+            { thai: 'ขึ้นอยู่กับ', ipa: 'kʉ̂n yùu gàp', en: 'it depends on', emoji: '⚖️' },
+            { thai: 'เพื่อที่จะ', ipa: 'pʉ̂ʉa thîi jà', en: 'in order to', emoji: '🎯' },
+            { thai: 'นอกจากนี้', ipa: 'nôok jàak níi', en: 'furthermore', emoji: '➕' },
+            { thai: 'ยกตัวอย่างเช่น', ipa: 'yók dtua-yàang chên', en: 'for example', emoji: '💡' }
+        ];
+
+        // --- COMPONENT LOGIC ---
+        // Creates the HTML element structure for a single Thai phrase block
+        function createThaiBlockElement(thai, ipa, en, emoji, isLarge) {
+            const wrapper = document.createElement('div');
+            wrapper.className = "bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-4 flex flex-col items-start transition-all hover:shadow-md";
+            
+            let showIPA = false;
+            let showEN = false;
+
+            const largeClass = isLarge ? 'text-3xl font-bold text-blue-900' : 'text-xl';
+            const emojiHtml = emoji ? `<span>${emoji}</span>` : '';
+
+            wrapper.innerHTML = `
+                <div class="flex flex-row items-center flex-wrap gap-3 w-full">
+                    <button class="tts-btn bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400" title="Play Audio">🔊</button>
+                    <div class="flex-1 font-medium text-slate-800 flex items-center gap-2 ${largeClass}">
+                        ${emojiHtml}
+                        <span>${thai}</span>
+                    </div>
+                    <div class="flex gap-2 ml-auto mt-2 sm:mt-0">
+                        <button class="ipa-btn px-3 py-1 text-sm font-semibold rounded-lg transition-colors border bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100">IPA</button>
+                        <button class="en-btn px-3 py-1 text-sm font-semibold rounded-lg transition-colors border bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100">EN</button>
+                    </div>
+                </div>
+                <div class="translations-container mt-3 w-full pt-3 border-t border-slate-100 flex-col gap-1 pl-[3.25rem] hidden">
+                    <div class="ipa-text text-purple-600 text-lg items-center gap-2 hidden">
+                        <span class="text-xs font-bold uppercase tracking-wider text-purple-400">IPA:</span> 
+                        <span>${ipa}</span>
+                    </div>
+                    <div class="en-text text-green-600 text-lg items-center gap-2 hidden">
+                        <span class="text-xs font-bold uppercase tracking-wider text-green-400">EN:</span> 
+                        <span>${en}</span>
+                    </div>
+                </div>
+            `;
+
+            // Element Queries
+            const ttsBtn = wrapper.querySelector('.tts-btn');
+            const ipaBtn = wrapper.querySelector('.ipa-btn');
+            const enBtn = wrapper.querySelector('.en-btn');
+            const translationsContainer = wrapper.querySelector('.translations-container');
+            const ipaText = wrapper.querySelector('.ipa-text');
+            const enText = wrapper.querySelector('.en-text');
+
+            // Text-to-Speech Event
+            ttsBtn.addEventListener('click', () => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(thai);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85; // Slower for learning clarity
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    alert("Text-to-Speech is not supported in this browser.");
+                }
+            });
+
+            // UI Update Logic
+            const updateUI = () => {
+                // Main container
+                if (showIPA || showEN) {
+                    translationsContainer.classList.remove('hidden');
+                    translationsContainer.classList.add('flex');
+                } else {
+                    translationsContainer.classList.add('hidden');
+                    translationsContainer.classList.remove('flex');
+                }
+
+                // IPA specific
+                if (showIPA) {
+                    ipaText.classList.remove('hidden');
+                    ipaText.classList.add('flex');
+                    ipaBtn.className = "ipa-btn px-3 py-1 text-sm font-semibold rounded-lg transition-colors border bg-purple-100 border-purple-300 text-purple-700";
+                } else {
+                    ipaText.classList.add('hidden');
+                    ipaText.classList.remove('flex');
+                    ipaBtn.className = "ipa-btn px-3 py-1 text-sm font-semibold rounded-lg transition-colors border bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100";
+                }
+
+                // EN specific
+                if (showEN) {
+                    enText.classList.remove('hidden');
+                    enText.classList.add('flex');
+                    enBtn.className = "en-btn px-3 py-1 text-sm font-semibold rounded-lg transition-colors border bg-green-100 border-green-300 text-green-700";
+                } else {
+                    enText.classList.add('hidden');
+                    enText.classList.remove('flex');
+                    enBtn.className = "en-btn px-3 py-1 text-sm font-semibold rounded-lg transition-colors border bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100";
+                }
+            };
+
+            // Toggle Events
+            ipaBtn.addEventListener('click', () => {
+                showIPA = !showIPA;
+                updateUI();
+            });
+
+            enBtn.addEventListener('click', () => {
+                showEN = !showEN;
+                updateUI();
+            });
+
+            return wrapper;
+        }
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Initialize all static placeholders in the HTML
+            const mounts = document.querySelectorAll('.thai-block-mount');
+            mounts.forEach(mount => {
+                const thai = mount.getAttribute('data-thai');
+                const ipa = mount.getAttribute('data-ipa');
+                const en = mount.getAttribute('data-en');
+                const emoji = mount.getAttribute('data-emoji') || '';
+                const isLarge = mount.getAttribute('data-large') === 'true';
+
+                const blockElement = createThaiBlockElement(thai, ipa, en, emoji, isLarge);
+                mount.replaceWith(blockElement);
+            });
+
+            // 2. Inject target vocabulary dynamically
+            const targetVocabContainer = document.getElementById('target-vocab-container');
+            newVocab.forEach(word => {
+                const blockElement = createThaiBlockElement(word.thai, word.ipa, word.en, word.emoji, false);
+                targetVocabContainer.appendChild(blockElement);
+            });
+
+            // 3. Setup Random Review Word Logic
+            const randomBtn = document.getElementById('random-btn');
+            const randomContainer = document.getElementById('random-word-container');
+
+            const pickRandomWord = () => {
+                const randomIndex = Math.floor(Math.random() * reviewVocab.length);
+                const word = reviewVocab[randomIndex];
+                
+                // Clear previous and inject new block
+                randomContainer.innerHTML = '';
+                const blockElement = createThaiBlockElement(word.thai, word.ipa, word.en, word.emoji, true);
+                // Ensure the block expands to full width
+                blockElement.classList.add('w-full');
+                randomContainer.appendChild(blockElement);
+            };
+
+            randomBtn.addEventListener('click', pickRandomWord);
+            
+            // Auto-pick first word on load
+            pickRandomWord();
+        });
+    </script>
+</body>
+</html>
