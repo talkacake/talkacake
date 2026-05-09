@@ -563,12 +563,15 @@
 
         function toggleLang(btn, lang) {
             btn.classList.toggle(`active-${lang}`);
-            const container = btn.closest('.flex').parentElement;
-            let target = container.querySelector('.' + lang);
-            if (!target) {
-                target = btn.closest('div').parentElement.querySelector('.' + lang);
+            let current = btn.parentElement;
+            while (current && current !== document.body) {
+                let target = current.querySelector('.' + lang);
+                if (target) {
+                    target.classList.toggle('hidden-content');
+                    return;
+                }
+                current = current.parentElement;
             }
-            if(target) target.classList.toggle('hidden-content');
         }
 
         // --- UI BUILDER ---
