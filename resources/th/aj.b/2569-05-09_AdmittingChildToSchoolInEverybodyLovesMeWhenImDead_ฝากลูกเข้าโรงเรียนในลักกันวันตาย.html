@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฝากลูกเข้าโรงเรียนในลักกันวันตาย</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f4f4f9;
+            color: #1e293b;
+        }
+        
+        .ipa-text {
+            color: #d97706; 
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+        }
+
+        .en-text {
+            color: #2563eb; 
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        .btn-toggle {
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .btn-toggle:hover { background-color: #f1f5f9; }
+        .btn-toggle.active-ipa { background-color: #fffbeb; border-color: #d97706; color: #d97706; }
+        .btn-toggle.active-en { background-color: #eff6ff; border-color: #2563eb; color: #2563eb; }
+
+        .card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        
+        .tts-button {
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 0;
+            color: #0ea5e9;
+        }
+        .tts-button:active { transform: scale(0.85); }
+        .tts-playing { color: #dc2626 !important; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .yt-video-container {
+            position: relative;
+            padding-bottom: 56.25%; 
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #000;
+        }
+        .yt-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hidden-content { display: none !important; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b-4 border-indigo-500">
+        <div class="max-w-4xl mx-auto px-4 py-4 text-center flex justify-center items-center gap-3">
+            <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 flex items-center justify-center gap-2">
+                🏫 ฝากลูกเข้าโรงเรียนในลักกันวันตาย 💼
+            </h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-10">
+
+        <!-- 1. Review Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-indigo-50">
+            <div id="heading-review" class="mb-6 pb-4 border-b border-gray-100"></div>
+
+            <div class="text-center relative overflow-hidden bg-indigo-50 p-6 rounded-2xl border border-indigo-100 mb-8">
+                <div id="instruction-review" class="mb-6 relative z-10"></div>
+                
+                <div id="vocab-card" class="bg-white p-8 rounded-2xl min-h-[160px] flex flex-col items-center justify-center mb-6 shadow-sm border border-gray-100">
+                    <p class="text-indigo-400 italic text-lg font-medium"><i class="fas fa-hand-pointer mr-2 animate-bounce"></i>พร้อมแล้วกดปุ่มสุ่มคำศัพท์...</p>
+                </div>
+
+                <button onclick="randomVocab()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto text-lg">
+                    <i class="fas fa-random"></i>
+                    <span>สุ่มคำศัพท์</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Lead-in Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-emerald-400">
+            <div id="heading-leadin" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="leadin-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 3. Video Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-rose-50">
+            <div id="heading-video" class="mb-6 pb-4 border-b border-gray-100"></div>
+
+            <!-- YouTube Embed -->
+            <div class="yt-video-container mb-8 max-w-sm mx-auto shadow-lg border-4 border-gray-900">
+                <iframe src="https://www.youtube.com/embed/2II8pPN1rms" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+
+            <div class="bg-rose-50 p-5 md:p-6 rounded-2xl border border-rose-100 shadow-inner">
+                <div id="heading-script" class="mb-5 pb-3 border-b-2 border-rose-200"></div>
+                <div id="script-content" class="space-y-4">
+                    <!-- Script injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Comprehension Section (Video) -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-amber-400">
+            <div id="heading-vid-comp" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="vid-comp-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 5. Target Vocab Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-purple-50">
+            <div id="heading-vocab" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="target-vocab-list"></div>
+
+            <div id="heading-grammar" class="mb-6 pb-4 border-b border-gray-100 mt-8"></div>
+            <div class="space-y-4" id="target-grammar-list"></div>
+        </section>
+
+        <!-- 6. Reading Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-sky-50">
+            <div id="heading-reading" class="mb-6 pb-4 border-b border-gray-100"></div>
+            
+            <div class="bg-sky-50 p-6 md:p-8 rounded-2xl border border-sky-100 mb-8 shadow-inner">
+                <div id="reading-title" class="mb-4 text-center font-bold text-xl text-sky-800"></div>
+                <div id="reading-passage" class="space-y-4"></div>
+            </div>
+
+            <div id="heading-read-comp" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="read-comp-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 7. Discussion Questions -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-teal-400">
+            <div id="heading-discussion" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="discussion-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 8. Speaking Tasks -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-yellow-100">
+            <div id="heading-speaking" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div class="grid grid-cols-1 gap-6" id="speaking-tasks"></div>
+        </section>
+
+        <!-- 9. Extension Activities -->
+        <section class="bg-gray-50 p-6 md:p-8 rounded-3xl shadow-inner border border-gray-200">
+            <div id="heading-extension" class="mb-6 pb-4 border-b border-gray-300"></div>
+            <div class="grid grid-cols-1 gap-6" id="extension-tasks"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-8 text-center bg-white border-t border-gray-200">
+        <p class="text-indigo-600 text-sm font-medium">สนุกกับการเรียนภาษาไทยนะครับ! 🇹🇭✨</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- DATA STORE ---
+        const content = {
+            headings: {
+                review: { t: "ทบทวนคำศัพท์เก่า 🎲", i: "thóp-thuuan kham-sàp gào", e: "Review Old Vocabulary" },
+                leadin: { t: "ก่อนเริ่มบทเรียน 🤔", i: "gɔ̀ɔn rə̂əm bòt-riian", e: "Before we start" },
+                video: { t: "วิดีโอ: ฝากลูกเข้าโรงเรียน 🎬", i: "wí-dii-oo: fàak lûuk khâo rohng-riian", e: "Video: Getting child into school" },
+                script: { t: "บทสนทนา 💬", i: "bòt sǒn-thá-naa", e: "Transcript" },
+                vidComp: { t: "คำถามจากวิดีโอ ❓", i: "khǎm-thǎam jàak wí-dii-oo", e: "Video Comprehension" },
+                vocab: { t: "คำศัพท์เป้าหมาย 🎯", i: "kham-sàp bpâo-mǎai", e: "Target Vocabulary" },
+                grammar: { t: "โครงสร้างประโยค 🧱", i: "khroong-sâang bprà-yôok", e: "Sentence Structures" },
+                reading: { t: "บทอ่านสั้นๆ 📖", i: "bòt àan sân-sân", e: "Short Reading" },
+                readComp: { t: "คำถามจากบทอ่าน ❓", i: "khǎm-thǎam jàak bòt àan", e: "Reading Comprehension" },
+                discussion: { t: "ชวนคุย 🗣️", i: "chuuan khui", e: "Discussion" },
+                speaking: { t: "กิจกรรมฝึกพูด 🎤", i: "gìt-jà-gam fʉ̀k phûut", e: "Speaking Activities" },
+                extension: { t: "กิจกรรมเพิ่มเติม ⏱️", i: "gìt-jà-gam phə̂əm-dtəəm", e: "Extension Activities" }
+            },
+            review: {
+                instruction: { t: "ครูสุ่มคำศัพท์ 1 คำ แล้วตั้งคำถามโดยใช้คำนั้นให้นักเรียนตอบ 🗣️", i: "khruu sùm kham-sàp nʉ̀ng kham láeo dtâng khǎm-thǎam dooy chái kham nán hâi nák-riian dtɔ̀ɔp", e: "Teacher randomly selects 1 word and asks a question using that word for the student to answer." }
+            },
+            leadin: [
+                { t: "1. ในประเทศของคุณ พ่อแม่ต้องจ่ายเงินพิเศษเพื่อให้ลูกเข้าโรงเรียนดังๆ ไหม? 🏫💰", i: "nai bprà-thêet khɔ̌ɔng khun phɔ̂ɔ-mâae dtɔ̂ng jàai ngən phǐ-sèet phʉ̂ʉa hâi lûuk khâo rohng-riian dang dang mǎi?", e: "1. In your country, do parents have to pay extra money to get their kids into famous schools?" },
+                { t: "2. คุณคิดว่าอะไรคือสาเหตุที่ทำให้พ่อแม่ยอมทำทุกอย่างเพื่อให้ลูกเข้าโรงเรียนดีๆ? 🤔👨‍👩‍👧‍👦", i: "khun khít wâa à-rai khʉʉ sǎa-hèet thîi tham hâi phɔ̂ɔ-mâae yɔɔm tham thúk yàang phʉ̂ʉa hâi lûuk khâo rohng-riian dii dii?", e: "2. What do you think is the reason parents are willing to do anything to get their kids into good schools?" },
+                { t: "3. คุณรู้จักคำว่า 'แป๊ะเจี๊ยะ' (เงินบริจาคพิเศษ) ในสังคมไทยไหม? ✉️💸", i: "khun rúu-jàk kham wâa 'bpáe-jíia' nai sǎng-khom thai mǎi?", e: "3. Do you know the word 'Pae Jia' (special donation money) in Thai society?" }
+            ],
+            scriptLines: [
+                { t: "ครู: ต้องขอบคุณคุณโทนี่กับคุณจาเน็ตนะครับ 🙏", i: "khruu: dtɔ̂ng khɔ̀ɔp-khun khun thoo-nîi gàp khun jaa-nét ná khráp", e: "Teacher: I must thank Tony and Janet." },
+                { t: "ครู: ที่อุตส่าห์สนับสนุนโรงเรียนของเราตลอดเวลาสองปีที่ผ่านมานะครับ 🏫", i: "khruu: thîi ùt-sàa sà-nàp-sà-nǔn rohng-riian khɔ̌ɔng rao dtà-lɔ̀ɔt wee-laa sɔ̌ɔng bpii thîi phàan maa ná khráp", e: "Teacher: For going out of your way to support our school over the past two years." },
+                { t: "ครู: อีกนิดเดียวเอง สู้ๆครับ ✌️", i: "khruu: ìik nít diao eeng, sûu sûu khráp", e: "Teacher: Just a little bit more. Keep fighting." },
+                { t: "โทนี่: เรื่องสโนว์นี่ 👧", i: "thoo-nîi: rʉ̂ʉang sà-noo nîi", e: "Tony: About Snow..." },
+                { t: "โทนี่: พอจะแนะนำได้ไหมครับว่า มันต้องยังไง ❓", i: "thoo-nîi: phɔɔ jà náe-nam dâi mǎi khráp wâa man dtɔ̂ng yang-ngai", e: "Tony: Could you recommend what we need to do?" },
+                { t: "ครู: อืม...Hard to say เพราะว่ามันไม่ได้ขึ้นอยู่กับผมเนาะ 🤷‍♂️", i: "khruu: uum... Hard to say phrɔ́ wâa man mâi dâi khʉ̂n yùu gàp phǒm nɔ́", e: "Teacher: Hmm... Hard to say because it doesn't depend on me, right?" },
+                { t: "ครู: มันขึ้นอยู่กับผู้ปกครองท่านอื่นด้วย ใช่ไหมครับ 👪", i: "khruu: man khʉ̂n yùu gàp phûu-bpòk-khrɔɔng thâan ʉ̀ʉn dûuay, châi mǎi khráp", e: "Teacher: It depends on other parents too, right?" },
+                { t: "ครู: ผมแนะนำให้คุณโทนี่เช็กเว็บไซต์ของเรานะครับ 💻", i: "khruu: phǒm náe-nam hâi khun thoo-nîi chék wép-sái khɔ̌ɔng rao ná khráp", e: "Teacher: I recommend you check our website." },
+                { t: "ครู: เรามี update ranking real-time เลย นะครับ 📊", i: "khruu: rao mii update ranking real-time ləəi ná khráp", e: "Teacher: We update the ranking in real-time." },
+                { t: "โทนี่: เอ่อ...รู้ครับ แต่...เหลืออีกสิบอันดับเนี่ย 📉", i: "thoo-nîi: ə̀ə... rúu khráp dtàe... lʉ̌ʉa ìik sìp an-dàp nîia", e: "Tony: Uh... I know, but... there are 10 ranks left..." },
+                { t: "โทนี่: คือ...ตัวเลขมัน...ต้องยังไงอ่ะครับ 💰", i: "thoo-nîi: khʉʉ... dtua-lêek man... dtɔ̂ng yang-ngai à khráp", e: "Tony: I mean... the numbers... what does it have to be?" },
+                { t: "ครู: คือคุณโทนี่ ผมไม่อยากให้คุณคิดเรื่องเงินเลยนะครับ 💸", i: "khruu: khʉʉ khun thoo-nîi, phǒm mâi yàak hâi khun khít rʉ̂ʉang ngən ləəi ná khráp", e: "Teacher: I mean, Tony, I don't want you to think about money at all." },
+                { t: "ครู: คิดซะว่า มันเป็นการ support การศึกษาบ้านเราใช่ไหมครับ 📚", i: "khruu: khít sá wâa, man bpen gaan support gaan-sʉ̀k-sǎa bâan rao châi mǎi khráp", e: "Teacher: Just think of it as supporting our education system, right?" },
+                { t: "โทนี่: ครับ 😔", i: "thoo-nîi: khráp", e: "Tony: Yes." },
+                { t: "ครู: Good luck! 🍀", i: "khruu: Good luck!", e: "Teacher: Good luck!" }
+            ],
+            vidComp: [
+                { t: "1. พ่อแม่ทำอะไรให้กับโรงเรียนในช่วงสองปีที่ผ่านมา? ⏳", i: "phɔ̂ɔ-mâae tham à-rai hâi gàp rohng-riian nai chûuang sɔ̌ɔng bpii thîi phàan maa?", e: "1. What have the parents done for the school over the past two years?" },
+                { t: "2. ครูแนะนำให้โทนี่ทำอะไรเพื่อดูอันดับของลูก? 🌐", i: "khruu náe-nam hâi thoo-nîi tham à-rai phʉ̂ʉa duu an-dàp khɔ̌ɔng lûuk?", e: "2. What did the teacher advise Tony to do to check his child's ranking?" },
+                { t: "3. ครูบอกว่าให้คิดซะว่าเงินที่จ่ายไปคืออะไร? 💭", i: "khruu bɔ̀ɔk wâa hâi khít sá wâa ngən thîi jàai bpai khʉʉ à-rai?", e: "3. What did the teacher say to consider the paid money as?" }
+            ],
+            targetVocab: [
+                { t: "สนับสนุน", i: "sà-nàp-sà-nǔn", e: "support / sponsor", emoji: "🤝" },
+                { t: "ผู้ปกครอง", i: "phûu-bpòk-khrɔɔng", e: "parents / guardians", emoji: "👪" },
+                { t: "อันดับ", i: "an-dàp", e: "rank / ranking", emoji: "📊" },
+                { t: "การศึกษา", i: "gaan-sʉ̀k-sǎa", e: "education", emoji: "📚" },
+                { t: "แนะนำ", i: "náe-nam", e: "recommend / advise", emoji: "💡" }
+            ],
+            grammar: [
+                { t: "อุตส่าห์ + [verb]", i: "ùt-sàa + [verb]", e: "to go out of one's way / make an effort to do something", ex: "อุตส่าห์สนับสนุนโรงเรียนของเราตั้งสองปี (Made an effort to support our school for two years)" },
+                { t: "ขึ้นอยู่กับ + [noun]", i: "khʉ̂n yùu gàp + [noun]", e: "to depend on...", ex: "เรื่องนี้ขึ้นอยู่กับผู้ปกครองท่านอื่น (This matter depends on other parents)" },
+                { t: "คิดซะว่า + [sentence]", i: "khít sá wâa + [sentence]", e: "just think of it as...", ex: "คิดซะว่าเป็นการสนับสนุนการศึกษา (Just think of it as supporting education)" }
+            ],
+            reading: {
+                title: { t: "การบริจาคเงินแลกที่นั่งเรียน 🏫💸", i: "gaan bɔɔ-rí-jàak ngən lâek thîi nâng riian", e: "Donating money in exchange for a school seat" },
+                passage: [
+                    { t: "ในสังคมไทย มีระบบที่คนทั่วไปเรียกว่า 'แป๊ะเจี๊ยะ' หรือเงินบริจาคพิเศษ", i: "nai sǎng-khom thai, mii rá-bòp thîi khon thûua-bpai rîiak wâa 'bpáe-jíia' rʉ̌ʉ ngən bɔɔ-rí-jàak phǐ-sèet", e: "In Thai society, there is a system commonly called 'Pae Jia' or special donation money." },
+                    { t: "ผู้ปกครองหลายคนยอมจ่ายเงินจำนวนมากเพื่อสนับสนุนโรงเรียน แลกกับโอกาสให้ลูกได้เข้าเรียนในโรงเรียนที่มีชื่อเสียง", i: "phûu-bpòk-khrɔɔng lǎai khon yɔɔm jàai ngən jam-nuuan mâak phʉ̂ʉa sà-nàp-sà-nǔn rohng-riian, lâek gàp oo-gàat hâi lûuk dâi khâo riian nai rohng-riian thîi mii chʉ̂ʉ-sǐiang", e: "Many parents are willing to pay a large amount of money to support the school, in exchange for the opportunity for their children to attend famous schools." },
+                    { t: "แม้ว่ากระทรวงศึกษาธิการจะห้ามทำ แต่ในความเป็นจริง มันแค่เปลี่ยนรูปแบบไปเป็นการ 'บริจาคโดยสมัครใจ'", i: "máe wâa grà-suuang sʉ̀k-sǎa-thí-gaan jà hâam tham, dtàe nai khwaam bpen jing, man khâe bplìian rûup-bàep bpai bpen gaan 'bɔɔ-rí-jàak dooy sà-màk-jai'", e: "Although the Ministry of Education forbids it, in reality, it just changes form to 'voluntary donation'." },
+                    { t: "สิ่งนี้ทำให้เกิดความเหลื่อมล้ำทางการศึกษา เพราะเด็กที่ครอบครัวมีเงินจะมีโอกาสมากกว่าเด็กที่เรียนเก่งแต่ยากจน", i: "sìng níi tham hâi gə̀ət khwaam lʉ̀ʉam-lám thaang gaan-sʉ̀k-sǎa, phrɔ́ dèk thîi khrɔ̂ɔp-khruua mii ngən jà mii oo-gàat mâak gwàa dèk thîi riian gèng dtàe yâak-jon", e: "This causes educational inequality, because children from wealthy families will have more opportunities than smart but poor children." }
+                ],
+                comp: [
+                    { t: "1. 'แป๊ะเจี๊ยะ' คืออะไร? 💰", i: "'bpáe-jíia' khʉʉ à-rai?", e: "1. What is 'Pae Jia'?" },
+                    { t: "2. การบริจาคเงินให้โรงเรียนส่งผลอย่างไรต่อระบบการศึกษา? ⚖️", i: "gaan bɔɔ-rí-jàak ngən hâi rohng-riian sòng phǒn yàang-rai dtɔ̀ɔ rá-bòp gaan-sʉ̀k-sǎa?", e: "2. How does donating money to schools affect the education system?" },
+                    { t: "3. กระทรวงศึกษาธิการอนุญาตให้เก็บเงินแป๊ะเจี๊ยะหรือไม่? 🚫", i: "grà-suuang sʉ̀k-sǎa-thí-gaan à-nú-yâat hâi gèp ngən bpáe-jíia rʉ̌ʉ mâi?", e: "3. Does the Ministry of Education allow collecting Pae Jia money?" }
+                ]
+            },
+            discussion: [
+                { t: "1. คุณคิดว่าการที่ผู้ปกครองต้องจ่ายเงินเพื่อ 'อัปเดตอันดับ' เป็นเรื่องปกติไหม? 📊", i: "khun khít wâa gaan thîi phûu-bpòk-khrɔɔng dtɔ̂ng jàai ngən phʉ̂ʉa 'ap-dèet an-dàp' bpen rʉ̂ʉang bpà-gà-dtì mǎi?", e: "1. Do you think it is normal for parents to pay money to 'update the ranking'?" },
+                { t: "2. ระบบนี้ทำให้เกิดความ 'เหลื่อมล้ำ' ในสังคมไทยอย่างไร? ⚖️📉", i: "rá-bòp níi tham hâi gə̀ət khwaam 'lʉ̀ʉam-lám' nai sǎng-khom thai yàang-rai?", e: "2. How does this system cause 'inequality' in Thai society?" },
+                { t: "3. ถ้าคุณเป็นผู้ปกครอง คุณจะยอมจ่ายเงินเพื่อซื้อสังคมและสภาพแวดล้อมดีๆ ให้ลูกไหม? 👨‍👩‍👧‍👦", i: "thâa khun bpen phûu-bpòk-khrɔɔng, khun jà yɔɔm jàai ngən phʉ̂ʉa sʉ́ʉ sǎng-khom láe sà-phâap wâet-lɔ́ɔm dii dii hâi lûuk mǎi?", e: "3. If you were a parent, would you be willing to pay to buy a good society and environment for your child?" },
+                { t: "4. เราควรแก้ปัญหาเรื่อง 'การศึกษา' ที่ขึ้นอยู่กับเงินอย่างไร? 🛠️", i: "rao khuaan gâae pan-hǎa rʉ̂ʉang 'gaan-sʉ̀k-sǎa' thîi khʉ̂n yùu gàp ngən yàang-rai?", e: "4. How should we solve the problem of 'education' depending on money?" },
+                { t: "5. ในอนาคต คุณคิดว่าระบบโรงเรียนไทยจะ 'กลับไปเป็นเหมือนเดิมไม่ได้' หรือจะพัฒนาขึ้น? 🔙🚫", i: "nai a-naa-khót, khun khít wâa rá-bòp rohng-riian thai jà 'glàp bpai bpen mʉ̌ʉan dəəm mâi dâi' rʉ̌ʉ jà phát-thá-naa khʉ̂n?", e: "5. In the future, do you think the Thai school system 'cannot go back to how it was' or will it improve?" }
+            ],
+            speaking: [
+                { 
+                    icon: "🎭", 
+                    title: "เกมใบ้คำ (Speaking Game)", 
+                    desc: "ครูสุ่มคำศัพท์ แล้วให้นักเรียนใบ้คำโดยห้ามพูดคำนั้นออกมาตรงๆ 🤫",
+                    i: "khruu sùm kham-sàp, láeo hâi nák-riian bâi kham dooy hâam phûut kham nán ɔ̀ɔk maa dtrong dtong",
+                    e: "Teacher picks a random word, and the student must explain the word without saying it directly."
+                },
+                { 
+                    icon: "🎤", 
+                    title: "สัมภาษณ์ในชีวิตจริง (Real-life Interview)", 
+                    desc: "คุณเป็นนักข่าว สัมภาษณ์ผู้ปกครอง (ครู) ว่าทำไมถึงยอมทุ่มเงินสนับสนุนโรงเรียน 🎙️",
+                    i: "khun bpen nák-khào, sǎm-phâat phûu-bpòk-khrɔɔng (khruu) wâa tham-mai thʉ̌ng yɔɔm thûm ngən sà-nàp-sà-nǔn rohng-riian",
+                    e: "You are a reporter. Interview a parent (teacher) about why they are willing to pour money to support the school."
+                },
+                { 
+                    icon: "📖", 
+                    title: "เล่าเรื่อง (Real-life Story-telling)", 
+                    desc: "เล่าประสบการณ์ที่คุณ 'อุตส่าห์' พยายามทำอะไรบางอย่าง แต่มัน 'ขึ้นอยู่กับ' คนอื่น 🔄",
+                    i: "lâo bprà-sòp-gaan thîi khun 'ùt-sàa' phà-yaa-yaam tham à-rai baang yàang, dtàe man 'khʉ̂n yùu gàp' khon ʉ̀ʉn",
+                    e: "Share an experience where you 'made an effort' to do something, but it 'depended on' someone else."
+                }
+            ],
+            extension: [
+                { 
+                    icon: "⚖️", 
+                    title: "โต้วาที (Real-life Debate)", 
+                    desc: "การบริจาคเงินให้โรงเรียน เป็นการ 'สนับสนุนการศึกษา' หรือเป็นการ 'คอร์รัปชัน'? 💬",
+                    i: "gaan bɔɔ-rí-jàak ngən hâi rohng-riian bpen gaan 'sà-nàp-sà-nǔn gaan-sʉ̀k-sǎa' rʉ̌ʉ bpen gaan 'khɔɔ-ráp-chân'?",
+                    e: "Is donating money to schools 'supporting education' or 'corruption'?"
+                },
+                { 
+                    icon: "📊", 
+                    title: "นำเสนอ (Real-life Presentation)", 
+                    desc: "ออกแบบและนำเสนอระบบการรับนักเรียนเข้าโรงเรียนที่โปร่งใสและยุติธรรมสำหรับทุกคน 💡",
+                    i: "ɔ̀ɔk-bàep láe nam-sà-nə̌ə rá-bòp gaan ráp nák-riian khâo rohng-riian thîi bproong-sǎi láe yút-dtì-tham sǎm-ràp thúk khon",
+                    e: "Design and present a transparent and fair school admission system for everyone."
+                }
+            ]
+        };
+
+        // Massive Vocab List Processed from Prompt
+        const rawVocabData = `📝📄	เรียงความ	riiang-kwaam	essays
+📚📝	เรื่องสั้น	rʉ̂ʉang-sân	short stories
+📏🧱	หนา	nǎa	thick
+🎓📸	งานรับปริญญา	ngaan-ráp-bpà-rin-yaa	graduation
+🎭🎬	การแสดง	gaan-sà-dɛɛng	performance
+🎶🎤	ดนตรีสด	don-dtrii-sòt	live music
+👔	มืออาชีพ	mʉʉ-aa-chîip	professional
+🗂️🧹	จัด	jàt	arrange / organise / hold
+🔰📘	ระดับเริ่มต้น	rá-dàp-rə̂əm-dtôn	beginner level
+🏙️🏠	ระเบียง	rá-biiang	balcony
+⭕🎺	วง	wong	circle / band
+💵	เงินเดือน	ŋən dʉan	salary
+🍀🚪✨	โอกาส 	ʔoo-gàat	Opportunity
+👕	เสื้อยืด	sʉ̂a-yʉ̂ʉt	t-shirt
+🤵	เจ้าบ่าว	jâo-bàao	groom
+👰💍	เจ้าสาว	jâo-saao	bride
+💍	คู่หมั้น	khûu-màn	fiance
+💔🤫	นอกใจ	nɔ̂ɔk-jai	cheat on
+🎭🃏	หลอก	lɔ̀ɔk	To trick
+👕	สวม	sŭuam	Wear / put on
+🦌📯	เขา	khǎo	horns
+🚫	อย่า	yàa	Don't
+🌱	หญ้า	yâa	grass
+🔁	แทน	thaaen	instead of
+👋💥	ตบ	dtòp	slap
+🤗💛	ปลอบใจ	plàawp-jai	to comfort
+🎲✨	บังเอิญ	bang-ʉʉan	coincident
+🎲✨	โดยบังเอิญ	dooi-bang-ʉʉan	coincidentally
+🕵️‍♂️🧩	ปริศนา	prìt-sà-nǎa	Mystery
+💥🌪️	หายนะ	hǎai-yá-ná	Disaster
+❓🔍	สาเหตุ	sǎa-hèet	Cause
+📝	บรรณาธิการ	ban-naa-tí-gaan	editor
+📚🔬	วิธีการวิจัย	wí-tii gan wí-jai	research methods
+🗂️	หัวข้อ	hŭua-kâw	Topics
+🤝🙋	การมีส่วนร่วม	gaan mii-sùan-rûam	participation
+🕵️‍♂️🎭	โกง	goong	cheat
+😔🏝️	โดดเดี่ยว	dòht-dìao	isolated
+✅	คุณภาพ	kun-ná-pâap	 Quality
+🚌🚆🚇	การขนส่งสาธารณะ	gaan kǒn-sòhng sǎa-taa-rá-ná	public transportation
+🏘️👥	ชุมชน	chum-chon	communities
+👵👴	สังคมผู้สูงอายุ	sǎng-kom pûu sǔung-aa-yú	aging society
+🎉💍	วันครบรอบ	wan-króp-râawp	Anniversary
+🎵🎸	วงดนตรี	wong don-dtrii	(music) band
+🏆🎯	การแข่งขัน	gaan kàeng-kǎn	competition
+⚙️🏃	ดำเนินการ	dam-nəən-gaan	facilitate / proceed / run
+💎🪙	สมบัติ	sǒm-bàt	treasure
+🌊🫧	จม	jom	To sink / drown
+💎	อัญมณี	an-yá-má-nii	gems
+⚙️	กลไก	gon-gai	mechanism
+🕯️🖤	ไว้อาลัย	wái-aa-lai	mourning
+📢📰	การประกาศ	gaan bprà-gàat	announcement
+👥💼	เพื่อนร่วมงาน	pêuan-rûam-ngaan	co-worker
+📝⏳	มีอะไรให้ทำเยอะ	mii-à-rai-hâi-tam-yóe	There are lots to do.
+🌊🚧🛣️	น้ำท่วมถนนหลายเส้น/สาย	náam-tûam-tá-nŏn-lăai-sên/sǎai	Many roads were flooded. 
+🧾💰	ค่าดำเนินการสอบ	khâa-dam-nern-gaan-sòob	Test processing fees
+🗺️🌍	ภูมิศาสตร์	puum-mí-sàat	Geography
+🏗️🛣️	โครงสร้าง(พื้นฐาน)	kroong-sâang-pěun-thăan	Infrastructure
+💰📈	มูลค่า	muun-láa-kaâ	value (assets / stuff)
+🪜	บันได	ban-dai	stairs
+🌍	เส้นศูนย์สูตร	sên-sŭun-sùut	equator
+⚡🔋	พลังงาน	pá lang-ŋaan	energy
+👑💪	อำนาจ	am-nâat	power (influence)
+🏞️🌾	ที่ราบ	têe-râap	plains
+😇	ปณิธาน	bpà-ní-taan	resolutions
+🧐	ตั้งใจ	dtâng-jai	determined/focused
+🥅	เป้าหมาย	bpâo-mǎai	goals
+🙆	ยืดหยุ่น	yʉ̂ʉt-yùn	flexible
+💉	จำเป็น / บังคับ	jam-bpen / bang-káp	obligatory
+🙏	ปรารถนา	bpràat-tà-nǎa	desire / wish
+💾💸	ประหยัด	bprà-yàt	frugal / To save
+👍⏰	มีวินัย	mii wí-nai	disciplined
+💯	เด็ดขาด	dèt-kàat	definitive
+🧑‍🎨	มีความคิดสร้างสรรค์	mii kwaam-kít sâang-sǎn	creative
+💧➕🧪	เจือจาง	jʉʉa-jaang	dilute
+🌡️📉📈	อุณหภูมิ	un-hà-pum	temperature
+🧱📦⚖️	ความหนาแน่น	kwaam-nǎa-nɛ̂ɛn	density
+🎈🌊🆙	ลอย	lɔɔi	float
+💎⛰️🧪	แร่ธาตุ	rɛ̂ɛ-tâat	mineral
+🌋⛏️🗺️	ธรณีวิทยา	tɔɔ-rá-nii-wít-tá-yaa	Geology
+💎⚛️🧊	โครงสร้างผลึก	kroong-sâang pà lùek	Crystal structure
+🎯🔍📍	เฉพาะ	chà-pɔ́	specific
+🧪🧊💧	สถานะ	sà-tǎa-ná	status; state
+✨📝🧬	ลักษณะเฉพาะ	lák-sà-nà chà-pɔ́	characteristic
+🌨️🧊☄️	ลูกเห็บ	lûuk-hèp	hail (n)
+🪵🪚🍂	ขี้เลื่อย	kîi-lʉ̂ai	sawdust
+🏠🔥🛡️	ฉนวนกันความร้อน	chà-nǔuan gan kwaam rɔ́ɔn	insulation
+🧊🫠🔥	ละลาย	lá-laai	melt
+🤔❓🧐	สงสัย	sǒng-sǎi	wonder; be curious about sth
+🔨⚠️❌	ทำให้...เสียหาย	tam-hâi...sǐa-hǎai	make...damaged
+🕊️🤝🌐	ทูต	tûut	ambassador
+🏛️🏢👑	เมืองหลวง	mʉʉang-lǔang	capital city
+🏭🏗️💨	โรงงาน	roong-ngaan	factory
+🚢📦🌎	ส่งออก	sòng-ɔ̀ɔk	export
+🪨🧊🧱	ก้อน	gɔ̂n	bar; lump
+📐📏📦	ขนาด	kà-nàat	size
+⛸️🍌💦	ลื่น	lʉ̂ʉn	slippery
+🎓📚	วิชาการ	wí-chaa-gaan	academic
+🧑‍💻🛠️	วิศวกร	wí-sà-wá-gawn	engineer
+✅	ยืนยัน	yeun-yan	confirm
+🌋📳	แรงสั่นสะเทือน	raeng-sàn-sa-thʉ̄an	tremors
+🎯💥	กระทบ	grà-thóp	affect
+🪨⚠️	รอยเลื่อน	rooi-lʉ̂an	fault
+🏢🤝	หน่วยงานที่เกี่ยวข้อง	nùay-ngaan-têe-gìeow-khâawng	relevant agencies
+📉💥	ส่งผลกระทบต่อ	sòng-pŏn-gra-thóp-dtòr	send effect -> have an impact on
+🛡️🏛️	ความมั่นคง	kwaam-mân-khong	stability
+🏞️🌊	เขื่อน	kèuuan	dam
+👣👀	ติดตาม	dtìt-dtaam	follow
+🔍📌	ลักษณะ	lák-sà-nà	characteristic 
+🏚️💥	ถล่ม	tà-lòhm	collapse
+🧑‍🤝‍🧑	คำสรรพนาม	kum-sàp-naam	pronouns
+🫵🙂	ตัวเอง	dtua-eng	self, you (friendly)
+🙋	ข้า	kâa	I (more polite than กู)
+👉	เอ็ง	aeng	You (more polite than มึง)
+🙋	เรา	rao	I (more polite than ข้า); we
+🫵	แก	gɛɛ	You (more polite than เอ็ง), 3rd person
+🌏📌	สถานการณ์	sa-thăan-ná-gaan	situations
+🙇‍♂️🙏	แสดงความเคารพ	sà-daeng-kwaam-kâao-róp	show respect
+😎🤝	กันเอง	gan-eeng	casual
+🤝🔗	ความสัมพันธ์	kwaam-sam-pan	relationships; bonds
+🤝🗣️	ภาษาบอกความสนิท	paa-săa-bòk-kwaam-sà-nìt	Language signals closeness.
+⚛️🔬	ฟิสิกส์อนุภาค	fí-sìk-à-nú-pâak	Particle Physics
+🚇🕳️	อุโมงค์	ù-mohng	tunnel
+⚛️🔬	เครื่องเร่งอนุภาค	krʉ̂ang-rêeng-à-nú-phâak	Particle Accelerator
+🧠📚	ทฤษฎี	trít-sà-dee	theory
+👥🏃‍♂️	แห่	hàae	To flock
+💥📉	ผลกระทบ	pŏn-grà-tóp	effects
+🚚🚛	ขนส่ง	kŏn-sòng	transport
+🌊🗺️	ช่องแคบ	chɔ̂ng-khàep	strait
+🥅	เป้าหมาย	bpâo-mǎai	goals
+⛏️🪨	ถ่านหิน	tàan-hĭn	coal
+⚙️🚀	มีประสิทธิภาพ	mii-bprà-sìt-tí-pâap	efficient
+🛠️🧠	วิธี	wí-thee	ways; methods
+🧱📦⚖️	ความหนาแน่น	kwaam-nǎa-nɛ̂ɛn	density
+📈🌱	การขยายตัว	gaan-kà-yǎai-dtua	expansion
+🛠️✏️	แก้	gâe	fix; edit
+💸🧾	ค่าดำเนินการ	kâa-dam-neern-gaan	processing fees
+🌨️🧊	ลูกเห็บ	lôok-hèp	hail (n)
+⚖️	มวล	muan	mass
+❌	ยกเลิก	yók-lə̂erk	cancel
+🌧️🌬️	มรสุม	mon-rá-sùm	monsoon
+📦🛒	ตุน	dtun	stock up
+🔮📈	พยากรณ์	phá-yaa-gawn	forecast
+🧑‍💼📋	คนจัดงาน	kon-jàt-ngaan	organizer
+🎨📚🎮	งานอดิเรก	ngaan-à-dì-rèek	hobbies
+📝	สรุป	sà-rùp	summarize
+🧠📚	จิตวิทยา	jìt-wít-thá-yaa	psychology
+🏛️📐	สถาปัตย์	sà-thăa-bpàt	architecture
+🏙️⚖️	ปัญหาสังคม	bpan-hăa-săng-khom	social issues
+📝	คำนาม	kam-nahm	noun
+🖼️🎟️	นิทรรศการ	nít-tát-sà-gǎan	exhibition
+💪🎯	ความมุ่งมั่น	kwaam-mûng-màn	determination
+✨🧘	ความเรียบง่าย	kwaam-rîap-ngâai	simplicity
+🖱️📜	เลื่อน	lêuuaen	scroll / slide
+🪏📜	ไถ	tăi	scroll / plow
+🎯🧠💪	ชำนาญ	cham-naan	skilled; proficient
+🗣️⚖️	โต้วาที	dtôh-waa-tii	debate
+🗂️	หัวข้อ	hŭa-khôr	topics
+🏛️🙏	ศาล	săan	shrine; court
+👥🏘️	ชุมชน	choom-chohn	communities
+🛠️🌱	พัฒนา	pát-tá-naa	develop
+🏆🎯	การแข่งขัน	gaan kàeng-kǎn	competition
+🎙️📺	นิเทศ	ní-tâet	Comm Arts
+🕯️🙏	จุดธูป	jùt-tûup	To light incense
+📝📣	คำร้อง	kam-róong	petition
+🛡️🔒	ปกป้อง	bpòk-bpông	protect; defend
+📉💥	ส่งผลกระทบต่อ	sòng-pŏn-gra-thóp-dtòr	have an impact on
+🙏✨	ศรัทธา	sàt-thaa	faith; faithful
+🛡️👮	พิทักษ์	pí-ták	protect; guard
+⚖️📄	คดีความ	ká-dee-kwaam	lawsuit; legal case
+📝📋	แบบสำรวจ	bàep-sǎm-rùat	survey (forms)
+🏚️🧨	รื้อถอน	rʉ́ʉ-thŏn	demolish; tear down
+🤝💡	เสนอ	sà-nə̌ə	propose
+💥🎯	กระทบ	grà-thóp	affect; impact
+🧑‍⚖️🏛️	รัฐมนตรี	rát-tha-mon-dtrii	minister
+✋✅	ยืนกราน	yeun-graan	confirm
+🗺️🌏	ภูมิภาค	poo-mí-pâak	region (ASEAN)
+🏗️	โครงสร้าง	krôhng-sâang	structure
+🦘⬆️	กระโดด	gra-dòht	jump
+🤝💬	ต่อรอง	dtòr-rɔɔng	negotiate
+📝📋	ขึ้นทะเบียน	kêun-thá-bian	To register (put a name up); To (put sth on the) list
+📝✅	ลงทะเบียน	long-thá-bian	To register (put a name down); sign up
+🙏💧	รดน้ําดําหัว	rót-náam-dam-hŭa	Pouring water on the hands of revered elders and asking for blessing
+⚖️📉	ความเหลื่อมล้ำ	khwaam-lʉ̀am-láam	inequality
+🧳🌍	ผู้อพยพ	pûu-òp-phá-yóp	immigrants
+⚡️📉	ผลกระทบ	pŏn-grà-thóp	effects
+🔁🔄	วงจรต่อเนื่อง	wong-jon-dtàaw-nʉ̂ʉang	perpetuating cycle
+🚫🤥	เชื่อถือไม่ได้	chêua-thĕuue-mâi-dâai	not reliable; not credible
+🛠️	แก้ไข	gâae-kǎi	solve; fix
+🚨⏱️	เร่งด่วน	rêng-dùan	urgent
+🏥🩺	สาธารณสุข	sàa-thaa-rá-ná-sùk	healthcare
+🔗	เชื่อม	chʉ̂ʉam	connect
+🏥👵	ศูนย์ดูแลผู้สูงอายุ	sǔun-doolae-phûu-sǔung-aa-yú	nursing home
+👵🏠	บ้านพักคนชรา	bâan-phák-kon-chraa	retirement home`;
+
+        const vocabPool = rawVocabData.trim().split('\n').map(line => {
+            const parts = line.split('\t').map(p => p.trim());
+            if(parts.length >= 3) {
+                const firstPart = parts[0];
+                const emojiMatch = firstPart.match(/^([\p{Emoji}\s]+)/u);
+                let emoji = "✨", th = "", ipa = "", en = "";
+                if(emojiMatch) {
+                    emoji = emojiMatch[1].trim();
+                    th = firstPart.replace(emojiMatch[1], '').trim();
+                } else {
+                    th = firstPart;
+                }
+                
+                if(!th && parts.length >= 4) {
+                    th = parts[1]; ipa = parts[2]; en = parts[3];
+                } else if (parts.length === 4) {
+                    th = parts[1]; ipa = parts[2]; en = parts[3];
+                } else {
+                    ipa = parts[1]; en = parts[2];
+                }
+                return { emoji, th, ipa, en };
+            }
+            return null;
+        }).filter(v => v !== null);
+
+        // --- CORE FUNCTIONS ---
+        function speak(text, btnElement) {
+            window.speechSynthesis.cancel();
+            document.querySelectorAll('.tts-playing').forEach(el => el.classList.remove('tts-playing'));
+            if(btnElement) btnElement.classList.add('tts-playing');
+
+            const cleanText = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+            const msg = new SpeechSynthesisUtterance(cleanText);
+            
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH' || voice.lang === 'th_TH');
+            if (thaiVoice) msg.voice = thaiVoice;
+            else msg.lang = 'th-TH';
+            
+            msg.rate = 0.9;
+            msg.onend = () => { if(btnElement) btnElement.classList.remove('tts-playing'); };
+            msg.onerror = () => { if(btnElement) btnElement.classList.remove('tts-playing'); };
+            window.speechSynthesis.speak(msg);
+        }
+
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+
+        function toggleLang(btn, lang) {
+            btn.classList.toggle(`active-${lang}`);
+            const container = btn.closest('.flex').parentElement;
+            let target = container.querySelector('.' + lang);
+            if (!target) {
+                target = btn.closest('div').parentElement.querySelector('.' + lang);
+            }
+            if(target) target.classList.toggle('hidden-content');
+        }
+
+        // --- UI BUILDER ---
+        function createSmartText(data, textClass = "text-lg text-gray-800") {
+            const id = Math.random().toString(36).substr(2, 9);
+            const thaiText = data.t;
+            const ipaText = data.i;
+            const enText = data.e;
+
+            return `
+                <div class="mb-3" id="${id}">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span class="font-medium ${textClass} thai-text">${thaiText}</span>
+                        <button onclick="speak('${thaiText.replace(/'/g, "\\'")}', this)" class="tts-button text-blue-500 text-lg">🔊</button>
+                        <div class="flex gap-1 ml-auto">
+                            <button onclick="toggleLang(this, 'ipa')" class="btn-toggle">IPA</button>
+                            <button onclick="toggleLang(this, 'en')" class="btn-toggle">EN</button>
+                        </div>
+                    </div>
+                    <div class="ipa hidden-content text-orange-600 font-mono text-sm mb-1">${ipaText}</div>
+                    <div class="en hidden-content text-blue-600 italic text-sm mb-1">${enText}</div>
+                </div>
+            `;
+        }
+
+        function createHeader(data, icon, colorClass) {
+            return `
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="text-3xl">${icon}</span>
+                    <h2 class="text-2xl font-bold ${colorClass} thai-text">${data.t}</h2>
+                    <button onclick="speak('${data.t.replace(/'/g, "\\'")}', this)" class="tts-button text-blue-500 text-xl">🔊</button>
+                    <div class="flex gap-1 ml-auto">
+                        <button onclick="toggleLang(this, 'ipa')" class="btn-toggle">IPA</button>
+                        <button onclick="toggleLang(this, 'en')" class="btn-toggle">EN</button>
+                    </div>
+                </div>
+                <div class="ipa hidden-content text-orange-600 font-mono text-sm mt-1 ml-12">${data.i}</div>
+                <div class="en hidden-content text-blue-600 italic text-sm mt-1 ml-12">${data.e}</div>
+            `;
+        }
+
+        function randomVocab() {
+            const displayArea = document.getElementById('vocab-card'); 
+            const word = vocabPool[Math.floor(Math.random() * vocabPool.length)];
+            
+            displayArea.innerHTML = `
+                <div class="text-center w-full animate-pop">
+                    <div class="text-5xl mb-4">${word.emoji}</div>
+                    <div class="flex flex-wrap items-center justify-center gap-2 mb-2">
+                        <span class="text-3xl font-bold text-indigo-700 thai-text">${word.th}</span>
+                        <button onclick="speak('${word.th}', this)" class="tts-button text-blue-500 text-2xl">🔊</button>
+                    </div>
+                    <div class="flex gap-2 justify-center mt-3 mb-2">
+                        <button onclick="toggleLang(this, 'ipa')" class="btn-toggle text-xs">IPA</button>
+                        <button onclick="toggleLang(this, 'en')" class="btn-toggle text-xs">EN</button>
+                    </div>
+                    <div class="ipa hidden-content text-orange-600 font-mono text-base mb-1 w-full text-center">/${word.ipa}/</div>
+                    <div class="en hidden-content text-blue-600 italic text-base w-full text-center">${word.en}</div>
+                </div>
+            `;
+        }
+
+        // Initialize UI
+        window.onload = function() {
+            // Headings
+            document.getElementById('heading-review').innerHTML = createHeader(content.headings.review, "🎲", "text-indigo-700");
+            document.getElementById('heading-leadin').innerHTML = createHeader(content.headings.leadin, "🤔", "text-emerald-700");
+            document.getElementById('heading-video').innerHTML = createHeader(content.headings.video, "🎬", "text-rose-700");
+            document.getElementById('heading-script').innerHTML = createHeader(content.headings.script, "💬", "text-rose-800");
+            document.getElementById('heading-vid-comp').innerHTML = createHeader(content.headings.vidComp, "❓", "text-amber-700");
+            document.getElementById('heading-vocab').innerHTML = createHeader(content.headings.vocab, "🎯", "text-purple-700");
+            document.getElementById('heading-grammar').innerHTML = createHeader(content.headings.grammar, "🧱", "text-purple-700");
+            document.getElementById('heading-reading').innerHTML = createHeader(content.headings.reading, "📖", "text-sky-700");
+            document.getElementById('heading-read-comp').innerHTML = createHeader(content.headings.readComp, "❓", "text-sky-700");
+            document.getElementById('heading-discussion').innerHTML = createHeader(content.headings.discussion, "🗣️", "text-teal-700");
+            document.getElementById('heading-speaking').innerHTML = createHeader(content.headings.speaking, "🎤", "text-yellow-600");
+            document.getElementById('heading-extension').innerHTML = createHeader(content.headings.extension, "⏱️", "text-gray-700");
+
+            // Content
+            document.getElementById('instruction-review').innerHTML = createSmartText(content.review.instruction, "text-gray-700 text-lg");
+            
+            document.getElementById('leadin-questions').innerHTML = content.leadin.map(q => 
+                `<div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('script-content').innerHTML = content.scriptLines.map((line) => {
+                const isTeacher = line.t.includes('ครู:');
+                const bg = isTeacher ? 'bg-white border-gray-200' : 'bg-rose-50 border-rose-100';
+                return `<div class="p-3 rounded-xl shadow-sm border ${bg}">${createSmartText(line, "text-[0.95rem]")}</div>`;
+            }).join('');
+
+            document.getElementById('vid-comp-questions').innerHTML = content.vidComp.map(q => 
+                `<div class="bg-amber-50 p-4 rounded-xl border border-amber-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('target-vocab-list').innerHTML = content.targetVocab.map(v => 
+                `<div class="bg-purple-50 p-4 rounded-xl border border-purple-100 flex flex-col justify-center">
+                    <div class="text-3xl mb-2 text-center">${v.emoji}</div>
+                    ${createSmartText(v, "text-xl font-bold text-center text-purple-900 w-full")}
+                </div>`
+            ).join('');
+
+            document.getElementById('target-grammar-list').innerHTML = content.grammar.map(g => 
+                `<div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    ${createSmartText(g, "text-lg font-bold text-purple-800")}
+                    <div class="mt-2 pl-4 border-l-2 border-purple-300 text-sm text-gray-600 thai-text">${g.ex}</div>
+                </div>`
+            ).join('');
+
+            document.getElementById('reading-title').innerHTML = createSmartText(content.reading.title, "text-xl font-bold text-sky-900 justify-center w-full flex");
+            document.getElementById('reading-passage').innerHTML = content.reading.passage.map(p => 
+                `<div class="leading-relaxed">${createSmartText(p, "text-[1.05rem] text-gray-800")}</div>`
+            ).join('');
+
+            document.getElementById('read-comp-questions').innerHTML = content.reading.comp.map(q => 
+                `<div class="bg-sky-50 p-4 rounded-xl border border-sky-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('discussion-questions').innerHTML = content.discussion.map(q => 
+                `<div class="bg-teal-50 p-4 rounded-xl border border-teal-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('speaking-tasks').innerHTML = content.speaking.map(task => 
+                `<div class="bg-yellow-50 p-5 rounded-2xl border border-yellow-200">
+                    <div class="text-4xl mb-3">${task.icon}</div>
+                    <div class="font-bold text-xl text-yellow-800 mb-2">${task.title}</div>
+                    ${createSmartText({t: task.desc, i: task.i, e: task.e}, "text-gray-800")}
+                </div>`
+            ).join('');
+
+            document.getElementById('extension-tasks').innerHTML = content.extension.map(task => 
+                `<div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="text-4xl mb-3">${task.icon}</div>
+                    <div class="font-bold text-xl text-gray-800 mb-2">${task.title}</div>
+                    ${createSmartText({t: task.desc, i: task.i, e: task.e}, "text-gray-700")}
+                </div>`
+            ).join('');
+        };
+    </script>
+</body>
+</html>
