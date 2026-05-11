@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แผนไปเที่ยว (Travel Plans)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun for Thai -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4; /* Very light sky/mint blue */
+        }
+        .thai-text {
+            font-size: 1.5rem;
+            color: #0f172a;
+            line-height: 1.6;
+        }
+        .ipa-text {
+            color: #0284c7; /* Sky blue for phonetics */
+            font-style: italic;
+            font-family: sans-serif;
+        }
+        .en-text {
+            color: #475569; /* Slate for English */
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle:active {
+            transform: scale(0.95);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto pb-24">
+
+    <!-- Header -->
+    <header class="text-center mb-8" id="main-header"></header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex justify-start md:justify-center space-x-2 mb-8 sticky top-2 z-50 bg-white/90 p-2 rounded-xl backdrop-blur-sm shadow-sm border border-sky-100 overflow-x-auto no-scrollbar">
+        <a href="#game" class="px-3 py-2 bg-emerald-50 rounded-lg text-sm shadow-sm text-emerald-800 font-bold hover:bg-emerald-100 whitespace-nowrap">1. เกมคำศัพท์</a>
+        <a href="#leadin" class="px-3 py-2 bg-sky-50 rounded-lg text-sm shadow-sm text-sky-800 font-bold hover:bg-sky-100 whitespace-nowrap">2. เกริ่นนำ</a>
+        <a href="#roleplay" class="px-3 py-2 bg-indigo-50 rounded-lg text-sm shadow-sm text-indigo-800 font-bold hover:bg-indigo-100 whitespace-nowrap">3. บทบาทสมมติ</a>
+        <a href="#debate" class="px-3 py-2 bg-orange-50 rounded-lg text-sm shadow-sm text-orange-800 font-bold hover:bg-orange-100 whitespace-nowrap">4. โต้วาที</a>
+        <a href="#story" class="px-3 py-2 bg-purple-50 rounded-lg text-sm shadow-sm text-purple-800 font-bold hover:bg-purple-100 whitespace-nowrap">5. เล่าเรื่อง</a>
+        <a href="#presentation" class="px-3 py-2 bg-rose-50 rounded-lg text-sm shadow-sm text-rose-800 font-bold hover:bg-rose-100 whitespace-nowrap">6. นำเสนอ</a>
+        <a href="#interview" class="px-3 py-2 bg-teal-50 rounded-lg text-sm shadow-sm text-teal-800 font-bold hover:bg-teal-100 whitespace-nowrap">7. สัมภาษณ์</a>
+        <a href="#discuss" class="px-3 py-2 bg-amber-50 rounded-lg text-sm shadow-sm text-amber-800 font-bold hover:bg-amber-100 whitespace-nowrap">8. คุยกัน</a>
+    </div>
+
+    <!-- 1. GAME -->
+    <section id="game" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-emerald-400">
+            <div id="h-game"></div>
+            <div id="i-game" class="mb-6 bg-emerald-50 p-3 rounded-lg"></div>
+            
+            <div id="random-card-display" class="min-h-[200px] flex items-center justify-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 mb-4 p-6">
+                <p class="text-slate-400 text-lg">กดปุ่มเพื่อเริ่มเกม</p>
+            </div>
+
+            <button onclick="generateRandomWord()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-transform active:scale-95 text-xl flex items-center justify-center gap-3">
+                <i class="fa-solid fa-shuffle"></i>
+                <span>สุ่มคำศัพท์ (Random Word)</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 2. LEAD IN -->
+    <section id="leadin" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-sky-400">
+            <div id="h-leadin"></div>
+            <div id="i-leadin" class="mb-6 bg-sky-50 p-3 rounded-lg"></div>
+            <div id="c-leadin" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 3. ROLE PLAY -->
+    <section id="roleplay" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-indigo-400">
+            <div id="h-roleplay"></div>
+            <div id="i-roleplay" class="mb-6 bg-indigo-50 p-3 rounded-lg"></div>
+            <div id="c-roleplay" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 4. DEBATE -->
+    <section id="debate" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-orange-400">
+            <div id="h-debate"></div>
+            <div id="i-debate" class="mb-6 bg-orange-50 p-3 rounded-lg"></div>
+            <div id="c-debate" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 5. STORY -->
+    <section id="story" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-purple-400">
+            <div id="h-story"></div>
+            <div id="i-story" class="mb-6 bg-purple-50 p-3 rounded-lg"></div>
+            <div id="c-story" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 6. PRESENTATION -->
+    <section id="presentation" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-rose-400">
+            <div id="h-present"></div>
+            <div id="i-present" class="mb-6 bg-rose-50 p-3 rounded-lg"></div>
+            <div id="c-present" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 7. INTERVIEW -->
+    <section id="interview" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-teal-400">
+            <div id="h-interview"></div>
+            <div id="i-interview" class="mb-6 bg-teal-50 p-3 rounded-lg"></div>
+            <div id="c-interview" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <!-- 8. DISCUSSION -->
+    <section id="discuss" class="mb-14">
+        <div class="bg-white rounded-2xl shadow-sm p-6 border-l-8 border-amber-400">
+            <div id="h-discuss"></div>
+            <div id="i-discuss" class="mb-6 bg-amber-50 p-3 rounded-lg"></div>
+            <div id="c-discuss" class="space-y-4"></div>
+        </div>
+    </section>
+
+    <footer class="text-center text-slate-400 text-xs mb-8 pb-8">
+        Easy Thai Speaking Lesson ✨
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 0. UI TEXT DATA ---
+        const uiData = {
+            mainTitle: { thai: "แผนไปเที่ยว ✈️🌴", ipa: "phɛ̌ɛn bpai thîao", en: "Travel Plans" },
+            
+            game: {
+                h: { thai: "เกมคำศัพท์ 🎲", ipa: "geem kham-sàp", en: "Vocab Game" },
+                i: { thai: "สุ่มคำศัพท์ แล้วแต่งประโยคง่ายๆ", ipa: "sǔm kham-sàp lɛ́ew dtɛ̀ng bprà-yòok ngâai ngâai", en: "Randomize a word and make a simple sentence." }
+            },
+            leadIn: {
+                h: { thai: "เกริ่นนำ 🎤", ipa: "gə̀rn nam", en: "Lead-in" },
+                i: { thai: "ตอบคำถามง่ายๆ เกี่ยวกับการไปเที่ยว", ipa: "dtɔ̀ɔp kham-thǎam ngâai ngâai gìiao gàp gaan bpai thîao", en: "Answer simple questions about traveling." }
+            },
+            roleplay: {
+                h: { thai: "บทบาทสมมติ: นัดไปทะเล 🌊", ipa: "bòt-bàat sǒm-mút: nát bpai thá-lee", en: "Role Play: Beach Trip" },
+                i: { thai: "คุยกับเพื่อนเพื่อวางแผนไปทะเล", ipa: "khui gàp phʉ̂an phʉ̂a waang phɛ̌ɛn bpai thá-lee", en: "Talk to a friend to plan a beach trip." }
+            },
+            debate: {
+                h: { thai: "โต้วาทีสั้นๆ ⚖️", ipa: "dtô:-waa-thi: sân sǎn", en: "Short Debate" },
+                i: { thai: "เที่ยวกลางวัน หรือ เที่ยวกลางคืน?", ipa: "thîao glaang-wan rʉ̌ʉ thîao glaang-khʉʉn?", en: "Travel during the day or at night?" }
+            },
+            story: {
+                h: { thai: "เล่าเรื่องง่ายๆ 📖", ipa: "lâo rʉ̂ang ngâai ngâai", en: "Simple Story-telling" },
+                i: { thai: "แต่งเรื่องสั้นๆ 3 ประโยค", ipa: "dtɛ̀ng rʉ̂ang sân sǎn sǎam bprà-yòok", en: "Make a short 3-sentence story." }
+            },
+            presentation: {
+                h: { thai: "นำเสนอ: ทริปหน้าของฉัน 🧳", ipa: "nam sà-nə̌e: trip nâa khɔ̌ng chǎn", en: "Presentation: My next trip" },
+                i: { thai: "ตอบคำถาม 3 ข้อเพื่อบอกแผนของคุณ", ipa: "dtɔ̀ɔp kham-thǎam sǎam khɔ̂ɔ phʉ̂a bɔ̀k phɛ̌ɛn khɔ̌ng khun", en: "Answer 3 questions to tell your plan." }
+            },
+            interview: {
+                h: { thai: "สัมภาษณ์เพื่อน 🗣️", ipa: "sǎm-phâat phʉ̂an", en: "Interview a friend" },
+                i: { thai: "ถามเพื่อน 2 คำถามเกี่ยวกับการเที่ยว", ipa: "thǎam phʉ̂an sɔ̌ng kham-thǎam gìiao gàp gaan thîao", en: "Ask a friend 2 questions about traveling." }
+            },
+            discuss: {
+                h: { thai: "คุยกันสบายๆ 💬", ipa: "khui gan sà-baai sà-baai", en: "Casual Discussion" },
+                i: { thai: "คุณคิดยังไงกับเรื่องพวกนี้?", ipa: "khun khít yang-ngai gàp rʉ̂ang phûak níi?", en: "What do you think about these things?" }
+            }
+        };
+
+        // --- 1. FULL VOCAB ARRAY (ONLY the 9 requested words) ---
+        const fullVocabList = [
+            {thai: "🪸🐠 ปะการัง", ipa: "bpà-gaa-rang", en: "corals"},
+            {thai: "☀️🌤️ กลางวัน", ipa: "glaang-wan", en: "during the day"},
+            {thai: "🌙 กลางคืน", ipa: "glaang-kʉʉn", en: "at night"},
+            {thai: "➡️ สำหรับ", ipa: "sǎm-ràp", en: "for"},
+            {thai: "🏁 สุดท้าย", ipa: "sùt-táai", en: "last; final"},
+            {thai: "📊📈🌐 ส่วนใหญ่", ipa: "sùan-yài", en: "mostly"},
+            {thai: "😰😵‍💫 เครียด", ipa: "krîiat", en: "stressed"},
+            {thai: "🛠️ ใช้", ipa: "chái", en: "use"},
+            {thai: "🤔✨ น่าสนใจ", ipa: "nâa-sŏn-jai", en: "interesting"}
+        ];
+
+        // --- SECTIONS DATA ---
+        
+        const leadinData = [
+            { thai: "1. คุณชอบไปเที่ยวทะเล หรือ ภูเขา? 🌊⛰️", ipa: "khun chɔ̂ɔp bpai thîao thá-lee rʉ̌ʉ phuu-khǎo?", en: "Do you like going to the sea or mountains?" },
+            { thai: "2. เวลาไปเที่ยว คุณ เครียด ไหม? 😰", ipa: "wee-laa bpai thîao, khun krîiat mái?", en: "When traveling, are you stressed?" },
+            { thai: "3. คุณชอบไปเที่ยวกับใคร? 👥", ipa: "khun chɔ̂ɔp bpai thîao gàp khrai?", en: "Who do you like to travel with?" }
+        ];
+
+        const roleplayData = [
+            { speaker: "A", thai: "วันหยุดนี้ ไปเที่ยวทะเลไหม? สำหรับ ฉัน ทะเล น่าสนใจ มาก 🌊✨", ipa: "wan-yùt níi bpai thîao thá-lee mái? sǎm-ràp chǎn thá-lee nâa-sŏn-jai mâak", en: "This holiday, go to the sea? For me, the sea is very interesting." },
+            { speaker: "B (You)", thai: "ไปสิ! ส่วนใหญ่ ฉันชอบไปดู ปะการัง 🪸🐠", ipa: "bpai sì! sùan-yài chǎn chɔ̂ɔp bpai duu bpà-gaa-rang", en: "Sure! Mostly I like to go see corals." },
+            { speaker: "A", thai: "ดีเลย! เราจะดูปะการังตอน กลางวัน และพักผ่อนตอน กลางคืน ☀️🌙", ipa: "dii loei! rao jà duu bpà-gaa-rang dtawn glaang-wan lɛ́ phák-phɔ̀ɔn dtawn glaang-kʉʉn", en: "Great! We will see corals during the day and rest at night." },
+            { speaker: "B (You)", thai: "สุดท้าย เราจะ ใช้ เงินสด หรือ บัตร? 🏁💳", ipa: "sùt-táai, rao jà chái ngəən-sòt rʉ̌ʉ bàt?", en: "Lastly, will we use cash or card?" },
+            { speaker: "A", thai: "ใช้ บัตร ง่ายกว่า! ไม่ เครียด 🛠️😄", ipa: "chái bàt ngâai gwàa! mâi krîiat", en: "Using a card is easier! Not stressed." }
+        ];
+
+        const debateData = [
+            { speaker: "Topic", thai: "เที่ยวตอน กลางวัน ☀️ VS เที่ยวตอน กลางคืน 🌙", ipa: "thîao dtawn glaang-wan VS thîao dtawn glaang-kʉʉn", en: "Travel during the day VS Travel at night" },
+            { speaker: "Team กลางวัน", thai: "กลางวัน ดีกว่า! ถ่ายรูปสวย ดู ปะการัง ได้ 📸🪸", ipa: "glaang-wan dii gwàa! thǎai rûup sǔay, duu bpà-gaa-rang dâai", en: "Day is better! Take beautiful photos, can see corals." },
+            { speaker: "Team กลางคืน", thai: "แต่ กลางคืน ไม่ร้อน! และไม่ เครียด 🍻😎", ipa: "dtɛ̀ɛ glaang-kʉʉn mâi rɔ́ɔn! lɛ́ mâi krîiat", en: "But night is not hot! And not stressed." },
+            { speaker: "Team กลางวัน", thai: "แต่ ส่วนใหญ่ คนชอบเที่ยวตอน กลางวัน นะ 📊", ipa: "dtɛ̀ɛ sùan-yài khon chɔ̂ɔp thîao dtawn glaang-wan ná", en: "But mostly people like to travel during the day." }
+        ];
+
+        const storyData = [
+            { thai: "เล่าเรื่องสั้นๆ 3 ประโยค (บอกครู) 🗣️", ipa: "lâo rʉ̂ang sân sǎn sǎam bprà-yòok (bɔ̀k khruu)", en: "Tell a short 3-sentence story (tell the teacher)." },
+            { thai: "คำศัพท์ที่ต้อง ใช้: ปะการัง, น่าสนใจ, สุดท้าย 🪸✨🏁", ipa: "kham-sàp thîi dtɔ̂ng chái: bpà-gaa-rang, nâa-sŏn-jai, sùt-táai", en: "Vocab to use: corals, interesting, last/finally." },
+            { thai: "ตัวอย่าง: ทะเล น่าสนใจ มาก ฉันชอบ ปะการัง สุดท้าย ฉันมีความสุข 😄", ipa: "dtua-yàang: thá-lee nâa-sŏn-jai mâak. chǎn chɔ̂ɔp bpà-gaa-rang. sùt-táai chǎn mii khwaam sùk.", en: "Example: The sea is very interesting. I like corals. Finally, I am happy." }
+        ];
+
+        const presentData = [
+            { thai: "นำเสนอเรื่อง: ทริปหน้าของฉัน 🧳", ipa: "nam-sà-nə̌ə rʉ̂ang: trip nâa khɔ̌ng chǎn", en: "Presentation topic: My next trip" },
+            { thai: "1. จะไปที่ไหน? สำหรับ ใคร? 📍👥", ipa: "nʉ̀ng. jà bpai thîi nǎi? sǎm-ràp khrai?", en: "1. Where will you go? For whom?" },
+            { thai: "2. ส่วนใหญ่ จะทำอะไรที่นั่น? 📊📸", ipa: "sɔ̌ng. sùan-yài jà tham à-rai thîi nân?", en: "2. Mostly what will you do there?" },
+            { thai: "3. จะ ใช้ เงินเยอะไหม? 🛠️💸", ipa: "sǎam. jà chái ngəən yə́ mái?", en: "3. Will you use a lot of money?" }
+        ];
+
+        const interviewData = [
+            { speaker: "คำถาม 1", thai: "ทริป สุดท้าย ของคุณคือที่ไหน? 🏁✈️", ipa: "trip sùt-táai khɔ̌ng khun khʉʉ thîi nǎi?", en: "Where was your last trip?" },
+            { speaker: "คำถาม 2", thai: "เวลาหลงทาง คุณ เครียด ไหม? 😰🗺️", ipa: "wee-laa lǒng thaang khun krîiat mái?", en: "When you get lost, are you stressed?" }
+        ];
+
+        const discussData = [
+            { thai: "1. คุณคิดว่า พิพิธภัณฑ์ น่าสนใจ ไหม? 🤔🏛️", ipa: "khun khít wâa pí-pít-thá-phan nâa-sŏn-jai mái?", en: "Do you think museums are interesting?" },
+            { thai: "2. ไปเที่ยวกับเพื่อน ใช้ เงินเยอะไหม? 💸👯‍♀️", ipa: "bpai thîao gàp phʉ̂an chái ngəən yə́ mái?", en: "Traveling with friends, do you use a lot of money?" }
+        ];
+
+        // --- COMPONENT FACTORY ---
+
+        function createHeader(dataObj, id) {
+            return `
+            <div class="flex flex-col md:flex-row items-center gap-3 border-b border-sky-100 pb-3 mb-4">
+                <button onclick="speakText('${dataObj.h.thai.replace(/'/g, "\\'")}')" class="bg-sky-100 text-sky-700 hover:bg-sky-200 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <div class="text-center md:text-left flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-800">${dataObj.h.thai}</h2>
+                    <div id="ipa-${id}-h" class="hidden"><p class="ipa-text text-sm">${dataObj.h.ipa}</p></div>
+                    <div id="en-${id}-h" class="hidden"><p class="en-text text-sm">${dataObj.h.en}</p></div>
+                </div>
+                <div class="flex gap-2 text-xs">
+                     <button onclick="toggleVisibility('ipa-${id}-h', this)" class="text-slate-400 hover:text-sky-600 font-bold border border-slate-200 px-2 py-1 rounded">IPA</button>
+                     <button onclick="toggleVisibility('en-${id}-h', this)" class="text-slate-400 hover:text-sky-600 font-bold border border-slate-200 px-2 py-1 rounded">EN</button>
+                </div>
+            </div>`;
+        }
+
+        function createInstr(dataObj, id) {
+            return `
+            <div class="flex flex-col md:flex-row items-center gap-3">
+                <button onclick="speakText('${dataObj.i.thai.replace(/'/g, "\\'")}')" class="text-slate-400 hover:text-sky-600 flex-shrink-0">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <div class="text-center md:text-left flex-grow">
+                    <p class="text-lg text-slate-700 font-medium">${dataObj.i.thai}</p>
+                    <div id="ipa-${id}-i" class="hidden"><p class="ipa-text text-sm">${dataObj.i.ipa}</p></div>
+                    <div id="en-${id}-i" class="hidden"><p class="en-text text-sm italic">${dataObj.i.en}</p></div>
+                </div>
+                <div class="flex gap-2 text-[10px]">
+                     <button onclick="toggleVisibility('ipa-${id}-i', this)" class="text-slate-400 hover:bg-sky-100 px-2 py-1 rounded border border-transparent">IPA</button>
+                     <button onclick="toggleVisibility('en-${id}-i', this)" class="text-slate-400 hover:bg-sky-100 px-2 py-1 rounded border border-transparent">EN</button>
+                </div>
+            </div>`;
+        }
+
+        function createCard(item, id, showSpeaker = false, colorTheme = "sky") {
+            const speakerLabel = showSpeaker && item.speaker ? `<span class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1 block">${item.speaker}</span>` : '';
+            return `
+            <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-slate-100 animate-fade-in">
+                ${speakerLabel}
+                <div class="flex items-start gap-3">
+                    <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="mt-1 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <div class="flex-grow">
+                        <p class="thai-text font-bold mb-2">${item.thai}</p>
+                        <div id="ipa-${id}" class="hidden mb-1"><p class="ipa-text text-lg">${item.ipa}</p></div>
+                        <div id="en-${id}" class="hidden"><p class="en-text text-sm border-t border-slate-100 pt-1 mt-1">${item.en}</p></div>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="toggleVisibility('ipa-${id}', this)" class="btn-toggle text-xs px-3 py-1 rounded-md border border-sky-200 text-sky-700 font-bold bg-sky-50 hover:bg-sky-100">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}', this)" class="btn-toggle text-xs px-3 py-1 rounded-md border border-slate-200 text-slate-600 font-bold bg-slate-50 hover:bg-slate-100">EN</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function createRandomCard(item, id) {
+            return `
+            <div class="flex flex-col items-center animate-fade-in w-full bg-white p-6 rounded-xl shadow-sm border border-emerald-100">
+                <button onclick="speakText('${item.thai.replace(/'/g, "\\'")}')" class="mb-4 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-full w-16 h-16 flex items-center justify-center transition-colors text-2xl">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <p class="text-3xl font-bold text-emerald-700 text-center mb-4">${item.thai}</p>
+                <div id="ipa-${id}" class="hidden mb-2 text-center"><p class="ipa-text text-xl">${item.ipa}</p></div>
+                <div id="en-${id}" class="hidden text-center mb-4"><p class="en-text text-lg border-t border-slate-200 pt-2">${item.en}</p></div>
+                <div class="flex gap-3">
+                    <button onclick="toggleVisibility('ipa-${id}', this)" class="btn-toggle px-4 py-2 rounded-lg border border-sky-200 text-sky-700 font-bold bg-sky-50 hover:bg-sky-100">IPA</button>
+                    <button onclick="toggleVisibility('en-${id}', this)" class="btn-toggle px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-bold bg-slate-50 hover:bg-slate-100">EN</button>
+                </div>
+            </div>`;
+        }
+
+        // --- LOGIC ---
+
+        function toggleVisibility(elementId, btn) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                btn.classList.add('ring-2', 'ring-offset-1');
+            } else {
+                el.classList.add('hidden');
+                btn.classList.remove('ring-2', 'ring-offset-1');
+            }
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.8;
+            
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH');
+            if (thaiVoice) utterance.voice = thaiVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function generateRandomWord() {
+            const randomIndex = Math.floor(Math.random() * fullVocabList.length);
+            const item = fullVocabList[randomIndex];
+            const html = createRandomCard(item, `rand-${Date.now()}`);
+            document.getElementById('random-card-display').innerHTML = html;
+        }
+
+        function renderContent() {
+            // Main Title
+            document.getElementById('main-header').innerHTML = `
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <button onclick="speakText('${uiData.mainTitle.thai.replace(/'/g, "\\'")}')" class="bg-sky-200 text-sky-800 hover:bg-sky-300 rounded-full w-12 h-12 flex items-center justify-center transition-colors mb-2">
+                        <i class="fa-solid fa-plane text-xl"></i>
+                    </button>
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-800 text-center">${uiData.mainTitle.thai}</h1>
+                    <div class="flex gap-2 text-xs mt-2">
+                         <button onclick="toggleVisibility('ipa-main', this)" class="text-slate-500 hover:bg-slate-200 px-3 py-1 rounded-full border border-slate-300 font-bold">IPA</button>
+                         <button onclick="toggleVisibility('en-main', this)" class="text-slate-500 hover:bg-slate-200 px-3 py-1 rounded-full border border-slate-300 font-bold">EN</button>
+                    </div>
+                    <div id="ipa-main" class="hidden mt-2"><p class="ipa-text text-xl">${uiData.mainTitle.ipa}</p></div>
+                    <div id="en-main" class="hidden"><p class="en-text text-lg">${uiData.mainTitle.en}</p></div>
+                </div>
+            `;
+
+            // Render Sections
+            document.getElementById('h-game').innerHTML = createHeader(uiData.game, 'game');
+            document.getElementById('i-game').innerHTML = createInstr(uiData.game, 'game');
+
+            document.getElementById('h-leadin').innerHTML = createHeader(uiData.leadIn, 'leadin');
+            document.getElementById('i-leadin').innerHTML = createInstr(uiData.leadIn, 'leadin');
+            document.getElementById('c-leadin').innerHTML = leadinData.map((item, idx) => createCard(item, `leadin-${idx}`, false)).join('');
+
+            document.getElementById('h-roleplay').innerHTML = createHeader(uiData.roleplay, 'roleplay');
+            document.getElementById('i-roleplay').innerHTML = createInstr(uiData.roleplay, 'roleplay');
+            document.getElementById('c-roleplay').innerHTML = roleplayData.map((item, idx) => createCard(item, `role-${idx}`, true)).join('');
+
+            document.getElementById('h-debate').innerHTML = createHeader(uiData.debate, 'debate');
+            document.getElementById('i-debate').innerHTML = createInstr(uiData.debate, 'debate');
+            document.getElementById('c-debate').innerHTML = debateData.map((item, idx) => createCard(item, `deb-${idx}`, true)).join('');
+
+            document.getElementById('h-story').innerHTML = createHeader(uiData.story, 'story');
+            document.getElementById('i-story').innerHTML = createInstr(uiData.story, 'story');
+            document.getElementById('c-story').innerHTML = storyData.map((item, idx) => createCard(item, `story-${idx}`, false)).join('');
+
+            document.getElementById('h-present').innerHTML = createHeader(uiData.presentation, 'present');
+            document.getElementById('i-present').innerHTML = createInstr(uiData.presentation, 'present');
+            document.getElementById('c-present').innerHTML = presentData.map((item, idx) => createCard(item, `pres-${idx}`, false)).join('');
+
+            document.getElementById('h-interview').innerHTML = createHeader(uiData.interview, 'int');
+            document.getElementById('i-interview').innerHTML = createInstr(uiData.interview, 'int');
+            document.getElementById('c-interview').innerHTML = interviewData.map((item, idx) => createCard(item, `int-${idx}`, true)).join('');
+
+            document.getElementById('h-discuss').innerHTML = createHeader(uiData.discuss, 'disc');
+            document.getElementById('i-discuss').innerHTML = createInstr(uiData.discuss, 'disc');
+            document.getElementById('c-discuss').innerHTML = discussData.map((item, idx) => createCard(item, `disc-${idx}`, false)).join('');
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            renderContent();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => {};
+            }
+        });
+    </script>
+</body>
+</html>
