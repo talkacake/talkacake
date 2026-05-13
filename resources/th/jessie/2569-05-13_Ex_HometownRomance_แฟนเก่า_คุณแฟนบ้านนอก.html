@@ -2,43 +2,46 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>ฝึกพูดภาษาไทย</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>แฟนเก่า</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- React Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Fonts: Sarabun -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        body { 
-            font-family: 'Sarabun', sans-serif; 
-            background-color: #f0fdfa; /* Sky-50 */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
-        .btn-press { transition: transform 0.1s; }
-        .btn-press:active { transform: scale(0.95); }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes slideIn {
+        .font-thai { font-family: 'Sarabun', sans-serif; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-slide { animation: slideIn 0.3s ease-out forwards; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
         .animate-shake { animation: shake 0.3s ease-in-out; }
+        .animate-slide { animation: fadeIn 0.3s ease-out forwards; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="text-slate-800">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -50,7 +53,8 @@
                 refresh: <><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></>,
                 book: <><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></>,
                 message: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>,
-                zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>,
+                play: <polygon points="5 3 19 12 5 21 5 3"/>
             };
             return (
                 <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -70,7 +74,7 @@
         };
 
         // --- Core SmartText Component ---
-        const SmartText = ({ th, ipa, en, emoji = "", size = "md", isTitle = false, isButton = false }) => {
+        const SmartText = ({ th, ipa, en, emoji = "", size = "md", isTitle = false, isButton = false, titleColor = "text-slate-800" }) => {
             const [showIPA, setShowIPA] = useState(false);
             const [showEN, setShowEN] = useState(false);
 
@@ -104,18 +108,18 @@
                             <div className="flex items-center gap-2 mb-2 flex-wrap">
                                 <button 
                                     onClick={(e) => speakThai(th, e)}
-                                    className={`p-2 rounded-full btn-press shrink-0 ${isTitle ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-sky-100 text-sky-600 hover:bg-sky-200'}`}
+                                    className={`p-2 rounded-full btn-press shrink-0 ${isTitle ? (titleColor.includes('white') ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-white text-slate-500 shadow-sm hover:bg-slate-50') : 'bg-rose-100 text-rose-600 hover:bg-rose-200'}`}
                                 >
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                    <Icon name="play" size={16} />
                                 </button>
-                                <span className={`${textSize} ${isTitle ? 'text-white' : 'text-slate-800'} leading-snug`}>{th}</span>
+                                <span className={`${textSize} ${isTitle ? titleColor : 'text-slate-800'} leading-snug break-words font-thai`}>{th}</span>
                             </div>
 
                             <div className={`flex gap-2 ${isTitle ? 'justify-center' : ''}`}>
                                 {ipa && (
                                     <button 
                                         onClick={() => setShowIPA(!showIPA)}
-                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showIPA ? (isTitle ? 'bg-white/30 text-white border-white/50' : 'bg-indigo-100 text-indigo-700 border-indigo-200') : (isTitle ? 'bg-white/10 text-white/70 border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200')}`}
+                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showIPA ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-400 border-slate-200'} ${isTitle ? (titleColor.includes('white') ? '!bg-white/20 !border-white/30 !text-white' : 'bg-white shadow-sm hover:bg-slate-50') : ''}`}
                                     >
                                         IPA
                                     </button>
@@ -123,87 +127,198 @@
                                 {en && (
                                     <button 
                                         onClick={() => setShowEN(!showEN)}
-                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showEN ? (isTitle ? 'bg-white/30 text-white border-white/50' : 'bg-emerald-100 text-emerald-700 border-emerald-200') : (isTitle ? 'bg-white/10 text-white/70 border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200')}`}
+                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showEN ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-400 border-slate-200'} ${isTitle ? (titleColor.includes('white') ? '!bg-white/20 !border-white/30 !text-white' : 'bg-white shadow-sm hover:bg-slate-50') : ''}`}
                                     >
                                         EN
                                     </button>
                                 )}
                             </div>
 
-                            {showIPA && <div className={`mt-2 font-mono text-sm pl-3 border-l-2 ${isTitle ? 'text-center border-l-0 text-sky-100 border-sky-300' : 'text-left border-indigo-300 text-indigo-600'}`}>{ipa}</div>}
-                            {showEN && <div className={`mt-1 text-sm pl-3 border-l-2 ${isTitle ? 'text-center border-l-0 text-emerald-100 border-emerald-300' : 'text-left border-emerald-300 text-emerald-700'}`}>{en}</div>}
+                            {showIPA && <div className={`mt-2 font-mono text-sm pl-3 border-l-2 ${isTitle ? 'text-center border-l-0 text-amber-600' : 'text-left border-amber-300 text-amber-600'} ${isTitle && titleColor.includes('white') ? '!text-rose-100' : ''}`}>{ipa}</div>}
+                            {showEN && <div className={`mt-1 text-sm pl-3 border-l-2 ${isTitle ? 'text-center border-l-0 text-indigo-700 italic' : 'text-left border-indigo-300 text-indigo-700'} ${isTitle && titleColor.includes('white') ? '!text-rose-100' : ''}`}>{en}</div>}
                         </div>
                     </div>
                 </div>
             );
         };
 
-        // --- Exercise Components ---
-        
-        const MultipleChoice = ({ items, title, icon, colorTheme }) => {
+        // --- Data ---
+        // Target Vocab
+        const targetVocab = [
+            { t: "นาน", i: "naan", e: "long time", em: "⏳" },
+            { t: "ป่วย", i: "bpùuai", e: "sick", em: "🤒" },
+            { t: "คิดถึง", i: "kít-tʉ̌ng", e: "miss (someone)", em: "🥺" }
+        ];
+
+        // Target Structures
+        const targetStructures = [
+            { t: "ไม่เจอกันนานเลยนะ", i: "mâi jer gan naan ləəi ná", e: "Long time no see", em: "👋" },
+            { t: "ดูเหมือน...", i: "duu mʉ̌an...", e: "Looks like... / Seems like...", em: "👀" }
+        ];
+
+        // Video Script
+        const scriptData = [
+            { speaker: "เจน", t: "ไม่เจอกันนานเลยนะ", i: "mâi jer gan naan ləəi ná", e: "Haven't seen you for a long time.", em: "👱‍♀️" },
+            { speaker: "เจน", t: "ศิเป็นยังไงบ้าง", i: "Sì bpen yang-ngai bâang", e: "How are you, Si?", em: "👱‍♀️" },
+            { speaker: "เจน", t: "สบายดีไหม", i: "sà-baai dii mǎi", e: "Are you doing well?", em: "👱‍♀️" },
+            { speaker: "ศิ", t: "ศิดูเหมือนคนป่วยเหรอ", i: "Sì duu mʉ̌an kon bpùuai rɔ̌ɔ", e: "Do I look like a sick person?", em: "👩🏻" },
+            { speaker: "เจน", t: "เจนคิดถึงศินะ", i: "Jen kít-tʉ̌ng Sì ná", e: "Jane misses Si, you know.", em: "👱‍♀️" }
+        ];
+
+        const qaData = [
+            {
+                q: { th: "คุณเคยไปเที่ยวคนเดียวไหม?", ipa: "kun kəəi bpai tîao kon diao mǎi?", en: "Have you ever traveled alone?" },
+                a: { th: "เคย สนุกมาก", ipa: "kəəi, sà-nùk mâak", en: "Yes, it was very fun." }
+            },
+            {
+                q: { th: "ถ้าป่วย คุณจะทำยังไง?", ipa: "tâa bpùai, kun jà tam yang ngai?", en: "If you are sick, what will you do?" },
+                a: { th: "ก็ต้องไปปรึกษาหมอ", ipa: "gɔ̂ɔ dtɔ̂ɔng bpai bprʉ̀k sǎa mɔ̌ɔ", en: "I have to consult a doctor." }
+            },
+            {
+                q: { th: "เมื่อวานเกิดอะไรขึ้น?", ipa: "mʉ̂ʉ waan gə̀ət à-rai kʉ̂n?", en: "What happened yesterday?" },
+                a: { th: "รถชนกัน", ipa: "rót chon gan", en: "Cars crashed." }
+            },
+            {
+                q: { th: "คุณหิวไหม?", ipa: "kun hǐu mǎi?", en: "Are you hungry?" },
+                a: { th: "กินอาหารให้ตรงเวลานะ", ipa: "gin aa-hǎan hâi dtrong wee-laa ná", en: "Eat on time." }
+            },
+            {
+                q: { th: "เขาเป็นคนยังไง?", ipa: "kǎo bpen kon yang ngai?", en: "What kind of person is he?" },
+                a: { th: "เขาใจร้อนและขี้โมโห", ipa: "kǎo jai rɔ́ɔn lɛ́ kîi moo-hǒo", en: "He is hot-tempered and gets angry easily." }
+            }
+        ];
+
+        const orderData = [
+            {
+                jumbled: [{th:"พี่คะ "}, {th:"นวด "}, {th:"หน่อยค่ะ "}, {th:"ช่วย "}],
+                target: { th: "พี่คะ ช่วย นวด หน่อยค่ะ ", ipa: "pîi ká chûai nûat nɔ̀ɔi kâ", en: "Sister, please help massage a bit." }
+            },
+            {
+                jumbled: [{th:"ไม่ควร "}, {th:"ขับรถ "}, {th:"คนแก่ "}],
+                target: { th: "คนแก่ ไม่ควร ขับรถ ", ipa: "kon gɛ̀ɛ mâi kuan kàp rót", en: "Old people shouldn't drive." }
+            },
+            {
+                jumbled: [{th:"ซื้อ "}, {th:"อย่างอื่น "}, {th:"จะ "}],
+                target: { th: "จะ ซื้อ อย่างอื่น ", ipa: "jà sʉ́ʉ yàang ʉ̀ʉn", en: "Will buy something else." }
+            },
+            {
+                jumbled: [{th:"ดูเหมือน "}, {th:"ป่วย "}, {th:"คน "}],
+                target: { th: "ดูเหมือน คน ป่วย ", ipa: "duu mʉ̌an kon bpùai", en: "Looks like a sick person." }
+            },
+            {
+                jumbled: [{th:"กัน "}, {th:"คุย "}, {th:"อะไร "}],
+                target: { th: "คุย อะไร กัน ", ipa: "kui à-rai gan", en: "What are you talking about?" }
+            }
+        ];
+
+        const gapFillData = [
+            {
+                pre: "ไม่ได้เจอ", post: "นานเลยนะ",
+                options: [
+                    { th: "กอด", correct: false },
+                    { th: "กัน", correct: true },
+                    { th: "ไป", correct: false }
+                ],
+                full: { th: "ไม่ได้เจอกันนานเลยนะ", ipa: "mâi dâi jəə gan naan ləəi ná", en: "Haven't seen each other for a long time." }
+            },
+            {
+                pre: "เขา", post: "คนป่วยเหรอ",
+                options: [
+                    { th: "รู้สึก", correct: false },
+                    { th: "ดูเหมือน", correct: true },
+                    { th: "โกรธ", correct: false }
+                ],
+                full: { th: "เขาดูเหมือนคนป่วยเหรอ", ipa: "kǎo duu mʉ̌an kon bpùai rɔ̌ɔ", en: "Does he look like a sick person?" }
+            },
+            {
+                pre: "ขับรถช้าๆ นะคะ ทาง", post: "",
+                options: [
+                    { th: "ปลอดภัย", correct: false },
+                    { th: "อันตราย", correct: true },
+                    { th: "สวย", correct: false }
+                ],
+                full: { th: "ขับรถช้าๆ นะคะ ทางอันตราย", ipa: "kàp rót cháa-cháa ná ká taang an-dtà-raai", en: "Drive slowly please, the road is dangerous." }
+            },
+            {
+                pre: "มี", post: "อะไรกินบ้าง?",
+                options: [
+                    { th: "หมา", correct: false },
+                    { th: "ข่าว", correct: false },
+                    { th: "อาหาร", correct: true }
+                ],
+                full: { th: "มีอาหารอะไรกินบ้าง?", ipa: "mii aa-hǎan à-rai gin bâang?", en: "Is there any food to eat?" }
+            },
+            {
+                pre: "ฉัน", post: "เธอมากนะ",
+                options: [
+                    { th: "คิดถึง", correct: true },
+                    { th: "ลืม", correct: false },
+                    { th: "ทิ้ง", correct: false }
+                ],
+                full: { th: "ฉันคิดถึงเธอมากนะ", ipa: "chǎn kít-tʉ̌ng təə mâak ná", en: "I miss you very much." }
+            }
+        ];
+
+        const matchingData = [
+            { id: 1, th: "คิดถึง", emoji: "🥺" },
+            { id: 2, th: "ป่วย", emoji: "🤒" },
+            { id: 3, th: "นาน", emoji: "⏳" },
+            { id: 4, th: "โกรธ", emoji: "😠" },
+            { id: 5, th: "เพื่อน", emoji: "👫" }
+        ];
+
+        const errorData = [
+            {
+                sentence: ["เขา", "บอก", "ว่า", "กินยา", "ไม่", "สบาย"],
+                wrongIdx: 3,
+                full: { th: "เขาบอกว่าไม่สบาย", ipa: "kǎo bɔ̀ɔk wâa mâi sà-baai", en: "He said he is not well." }
+            },
+            {
+                sentence: ["ขับรถ", "หมอ", "ช้าๆ", "นะ", "อันตราย"],
+                wrongIdx: 1,
+                full: { th: "ขับรถช้าๆ นะ อันตราย", ipa: "kàp rót cháa-cháa ná an-dtà-raai", en: "Drive slowly, it's dangerous." }
+            },
+            {
+                sentence: ["ฉัน", "คิดถึง", "ร่ม", "ครอบครัว", "มาก"],
+                wrongIdx: 2,
+                full: { th: "ฉันคิดถึงครอบครัวมาก", ipa: "chǎn kít-tʉ̌ng krɔ̂ɔp-krua mâak", en: "I miss my family very much." }
+            },
+            {
+                sentence: ["เห็น", "หมา", "แว่นตา", "ทะเล", "ไหม"],
+                wrongIdx: 2,
+                full: { th: "เห็นหมาทะเลไหม", ipa: "hěn mǎa tá-lee mǎi", en: "Do you see the sea dog (seal)?" } 
+            },
+            {
+                sentence: ["เพื่อน", "เก่า", "ตกหมึก", "ไม่ได้", "เจอ", "กัน", "นาน"],
+                wrongIdx: 2,
+                full: { th: "เพื่อนเก่า ไม่ได้เจอกันนาน", ipa: "pʉ̂an gào mâi dâi jəə gan naan", en: "Old friend, haven't seen each other for a long time." }
+            }
+        ];
+
+        const QandA = ({ items }) => {
             const [currentIdx, setCurrentIdx] = useState(0);
-            const [showAnswer, setShowAnswer] = useState(false);
-            const [selected, setSelected] = useState(null);
-
-            const handleSelect = (idx, isCorrect) => {
-                setSelected(idx);
-                setShowAnswer(true);
-                if(isCorrect) speakThai(items[currentIdx].options[idx].th);
-            };
-
-            const next = () => {
-                setShowAnswer(false);
-                setSelected(null);
-                setCurrentIdx(c => c + 1);
-            };
-
-            const q = items[currentIdx];
-
             return (
-                <div className={`bg-${colorTheme}-50 p-5 rounded-[2rem] shadow-sm border border-${colorTheme}-100 mb-6`}>
-                    <SmartText th={title.th} ipa={title.ipa} en={title.en} emoji={icon} size="lg" />
+                <div className="bg-sky-50 p-5 rounded-[2rem] shadow-sm border border-sky-100 mb-6">
+                    <SmartText th="ถาม-ตอบ" ipa="tǎam-dtɔ̀ɔp" en="Q&A" emoji="💬" size="lg" isTitle={true} titleColor="text-sky-700"/>
                     <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
                     
-                    <div className="bg-white p-4 rounded-xl border border-slate-200 mb-4 shadow-sm">
-                        <span className={`text-xs font-bold text-${colorTheme}-500 uppercase tracking-widest block mb-2`}>Q</span>
-                        <SmartText th={q.q.th} ipa={q.q.ipa} en={q.q.en} emoji="🗣️" />
+                    <div className="bg-white p-4 rounded-xl border border-sky-200 mb-4 shadow-sm">
+                        <span className="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-2">Q</span>
+                        <SmartText th={items[currentIdx].q.th} ipa={items[currentIdx].q.ipa} en={items[currentIdx].q.en} emoji="❓" />
                     </div>
 
-                    <div className="space-y-3 mb-6">
-                        {q.options.map((opt, i) => {
-                            let btnStyle = "bg-white border-slate-200 text-slate-700";
-                            if (showAnswer) {
-                                if (opt.correct) btnStyle = "bg-emerald-100 border-emerald-500 text-emerald-800";
-                                else if (selected === i) btnStyle = "bg-rose-100 border-rose-500 text-rose-800";
-                                else btnStyle = "bg-slate-50 border-slate-200 text-slate-400 opacity-50";
-                            }
-
-                            return (
-                                <button 
-                                    key={i} 
-                                    disabled={showAnswer}
-                                    onClick={() => handleSelect(i, opt.correct)}
-                                    className={`w-full p-4 rounded-xl border-2 font-bold text-lg text-left transition-all btn-press ${btnStyle}`}
-                                >
-                                    {opt.th}
-                                </button>
-                            );
-                        })}
+                    <div className="bg-white p-4 rounded-xl border border-sky-200 mb-4 shadow-sm">
+                        <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest block mb-2">A</span>
+                        <SmartText th={items[currentIdx].a.th} ipa={items[currentIdx].a.ipa} en={items[currentIdx].a.en} emoji="💡" />
                     </div>
 
-                    {showAnswer && (
-                        <div className="animate-slide">
-                            <SmartText th={q.options.find(o=>o.correct).th} ipa={q.options.find(o=>o.correct).ipa} en={q.options.find(o=>o.correct).en} emoji="✅" />
-                            {currentIdx < items.length - 1 && (
-                                <button onClick={next} className={`w-full mt-4 py-3 bg-${colorTheme}-500 text-white rounded-xl font-bold btn-press shadow-md`}>
-                                    <SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next Question" isButton={true} />
-                                </button>
-                            )}
-                        </div>
-                    )}
+                    <div className="flex justify-between mt-4">
+                        <button onClick={() => setCurrentIdx(prev => Math.max(0, prev - 1))} disabled={currentIdx === 0} className="p-3 bg-white text-slate-500 rounded-xl font-bold btn-press disabled:opacity-50">⬅️</button>
+                        <button onClick={() => setCurrentIdx(prev => Math.min(items.length - 1, prev + 1))} disabled={currentIdx === items.length - 1} className="px-6 py-3 bg-sky-500 text-white rounded-xl font-bold btn-press shadow-md disabled:opacity-50"><SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true}/></button>
+                    </div>
                 </div>
             );
-        };
+        }
 
         const OrderSentence = ({ items }) => {
             const [currentIdx, setCurrentIdx] = useState(0);
@@ -212,13 +327,10 @@
             const [isCorrect, setIsCorrect] = useState(false);
             const [showError, setShowError] = useState(false);
 
-            useEffect(() => {
-                resetQuestion();
-            }, [currentIdx]);
+            useEffect(() => { resetQuestion(); }, [currentIdx]);
 
             const resetQuestion = () => {
-                const words = items[currentIdx].jumbled;
-                setAvailableWords([...words]);
+                setAvailableWords([...items[currentIdx].jumbled]);
                 setSelectedWords([]);
                 setIsCorrect(false);
                 setShowError(false);
@@ -244,25 +356,19 @@
             const checkAnswer = () => {
                 const currentAnswer = selectedWords.map(w => w.th).join('').replace(/\s+/g, '');
                 const targetAnswer = items[currentIdx].target.th.replace(/\s+/g, '');
-
                 if (currentAnswer === targetAnswer && availableWords.length === 0) {
-                    setIsCorrect(true);
-                    setShowError(false);
-                    speakThai(items[currentIdx].target.th);
-                } else {
-                    setShowError(true);
-                }
+                    setIsCorrect(true); setShowError(false); speakThai(items[currentIdx].target.th);
+                } else { setShowError(true); }
             };
 
             return (
                 <div className="bg-orange-50 p-5 rounded-[2rem] shadow-sm border border-orange-100 mb-6">
-                    <SmartText th="เรียงประโยค" ipa="riang bprà-yòok" en="Order Sentence" emoji="🧩" size="lg" />
-                    
+                    <SmartText th="เรียงประโยค" ipa="riang bprà-yòok" en="Order Sentence" emoji="🧩" size="lg" isTitle={true} titleColor="text-orange-700"/>
                     <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
                     
                     <div className="min-h-[80px] p-4 bg-white rounded-xl mb-4 border-2 border-dashed border-orange-200 flex flex-wrap gap-2 items-center shadow-inner">
                         {selectedWords.map((w, i) => (
-                            <button key={i} onClick={() => unselectWord(w, i)} className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold text-lg shadow-sm btn-press">
+                            <button key={i} onClick={() => unselectWord(w, i)} className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold text-lg shadow-sm btn-press font-thai">
                                 {w.th.trim()}
                             </button>
                         ))}
@@ -270,7 +376,7 @@
 
                     <div className="flex flex-wrap gap-2 mb-6 justify-center">
                         {availableWords.map((w, i) => (
-                            <button key={i} onClick={() => selectWord(w, i)} className="px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg font-bold text-lg hover:bg-slate-50 btn-press transition-colors">
+                            <button key={i} onClick={() => selectWord(w, i)} className="px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg font-bold text-lg hover:bg-slate-50 btn-press shadow-sm font-thai">
                                 {w.th.trim()}
                             </button>
                         ))}
@@ -278,16 +384,14 @@
 
                     <div className="flex flex-col items-center gap-3 mb-4">
                         {availableWords.length === 0 && !isCorrect && (
-                            <button onClick={checkAnswer} className="px-8 py-3 bg-slate-800 text-white rounded-xl font-bold text-lg btn-press shadow-md transition-colors w-full">
-                                <SmartText th="ตรวจคำตอบ" ipa="dtruat kam-dtɔ̀ɔp" en="Check Answer" isButton={true} />
+                            <button onClick={checkAnswer} className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-lg btn-press shadow-md">
+                                <SmartText th="ตรวจคำตอบ" ipa="dtruat kam-dtɔ̀ɔp" en="Check Answer" isButton={true}/>
                             </button>
                         )}
-                        {showError && (
-                            <div className="text-rose-500 font-bold animate-shake text-sm flex flex-col items-center">
-                                <span>❌</span>
-                                <SmartText th="ลองใหม่อีกครั้ง" ipa="lɔɔng mài ìik kráng" en="Try again" isButton={true} />
-                            </div>
-                        )}
+                        {showError && <div className="text-rose-500 font-bold animate-shake text-sm flex flex-col items-center">
+                            <span>❌</span>
+                            <SmartText th="ลองใหม่อีกครั้ง" ipa="lɔɔng mài ìik kráng" en="Try again" isButton={true}/>
+                        </div>}
                     </div>
 
                     {isCorrect && (
@@ -297,14 +401,9 @@
                     )}
 
                     <div className="flex justify-between items-center gap-2">
-                        <button onClick={resetQuestion} className="px-4 py-2 text-slate-500 bg-white border border-slate-200 rounded-xl font-bold btn-press flex-1">
-                             <SmartText th="เริ่มใหม่" ipa="rə̂əm mài" en="Restart" isButton={true} />
-                        </button>
-                        {isCorrect && currentIdx < items.length - 1 && (
-                            <button onClick={() => setCurrentIdx(currentIdx + 1)} className="px-4 py-2 bg-orange-500 text-white rounded-xl font-bold btn-press shadow-md flex-1">
-                                <SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true} />
-                            </button>
-                        )}
+                        <button onClick={resetQuestion} className="flex-1 py-2 text-slate-500 bg-white border border-slate-200 rounded-xl font-bold btn-press"><SmartText th="เริ่มใหม่" ipa="rə̂əm mài" en="Start over" isButton={true}/></button>
+                        {isCorrect && currentIdx < items.length - 1 && <button onClick={() => setCurrentIdx(currentIdx + 1)} className="flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold btn-press shadow-md"><SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true}/></button>}
+                        {isCorrect && currentIdx === items.length - 1 && <span className="flex-1 text-center text-emerald-600 font-bold">🎉</span>}
                     </div>
                 </div>
             );
@@ -330,10 +429,10 @@
 
             return (
                 <div className="bg-purple-50 p-5 rounded-[2rem] shadow-sm border border-purple-100 mb-6">
-                    <SmartText th="เติมคำในช่องว่าง" ipa="dtəəm kam nai chɔ̂ng wâang" en="Gap Fill" emoji="🕳️" size="lg" />
+                    <SmartText th="เติมคำในช่องว่าง" ipa="dtəəm kam nai chɔ̂ng wâang" en="Gap Fill" emoji="🕳️" size="lg" isTitle={true} titleColor="text-purple-700"/>
                     <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
                     
-                    <div className="bg-white p-6 rounded-xl border border-purple-200 mb-6 shadow-sm text-center text-xl font-bold text-slate-700 leading-relaxed">
+                    <div className="bg-white p-6 rounded-xl border border-purple-200 mb-6 shadow-sm text-center text-xl font-bold text-slate-700 leading-relaxed font-thai">
                         {q.pre} <span className={`inline-block border-b-2 px-4 min-w-[80px] ${isCorrect ? 'text-emerald-600 border-emerald-500' : (showError ? 'text-rose-500 border-rose-500' : 'border-slate-400 text-slate-400')}`}>
                             {selectedOpt !== null ? q.options[selectedOpt].th : "..."}
                         </span> {q.post}
@@ -343,7 +442,7 @@
                         {q.options.map((opt, i) => (
                             <button 
                                 key={i} onClick={() => handleSelect(i, opt.correct)} disabled={isCorrect}
-                                className={`p-4 rounded-xl border-2 font-bold text-lg transition-all btn-press
+                                className={`p-4 rounded-xl border-2 font-bold text-lg transition-all btn-press font-thai
                                     ${isCorrect && opt.correct ? 'bg-emerald-100 border-emerald-500 text-emerald-800' : 
                                       selectedOpt === i && !opt.correct ? 'bg-rose-100 border-rose-500 text-rose-800 animate-shake' : 
                                       'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
@@ -360,11 +459,8 @@
                     )}
 
                     <div className="flex justify-end">
-                        {isCorrect && currentIdx < items.length - 1 && (
-                            <button onClick={() => setCurrentIdx(c => c + 1)} className="px-6 py-2 bg-purple-500 text-white rounded-xl font-bold btn-press shadow-md w-full">
-                                <SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true} />
-                            </button>
-                        )}
+                        {isCorrect && currentIdx < items.length - 1 && <button onClick={() => setCurrentIdx(c => c + 1)} className="w-full py-3 bg-purple-500 text-white rounded-xl font-bold btn-press shadow-md"><SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true}/></button>}
+                        {isCorrect && currentIdx === items.length - 1 && <span className="w-full text-center text-emerald-600 font-bold">🎉</span>}
                     </div>
                 </div>
             );
@@ -396,12 +492,12 @@
 
             return (
                 <div className={`bg-emerald-50 p-5 rounded-[2rem] shadow-sm border border-emerald-100 mb-6 ${shaking ? 'animate-shake' : ''}`}>
-                    <SmartText th="จับคู่ความหมาย" ipa="jàp-kûu kwaam-mǎi" en="Matching" emoji="🔗" size="lg" />
+                    <SmartText th="จับคู่ความหมาย" ipa="jàp-kûu kwaam-mǎi" en="Matching" emoji="🔗" size="lg" isTitle={true} titleColor="text-emerald-700"/>
                     <div className="grid grid-cols-2 gap-4 mt-4">
                         <div className="space-y-3">
                             {pairs.map(p => (
                                 <button key={p.id} onClick={() => handleLeft(p.id)} disabled={solved.includes(p.id)}
-                                    className={`w-full p-4 rounded-xl border-2 font-bold text-left btn-press transition-colors
+                                    className={`w-full p-4 rounded-xl border-2 font-bold text-left btn-press transition-colors font-thai
                                         ${solved.includes(p.id) ? 'bg-emerald-200 border-emerald-500 text-emerald-800 opacity-60' : 
                                           selectedLeft === p.id ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white border-slate-200 text-slate-700'}`}
                                 >
@@ -441,10 +537,10 @@
 
             return (
                 <div className="bg-rose-50 p-5 rounded-[2rem] shadow-sm border border-rose-100 mb-6">
-                    <SmartText th="หาคำที่ผิด" ipa="hǎa kam tîi pìt" en="Find the mistake" emoji="🔍" size="lg" />
+                    <SmartText th="หาคำที่ผิด" ipa="hǎa kam tîi pìt" en="Find the mistake" emoji="🔍" size="lg" isTitle={true} titleColor="text-rose-700"/>
                     <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
                     
-                    <div className="flex flex-wrap justify-center gap-2 mb-6 bg-white p-6 rounded-xl border border-rose-200 shadow-sm">
+                    <div className="flex flex-wrap justify-center gap-2 mb-6 bg-white p-6 rounded-xl border border-rose-200 shadow-sm font-thai">
                         {q.sentence.map((w, i) => (
                             <button 
                                 key={i} onClick={() => handleSelect(i)} disabled={isCorrect}
@@ -455,12 +551,10 @@
                         ))}
                     </div>
 
-                    {showError && (
-                        <div className="text-rose-500 font-bold text-center animate-shake text-sm mb-4 flex flex-col items-center">
-                            <span>❌</span>
-                            <SmartText th="ลองหาดูดีๆ" ipa="lɔɔng hǎa duu dii-dii" en="Look carefully" isButton={true} />
-                        </div>
-                    )}
+                    {showError && <div className="text-rose-500 font-bold text-center animate-shake text-sm mb-4 flex flex-col items-center">
+                        <span>❌</span>
+                        <SmartText th="ลองหาดูดีๆ" ipa="lɔɔng hǎa duu dii-dii" en="Look carefully" isButton={true}/>
+                    </div>}
 
                     {isCorrect && (
                         <div className="animate-slide bg-white p-4 rounded-xl border border-emerald-200 mb-4">
@@ -469,336 +563,274 @@
                     )}
 
                     <div className="flex justify-end">
-                        {isCorrect && currentIdx < items.length - 1 && (
-                            <button onClick={() => setCurrentIdx(c => c + 1)} className="px-6 py-2 bg-rose-500 text-white rounded-xl font-bold btn-press shadow-md w-full">
-                                <SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true} />
-                            </button>
-                        )}
+                        {isCorrect && currentIdx < items.length - 1 && <button onClick={() => setCurrentIdx(c => c + 1)} className="w-full py-3 bg-rose-500 text-white rounded-xl font-bold btn-press shadow-md"><SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true}/></button>}
+                        {isCorrect && currentIdx === items.length - 1 && <span className="w-full text-center text-emerald-600 font-bold">🎉</span>}
                     </div>
                 </div>
             );
         };
 
-        const SimpleCard = ({ title, emoji, items, bgColor }) => (
-            <div className={`p-5 rounded-3xl shadow-sm border border-slate-100 mb-6 ${bgColor}`}>
-                <SmartText th={title.th} ipa={title.ipa} en={title.en} emoji={emoji} isTitle={true} size="lg" />
-                <div className="space-y-3 mt-4">
-                    {items.map((item, i) => (
-                        <SmartText key={i} th={item.th} ipa={item.ipa} en={item.en} emoji={item.emoji} />
-                    ))}
+        const SimpleCard = ({ title, emoji, items, bgColor }) => {
+            const colorMap = {
+                'bg-rose-50': 'text-rose-700',
+                'bg-sky-50': 'text-sky-700',
+                'bg-orange-50': 'text-orange-700',
+                'bg-emerald-50': 'text-emerald-700',
+                'bg-purple-50': 'text-purple-700',
+                'bg-blue-50': 'text-blue-700',
+                'bg-amber-50': 'text-amber-700'
+            };
+            const tColor = colorMap[bgColor] || 'text-slate-800';
+            
+            return (
+                <div className={`p-5 rounded-3xl shadow-sm border border-slate-100 mb-6 ${bgColor}`}>
+                    <SmartText th={title.th} ipa={title.ipa} en={title.en} emoji={emoji} isTitle={true} size="lg" titleColor={tColor} />
+                    <div className="space-y-3 mt-4">
+                        {items.map((item, i) => (
+                            <SmartText key={i} th={item.th} ipa={item.ipa} en={item.en} emoji={item.emoji || "💬"} />
+                        ))}
+                    </div>
                 </div>
-            </div>
-        );
-
-        // --- Data ---
-        const reviewData = {
-            qa: [
-                {
-                    q: { th: "ไปตกหมึกตอนกลางคืนใช่ไหม?", ipa: "bpai dtòk mʉ̀k dtɔɔn glaang kʉʉn châi mǎi?", en: "Go squid fishing at night, right?" },
-                    options: [
-                        { th: "ใช่จ้ะ", ipa: "châi jâ", en: "Yes.", correct: true },
-                        { th: "ป่วย", ipa: "bpùai", en: "Sick.", correct: false },
-                        { th: "ร่ม", ipa: "rôm", en: "Umbrella.", correct: false }
-                    ]
-                },
-                {
-                    q: { th: "เกิดอะไรขึ้น?", ipa: "gə̀ət à rai kʉ̂n?", en: "What happened?" },
-                    options: [
-                        { th: "กินยา", ipa: "gin yaa", en: "Take medicine.", correct: false },
-                        { th: "รถชนกัน", ipa: "rót chon gan", en: "Cars collided.", correct: true },
-                        { th: "อาบน้ำ", ipa: "àap náam", en: "Take a shower.", correct: false }
-                    ]
-                },
-                {
-                    q: { th: "ขอเช่ารถสามวันค่ะ คิดราคาเท่าไหร่คะ?", ipa: "kɔ̌ɔ châo rót sǎam wan kâ, kít raa-kaa tâo-rài ká?", en: "I'd like to rent a car for 3 days. How much?" },
-                    options: [
-                        { th: "แดดออก", ipa: "dɛ̀ɛt ɔ̀ɔk", en: "Sunny.", correct: false },
-                        { th: "หนึ่งหมื่น", ipa: "nʉ̀ng mʉ̀ʉn", en: "10,000.", correct: true },
-                        { th: "ขับหนี", ipa: "kàp nǐi", en: "Drive away.", correct: false }
-                    ]
-                },
-                {
-                    q: { th: "แอร์ไม่เย็นเลยค่ะ ช่วยดูให้หน่อย", ipa: "ɛɛ mâi yen ləəi kâ, chûai duu hâi nɔ̀ɔi", en: "The AC isn't cold at all. Please check it." },
-                    options: [
-                        { th: "อร่อยมาก", ipa: "à-rɔ̀ɔi mâak", en: "Very delicious.", correct: false },
-                        { th: "ขี้หนาว", ipa: "kîi nǎao", en: "Get cold easily.", correct: false },
-                        { th: "ได้", ipa: "dâi", en: "Can / Yes.", correct: true }
-                    ]
-                },
-                {
-                    q: { th: "ปวดคอ ทำยังไงดี?", ipa: "bpùat kɔɔ, tam yang ngai dii?", en: "My neck hurts, what should I do?" },
-                    options: [
-                        { th: "ก็ต้องไปปรึกษาหมอ", ipa: "gɔ̂ɔ dtɔ̂ɔng bpai bprʉ̀k sǎa mɔ̌ɔ", en: "You have to consult a doctor.", correct: true },
-                        { th: "ไปดูสิ", ipa: "bpai duu sì", en: "Go look.", correct: false },
-                        { th: "กอด", ipa: "gɔ̀ɔt", en: "Hug.", correct: false }
-                    ]
-                }
-            ],
-            order: [
-                {
-                    jumbled: [{th:"หมอ "}, {th:"ปรึกษา "}, {th:"ก็ต้อง "}, {th:"ไป "}],
-                    target: { th: "ก็ต้องไปปรึกษาหมอ", ipa: "gɔ̂ɔ dtɔ̂ɔng bpai bprʉ̀k sǎa mɔ̌ɔ", en: "you have to consult the doctor." }
-                },
-                {
-                    jumbled: [{th:"ดีๆหน่อย "}, {th:"ให้ "}, {th:"ดูแล "}, {th:"ร่างกายตัวเอง "}],
-                    target: { th: "ดูแลร่างกายตัวเองให้ดีๆหน่อย", ipa: "duu lɛɛ râang gaai dtua eeng hâi dii dii nɔ̀ɔi", en: "Take care of your body well, please." }
-                },
-                {
-                    jumbled: [{th:"ตอนกลางคืน "}, {th:"ไป "}, {th:"ใช่ไหม "}, {th:"ตกหมึก "}],
-                    target: { th: "ไปตกหมึกตอนกลางคืนใช่ไหม", ipa: "bpai dtòk mʉ̀k dtɔɔn glaang kʉʉn châi mǎi", en: "We go squid fishing at night, right?" }
-                },
-                {
-                    jumbled: [{th:"คนแก่ "}, {th:"ขับรถ "}, {th:"ไม่ควร "}],
-                    target: { th: "คนแก่ไม่ควรขับรถ", ipa: "kon gɛ̀ɛ mâi kuan kàp rót", en: "Old people shouldn't drive." }
-                },
-                {
-                    jumbled: [{th:"ประคบร้อน "}, {th:"ต้อง "}, {th:"ปวดคอ "}],
-                    target: { th: "ปวดคอต้องประคบร้อน", ipa: "bpùat kɔɔ dtɔ̂ng bprà kóp rɔ́ɔn", en: "Neck pain requires hot compress." }
-                }
-            ],
-            gapFill: [
-                {
-                    pre: "ไม่ได้เจอ", post: "นานเลย สบายดีไหม?",
-                    options: [
-                        { th: "กอด", correct: false },
-                        { th: "กัน", correct: true },
-                        { th: "ใกล้", correct: false }
-                    ],
-                    full: { th: "ไม่ได้เจอกันนานเลย สบายดีไหม?", ipa: "mâi dâi jəə gan naan ləəi sà-baai-dii mǎi?", en: "Haven't seen each other for a long time. Are you well?" }
-                },
-                {
-                    pre: "ขับรถช้าๆ นะคะ ทาง", post: "",
-                    options: [
-                        { th: "ปลอดภัย", correct: false },
-                        { th: "อันตราย", correct: true },
-                        { th: "สะอาด", correct: false }
-                    ],
-                    full: { th: "ขับรถช้าๆ นะคะ ทางอันตราย", ipa: "kàp rót cháa-cháa ná ká taang an-dtà-raai", en: "Drive slowly please, the road is dangerous." }
-                },
-                {
-                    pre: "ขอ", post: "ห้องหน่อยได้ไหมคะ",
-                    options: [
-                        { th: "กุญแจ", correct: true },
-                        { th: "เงิน", correct: false },
-                        { th: "หมอ", correct: false }
-                    ],
-                    full: { th: "ขอกุญแจห้องหน่อยได้ไหมคะ", ipa: "kɔ̌ɔ gun-jɛɛ hɔ̂ng nɔ̀ɔi dâi mǎi ká", en: "Can I have the room key please?" }
-                },
-                {
-                    pre: "น้ำใสมาก เห็น", post: "ทะเลเลย",
-                    options: [
-                        { th: "แก้ว", correct: false },
-                        { th: "ก้น", correct: true },
-                        { th: "ขวด", correct: false }
-                    ],
-                    full: { th: "น้ำใสมาก เห็นก้นทะเลเลย", ipa: "náam sǎi mâak hěn gôn tá-lee ləəi", en: "The water is very clear, can see the bottom of the sea." }
-                },
-                {
-                    pre: "มีอาหารอะไร", post: "บ้าง?",
-                    options: [
-                        { th: "ใคร", correct: false },
-                        { th: "หมา", correct: false },
-                        { th: "กิน", correct: true }
-                    ],
-                    full: { th: "มีอาหารอะไรกินบ้าง?", ipa: "mii aa-hǎan à-rai gin bâang?", en: "Is there any food to eat?" }
-                }
-            ],
-            matching: [
-                { id: 1, th: "ปวดคอ", emoji: "🤕" },
-                { id: 2, th: "กุญแจ", emoji: "🔑" },
-                { id: 3, th: "ทะเลสาบ", emoji: "🏞️" },
-                { id: 4, th: "โรงแรม", emoji: "🏨" },
-                { id: 5, th: "ขับรถ", emoji: "🚗" }
-            ],
-            error: [
-                {
-                    sentence: ["เขา", "บอก", "ว่า", "กินยา", "ไม่", "สบายดี"],
-                    wrongIdx: 3,
-                    full: { th: "เขาบอกว่าไม่สบายดี", ipa: "kǎo bɔ̀ɔk wâa mâi sà-baai dii", en: "He said he is not well." }
-                },
-                {
-                    sentence: ["ขับรถ", "หมอ", "ช้าๆ", "นะ", "อันตราย"],
-                    wrongIdx: 1,
-                    full: { th: "ขับรถช้าๆ นะ อันตราย", ipa: "kàp rót cháa-cháa ná an-dtà-raai", en: "Drive slowly, it's dangerous." }
-                },
-                {
-                    sentence: ["ฉัน", "จอง", "ร่ม", "โรงแรม", "ไว้"],
-                    wrongIdx: 2,
-                    full: { th: "ฉันจองโรงแรมไว้", ipa: "chǎn jɔɔng roong-rɛɛm wái", en: "I booked a hotel." }
-                },
-                {
-                    sentence: ["เห็น", "ก้น", "แว่นตา", "ทะเล", "ไหม"],
-                    wrongIdx: 2,
-                    full: { th: "เห็นก้นทะเลไหม", ipa: "hěn gôn tá-lee mǎi", en: "Do you see the bottom of the sea?" }
-                },
-                {
-                    sentence: ["เพื่อน", "เก่า", "ตกหมึก", "ไม่ได้", "เจอ", "กัน", "นาน"],
-                    wrongIdx: 2,
-                    full: { th: "เพื่อนเก่า ไม่ได้เจอกันนาน", ipa: "pʉ̂an gào mâi dâi jəə gan naan", en: "Old friend, haven't seen each other for a long time." }
-                }
-            ]
+            );
         };
 
-        const scenariosData = [
-            {
-                title: { th: "นวด", ipa: "nûat", en: "Massage" }, emoji: "💆‍♀️", color: "bg-rose-50",
-                items: [
-                    { th: "บ่า ไหล่", ipa: "bàa lài", en: "Shoulders", emoji: "💪" },
-                    { th: "เจ็บ' กับ 'ปวด' ต่างกันยังไง", ipa: "jèp' gàp 'bpùat' dtàang gan yang ngai", en: "How is 'jeb' and 'bpuad' different from one another?", emoji: "🤕🩹" },
-                    { th: "ดูแลร่างกายตัวเองให้ดีๆหน่อย", ipa: "duu lɛɛ râang gaai dtua eeng hâi dii dii nɔ̀ɔi", en: "Take care of your body well, please.", emoji: "💪🧘‍♀️" },
-                    { th: "ปวดคอ ต้อง ประคบร้อน", ipa: "bpùat kɔɔ dtɔ̂ng bprà kóp rɔ́ɔn", en: "Neck pain, must use heat pack", emoji: "🔥🩹" },
-                    { th: "ทำกายภาพ", ipa: "gaai yá pâap", en: "Do physiotherapy", emoji: "🧑‍⚕️🧘" }
-                ]
-            },
-            {
-                title: { th: "ตกหมึก", ipa: "dtòk mʉ̀k", en: "Squid Fishing" }, emoji: "🦑", color: "bg-indigo-50",
-                items: [
-                    { th: "เรือ", ipa: "rʉa", en: "Boat", emoji: "⛵" },
-                    { th: "ตอนกลางคืน", ipa: "glaang kʉʉn", en: "nighttime / in the middle of the night", emoji: "🌙🌃" },
-                    { th: "ทะเล", ipa: "tá lee", en: "sea", emoji: "🌊" },
-                    { th: "ต้ม", ipa: "dtôm", en: "Boil", emoji: "🍲" },
-                    { th: "รสจัด", ipa: "rót jàt", en: "Strong flavour", emoji: "🌶️🔥" }
-                ]
-            },
-            {
-                title: { th: "Snorkel & พายเรือ Kayak", ipa: "Snorkel & paai rʉa Kayak", en: "Snorkeling & Kayaking" }, emoji: "🤿🛶", color: "bg-cyan-50",
-                items: [
-                    { th: "ดำน้ำ", ipa: "dam náam", en: "Scuba diving", emoji: "🤿" },
-                    { th: "แดดออก", ipa: "dɛ̀ɛt ɔ̀ɔk", en: "sunny", emoji: "☀️" },
-                    { th: "ครีมกันแดด", ipa: "kriim gan dɛ̀ɛt", en: "suncream", emoji: "🧴☀️" },
-                    { th: "ก้นทะเล", ipa: "gôn tá lee", en: "Bottom of the sea", emoji: "🌊" },
-                    { th: "เหนื่อย", ipa: "nʉ̀ai", en: "Tired", emoji: "😫😴" }
-                ]
-            },
-            {
-                title: { th: "เช่ารถ", ipa: "châo rót", en: "Rent a car" }, emoji: "🚗", color: "bg-amber-50",
-                items: [
-                    { th: "เช่า", ipa: "châo", en: "Rent", emoji: "🏠🔑" },
-                    { th: "ขับรถเป็นป่ะเนี่ย", ipa: "kàp rót bpen bpà nîa", en: "Can you drive?!", emoji: "🚗" },
-                    { th: "ประหยัดน้ำมัน", ipa: "bprà yàt náam man", en: "Saves gas/petrol", emoji: "⛽️" },
-                    { th: "ป้ายทะเบียนรถ", ipa: "bpâai tá bian rót", en: "car license plate ", emoji: "🚗🪪" },
-                    { th: "ค่าธรรมเนียม", ipa: "kâa tam niam", en: "Fees", emoji: "💸" }
-                ]
-            },
-            {
-                title: { th: "ขับรถในเกาะ", ipa: "kàp rót nai gɔ̀", en: "Driving on the island" }, emoji: "🛣️", color: "bg-orange-50",
-                items: [
-                    { th: "อันตราย", ipa: "an dtà raai", en: "dangerous", emoji: "⚠️" },
-                    { th: "ช้า", ipa: "cháa", en: "slow", emoji: "🐢" },
-                    { th: "เกาะกลางถนน", ipa: "gɔ̀ glaang tà nǒn", en: "traffic island / street isle (middle road)", emoji: "🚧" },
-                    { th: "ข้างถนน", ipa: "kâang tà nǒn", en: "on the side of the road", emoji: "🛣️" },
-                    { th: "แซง", ipa: "sɛɛng", en: "go past / overtake", emoji: "🚗💨" }
-                ]
-            },
-            {
-                title: { th: "Homestay (Talk to the host)", ipa: "Homestay", en: "Homestay" }, emoji: "🏡", color: "bg-green-50",
-                items: [
-                    { th: "กุญแจ", ipa: "gun jɛɛ", en: "Keys", emoji: "🔑" },
-                    { th: "แอร์", ipa: "ae", en: "Air conditioner", emoji: "❄️" },
-                    { th: "กินอาหารให้ตรงเวลา", ipa: "gin aa hǎan hâi dtrong wee laa", en: "Eat right on time.", emoji: "⏰🍽️" },
-                    { th: "ร้านสะดวกซื้อ", ipa: "ráan sà dùak sʉ́ʉ", en: "Convenience store", emoji: "🏪" },
-                    { th: "จ่ายเงิน", ipa: "jàai ngən", en: "pay", emoji: "💸" }
-                ]
-            },
-            {
-                title: { th: "โรงแรม", ipa: "roong rɛɛm", en: "Hotel" }, emoji: "🏨", color: "bg-blue-50",
-                items: [
-                    { th: "จอง", ipa: "jɔɔng", en: "book / reserve", emoji: "📖📝" },
-                    { th: "ผ้าปูที่นอน", ipa: "pâa bpuu tîi nɔɔn", en: "Bed sheets", emoji: "🛏️🛌" },
-                    { th: "ผ้าห่ม", ipa: "pâa hòm", en: "Blankets", emoji: "🛏️" },
-                    { th: "ปรับอุณหภูมิได้", ipa: "bpràp un hà puum dâi", en: "Can adjust the temperature", emoji: "🌡️🔧" },
-                    { th: "เที่ยงคืน", ipa: "tîang kʉʉn", en: "midnight", emoji: "🌙🕛" }
-                ]
-            },
-            {
-                title: { th: "เจอเพื่อนคนไทย", ipa: "jəə pʉ̂an kon tai", en: "Meeting a Thai friend" }, emoji: "🇹🇭", color: "bg-fuchsia-50",
-                items: [
-                    { th: "เพื่อน", ipa: "pʉ̂an", en: "Friends", emoji: "👫" },
-                    { th: "กอด", ipa: "gɔ̀ɔt", en: "Hug", emoji: "🤗" },
-                    { th: "ไม่ได้ไปข้างนอก", ipa: "mâi dâi bpai kâang nɔ̂ɔk", en: "Didn't go outside", emoji: "🏠🚫" },
-                    { th: "เลี้ยง", ipa: "líiang", en: "Treat / Shout someone", emoji: "🍻💸" },
-                    { th: "เม้ามอย", ipa: "máao mɔɔi", en: "chit-chat", emoji: "💬🗣️" }
-                ]
-            }
-        ];
+        const LessonSection = () => {
+            const [showScript, setShowScript] = useState(false);
+            const [currentQ, setCurrentQ] = useState(0);
+            const [selectedA, setSelectedA] = useState(null);
+            const [showAns, setShowAns] = useState(false);
 
-        const extensionData = [
-            {
-                title: { th: "บทบาทสมมติ (Role-play)", ipa: "bòt-bàat sǒm-mút", en: "Role-play" }, emoji: "🎭",
-                items: [
-                    { th: "สถานการณ์: คุณเช่ารถขับไปหาเพื่อน แต่รถเสีย แอร์ไม่เย็น และหลงทาง", ipa: "sà-tǎan-ná-gaan: kun châo rót kàp bpai hǎa pʉ̂an dtɛ̀ɛ rót sǐa, ɛɛ mâi yen, lɛ́ lǒng taang", en: "Situation: You rented a car to see a friend, but it broke down, AC isn't cold, and you're lost." },
-                    { th: "เพื่อน: ทำไมมาถึงสาย เกิดอะไรขึ้น?", ipa: "pʉ̂an: tam-mai maa tʉ̌ng sǎai gə̀ət à-rai kʉ̂n?", en: "Friend: Why are you late? What happened?" },
-                    { th: "คุณ: เล่าปัญหาให้ฟัง และถามว่า ทำยังไงดี?", ipa: "kun: lâo bpan-hǎa hâi fang lɛ́ tǎam wâa tam yang ngai dii?", en: "You: Explain the problem and ask what to do." }
-                ]
-            },
-            {
-                title: { th: "เกมพูดคุย (Speaking Game)", ipa: "geem pûut kui", en: "Speaking Game" }, emoji: "🎲",
-                items: [
-                    { th: "คุณเพิ่งทำข้อเท้าพลิกตอนลงเรือไปตกหมึก", ipa: "kun pə̂ng tam kɔ̂ɔ-táao plík dtɔɔn long rʉa bpai dtòk mʉ̀k", en: "You just sprained your ankle getting off the boat to go squid fishing." },
-                    { th: "หมอถาม: เกิดอะไรขึ้น?", ipa: "mɔ̌ɔ tǎam: gə̀ət à-rai kʉ̂n?", en: "Doctor asks: What happened?" },
-                    { th: "คุณจะอธิบายอาการ และ ถามวิธีรักษาว่าอย่างไร?", ipa: "kun jà à-tí-baai aa-gaan lɛ́ tǎam wí-tii rák sǎa wâa yàang-rai?", en: "How will you explain the symptoms and ask for treatment?" }
-                ]
-            },
-            {
-                title: { th: "โต้วาที (Debate)", ipa: "dtôo waa tii", en: "Debate" }, emoji: "⚔️",
-                items: [
-                    { th: "ไปเที่ยวทะเล 'ตอนกลางวัน' หรือ 'ตอนกลางคืน' ดีกว่ากัน?", ipa: "bpai tîao tá-lee 'dtɔɔn glaang wan' rʉ̌ʉ 'dtɔɔn glaang kʉʉn' dii gwàa gan?", en: "Is going to the sea 'during the day' or 'at night' better?" },
-                    { th: "บอกจุดแข็งและจุดอ่อน", ipa: "bɔ̀ɔk jùt kɛ̌ng lɛ́ jùt ɔ̀ɔn", en: "Tell the strengths and weaknesses." },
-                    { th: "เช่น กลางวันมีแดด ถ่ายรูปสวย แต่ร้อน / กลางคืนเย็น แต่ ไม่ปลอดภัย", ipa: "chên glaang wan mii dɛ̀ɛt tàai rûup sǔuai dtɛ̀ɛ rɔ́ɔn / glaang kʉʉn yen dtɛ̀ɛ mâi bplɔ̀ɔt pai", en: "e.g. Day is sunny, good photos, but hot / Night is cool but not safe." }
-                ]
-            },
-            {
-                title: { th: "คำถามชวนคุย (Discussion)", ipa: "kam tǎam chuan kui", en: "Discussion" }, emoji: "💬",
-                items: [
-                    { th: "1. เวลาไปเที่ยว ชอบนอนโฮมสเตย์หรือโรงแรม? ทำไม?", ipa: "wee-laa bpai tîao, chɔ̂ɔp nɔɔn hoom sà-dtee rʉ̌ʉ roong-rɛɛm? tam-mai?", en: "When traveling, do you prefer a homestay or hotel? Why?" },
-                    { th: "2. คุณชอบขับรถเอง หรือ ให้คนอื่นขับ?", ipa: "kun chɔ̂ɔp kàp rót eeng rʉ̌ʉ hâi kon ʉ̀ʉn kàp?", en: "Do you like driving yourself or letting someone else drive?" },
-                    { th: "3. ปกติซื้อของฝากอะไรให้เพื่อนหรือครอบครัว?", ipa: "bpòk-gà-dtì sʉ́ʉ kɔ̌ɔng-fàak à-rai hâi pʉ̂an rʉ̌ʉ krɔ̂ɔp-krua?", en: "What souvenirs do you usually buy for friends or family?" },
-                    { th: "4. อาหารทะเลที่คุณชอบที่สุดคืออะไร?", ipa: "aa-hǎan tá-lee tîi kun chɔ̂ɔp tîi-sùt kʉʉ à-rai?", en: "What is your favorite seafood?" },
-                    { th: "5. ถ้าเพื่อนคนไทยมาเยี่ยม คุณจะพาไปเที่ยวที่ไหน?", ipa: "tâa pʉ̂an kon tai maa yîam, kun jà paa bpai tîao tîi nǎi?", en: "If a Thai friend visits, where will you take them?" }
-                ]
-            },
-            {
-                title: { th: "สัมภาษณ์ (Interview)", ipa: "sǎm-pâat", en: "Interview" }, emoji: "🎤",
-                items: [
-                    { th: "คุณเป็นเจ้าของโฮมสเตย์ ตอบคำถามลูกค้า", ipa: "kun bpen jâo kɔ̌ɔng hoom sà-dtee dtɔ̀ɔp kǎm-tǎam lûuk-káa", en: "You are a homestay owner. Answer customer questions." },
-                    { th: "Q: มีอาหารเช้ากี่โมง? A: ...", ipa: "Q: mii aa-hǎan cháo gìi moong? A: ...", en: "Q: What time is breakfast? A: ..." },
-                    { th: "Q: แถวนี้มีร้านสะดวกซื้อไหม? A: ...", ipa: "Q: tɛ̌o níi mii ráan sà-dùak-sʉ́ʉ mǎi? A: ...", en: "Q: Is there a convenience store around here? A: ..." }
-                ]
-            },
-            {
-                title: { th: "เล่าเรื่อง (Story-telling)", ipa: "lâo rʉ̂ang", en: "Story-telling" }, emoji: "📖",
-                items: [
-                    { th: "เล่าเรื่องอุบัติเหตุหรือปัญหาที่เคยเจอตอนไปเที่ยว", ipa: "lâo rʉ̂ang ù-bàt-dtì-hèet rʉ̌ʉ bpan-hǎa tîi kəəi jəə dtɔɔn bpai tîao", en: "Tell a story about an accident or problem you experienced while traveling." },
-                    { th: "แก้ปัญหานั้นยังไง? (เช่น รถชน, ป่วย)", ipa: "gɛ̂ɛ bpan-hǎa nán yang-ngai? (chên rót chon, bpùai)", en: "How did you solve that problem? (e.g. car crash, sick)" }
-                ]
-            },
-            {
-                title: { th: "นำเสนอ (Presentation)", ipa: "nam sà-nə̌ə", en: "Presentation" }, emoji: "📊",
-                items: [
-                    { th: "แนะนำสถานที่ท่องเที่ยว 1 แห่ง", ipa: "nɛ́-nam sà-tǎan tîi tɔ̂ng tîao nʉ̀ng hɛ̀ng", en: "Recommend 1 tourist attraction." },
-                    { th: "บอกเหตุผลว่าทำไมเพื่อนคนไทยควรไปเที่ยว", ipa: "bɔ̀ɔk hèet-pǒn wâa tam-mai pʉ̂an kon tai kuan bpai tîao", en: "Give reasons why a Thai friend should travel there." }
-                ]
-            }
-        ];
+            const comprehensionQs = [
+                {
+                    q: "ทำไมเจนถึงพูดว่า 'ไม่เจอกันนานเลยนะ'",
+                    ipa: "tam mai Jen tʉ̌ng pûut wâa 'mâi jer gan naan ləəi ná'",
+                    en: "Why did Jane say 'Long time no see'?",
+                    options: [
+                        { th: "เพราะโกรธศิ", ipa: "prɔ́ gròot Sì", en: "Because she's angry at Si." },
+                        { th: "เพราะเพิ่งเจอกัน", ipa: "prɔ́ pə̂ng jer gan", en: "Because they just met." },
+                        { th: "เพราะไม่ได้เจอศินานแล้ว", ipa: "prɔ́ mâi dâi jer Sì naan lɛ́ɛo", en: "Because she hasn't seen Si in a long time.", correct: true }
+                    ]
+                },
+                {
+                    q: "ศิมีอาการอย่างไร",
+                    ipa: "Sì mii aa gaan yàang rai",
+                    en: "What are Si's symptoms?",
+                    options: [
+                        { th: "ดูเหมือนคนป่วย", ipa: "duu mʉ̌an kon bpùuai", en: "Looks like a sick person.", correct: true },
+                        { th: "ปวดคอ", ipa: "bpùat kɔɔ", en: "Neck pain." },
+                        { th: "เวียนหัว", ipa: "wian hǔa", en: "Dizzy." }
+                    ]
+                },
+                {
+                    q: "เจนรู้สึกอย่างไรกับศิ",
+                    ipa: "Jen rúu sʉ̀k yàang rai gàp Sì",
+                    en: "How does Jane feel about Si?",
+                    options: [
+                        { th: "เสียใจ", ipa: "sǐa jai", en: "Sad." },
+                        { th: "คิดถึง", ipa: "kít tʉ̌ng", en: "Misses.", correct: true },
+                        { th: "เฉยๆ", ipa: "chə̌əi chə̌əi", en: "Indifferent." }
+                    ]
+                }
+            ];
 
-        // --- Main App ---
-        const App = () => {
-            const [activeTab, setActiveTab] = useState("review"); // review | scenarios | extension
+            const handleAns = (idx, isCorrect) => {
+                setSelectedA(idx);
+                setShowAns(true);
+            };
+
+            const nextQ = () => {
+                setShowAns(false);
+                setSelectedA(null);
+                setCurrentQ(c => c + 1);
+            };
 
             return (
-                <div className="max-w-md mx-auto min-h-screen pb-20">
+                <div className="space-y-6 pb-8 fade-in">
+                    
+                    {/* Lead-in */}
+                    <div className="bg-amber-50 p-5 rounded-[2rem] border-2 border-amber-200 shadow-sm">
+                        <SmartText th="ชวนคุยก่อนดูวิดีโอ" ipa="chuan kui gɔ̀ɔn duu wí-dii-oo" en="Lead-in Questions" emoji="🗣️" size="lg" isTitle={true} titleColor="text-amber-700"/>
+                        <div className="mt-4 space-y-3">
+                            <SmartText th="คุณเคยเจอ แฟนเก่า ไหม?" ipa="kun kəəi jer faen gào mǎi?" en="Have you ever met your ex-partner?" emoji="💔" />
+                            <SmartText th="ถ้าเจอ แฟนเก่า คุณจะพูดอะไร?" ipa="tâa jer faen gào kun jà pûut à-rai?" en="If you meet your ex, what will you say?" emoji="🤔" />
+                            <SmartText th="คุณ คิดถึง เพื่อนเก่า ไหม?" ipa="kun kít-tʉ̌ng pʉ̂an gào mǎi?" en="Do you miss your old friends?" emoji="🧑‍🤝‍🧑" />
+                        </div>
+                    </div>
+
+                    {/* Video */}
+                    <SmartText th="ดูวิดีโอคลิป" ipa="duu wí-dii-oo klíp" en="Watch the video clip" emoji="🎬" size="lg" isTitle={true} titleColor="text-rose-600" />
+                    <div className="rounded-[2rem] overflow-hidden shadow-xl bg-black aspect-[9/16] max-w-sm mx-auto relative border-4 border-rose-100">
+                        <iframe className="w-full h-full absolute top-0 left-0" src="https://www.youtube.com/embed/hpDRlUuatrg?rel=0&modestbranding=1" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                    </div>
+
+                    {/* Script Control */}
+                    <div className="flex justify-center mt-6">
+                        <button onClick={() => setShowScript(!showScript)} className={`flex items-center gap-2 px-6 py-3 rounded-full border-2 transition-all font-bold btn-press ${showScript ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-white text-slate-600 border-slate-200 shadow-sm'}`}>
+                            {showScript ? <Icon name="x" size={18}/> : <Icon name="message" size={18}/>}
+                            <SmartText th={showScript ? "ซ่อนบทสนทนา" : "ดูบทสนทนา"} ipa={showScript ? "sɔ̂ɔn bòt sǒn-tá-naa" : "duu bòt sǒn-tá-naa"} en={showScript ? "Hide Script" : "Show Script"} isButton={true}/>
+                        </button>
+                    </div>
+
+                    {/* Script Section */}
+                    {showScript && (
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 animate-slide">
+                            <SmartText th="บทสนทนา" ipa="bòt sǒn-tá-naa" en="Dialogue" emoji="💬" size="lg" isTitle={true} titleColor="text-slate-700"/>
+                            <div className="space-y-2 mt-4">
+                                {scriptData.map((line, i) => (
+                                    <div key={i} className={`p-4 rounded-xl border-l-4 ${line.speaker === 'เจน' ? 'bg-pink-50 border-pink-400' : 'bg-sky-50 border-sky-400'}`}>
+                                        <div className="text-xs font-bold uppercase mb-2 opacity-60 font-thai">{line.speaker}</div>
+                                        <SmartText th={line.t} ipa={line.i} en={line.e} emoji={line.em} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Comprehension */}
+                    <div className="bg-indigo-50 p-5 rounded-[2rem] border-2 border-indigo-200 shadow-sm mt-6">
+                        <SmartText th="ทดสอบความเข้าใจ" ipa="tót-sɔ̀ɔp kwaam kâo-jai" en="Comprehension Check" emoji="📝" size="lg" isTitle={true} titleColor="text-indigo-700"/>
+                        <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentQ + 1} / {comprehensionQs.length}</div>
+                        
+                        <div className="bg-white p-4 rounded-xl shadow-sm mb-4">
+                            <SmartText th={comprehensionQs[currentQ].q} ipa={comprehensionQs[currentQ].ipa} en={comprehensionQs[currentQ].en} emoji="❓" />
+                        </div>
+
+                        <div className="space-y-3">
+                            {comprehensionQs[currentQ].options.map((opt, i) => {
+                                let btnStyle = "bg-white border-slate-200 text-slate-700";
+                                if (showAns) {
+                                    if (opt.correct) btnStyle = "bg-emerald-100 border-emerald-500 text-emerald-800";
+                                    else if (selectedA === i) btnStyle = "bg-rose-100 border-rose-500 text-rose-800";
+                                    else btnStyle = "bg-slate-50 border-slate-200 text-slate-400 opacity-50";
+                                }
+                                return (
+                                    <button 
+                                        key={i} disabled={showAns} onClick={() => handleAns(i, opt.correct)}
+                                        className={`w-full p-4 rounded-xl border-2 font-bold text-lg text-left transition-all btn-press font-thai ${btnStyle}`}
+                                    >
+                                        <SmartText th={opt.th} ipa={opt.ipa} en={opt.en} isButton={true}/>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {showAns && currentQ < comprehensionQs.length - 1 && (
+                            <button onClick={nextQ} className="w-full mt-4 py-3 bg-indigo-500 text-white rounded-xl font-bold btn-press shadow-md">
+                                <SmartText th="ข้อต่อไป" ipa="kɔ̂ɔ dtɔ̀ɔ bpai" en="Next" isButton={true}/>
+                            </button>
+                        )}
+                        {showAns && currentQ === comprehensionQs.length - 1 && (
+                            <div className="mt-4 text-center text-emerald-600 font-bold animate-pulse">🎉</div>
+                        )}
+                    </div>
+
+                    {/* Vocab & Structure */}
+                    <div className="mt-8 space-y-6">
+                        <div className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <SmartText th="คำศัพท์เป้าหมาย" ipa="kam-sàp bpâo-mǎi" en="Target Vocabulary" emoji="🧠" size="lg" isTitle={true} titleColor="text-emerald-600" />
+                            <div className="space-y-3 mt-4">
+                                {targetVocab.map((v, i) => <SmartText key={i} th={v.t} ipa={v.i} en={v.e} emoji={v.em} />)}
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <SmartText th="รูปประโยคเป้าหมาย" ipa="rûup bprà-yòok bpâo-mǎi" en="Target Structures" emoji="🏗️" size="lg" isTitle={true} titleColor="text-sky-600" />
+                            <div className="space-y-3 mt-4">
+                                {targetStructures.map((v, i) => <SmartText key={i} th={v.t} ipa={v.i} en={v.e} emoji={v.em} />)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ExtensionSection = () => {
+            const extData = [
+                {
+                    icon: "🎭", title: { th: "บทบาทสมมติ (Role-play)", ipa: "bòt-bàat sǒm-mút", en: "Role-play" }, color: "bg-rose-50",
+                    items: [
+                        { th: "สถานการณ์: คุณบังเอิญเจอแฟนเก่าที่ร้านอาหาร", ipa: "sà tǎan ná gaan: kun bang əən jer faen gào tîi ráan aa hǎan", en: "Situation: You accidentally meet your ex at a restaurant." },
+                        { th: "A: ไม่เจอกันนานเลยนะ สบายดีไหม", ipa: "A: mâi dâi jəə gan naan ləəi ná sà baai dii mǎi", en: "A: Haven't seen you for a long time. Are you well?" },
+                        { th: "B: ดูเหมือนคนป่วย ป่วยหรือเปล่า", ipa: "B: duu mʉ̌an kon bpùuai bpùuai rʉ̌ʉ bplào", en: "B: You look sick. Are you sick?" }
+                    ]
+                },
+                {
+                    icon: "🗣️", title: { th: "เกมต่อประโยค (Speaking Game)", ipa: "geem dtɔ̀ɔ bprà-yòok", en: "Sentence Chain Game" }, color: "bg-sky-50",
+                    items: [
+                        { th: "พูดว่า: 'ฉันคิดถึง...'", ipa: "pûut wâa: 'chǎn kít-tʉ̌ng...'", en: "Say: 'I miss...'" },
+                        { th: "ตัวอย่าง: ฉันคิดถึง ทะเล", ipa: "dtua yàang: chǎn kít-tʉ̌ng tá lee", en: "Example: I miss the sea." },
+                        { th: "ตัวอย่าง: ฉันคิดถึง เพื่อน", ipa: "dtua yàang: chǎn kít-tʉ̌ng pʉ̂an", en: "Example: I miss my friend." }
+                    ]
+                },
+                {
+                    icon: "⚔️", title: { th: "โต้วาที (Debate)", ipa: "dtôo waa tii", en: "Debate" }, color: "bg-orange-50",
+                    items: [
+                        { th: "เป็นเพื่อนกับแฟนเก่า ได้ หรือ ไม่ได้?", ipa: "bpen pʉ̂an gàp faen gào dâi rʉ̌ʉ mâi dâi?", en: "Can you be friends with an ex or not?" },
+                        { th: "บอก จุดแข็ง (ข้อดี) และ จุดอ่อน (ข้อเสีย)", ipa: "bɔ̀ɔk jùt kɛ̌ng (kɔ̂ɔ dii) lɛ́ jùt ɔ̀ɔn (kɔ̂ɔ sǐa)", en: "Tell strengths (pros) and weaknesses (cons)." }
+                    ]
+                },
+                {
+                    icon: "💬", title: { th: "คำถามชวนคุย (Discussion)", ipa: "kam tǎam chuan kui", en: "Discussion" }, color: "bg-emerald-50",
+                    items: [
+                        { th: "ถ้าป่วย คุณจะไปหาหมอไหม?", ipa: "tâa bpùuai kun jà bpai hǎa mɔ̌ɔ mǎi?", en: "If you're sick, will you go to the doctor?" },
+                        { th: "คุณคิดถึงใครมากที่สุดตอนนี้?", ipa: "kun kít-tʉ̌ng krai mâak tîi sùt dtɔɔn níi?", en: "Who do you miss the most right now?" },
+                        { th: "เมื่อวานเกิดอะไรขึ้น เล่าให้ฟังหน่อย", ipa: "mʉ̂ʉa waan gə̀ət à rai kʉ̂n lâo hâi fang nɔ̀ɔi", en: "What happened yesterday? Tell me." }
+                    ]
+                },
+                {
+                    icon: "🎤", title: { th: "สัมภาษณ์ (Interview)", ipa: "sǎm-pâat", en: "Interview" }, color: "bg-purple-50",
+                    items: [
+                        { th: "สัมภาษณ์เพื่อนเกี่ยวกับการไปหาหมอ", ipa: "sǎm-pâat pʉ̂an gìao gàp gaan bpai hǎa mɔ̌ɔ", en: "Interview a friend about going to the doctor." },
+                        { th: "Q: ครั้งที่แล้วไปหาหมอเมื่อไหร่?", ipa: "Q: kráng tîi lɛ́ɛo bpai hǎa mɔ̌ɔ mʉ̂ʉa rài?", en: "Q: When did you go to the doctor last time?" },
+                        { th: "Q: อาการเป็นยังไง?", ipa: "Q: aa gaan bpen yang ngai?", en: "Q: What were the symptoms?" }
+                    ]
+                },
+                {
+                    icon: "📖", title: { th: "เล่าเรื่อง (Story-telling)", ipa: "lâo rʉ̂ang", en: "Story-telling" }, color: "bg-blue-50",
+                    items: [
+                        { th: "เล่าเรื่องตอนที่คุณ ป่วย", ipa: "lâo rʉ̂ang dtɔɔn tîi kun bpùuai", en: "Tell a story about when you were sick." },
+                        { th: "มีไข้ไหม ไปหาหมอไหม กินยาไหม", ipa: "mii kâi mǎi bpai hǎa mɔ̌ɔ mǎi gin yaa mǎi", en: "Did you have a fever? Did you go to the doctor? Did you take medicine?" }
+                    ]
+                },
+                {
+                    icon: "📊", title: { th: "นำเสนอ (Presentation)", ipa: "nam sà-nə̌ə", en: "Presentation" }, color: "bg-amber-50",
+                    items: [
+                        { th: "แนะนำวิธีดูแลตัวเองตอนป่วย", ipa: "nɛ́-nam wí tii duu lɛɛ dtua eeng dtɔɔn bpùuai", en: "Recommend ways to take care of yourself when sick." },
+                        { th: "เช่น กินอาหารให้ตรงเวลา กินยา", ipa: "chên gin aa hǎan hâi dtrong wee laa gin yaa", en: "For example: Eat on time, take medicine." }
+                    ]
+                }
+            ];
+
+            return (
+                <div className="space-y-6 pb-8 fade-in">
+                    <div className="text-center mb-6">
+                        <SmartText th="กิจกรรมเพิ่มเติม" ipa="gìt-jà-gam pêem dtəəm" en="Extension Activities" size="xl" isTitle={true} titleColor="text-slate-800" />
+                    </div>
+                    {extData.map((ext, i) => (
+                        <SimpleCard key={i} title={ext.title} emoji={ext.icon} items={ext.items} bgColor={ext.color} />
+                    ))}
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState("review");
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-slate-50 overflow-x-hidden">
                     
                     {/* Header */}
-                    <div className="bg-sky-500 p-6 text-white rounded-b-3xl shadow-md sticky top-0 z-50">
-                        <SmartText th="ทบทวน" ipa="tóp-tuan" en="Review" emoji="🇹🇭" size="xl" isTitle={true} />
+                    <div className="bg-sky-500 p-6 text-white rounded-b-3xl shadow-md sticky top-0 z-50 pb-safe">
+                        <SmartText th="แฟนเก่า" ipa="faen gào" en="Ex-partner" emoji="💔" size="xl" isTitle={true} titleColor="text-white drop-shadow-md" />
                         
                         {/* Tabs */}
                         <div className="flex bg-white/20 p-1 rounded-xl mt-2 backdrop-blur-sm shadow-inner">
                             <button onClick={() => setActiveTab("review")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "review" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
-                                <SmartText th="แบบฝึกหัด" ipa="bɛ̀ɛp-fʉ̀k-hàt" en="Exercises" isButton={true} />
+                                <SmartText th="ทบทวน" ipa="tóp-tuan" en="Review" isButton={true} />
                             </button>
-                            <button onClick={() => setActiveTab("scenarios")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "scenarios" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
-                                <SmartText th="สถานการณ์" ipa="sà-tǎan-ná-gaan" en="Scenarios" isButton={true} />
+                            <button onClick={() => setActiveTab("lesson")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "lesson" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <SmartText th="บทเรียน" ipa="bòt-rian" en="Lesson" isButton={true} />
                             </button>
                             <button onClick={() => setActiveTab("extension")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "extension" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
                                 <SmartText th="กิจกรรมเสริม" ipa="gìt-jà-gam sə̌əm" en="Extension" isButton={true} />
@@ -806,44 +838,20 @@
                         </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="px-4 mt-6">
+                    {/* Content Area */}
+                    <div className="px-4 pt-6 pb-28">
+                        {activeTab === 'review' && (
+                            <div className="animate-slide">
+                                <QandA items={qaData} />
+                                <OrderSentence items={orderData} />
+                                <GapFill items={gapFillData} />
+                                <Matching pairs={matchingData} />
+                                <ErrorCorrection items={errorData} />
+                            </div>
+                        )}
                         
-                        {/* TAB 1: Review Exercises */}
-                        {activeTab === "review" && (
-                            <div className="animate-slide">
-                                <QandA items={reviewData.qa} />
-                                <OrderSentence items={reviewData.order} />
-                                <GapFill items={reviewData.gapFill} />
-                                <Matching pairs={reviewData.matching} />
-                                <ErrorCorrection items={reviewData.error} />
-                            </div>
-                        )}
-
-                        {/* TAB 2: Scenarios */}
-                        {activeTab === "scenarios" && (
-                            <div className="animate-slide">
-                                <div className="text-center mb-6">
-                                    <SmartText th="บทสนทนาจำลอง" ipa="bòt sǒn-tá-naa jam lɔɔng" en="Simulated Dialogues" size="xl" isTitle={true} />
-                                </div>
-                                {scenariosData.map((scene, i) => (
-                                    <SimpleCard key={i} title={scene.title} emoji={scene.emoji} items={scene.items} bgColor={scene.color} />
-                                ))}
-                            </div>
-                        )}
-
-                        {/* TAB 3: Extension */}
-                        {activeTab === "extension" && (
-                            <div className="animate-slide">
-                                 <div className="text-center mb-6">
-                                    <SmartText th="กิจกรรมในชีวิตจริง" ipa="gìt-jà-gam nai chii-wít jing" en="Real-life Activities" size="xl" isTitle={true} />
-                                </div>
-                                {extensionData.map((ext, i) => (
-                                    <SimpleCard key={i} title={ext.title} emoji={ext.icon} items={ext.items} bgColor="bg-white" />
-                                ))}
-                            </div>
-                        )}
-
+                        {activeTab === 'lesson' && <LessonSection />}
+                        {activeTab === 'extension' && <ExtensionSection />}
                     </div>
                 </div>
             );
