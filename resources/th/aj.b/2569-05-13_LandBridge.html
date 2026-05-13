@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Bridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .ipa-text { color: #d97706; font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; }
+        .en-text { color: #2563eb; font-style: italic; font-size: 0.95rem; }
+
+        .btn-toggle {
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .btn-toggle:hover { background-color: #f1f5f9; }
+        .btn-toggle.active-ipa { background-color: #fffbeb; border-color: #d97706; color: #d97706; }
+        .btn-toggle.active-en { background-color: #eff6ff; border-color: #2563eb; color: #2563eb; }
+
+        .card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+
+        .tts-button {
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 0;
+            color: #0ea5e9;
+        }
+        .tts-button:active { transform: scale(0.85); }
+        .tts-playing { color: #dc2626 !important; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .yt-video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio for YT, although shorts are vertical, we use standard embed */
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #000;
+        }
+        .yt-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .yt-shorts-container {
+            position: relative;
+            padding-bottom: 177.77%; /* 9:16 Aspect Ratio for Shorts */
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #000;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        .yt-shorts-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hidden-content { display: none !important; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b-4 border-indigo-600">
+        <div class="max-w-4xl mx-auto px-4 py-4 text-center flex justify-center items-center gap-3">
+            <h1 class="text-2xl md:text-3xl font-bold text-indigo-900 flex items-center justify-center gap-2">
+                🌉 โครงการ Land Bridge 🚢
+            </h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-10">
+
+        <!-- 1. Review Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-indigo-50">
+            <div id="heading-review" class="mb-6 pb-4 border-b border-gray-100"></div>
+
+            <div class="text-center relative overflow-hidden bg-indigo-50 p-6 rounded-2xl border border-indigo-100 mb-8">
+                <div id="instruction-review" class="mb-6 relative z-10"></div>
+
+                <div id="vocab-card" class="bg-white p-8 rounded-2xl min-h-[160px] flex flex-col items-center justify-center mb-6 shadow-sm border border-gray-100">
+                    <p class="text-indigo-400 italic text-lg font-medium"><i class="fas fa-hand-pointer mr-2 animate-bounce"></i>กดเพื่อสุ่มคำศัพท์</p>
+                </div>
+
+                <button onclick="randomVocab()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto text-lg">
+                    <i class="fas fa-random"></i>
+                    <span>สุ่มคำศัพท์</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. Lead-in Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-emerald-400">
+            <div id="heading-leadin" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="leadin-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 3. Video Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-rose-50">
+            <div id="heading-video" class="mb-6 pb-4 border-b border-gray-100"></div>
+
+            <!-- YouTube Shorts Embed -->
+            <div class="yt-shorts-container mb-8 shadow-lg border-4 border-gray-900">
+                <iframe src="https://www.youtube.com/embed/FaYLGoRnfes" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+
+            <div class="bg-rose-50 p-5 md:p-6 rounded-2xl border border-rose-100 shadow-inner">
+                <div id="heading-script" class="mb-5 pb-3 border-b-2 border-rose-200"></div>
+                <div id="script-content" class="space-y-4">
+                    <!-- Script injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Comprehension Section (Video) -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-amber-400">
+            <div id="heading-vid-comp" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="vid-comp-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 5. Discussion Questions -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-teal-400">
+            <div id="heading-discussion" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div id="discussion-questions" class="space-y-4"></div>
+        </section>
+
+        <!-- 6. Target Vocab Section -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-purple-50">
+            <div id="heading-vocab" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="target-vocab-list"></div>
+
+            <div id="heading-grammar" class="mb-6 pb-4 border-b border-gray-100 mt-8"></div>
+            <div class="space-y-4" id="target-grammar-list"></div>
+        </section>
+
+        <!-- 7. Speaking Tasks -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-yellow-100">
+            <div id="heading-speaking" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div class="grid grid-cols-1 gap-6" id="speaking-tasks"></div>
+        </section>
+
+        <!-- 8. Extension Activities -->
+        <section class="bg-gray-50 p-6 md:p-8 rounded-3xl shadow-inner border border-gray-200">
+            <div id="heading-extension" class="mb-6 pb-4 border-b border-gray-300"></div>
+            <div class="grid grid-cols-1 gap-6" id="extension-tasks"></div>
+        </section>
+
+        <!-- 9. Additional Vocabulary -->
+        <section class="bg-white p-6 md:p-8 rounded-3xl card-shadow border-t-8 border-slate-400 mt-10">
+            <div id="heading-additional-vocab" class="mb-6 pb-4 border-b border-gray-100"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="additional-vocab-list"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-8 text-center bg-white border-t border-gray-200">
+        <p class="text-indigo-600 text-sm font-medium">สนุกกับการเรียนภาษาไทยนะครับ! 🇹🇭✨</p>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // --- DATA STORE ---
+        const content = {
+            headings: {
+                review: { t: "ทบทวนคำศัพท์เก่า 🎲", i: "thóp-thuuan kham-sàp gào", e: "Review Old Vocabulary" },
+                leadin: { t: "ก่อนเริ่มบทเรียน 🤔", i: "gɔ̀ɔn rə̂əm bòt-riian", e: "Before we start" },
+                video: { t: "วิดีโอ: ทำไม Land Bridge ถึงไม่คุ้มค่า? 🎬", i: "wí-dii-oo: tham-mai Land Bridge thʉ̌ng mâi khúm-khâa?", e: "Video: Why Land Bridge is not worth it?" },
+                script: { t: "เนื้อหาวิดีโอ 💬", i: "nʉ́a-hǎa wí-dii-oo", e: "Video Transcript" },
+                vidComp: { t: "คำถามจากวิดีโอ ❓", i: "khǎm-thǎam jàak wí-dii-oo", e: "Video Comprehension" },
+                discussion: { t: "ชวนคุย 🗣️", i: "chuuan khui", e: "Discussion" },
+                vocab: { t: "คำศัพท์เป้าหมาย 🎯", i: "kham-sàp bpâo-mǎai", e: "Target Vocabulary" },
+                grammar: { t: "โครงสร้างประโยค 🧱", i: "khroong-sâang bprà-yôok", e: "Sentence Structures" },
+                speaking: { t: "กิจกรรมฝึกพูด 🎤", i: "gìt-jà-gam fʉ̀k phûut", e: "Speaking Activities" },
+                extension: { t: "กิจกรรมเพิ่มเติม ⏱️", i: "gìt-jà-gam phə̂əm-dtəəm", e: "Extension Activities" },
+                additionalVocab: { t: "คำศัพท์เพิ่มเติม 📚", i: "kham-sàp phə̂əm-dtəəm", e: "Additional Vocabulary" }
+            },
+            review: {
+                instruction: { t: "ครูสุ่มคำศัพท์ แล้วให้นักเรียนแต่งประโยคให้ฟัง 🗣️", i: "khruu sùm kham-sàp láeo hâi nák-riian dtàeng bprà-yôok hâi fang", e: "Teacher randomly selects a word for the student to make a sentence." }
+            },
+            leadin: [
+                { t: "1. ในมุมมองของคุณ การสร้างโครงสร้างพื้นฐานขนาดใหญ่ (Mega Projects) ช่วยพัฒนาประเทศได้จริงไหม? 🏗️📈", i: "nai mum mɔɔng khɔ̌ɔng khun, gaan sâang khroong-sâang phʉ́ʉn-thǎan khà-nàat yài chûuay phat-thá-naa bprà-thêet dâi jing mǎi?", e: "1. In your view, do mega infrastructure projects actually help develop a country?" },
+                { t: "2. คุณคิดว่าสิ่งแวดล้อมสำคัญกว่าการเติบโตทางเศรษฐกิจหรือไม่? ทำไม? 🌳🆚💰", i: "khun khít wâa sìng-wâet-lɔ́ɔm sǎm-khan gwàa gaan dtə̀əp-dtoo thaang sèet-thà-gìt rʉ̌ʉ mâi? tham-mai?", e: "2. Do you think the environment is more important than economic growth? Why?" },
+                { t: "3. คุณเคยได้ยินโครงการ 'Land Bridge' ของประเทศไทยไหม? คุณคิดว่ามันคืออะไร? 🌉🇹🇭", i: "khun khoei dâi-yin kroong-gaan 'Land Bridge' khɔ̌ɔng bprà-thêet thai mǎi? khun khít wâa man khʉʉ à-rai?", e: "3. Have you heard of Thailand's 'Land Bridge' project? What do you think it is?" }
+            ],
+            scriptLines: [
+                { t: "ทำไมโครงการ Land Bridge ถึงถูกมองว่า ไม่คุ้มค่า 📉", i: "tham-mai kroong-gaan Land Bridge thʉ̌ng thùuk mɔɔng wâa mâi khúm khâa", e: "Why is the Land Bridge project viewed as not cost-effective?" },
+                { t: "Land Bridge โครงการมูลค่ากว่า 1 ล้านล้านบาทกลายเป็นที่ถกเถียงในแง่ของความคุ้มค่า 💰🗣️", i: "Land Bridge kroong-gaan muun-lá-khâa gwàa nʉ̀ng láan láan bàat glaai bpen thîi thòk thǐiang nai ngâae khɔ̌ɔng khwaam khúm khâa", e: "Land Bridge, a project worth over 1 trillion baht, has become debated in terms of cost-effectiveness" },
+                { t: "และอาจไม่จูงใจให้เรือขนส่งสินค้าใช้เส้นทางนี้ 🚢🚫", i: "láe àat mâi juung jai hâi rʉʉa khǒn-sòng sǐn-kháa chái sên-thaang níi", e: "and might not incentivize cargo ships to use this route." },
+                { t: "โดยประเด็นหลักๆ คือต้นทุนการยกขน 🏗️💸", i: "dooy bprà-den lǎk lǎk khʉʉ dtôn thun gaan yók khǒn", e: "The main issue is the cost of lifting and handling." },
+                { t: "การใช้ Land Bridge หมายความว่า เรือต้องมาจอดที่ท่าเรืออีกฝั่งหนึ่ง ยกตู้คอนเทนเนอร์ลง ⚓📦", i: "gaan chái Land Bridge mǎai khwaam wâa rʉʉa dtɔ̂ng maa jɔ̀ɔt thîi thâa-rʉʉa ìik fàng nʉ̀ng, yók dtûu khɔn-theen-nə̂ə long", e: "Using the Land Bridge means a ship has to dock at a port on one side, lift containers down" },
+                { t: "และบรรทุกในรถไฟหรือรถบรรทุก ข้ามฝั่งไป 90 กม. 🚂🚚", i: "láe ban-thúk nai rót fai rʉ̌ʉ rót ban-thúk, khâam fàng bpai gâao-sìp gi-loo-méet", e: "and load them onto trains or trucks, crossing 90 km to the other side." },
+                { t: "แล้วยกตู้สินค้าขึ้นเรืออีกลำ สิ่งที่ตามมาคือ ต้นทุนที่เพิ่มขึ้น ⬆️🚢", i: "láeo yók dtûu sǐn-kháa khʉ̂n rʉʉa ìik lam. sìng thîi dtaam maa khʉʉ dtôn thun thîi phə̂əm khʉ̂n", e: "Then lift the containers onto another ship. What follows is increased costs." },
+                { t: "นั่นคือค่าบริการท่าเรือ ค่าขนส่งทางบก 🏢🛤️", i: "nân khʉʉ khâa bɔɔ-rí-gaan thâa rʉʉa, khâa khǒn sòng thaang bòk", e: "That is port service fees, land transport fees" },
+                { t: "ซึ่งโดยรวมแล้วอาจสูงกว่าการแล่นเรือไปยังช่องแคบมะละกา ซึ่งเสียแค่ค่าน้ำมัน 🌊⛽", i: "sʉ̂ng dooy ruuam láeo àat sǔung gwàa gaan lâen rʉʉa bpai yang chɔ̂ng khâep má-lá-gaa, sʉ̂ng sǐia khâe khâa náam-man", e: "which overall might be higher than sailing to the Strait of Malacca, which only costs fuel." },
+                { t: "อีกทั้งความเสี่ยงสินค้าเสียหาย ทุกครั้งที่มีการยกมีความเสี่ยงที่สินค้าเสียหายหรือล่าช้า ⚠️📦", i: "ìik tháng khwaam sìiang sǐn-kháa sǐia hǎai. thúk khráng thîi mii gaan yók mii khwaam sìiang thîi sǐn-kháa sǐia hǎai rʉ̌ʉ lâa cháa", e: "Additionally, the risk of cargo damage. Every time there is lifting, there is a risk of cargo getting damaged or delayed." },
+                { t: "และประเด็นต่อมาคือ อาจช่วยประหยัดเวลาเพียงเล็กน้อย ⏱️🤏", i: "láe bprà-den dtɔ̀ɔ maa khʉʉ àat chûuay bprà-yàt wee-laa phiiang lék nɔ́ɔy", e: "And the next point is, it might only save a little bit of time." },
+                { t: "รัฐบาลระบุว่า Land Bridge จะช่วยร่นระยะเวลาประมาณ 4 วัน 🗓️", i: "rát-thà-baan rá-bù wâa Land Bridge jà chûuay rôn rá-yá wee-laa bprà-maan sìi wan", e: "The government stated that Land Bridge will help shorten the time by about 4 days." },
+                { t: "แต่การแล่นเรือผ่านช่องแคบมะละกานั้นใช้เวลาประมาณ 2 วัน 🌊✌️", i: "dtàe gaan lâen rʉʉa phàan chɔ̂ng khâep má-lá-gaa nán chái wee-laa bprà-maan sɔ̌ɔng wan", e: "But sailing through the Strait of Malacca takes about 2 days." },
+                { t: "และการยกตู้คอนเทนเนอร์ขึ้นลงจากท่าเรือถูกมองว่า อาจใช้เวลาอย่างน้อย 50-60 ชั่วโมง 🏗️⌛", i: "láe gaan yók dtûu khɔn-theen-nə̂ə khʉ̂n long jàak thâa rʉʉa thùuk mɔɔng wâa àat chái wee-laa yàang nɔ́ɔy hâa-sìp thʉ̌ng hòk-sìp chûua moong", e: "And lifting containers up and down the port is viewed as potentially taking at least 50-60 hours." },
+                { t: "เวลาที่มากขึ้นก็มาพร้อมกับต้นทุนที่เพิ่มขึ้น ⏳💰", i: "wee-laa thîi mâak khʉ̂n gɔ̂ maa phrɔ́ɔm gàp dtôn thun thîi phə̂əm khʉ̂n", e: "More time also comes with increased costs." },
+                { t: "ซึ่งในอีกด้านหนึ่ง สิงคโปร์ไม่ได้มีดีแค่ทางผ่าน แต่เป็นท่าเรือที่มีระบบครบวงจร 🇸🇬✨", i: "sʉ̂ng nai ìik dâan nʉ̀ng, sǐng-khà-bpoo mâi dâi mii dii khâe thaang phàan, dtàe bpen thâa rʉʉa thîi mii rá-bòp króp wong-jɔɔn", e: "On the other hand, Singapore is not just a good passageway, but a port with a comprehensive system" },
+                { t: "เช่น การซ่อมเรือ เติมน้ำมัน ประกันภัย และการเงิน 🛠️⛽🏦", i: "chên gaan sɔ̂m rʉʉa, dtəəm náam-man, bprà-gan phai, láe gaan ngən", e: "such as ship repair, refueling, insurance, and finance." },
+                { t: "โดยต้นทุนการก่อสร้างที่สูง เพื่อให้คุ้มทุนในระยะเวลาที่กำหนด ค่าบริการอาจตั้งไว้สูงจนจูงใจให้เรือมาใช้น้อย 🏗️💸", i: "dooy dtôn thun gaan gɔ̀ɔ sâang thîi sǔung, phʉ̂ʉa hâi khúm thun nai rá-yá wee-laa thîi gam-nòt, khâa bɔɔ-rí-gaan àat dtâng wái sǔung jon juung jai hâi rʉʉa maa chái nɔ́ɔy", e: "With high construction costs, to break even within a set timeframe, service fees might be set so high that it incentivizes fewer ships to use it." },
+                { t: "และยังไม่รวมถึงผลกระทบด้านเศรษฐกิจสีเขียวและการท่องเที่ยว 🌿🏖️", i: "láe yang mâi ruuam thʉ̌ng phǒn grà-thóp dâan sèet-thà-gìt sǐi khǐiao láe gaan thɔ̂ng thîiao", e: "And not to mention the impact on the green economy and tourism." },
+                { t: "ภาคใต้ตอนบนจังหวัดระนองและชุมพรมีศักยภาพสูงด้านการท่องเที่ยวเชิงนิเวศและเกษตรกรรมมูลค่าสูง 🌴🍍", i: "phâak dtâi dtɔɔn bon jang-wàt rá-nɔɔng láe chum-phɔɔn mii sàk-gà-yá-phâap sǔung dâan gaan thɔ̂ng thîiao chəəng ní-wêet láe gà-sèet-dtrà-gam muun-lá-khâa sǔung", e: "The upper south, Ranong and Chumphon provinces, have high potential for ecotourism and high-value agriculture." },
+                { t: "ด้านนักวิชาการกังวลว่า โครงการนี้จะทำลายรายได้มหาศาลจากภาคการท่องเที่ยวและเกษตรกรรมที่ยั่งยืนไปอย่างถาวร 👩‍🏫📉", i: "dâan nák wí-chaa-gaan gang-won wâa, kroong-gaan níi jà tham-laai raai dâi má-hǎa-sǎan jàak phâak gaan thɔ̂ng thîiao láe gà-sèet-dtrà-gam thîi yâng-yʉʉn bpai yàang thǎa-wɔɔn", e: "Academics are concerned that this project will permanently destroy massive income from tourism and sustainable agriculture" },
+                { t: "ซึ่งอาจมีมูลค่ามากกว่ากำไรจากท่าเรือ 🚢💸", i: "sʉ̂ng àat mii muun-lá-khâa mâak gwàa gam-rai jàak thâa rʉʉa", e: "which might be worth more than the profit from the port." }
+            ],
+            vidComp: [
+                { t: "1. ปัญหาหลักของการใช้ Land Bridge คืออะไรที่ทำให้เกิด 'ต้นทุนเพิ่มขึ้น'? 💸", i: "pan-hǎa lǎk khɔ̌ɔng gaan chái Land Bridge khʉʉ à-rai thîi tham hâi gə̀ət 'dtôn thun phə̂əm khʉ̂n'?", e: "1. What is the main problem with using Land Bridge that causes 'increased costs'?" },
+                { t: "2. การผ่าน 'ช่องแคบมะละกา' ใช้เวลากี่วัน? 🌊", i: "gaan phàan 'chɔ̂ng khâep má-lá-gaa' chái wee-laa gìi wan?", e: "2. How many days does passing the 'Strait of Malacca' take?" },
+                { t: "3. 'นักวิชาการ' กังวลเรื่องอะไรเกี่ยวกับโครงการนี้? 👩‍🏫", i: "'nák-wí-chaa-gaan' gang-won rʉ̂ʉang à-rai gìiao-gàp kroong-gaan níi?", e: "3. What are 'academics' concerned about regarding this project?" }
+            ],
+            discussion: [
+                { t: "1. คุณคิดว่า โครงการ Land Bridge จะ 'คุ้มค่า' กับประเทศไทยไหม? ทำไม? 🇹🇭", i: "khun khít wâa, kroong-gaan Land Bridge jà 'khúm-khâa' gàp bprà-thêet thai mǎi? tham-mai?", e: "1. Do you think the Land Bridge project will be 'cost-effective/worth it' for Thailand? Why?" },
+                { t: "2. ถ้าคุณเป็นนักลงทุน คุณจะ 'เลือกลงทุน' ใน Land Bridge หรือไม่? 💰", i: "thâa khun bpen nák-long-thun, khun jà 'lʉ̂ʉak long-thun' nai Land Bridge rʉ̌ʉ mâi?", e: "2. If you were an investor, would you 'choose to invest' in the Land Bridge?" },
+                { t: "3. การทำลาย 'การท่องเที่ยวเชิงนิเวศ' แลกกับ 'ท่าเรือ' เป็นสิ่งที่ยอมรับได้ไหมในมุมมองของคุณ? 🌴🚢", i: "gaan tham-laai 'gaan thɔ̂ng thîiao chəəng ní-wêet' lâek gàp 'thâa rʉʉa' bpen sìng thîi yɔɔm ráp dâi mǎi nai mum mɔɔng khɔ̌ɔng khun?", e: "3. Is destroying 'ecotourism' in exchange for a 'port' acceptable from your perspective?" },
+                { t: "4. คุณคิดว่าสิงคโปร์จะรู้สึก 'กังวล' กับโครงการ Land Bridge หรือไม่? 🇸🇬", i: "khun khít wâa sǐng-khà-bpoo jà rúu-sʉ̀k 'gang-won' gàp kroong-gaan Land Bridge rʉ̌ʉ mâi?", e: "4. Do you think Singapore would feel 'concerned' about the Land Bridge project?" },
+                { t: "5. 'การแข่งขัน' ของประเทศต่างๆ ในอาเซียน ส่งผลดีหรือผลเสียต่อภูมิภาค? 🌍", i: "'gaan khàeng-khǎn' khɔ̌ɔng bprà-thêet dtàang dtàang nai aa-sîian sòng phǒn dii rʉ̌ʉ phǒn sǐia dtɔ̀ɔ phuu-mí-phâak?", e: "5. Does the 'competition' among ASEAN countries have a positive or negative effect on the region?" }
+            ],
+            targetVocab: [
+                { t: "คุ้มค่า", i: "khúm khâa", e: "worthwhile / cost-effective", emoji: "💎" },
+                { t: "ถกเถียง", i: "thòk thǐiang", e: "to debate / argue", emoji: "🗣️" },
+                { t: "ต้นทุน", i: "dtôn thun", e: "cost", emoji: "📉" },
+                { t: "ความเสี่ยง", i: "khwaam sìiang", e: "risk", emoji: "⚠️" },
+                { t: "ทำลาย", i: "tham-laai", e: "to destroy", emoji: "💥" }
+            ],
+            grammar: [
+                { t: "อาจไม่จูงใจให้ [noun] [verb]", i: "àat mâi juung jai hâi [noun] [verb]", e: "might not incentivize [noun] to [verb]", ex: "ค่าบริการที่สูง อาจไม่จูงใจให้เรือมาใช้บริการ (High service fees might not incentivize ships to use the service.)" },
+                { t: "สิ่งที่ตามมาคือ...", i: "sìng thîi dtaam maa khʉʉ...", e: "What follows is... / The consequence is...", ex: "มีการยกของหลายครั้ง สิ่งที่ตามมาคือความเสี่ยงที่สินค้าจะเสียหาย (There are many lifts. What follows is the risk of cargo damage.)" },
+                { t: "ไม่ได้มีดีแค่... แต่...", i: "mâi dâi mii dii khâe... dtàe...", e: "not only good at... but also...", ex: "สิงคโปร์ไม่ได้มีดีแค่เป็นทางผ่าน แต่เป็นท่าเรือที่ครบวงจร (Singapore is not only good as a passageway, but also a comprehensive port.)" }
+            ],
+            speaking: [
+                {
+                    icon: "⚖️",
+                    title: "โต้วาที (Real-life Debate)",
+                    desc: "เศรษฐกิจ vs สิ่งแวดล้อม: การสร้างท่าเรือขนาดใหญ่คุ้มค่ากับการสูญเสียธรรมชาติหรือไม่? 🌲💼",
+                    i: "sèet-thà-gìt vs sìng wâet lɔ́ɔm: gaan sâang thâa rʉʉa khà-nàat yài khúm khâa gàp gaan sǔun sǐia tham-má-châat rʉ̌ʉ mâi?",
+                    e: "Economy vs Environment: Is building a mega port worth the loss of nature?"
+                },
+                {
+                    icon: "🎤",
+                    title: "สัมภาษณ์แบบสวมบทบาท (Real-life Interview)",
+                    desc: "นักข่าวสัมภาษณ์คุณ (ในฐานะนักวิชาการ) เกี่ยวกับ 'ความเสี่ยง' ของโครงการ Land Bridge 🎙️",
+                    i: "nák khào sǎm-phâat khun (nai thǎa-ná nák wí-chaa-gaan) gìiao gàp 'khwaam sìiang' khɔ̌ɔng kroong-gaan Land Bridge",
+                    e: "A reporter interviews you (as an academic) about the 'risks' of the Land Bridge project."
+                },
+                {
+                    icon: "📖",
+                    title: "เล่าเรื่อง (Real-life Story-telling)",
+                    desc: "เล่าถึงโครงการหรือนโยบายในประเทศของคุณ ที่ 'ถูกถกเถียง' ว่าคุ้มค่าหรือไม่คุ้มค่า 🗣️",
+                    i: "lâo thʉ̌ng kroong-gaan rʉ̌ʉ nóo-yoo-baai nai bprà-thêet khɔ̌ɔng khun, thîi 'thùuk thòk thǐiang' wâa khúm khâa rʉ̌ʉ mâi khúm khâa",
+                    e: "Tell a story about a project or policy in your country that was 'debated' whether it was worth it or not."
+                }
+            ],
+            extension: [
+                {
+                    icon: "🎭",
+                    title: "เกมใบ้คำ (Speaking Game Taboo)",
+                    desc: "ครูสุ่มคำศัพท์จากบทเรียน แล้วให้นักเรียนอธิบายโดย 'ห้าม' พูดคำนั้นออกมา 🤫",
+                    i: "khruu sùm kham-sàp jàak bòt riian láeo hâi nák riian à-thí-baai dooy 'hâam' phûut kham nán ɔ̀ɔk maa",
+                    e: "Teacher picks a random word from the lesson, and student explains it without saying the word itself."
+                },
+                {
+                    icon: "📊",
+                    title: "นำเสนอ (Real-life Presentation)",
+                    desc: "ถ้าคุณเป็นรัฐมนตรี คุณจะเสนอ 'วิธีแก้ปัญหา' เศรษฐกิจของไทยอย่างไร โดยไม่ต้องพึ่ง Land Bridge? 💡",
+                    i: "thâa khun bpen rát-thà-mon-dtrii, khun jà sà-nə̌ə 'wí-thii gâae pan-hǎa' sèet-thà-gìt khɔ̌ɔng thai yàang-rai dooy mâi dtɔ̂ng phʉ̂ng Land Bridge?",
+                    e: "If you were a minister, how would you propose to 'solve' Thailand's economy without relying on the Land Bridge?"
+                }
+            ],
+            additionalVocab: [
+                { t: "🏗️ โครงสร้างพื้นฐาน", i: "khroong-sâang phʉ́ʉn-thǎan", e: "Infrastructure" },
+                { t: "🚢 ท่าเรือ", i: "thâa rʉʉa", e: "Port" },
+                { t: "📦 ตู้คอนเทนเนอร์", i: "dtûu khɔn-theen-nə̂ə", e: "Container" },
+                { t: "📉 ขาดทุน", i: "khàat thun", e: "To lose money / Make a loss" },
+                { t: "🌿 เชิงนิเวศ", i: "chəəng ní-wêet", e: "Ecological" },
+                { t: "🚜 เกษตรกรรม", i: "gà-sèet-dtrà-gam", e: "Agriculture" },
+                { t: "💰 นักลงทุน", i: "nák long-thun", e: "Investor" },
+                { t: "🔄 ครบวงจร", i: "króp wong-jɔɔn", e: "Comprehensive / One-stop" },
+                { t: "⏱️ ร่นระยะเวลา", i: "rôn rá-yá wee-laa", e: "To shorten time" },
+                { t: "👩‍🏫 นักวิชาการ", i: "nák wí-chaa-gaan", e: "Academic / Scholar" }
+            ]
+        };
+
+        const rawVocabData = `📝📄	เรียงความ	riiang-kwaam	essays
+📚📝	เรื่องสั้น	rʉ̂ʉang-sân	short stories
+📏🧱	หนา	nǎa	thick
+🎓📸	งานรับปริญญา	ngaan-ráp-bpà-rin-yaa	graduation
+🎭🎬	การแสดง	gaan-sà-dɛɛng	performance
+🎶🎤	ดนตรีสด	don-dtrii-sòt	live music
+👔	มืออาชีพ	mʉʉ-aa-chîip	professional
+🗂️🧹	จัด	jàt	arrange / organise / hold
+🔰📘	ระดับเริ่มต้น	rá-dàp-rə̂əm-dtôn	beginner level
+🏙️🏠	ระเบียง	rá-biiang	balcony
+⭕🎺	วง	wong	circle / band
+💵	เงินเดือน	ŋən dʉan	salary
+🍀🚪✨	โอกาส 	ʔoo-gàat	Opportunity
+👕	เสื้อยืด	sʉ̂a-yʉ̂ʉt	t-shirt
+🤵	เจ้าบ่าว	jâo-bàao	groom
+👰💍	เจ้าสาว	jâo-saao	bride
+💍	คู่หมั้น	khûu-màn	fiance
+💔🤫	นอกใจ	nɔ̂ɔk-jai	cheat on
+🎭🃏	หลอก	lɔ̀ɔk	To trick
+👕	สวม	sŭuam	Wear / put on
+🦌📯	เขา	khǎo	horns
+🚫	อย่า	yàa	Don't
+🌱	หญ้า	yâa	grass
+🔁	แทน	thaaen	instead of
+👋💥	ตบ	dtòp	slap
+🤗💛	ปลอบใจ	plàawp-jai	to comfort
+🎲✨	บังเอิญ	bang-ʉʉan	coincident
+🎲✨	โดยบังเอิญ	dooi-bang-ʉʉan	coincidentally
+🕵️‍♂️🧩	ปริศนา	prìt-sà-nǎa	Mystery
+💥🌪️	หายนะ	hǎai-yá-ná	Disaster
+❓🔍	สาเหตุ	sǎa-hèet	Cause
+📝	บรรณาธิการ	ban-naa-tí-gaan	editor
+📚🔬	วิธีการวิจัย	wí-tii gan wí-jai	research methods
+🗂️	หัวข้อ	hŭua-kâw	Topics
+🤝🙋	การมีส่วนร่วม	gaan mii-sùan-rûam	participation
+🕵️‍♂️🎭	โกง	goong	cheat
+😔🏝️	โดดเดี่ยว	dòht-dìao	isolated
+✅	คุณภาพ	kun-ná-pâap	 Quality
+🚌🚆🚇	การขนส่งสาธารณะ	gaan kǒn-sòhng sǎa-taa-rá-ná	public transportation
+🏘️👥	ชุมชน	chum-chon	communities
+👵👴	สังคมผู้สูงอายุ	sǎng-kom pûu sǔung-aa-yú	aging society
+🎉💍	วันครบรอบ	wan-króp-râawp	Anniversary
+🎵🎸	วงดนตรี	wong don-dtrii	(music) band
+🏆🎯	การแข่งขัน	gaan kàeng-kǎn	competition
+⚙️🏃	ดำเนินการ	dam-nəən-gaan	facilitate / proceed / run
+💎🪙	สมบัติ	sǒm-bàt	treasure
+🌊🫧	จม	jom	To sink / drown
+💎	อัญมณี	an-yá-má-nii	gems
+⚙️	กลไก	gon-gai	mechanism
+🕯️🖤	ไว้อาลัย	wái-aa-lai	mourning
+📢📰	การประกาศ	gaan bprà-gàat	announcement
+👥💼	เพื่อนร่วมงาน	pêuan-rûam-ngaan	co-worker
+📝⏳	มีอะไรให้ทำเยอะ	mii-à-rai-hâi-tam-yóe	There are lots to do.
+🌊🚧🛣️	น้ำท่วมถนนหลายเส้น/สาย	náam-tûam-tá-nŏn-lăai-sên/sǎai	Many roads were flooded. 
+🧾💰	ค่าดำเนินการสอบ	khâa-dam-nern-gaan-sòob	Test processing fees
+🗺️🌍	ภูมิศาสตร์	puum-mí-sàat	Geography
+🏗️🛣️	โครงสร้าง(พื้นฐาน)	kroong-sâang-pěun-thăan	Infrastructure
+💰📈	มูลค่า	muun-láa-kaâ	value (assets / stuff)
+🪜	บันได	ban-dai	stairs
+🌍	เส้นศูนย์สูตร	sên-sŭun-sùut	equator
+⚡🔋	พลังงาน	pá lang-ŋaan	energy
+👑💪	อำนาจ	am-nâat	power (influence)
+🏞️🌾	ที่ราบ	têe-râap	plains
+😇	ปณิธาน	bpà-ní-taan	resolutions
+🧐	ตั้งใจ	dtâng-jai	determined/focused
+🥅	เป้าหมาย	bpâo-mǎai	goals
+🙆	ยืดหยุ่น	yʉ̂ʉt-yùn	flexible
+💉	จำเป็น / บังคับ	jam-bpen / bang-káp	obligatory
+🙏	ปรารถนา	bpràat-tà-nǎa	desire / wish
+💾💸	ประหยัด	bprà-yàt	frugal / To save
+👍⏰	มีวินัย	mii wí-nai	disciplined
+💯	เด็ดขาด	dèt-kàat	definitive
+🧑‍🎨	มีความคิดสร้างสรรค์	mii kwaam-kít sâang-sǎn	creative
+💧➕🧪	เจือจาง	jʉʉa-jaang	dilute
+🌡️📉📈	อุณหภูมิ	un-hà-pum	temperature
+🧱📦⚖️	ความหนาแน่น	kwaam-nǎa-nɛ̂ɛn	density
+🎈🌊🆙	ลอย	lɔɔi	float
+💎⛰️🧪	แร่ธาตุ	rɛ̂ɛ-tâat	mineral
+🌋⛏️🗺️	ธรณีวิทยา	tɔɔ-rá-nii-wít-tá-yaa	Geology
+💎⚛️🧊	โครงสร้างผลึก	kroong-sâang pà lùek	Crystal structure
+🎯🔍📍	เฉพาะ	chà-pɔ́	specific
+🧪🧊💧	สถานะ	sà-tǎa-ná	status; state
+✨📝🧬	ลักษณะเฉพาะ	lák-sà-nà chà-pɔ́	characteristic
+🌨️🧊☄️	ลูกเห็บ	lûuk-hèp	hail (n)
+🪵🪚🍂	ขี้เลื่อย	kîi-lʉ̂ai	sawdust
+🏠🔥🛡️	ฉนวนกันความร้อน	chà-nǔuan gan kwaam rɔ́ɔn	insulation
+🧊🫠🔥	ละลาย	lá-laai	melt
+🤔❓🧐	สงสัย	sǒng-sǎi	wonder; be curious about sth
+🔨⚠️❌	ทำให้...เสียหาย	tam-hâi...sǐa-hǎai	make...damaged
+🕊️🤝🌐	ทูต	tûut	ambassador
+🏛️🏢👑	เมืองหลวง	mʉʉang-lǔang	capital city
+🏭🏗️💨	โรงงาน	roong-ngaan	factory
+🚢📦🌎	ส่งออก	sòng-ɔ̀ɔk	export
+🪨🧊🧱	ก้อน	gɔ̂n	bar; lump
+📐📏📦	ขนาด	kà-nàat	size
+⛸️🍌💦	ลื่น	lʉ̂ʉn	slippery
+🎓📚	วิชาการ	wí-chaa-gaan	academic
+🧑‍💻🛠️	วิศวกร	wí-sà-wá-gawn	engineer
+✅	ยืนยัน	yeun-yan	confirm
+🌋📳	แรงสั่นสะเทือน	raeng-sàn-sa-thʉ̄an	tremors
+🎯💥	กระทบ	grà-thóp	affect
+🪨⚠️	รอยเลื่อน	rooi-lʉ̂an	fault
+🏢🤝	หน่วยงานที่เกี่ยวข้อง	nùay-ngaan-têe-gìeow-khâawng	relevant agencies
+📉💥	ส่งผลกระทบต่อ	sòng-pŏn-gra-thóp-dtòr	send effect -> have an impact on
+🛡️🏛️	ความมั่นคง	kwaam-mân-khong	stability
+🏞️🌊	เขื่อน	kèuuan	dam
+👣👀	ติดตาม	dtìt-dtaam	follow
+🔍📌	ลักษณะ	lák-sà-nà	characteristic 
+🏚️💥	ถล่ม	tà-lòhm	collapse
+🧑‍🤝‍🧑	คำสรรพนาม	kum-sàp-naam	pronouns
+🫵🙂	ตัวเอง	dtua-eng	self, you (friendly)
+🙋	ข้า	kâa	I (more polite than กู)
+👉	เอ็ง	aeng	You (more polite than มึง)
+🙋	เรา	rao	I (more polite than ข้า); we
+🫵	แก	gɛɛ	You (more polite than เอ็ง), 3rd person
+🌏📌	สถานการณ์	sa-thăan-ná-gaan	situations
+🙇‍♂️🙏	แสดงความเคารพ	sà-daeng-kwaam-kâao-róp	show respect
+😎🤝	กันเอง	gan-eeng	casual
+🤝🔗	ความสัมพันธ์	kwaam-sam-pan	relationships; bonds
+🤝🗣️	ภาษาบอกความสนิท	paa-săa-bòk-kwaam-sà-nìt	Language signals closeness.
+⚛️🔬	ฟิสิกส์อนุภาค	fí-sìk-à-nú-pâak	Particle Physics
+🚇🕳️	อุโมงค์	ù-mohng	tunnel
+⚛️🔬	เครื่องเร่งอนุภาค	krʉ̂ang-rêeng-à-nú-phâak	Particle Accelerator
+🧠📚	ทฤษฎี	trít-sà-dee	theory
+👥🏃‍♂️	แห่	hàae	To flock
+💥📉	ผลกระทบ	pŏn-grà-tóp	effects
+🚚🚛	ขนส่ง	kŏn-sòng	transport
+🌊🗺️	ช่องแคบ	chɔ̂ng-khàep	strait
+🥅	เป้าหมาย	bpâo-mǎai	goals
+⛏️🪨	ถ่านหิน	tàan-hĭn	coal
+⚙️🚀	มีประสิทธิภาพ	mii-bprà-sìt-tí-pâap	efficient
+🛠️🧠	วิธี	wí-thee	ways; methods
+🧱📦⚖️	ความหนาแน่น	kwaam-nǎa-nɛ̂ɛn	density
+📈🌱	การขยายตัว	gaan-kà-yǎai-dtua	expansion
+🛠️✏️	แก้	gâe	fix; edit
+💸🧾	ค่าดำเนินการ	kâa-dam-neern-gaan	processing fees
+🌨️🧊	ลูกเห็บ	lôok-hèp	hail (n)
+⚖️	มวล	muan	mass
+❌	ยกเลิก	yók-lə̂erk	cancel
+🌧️🌬️	มรสุม	mon-rá-sùm	monsoon
+📦🛒	ตุน	dtun	stock up
+🔮📈	พยากรณ์	phá-yaa-gawn	forecast
+🧑‍💼📋	คนจัดงาน	kon-jàt-ngaan	organizer
+🎨📚🎮	งานอดิเรก	ngaan-à-dì-rèek	hobbies
+📝	สรุป	sà-rùp	summarize
+🧠📚	จิตวิทยา	jìt-wít-thá-yaa	psychology
+🏛️📐	สถาปัตย์	sà-thăa-bpàt	architecture
+🏙️⚖️	ปัญหาสังคม	bpan-hăa-săng-khom	social issues
+📝	คำนาม	kam-nahm	noun
+🖼️🎟️	นิทรรศการ	nít-tát-sà-gǎan	exhibition
+💪🎯	ความมุ่งมั่น	kwaam-mûng-màn	determination
+✨🧘	ความเรียบง่าย	kwaam-rîap-ngâai	simplicity
+🖱️📜	เลื่อน	lêuuaen	scroll / slide
+🪏📜	ไถ	tăi	scroll / plow
+🎯🧠💪	ชำนาญ	cham-naan	skilled; proficient
+🗣️⚖️	โต้วาที	dtôh-waa-tii	debate
+🗂️	หัวข้อ	hŭa-khôr	topics
+🏛️🙏	ศาล	săan	shrine; court
+👥🏘️	ชุมชน	choom-chohn	communities
+🛠️🌱	พัฒนา	pát-tá-naa	develop
+🏆🎯	การแข่งขัน	gaan kàeng-kǎn	competition
+🎙️📺	นิเทศ	ní-tâet	Comm Arts
+🕯️🙏	จุดธูป	jùt-tûup	To light incense
+📝📣	คำร้อง	kam-róong	petition
+🛡️🔒	ปกป้อง	bpòk-bpông	protect; defend
+📉💥	ส่งผลกระทบต่อ	sòng-pŏn-gra-thóp-dtòr	have an impact on
+🙏✨	ศรัทธา	sàt-thaa	faith; faithful
+🛡️👮	พิทักษ์	pí-ták	protect; guard
+⚖️📄	คดีความ	ká-dee-kwaam	lawsuit; legal case
+📝📋	แบบสำรวจ	bàep-sǎm-rùat	survey (forms)
+🏚️🧨	รื้อถอน	rʉ́ʉ-thŏn	demolish; tear down
+🤝💡	เสนอ	sà-nə̌ə	propose
+💥🎯	กระทบ	grà-thóp	affect; impact
+🧑‍⚖️🏛️	รัฐมนตรี	rát-tha-mon-dtrii	minister
+✋✅	ยืนกราน	yeun-graan	confirm
+🗺️🌏	ภูมิภาค	poo-mí-pâak	region (ASEAN)
+🏗️	โครงสร้าง	krôhng-sâang	structure
+🦘⬆️	กระโดด	gra-dòht	jump
+🤝💬	ต่อรอง	dtòr-rɔɔng	negotiate
+📝📋	ขึ้นทะเบียน	kêun-thá-bian	To register (put a name up); To (put sth on the) list
+📝✅	ลงทะเบียน	long-thá-bian	To register (put a name down); sign up
+🙏💧	รดน้ําดําหัว	rót-náam-dam-hŭa	Pouring water on the hands of revered elders and asking for blessing
+⚖️📉	ความเหลื่อมล้ำ	khwaam-lʉ̀am-láam	inequality
+🧳🌍	ผู้อพยพ	pûu-òp-phá-yóp	immigrants
+⚡️📉	ผลกระทบ	pŏn-grà-thóp	effects
+🔁🔄	วงจรต่อเนื่อง	wong-jon-dtàaw-nʉ̂ʉang	perpetuating cycle
+🚫🤥	เชื่อถือไม่ได้	chêua-thĕuue-mâi-dâai	not reliable; not credible
+🛠️	แก้ไข	gâae-kǎi	solve; fix
+🚨⏱️	เร่งด่วน	rêng-dùan	urgent
+🏥🩺	สาธารณสุข	sàa-thaa-rá-ná-sùk	healthcare
+🔗	เชื่อม	chʉ̂ʉam	connect
+🏥👵	ศูนย์ดูแลผู้สูงอายุ	sǔun-doolae-phûu-sǔung-aa-yú	nursing home
+👵🏠	บ้านพักคนชรา	bâan-phák-kon-chraa	retirement home
+🗣️💬	สื่อสาร	sʉ̀ʉ-săan	communicate
+🤔💡	รู้เรื่อง	rúu-rêuang	make sense
+👀👏	ชม	chom	look; compliment
+🛡️👮	รปภ.	rôr-por-bor	security
+🛂	ตม.	dtɔɔ.mɔɔ	immigration
+🤩	ประทับใจ	bprà-tháp-jai	impressed
+🤯😖	ประสาทจะกิน	bpra-sàat-jà-gin	overstimulated (nerves)
+📖🛠️	คู่มือ	kûu-mʉʉ	manual
+🛟💪	เอาตัวรอด	ao-tua-râawt	survive
+📝👩‍🏫	คุมสอบ	kum-sàawp	To proctor an exam
+📝📄	ออกข้อสอบ	òk-khɔ̂ɔ-sɔ̀ɔp	To make the test (paper)
+⛏️🪨	แร่	râae	minerals (from mines)
+🎯🔍📍	เฉพาะ	chà-pɔ́	specific; unique
+🏛️🎨	กรมศิลปากร	grom-sĭn-lá-bpà-gorn	Fine Arts Department
+⚙️💻	ระบบ	ráb-bòp	system
+🛠️🏗️	ปรับปรุง	bpràp-bproong	renovate; improve
+🌊📈	ล้นหลาม	lón-lăam	overwhelming; in huge numbers
+↔️⏳	ระหว่าง	rá-wàang	during; between
+🏛️	...แห่งชาติ	hàeng-châat	national
+🧪✅	ทดสอบ	tót-sòop	to test out
+🎭✨	รอบพิเศษ	râawp-phí-sèet	extra show; special round
+🩺📄	ใบรับรองแพทย์	bai-ráp-rong-phêt	medical certificate
+🚪↩️	ถอนตัว	tŏn-tua	withdraw (pull self out)
+🛡️🌿	อนุรักษ์	à-nú-rák	preserve; conserve
+🎙️	อัด	àt	record
+🦻🔇	ที่อุดหู	têe-ùt-huu	earplugs
+📉🗑️	เสีย	sĭa	to lose; waste
+👷‍♂️👷‍♀️	คนงาน	kon-ngaan	workers
+🏚️💥	ถล่ม	tà-lòhm	collapse
+🛠️	ท่อ	tô	pipe
+💥🔨	แตก	dtàek	break; broken
+🤝	พันธมิตร	phan-thá-mít	alliance
+🧑‍⚖️🏛️	รัฐมนตรี	rát-tha-mon-dtrii	minister
+🌍🛂	ต่างประเทศ	dtàang-bprà-têet	foreign (affairs)
+🌱🧪	ปุ๋ย	bpŭi	fertilizer
+⚖️🤝	เลือกข้าง	lʉ́ak-kâang	take sides
+🗺️🌍	ภูมิรัฐศาสตร์	puum-mi-rát-thà-sàat	geopolitics
+🔄📝	ทบทวน	tóp-thuuan	review
+🤝🔗	ความสัมพันธ์	kwaam-sam-pan	relationships; bonds
+👑💪	อำนาจ	am-nâat	power (influence)
+🍽️🥀	ความหิวโหย	khwaam-hĭw-hǒey	famine
+⚔️🔥🪖	สงครามกลางเมือง	sŏng-kraam-glaang-mueang	civil war
+⚔️💥	ความขัดแย้ง	khwaam-khàt-yáeng	conflict
+🤝🗣️	การเจรจา	gaan-jay-rá-jaa	negotiation
+👥🤝	ฝ่าย	fàai	parties
+🎛️	การควบคุม	gaan-kûap-kum	control 
+🔙🚫	กลับไปเป็นเหมือนเดิมไม่ได้	glàp-bpai-bpen-mĕuan-derm-mâi-dâi	cannot go back to former state
+⛓️	ทาส	tâat	slaves
+👥	ชมรม	chom-rom	club; society
+📏🧱	หนา	năa	thick
+📄🙂	หน้า	nâa	page; face
+⚖️👨‍⚖️	กรรมการ	gam-ma-gaan	judge
+🏫📚	โรงเรียนเอกชน	roong-riian-èek-chon	private schools
+🙏💡	ขอคำแนะนำ	kŏr-kam-náe-nam	ask for advice
+💪	อุตส่าห์	ùt-sàa	พยายาม
+⚖️📉	ความเหลื่อมล้ำ	khwaam-lʉ̀am-láam	inequality
+🛠️🧩	แก้ปัญหา	gâe-bpan-hăa	solve the problem`;
+
+        const vocabPool = rawVocabData.trim().split('\n').map(line => {
+            const parts = line.split('\t').map(p => p.trim());
+            if(parts.length >= 3) {
+                const firstPart = parts[0];
+                const emojiMatch = firstPart.match(/^([\p{Emoji}\s]+)/u);
+                let emoji = "✨", th = "", ipa = "", en = "";
+                if(emojiMatch) {
+                    emoji = emojiMatch[1].trim();
+                    th = firstPart.replace(emojiMatch[1], '').trim();
+                } else {
+                    th = firstPart;
+                }
+                
+                if(!th && parts.length >= 4) {
+                    th = parts[1]; ipa = parts[2]; en = parts[3];
+                } else if (parts.length === 4) {
+                    th = parts[1]; ipa = parts[2]; en = parts[3];
+                } else {
+                    ipa = parts[1]; en = parts[2];
+                }
+                return { emoji, th, ipa, en };
+            }
+            return null;
+        }).filter(v => v !== null);
+
+        // --- CORE FUNCTIONS ---
+        function speak(text, btnElement) {
+            window.speechSynthesis.cancel();
+            document.querySelectorAll('.tts-playing').forEach(el => el.classList.remove('tts-playing'));
+            if(btnElement) btnElement.classList.add('tts-playing');
+
+            const cleanText = text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+            const msg = new SpeechSynthesisUtterance(cleanText);
+            
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang === 'th-TH' || voice.lang === 'th_TH');
+            if (thaiVoice) msg.voice = thaiVoice;
+            else msg.lang = 'th-TH';
+            
+            msg.rate = 0.9;
+            msg.onend = () => { if(btnElement) btnElement.classList.remove('tts-playing'); };
+            msg.onerror = () => { if(btnElement) btnElement.classList.remove('tts-playing'); };
+            window.speechSynthesis.speak(msg);
+        }
+
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+
+        function toggleLang(btn, lang) {
+            btn.classList.toggle(`active-${lang}`);
+            const container = btn.closest('.flex').parentElement;
+            let target = container.querySelector('.' + lang);
+            if (!target) {
+                target = btn.closest('div').parentElement.querySelector('.' + lang);
+            }
+            if(target) target.classList.toggle('hidden-content');
+        }
+
+        // --- UI BUILDER ---
+        function createSmartText(data, textClass = "text-lg text-gray-800") {
+            const id = Math.random().toString(36).substr(2, 9);
+            const thaiText = data.t;
+            const ipaText = data.i;
+            const enText = data.e;
+
+            // Optional: Ex. sentence for grammar
+            const exText = data.ex ? `<div class="mt-2 pl-4 border-l-2 border-purple-300 text-sm text-gray-600 thai-text">${data.ex}</div>` : '';
+
+            return `
+                <div class="mb-3" id="${id}">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span class="font-medium ${textClass} thai-text">${thaiText}</span>
+                        <button onclick="speak('${thaiText.replace(/'/g, "\\'")}', this)" class="tts-button text-blue-500 text-lg">🔊</button>
+                        <div class="flex gap-1 ml-auto">
+                            <button onclick="toggleLang(this, 'ipa')" class="btn-toggle">IPA</button>
+                            <button onclick="toggleLang(this, 'en')" class="btn-toggle">EN</button>
+                        </div>
+                    </div>
+                    <div class="ipa hidden-content text-orange-600 font-mono text-sm mb-1">${ipaText}</div>
+                    <div class="en hidden-content text-blue-600 italic text-sm mb-1">${enText}</div>
+                    ${exText}
+                </div>
+            `;
+        }
+
+        function createHeader(data, icon, colorClass) {
+            return `
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="text-3xl">${icon}</span>
+                    <h2 class="text-2xl font-bold ${colorClass} thai-text">${data.t}</h2>
+                    <button onclick="speak('${data.t.replace(/'/g, "\\'")}', this)" class="tts-button text-blue-500 text-xl">🔊</button>
+                    <div class="flex gap-1 ml-auto">
+                        <button onclick="toggleLang(this, 'ipa')" class="btn-toggle">IPA</button>
+                        <button onclick="toggleLang(this, 'en')" class="btn-toggle">EN</button>
+                    </div>
+                </div>
+                <div class="ipa hidden-content text-orange-600 font-mono text-sm mt-1 ml-12">${data.i}</div>
+                <div class="en hidden-content text-blue-600 italic text-sm mt-1 ml-12">${data.e}</div>
+            `;
+        }
+
+        function randomVocab() {
+            const displayArea = document.getElementById('vocab-card'); 
+            const word = vocabPool[Math.floor(Math.random() * vocabPool.length)];
+            
+            // Random question templates
+            const questions = [
+                `คุณคิดว่า <b>${word.th}</b> สำคัญยังไง?`,
+                `แต่งประโยคด้วยคำว่า <b>${word.th}</b> ให้ฟังหน่อย`,
+                `คุณนึกถึงอะไรเมื่อได้ยินคำว่า <b>${word.th}</b>?`,
+                `<b>${word.th}</b> เกี่ยวข้องกับชีวิตคุณไหม?`
+            ];
+            const q = questions[Math.floor(Math.random() * questions.length)];
+            const cleanQ = q.replace(/<\/?b>/g, '');
+
+            displayArea.innerHTML = `
+                <div class="text-center w-full animate-pop">
+                    <div class="text-5xl mb-4">${word.emoji}</div>
+                    <div class="flex flex-wrap items-center justify-center gap-2 mb-2">
+                        <span class="text-3xl font-bold text-indigo-700 thai-text">${word.th}</span>
+                        <button onclick="speak('${word.th}', this)" class="tts-button text-blue-500 text-2xl">🔊</button>
+                    </div>
+                    <div class="flex gap-2 justify-center mt-3 mb-2">
+                        <button onclick="toggleLang(this, 'ipa')" class="btn-toggle text-xs">IPA</button>
+                        <button onclick="toggleLang(this, 'en')" class="btn-toggle text-xs">EN</button>
+                    </div>
+                    <div class="ipa hidden-content text-orange-600 font-mono text-base mb-1 w-full text-center">/${word.ipa}/</div>
+                    <div class="en hidden-content text-blue-600 italic text-base w-full text-center">${word.en}</div>
+                    
+                    <div class="mt-6 p-4 bg-indigo-50 border border-indigo-100 rounded-xl text-left">
+                        <div class="flex items-center gap-2">
+                            <span class="text-indigo-900 font-medium">💬 ครูถาม (Tutor asks):</span>
+                            <button onclick="speak('${cleanQ}', this)" class="tts-button text-indigo-500 text-lg">🔊</button>
+                        </div>
+                        <p class="text-lg mt-1 text-indigo-800">${q}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize UI
+        window.onload = function() {
+            // Headings
+            document.getElementById('heading-review').innerHTML = createHeader(content.headings.review, "🎲", "text-indigo-700");
+            document.getElementById('heading-leadin').innerHTML = createHeader(content.headings.leadin, "🤔", "text-emerald-700");
+            document.getElementById('heading-video').innerHTML = createHeader(content.headings.video, "🎬", "text-rose-700");
+            document.getElementById('heading-script').innerHTML = createHeader(content.headings.script, "💬", "text-rose-800");
+            document.getElementById('heading-vid-comp').innerHTML = createHeader(content.headings.vidComp, "❓", "text-amber-700");
+            document.getElementById('heading-vocab').innerHTML = createHeader(content.headings.vocab, "🎯", "text-purple-700");
+            document.getElementById('heading-grammar').innerHTML = createHeader(content.headings.grammar, "🧱", "text-purple-700");
+            document.getElementById('heading-discussion').innerHTML = createHeader(content.headings.discussion, "🗣️", "text-teal-700");
+            document.getElementById('heading-speaking').innerHTML = createHeader(content.headings.speaking, "🎤", "text-yellow-600");
+            document.getElementById('heading-extension').innerHTML = createHeader(content.headings.extension, "⏱️", "text-gray-700");
+            document.getElementById('heading-additional-vocab').innerHTML = createHeader(content.headings.additionalVocab, "📚", "text-slate-700");
+
+            // Content
+            document.getElementById('instruction-review').innerHTML = createSmartText(content.review.instruction, "text-gray-700 text-lg text-center");
+            
+            document.getElementById('leadin-questions').innerHTML = content.leadin.map(q => 
+                `<div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('script-content').innerHTML = content.scriptLines.map((line) => {
+                const isTeacher = line.t.includes('ครู:');
+                const bg = isTeacher ? 'bg-white border-gray-200' : 'bg-rose-50 border-rose-100';
+                return `<div class="p-3 rounded-xl shadow-sm border ${bg}">${createSmartText(line, "text-[0.95rem]")}</div>`;
+            }).join('');
+
+            document.getElementById('vid-comp-questions').innerHTML = content.vidComp.map(q => 
+                `<div class="bg-amber-50 p-4 rounded-xl border border-amber-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('target-vocab-list').innerHTML = content.targetVocab.map(v => 
+                `<div class="bg-purple-50 p-4 rounded-xl border border-purple-100 flex flex-col justify-center">
+                    <div class="text-3xl mb-2 text-center">${v.emoji}</div>
+                    ${createSmartText(v, "text-xl font-bold text-center text-purple-900 w-full")}
+                </div>`
+            ).join('');
+
+            document.getElementById('target-grammar-list').innerHTML = content.grammar.map(g => 
+                `<div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    ${createSmartText(g, "text-lg font-bold text-purple-800")}
+                </div>`
+            ).join('');
+
+            document.getElementById('discussion-questions').innerHTML = content.discussion.map(q => 
+                `<div class="bg-teal-50 p-4 rounded-xl border border-teal-100">${createSmartText(q)}</div>`
+            ).join('');
+
+            document.getElementById('speaking-tasks').innerHTML = content.speaking.map(task => 
+                `<div class="bg-yellow-50 p-5 rounded-2xl border border-yellow-200">
+                    <div class="text-4xl mb-3">${task.icon}</div>
+                    <div class="font-bold text-xl text-yellow-800 mb-2">${task.title}</div>
+                    ${createSmartText({t: task.desc, i: task.i, e: task.e}, "text-gray-800")}
+                </div>`
+            ).join('');
+
+            document.getElementById('extension-tasks').innerHTML = content.extension.map(task => 
+                `<div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="text-4xl mb-3">${task.icon}</div>
+                    <div class="font-bold text-xl text-gray-800 mb-2">${task.title}</div>
+                    ${createSmartText({t: task.desc, i: task.i, e: task.e}, "text-gray-700")}
+                </div>`
+            ).join('');
+
+            document.getElementById('additional-vocab-list').innerHTML = content.additionalVocab.map(v => 
+                `<div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">${createSmartText(v, "text-xl font-bold text-slate-800")}</div>`
+            ).join('');
+        };
+    </script>
+</body>
+</html>
