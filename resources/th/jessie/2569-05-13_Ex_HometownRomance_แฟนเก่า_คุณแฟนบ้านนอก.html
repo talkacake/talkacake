@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ฝึกพูดภาษาไทย</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.95); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide { animation: slideIn 0.3s ease-out forwards; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+    </style>
+</head>
+<body class="text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICONS ---
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const icons = {
+                refresh: <><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></>,
+                book: <><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></>,
+                message: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>,
+                zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>,
+                check: <polyline points="20 6 9 17 4 12"/>,
+                x: <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+            };
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                    {icons[name]}
+                </svg>
+            );
+        };
+
+        // --- TTS Engine ---
+        const speakThai = (text, e) => {
+            if(e) e.stopPropagation();
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // --- Core SmartText Component ---
+        const SmartText = ({ th, ipa, en, emoji = "", size = "md", isTitle = false, isButton = false }) => {
+            const [showIPA, setShowIPA] = useState(false);
+            const [showEN, setShowEN] = useState(false);
+
+            const textSize = size === "lg" ? "text-xl md:text-2xl font-bold" : 
+                             size === "xl" ? "text-2xl md:text-3xl font-bold" : 
+                             "text-lg md:text-xl font-medium";
+
+            if (isButton) {
+                return (
+                    <div className="flex flex-col items-center">
+                        <span className="font-bold text-lg">{th}</span>
+                        {(showIPA || showEN) && (
+                            <div className="text-xs mt-1 opacity-80 text-center">
+                                {showIPA && <div>/{ipa}/</div>}
+                                {showEN && <div className="italic">{en}</div>}
+                            </div>
+                        )}
+                        <div className="flex gap-1 mt-2">
+                            {ipa && <button onClick={(e) => { e.stopPropagation(); setShowIPA(!showIPA); }} className="px-2 py-1 bg-white/20 rounded text-[10px]">IPA</button>}
+                            {en && <button onClick={(e) => { e.stopPropagation(); setShowEN(!showEN); }} className="px-2 py-1 bg-white/20 rounded text-[10px]">EN</button>}
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className={`flex flex-col gap-2 ${isTitle ? 'mb-4 w-full' : 'bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3 w-full'}`}>
+                    <div className={`flex items-start gap-3 ${isTitle ? 'justify-center text-center flex-col items-center' : ''}`}>
+                        {emoji && <span className={`shrink-0 ${isTitle ? 'text-5xl drop-shadow-md mb-2' : 'text-2xl mt-0.5'}`}>{emoji}</span>}
+                        <div className={`flex-1 w-full ${isTitle ? 'flex flex-col items-center' : ''}`}>
+                            <div className={`flex items-center gap-2 mb-2 flex-wrap w-full ${isTitle ? 'justify-center' : ''}`}>
+                                <button 
+                                    onClick={(e) => speakThai(th, e)}
+                                    className={`p-2 rounded-full btn-press shrink-0 ${isTitle ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-sky-100 text-sky-600 hover:bg-sky-200'}`}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                </button>
+                                <span className={`${textSize} ${isTitle ? 'text-white' : 'text-slate-800'} leading-snug break-words`}>{th}</span>
+                            </div>
+
+                            <div className={`flex gap-2 ${isTitle ? 'justify-center' : ''}`}>
+                                {ipa && (
+                                    <button 
+                                        onClick={() => setShowIPA(!showIPA)}
+                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showIPA ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-400 border-slate-200'} ${isTitle ? '!bg-white/20 !border-white/30 !text-white' : ''}`}
+                                    >
+                                        IPA
+                                    </button>
+                                )}
+                                {en && (
+                                    <button 
+                                        onClick={() => setShowEN(!showEN)}
+                                        className={`px-3 py-1 rounded-lg text-sm font-bold border btn-press ${showEN ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-400 border-slate-200'} ${isTitle ? '!bg-white/20 !border-white/30 !text-white' : ''}`}
+                                    >
+                                        EN
+                                    </button>
+                                )}
+                            </div>
+
+                            {showIPA && <div className={`mt-2 font-mono text-sm pl-3 border-l-2 text-left w-full ${isTitle ? 'border-white/50 text-sky-100' : 'border-indigo-300 text-indigo-600'}`}>{ipa}</div>}
+                            {showEN && <div className={`mt-1 text-sm pl-3 border-l-2 text-left w-full ${isTitle ? 'border-white/50 text-sky-100 italic' : 'border-emerald-300 text-emerald-700 italic'}`}>{en}</div>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Exercise Components ---
+        const QandA = ({ items }) => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            return (
+                <div className="bg-sky-50 p-5 rounded-[2rem] shadow-sm border border-sky-100 mb-6">
+                    <SmartText th="ถาม-ตอบ" ipa="tǎam-dtɔ̀ɔp" en="Q&A" emoji="💬" size="lg" />
+                    <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
+                    
+                    <div className="bg-white p-4 rounded-xl border border-sky-200 mb-4 shadow-sm">
+                        <span className="text-xs font-bold text-sky-500 uppercase tracking-widest block mb-2">Q</span>
+                        <SmartText th={items[currentIdx].q.th} ipa={items[currentIdx].q.ipa} en={items[currentIdx].q.en} emoji="❓" />
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border border-sky-200 mb-4 shadow-sm">
+                        <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest block mb-2">A</span>
+                        <SmartText th={items[currentIdx].a.th} ipa={items[currentIdx].a.ipa} en={items[currentIdx].a.en} emoji="💡" />
+                    </div>
+
+                    <div className="flex justify-between mt-4">
+                        <button onClick={() => setCurrentIdx(prev => Math.max(0, prev - 1))} disabled={currentIdx === 0} className="p-3 bg-white text-slate-500 rounded-xl font-bold btn-press disabled:opacity-50">⬅️</button>
+                        <button onClick={() => setCurrentIdx(prev => Math.min(items.length - 1, prev + 1))} disabled={currentIdx === items.length - 1} className="px-6 py-3 bg-sky-500 text-white rounded-xl font-bold btn-press shadow-md disabled:opacity-50">ข้อต่อไป ➡️</button>
+                    </div>
+                </div>
+            );
+        }
+
+        const OrderSentence = ({ items }) => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [selectedWords, setSelectedWords] = useState([]);
+            const [availableWords, setAvailableWords] = useState([]);
+            const [isCorrect, setIsCorrect] = useState(false);
+            const [showError, setShowError] = useState(false);
+
+            useEffect(() => { resetQuestion(); }, [currentIdx]);
+
+            const resetQuestion = () => {
+                setAvailableWords([...items[currentIdx].jumbled]);
+                setSelectedWords([]);
+                setIsCorrect(false);
+                setShowError(false);
+            };
+
+            const selectWord = (word, index) => {
+                setSelectedWords([...selectedWords, word]);
+                const newAvailable = [...availableWords];
+                newAvailable.splice(index, 1);
+                setAvailableWords(newAvailable);
+                setShowError(false);
+            };
+
+            const unselectWord = (word, index) => {
+                setAvailableWords([...availableWords, word]);
+                const newSelected = [...selectedWords];
+                newSelected.splice(index, 1);
+                setSelectedWords(newSelected);
+                setShowError(false);
+                setIsCorrect(false);
+            };
+
+            const checkAnswer = () => {
+                const currentAnswer = selectedWords.map(w => w.th).join('').replace(/\s+/g, '');
+                const targetAnswer = items[currentIdx].target.th.replace(/\s+/g, '');
+                if (currentAnswer === targetAnswer && availableWords.length === 0) {
+                    setIsCorrect(true); setShowError(false); speakThai(items[currentIdx].target.th);
+                } else { setShowError(true); }
+            };
+
+            return (
+                <div className="bg-orange-50 p-5 rounded-[2rem] shadow-sm border border-orange-100 mb-6">
+                    <SmartText th="เรียงประโยค" ipa="riang bprà-yòok" en="Order Sentence" emoji="🧩" size="lg" />
+                    <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
+                    
+                    <div className="min-h-[80px] p-4 bg-white rounded-xl mb-4 border-2 border-dashed border-orange-200 flex flex-wrap gap-2 items-center shadow-inner">
+                        {selectedWords.map((w, i) => (
+                            <button key={i} onClick={() => unselectWord(w, i)} className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold text-lg shadow-sm btn-press">
+                                {w.th.trim()}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                        {availableWords.map((w, i) => (
+                            <button key={i} onClick={() => selectWord(w, i)} className="px-4 py-2 bg-white text-slate-700 border border-slate-300 rounded-lg font-bold text-lg hover:bg-slate-50 btn-press shadow-sm">
+                                {w.th.trim()}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-col items-center gap-3 mb-4">
+                        {availableWords.length === 0 && !isCorrect && (
+                            <button onClick={checkAnswer} className="px-8 py-3 bg-slate-800 text-white rounded-xl font-bold text-lg btn-press shadow-md">
+                                ตรวจคำตอบ
+                            </button>
+                        )}
+                        {showError && <div className="text-rose-500 font-bold animate-shake text-sm">❌ ลองใหม่อีกครั้ง</div>}
+                    </div>
+
+                    {isCorrect && (
+                        <div className="animate-slide bg-white p-4 rounded-xl border-2 border-emerald-400 mb-4 shadow-sm">
+                            <SmartText th={items[currentIdx].target.th} ipa={items[currentIdx].target.ipa} en={items[currentIdx].target.en} emoji="✅" />
+                        </div>
+                    )}
+
+                    <div className="flex justify-between items-center">
+                        <button onClick={resetQuestion} className="px-4 py-2 text-slate-500 bg-white border border-slate-200 rounded-xl font-bold btn-press">เริ่มใหม่</button>
+                        {isCorrect && currentIdx < items.length - 1 && <button onClick={() => setCurrentIdx(currentIdx + 1)} className="px-6 py-2 bg-orange-500 text-white rounded-xl font-bold btn-press shadow-md">ข้อต่อไป ➡️</button>}
+                        {isCorrect && currentIdx === items.length - 1 && <span className="text-emerald-600 font-bold mr-2">🎉 เก่งมาก!</span>}
+                    </div>
+                </div>
+            );
+        };
+
+        const GapFill = ({ items }) => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [selectedOpt, setSelectedOpt] = useState(null);
+            const [isCorrect, setIsCorrect] = useState(false);
+            const [showError, setShowError] = useState(false);
+
+            useEffect(() => {
+                setSelectedOpt(null); setIsCorrect(false); setShowError(false);
+            }, [currentIdx]);
+
+            const handleSelect = (idx, correct) => {
+                setSelectedOpt(idx);
+                if (correct) { setIsCorrect(true); setShowError(false); speakThai(items[currentIdx].full.th); } 
+                else { setIsCorrect(false); setShowError(true); }
+            };
+
+            const q = items[currentIdx];
+
+            return (
+                <div className="bg-purple-50 p-5 rounded-[2rem] shadow-sm border border-purple-100 mb-6">
+                    <SmartText th="เติมคำในช่องว่าง" ipa="dtəəm kam nai chɔ̂ng wâang" en="Gap Fill" emoji="🕳️" size="lg" />
+                    <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
+                    
+                    <div className="bg-white p-6 rounded-xl border border-purple-200 mb-6 shadow-sm text-center text-xl font-bold text-slate-700 leading-relaxed">
+                        {q.pre} <span className={`inline-block border-b-2 px-4 min-w-[80px] ${isCorrect ? 'text-emerald-600 border-emerald-500' : (showError ? 'text-rose-500 border-rose-500' : 'border-slate-400 text-slate-400')}`}>
+                            {selectedOpt !== null ? q.options[selectedOpt].th : "..."}
+                        </span> {q.post}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 mb-4">
+                        {q.options.map((opt, i) => (
+                            <button 
+                                key={i} onClick={() => handleSelect(i, opt.correct)} disabled={isCorrect}
+                                className={`p-4 rounded-xl border-2 font-bold text-lg transition-all btn-press
+                                    ${isCorrect && opt.correct ? 'bg-emerald-100 border-emerald-500 text-emerald-800' : 
+                                      selectedOpt === i && !opt.correct ? 'bg-rose-100 border-rose-500 text-rose-800 animate-shake' : 
+                                      'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+                            >
+                                {opt.th}
+                            </button>
+                        ))}
+                    </div>
+
+                    {isCorrect && (
+                        <div className="animate-slide bg-white p-4 rounded-xl border border-emerald-200 mb-4">
+                            <SmartText th={q.full.th} ipa={q.full.ipa} en={q.full.en} emoji="✅" />
+                        </div>
+                    )}
+
+                    <div className="flex justify-end">
+                        {isCorrect && currentIdx < items.length - 1 && <button onClick={() => setCurrentIdx(c => c + 1)} className="px-6 py-2 bg-purple-500 text-white rounded-xl font-bold btn-press shadow-md">ข้อต่อไป ➡️</button>}
+                        {isCorrect && currentIdx === items.length - 1 && <span className="text-emerald-600 font-bold">🎉 จบแล้ว</span>}
+                    </div>
+                </div>
+            );
+        };
+
+        const Matching = ({ pairs }) => {
+            const [selectedLeft, setSelectedLeft] = useState(null);
+            const [selectedRight, setSelectedRight] = useState(null);
+            const [solved, setSolved] = useState([]);
+            const [shaking, setShaking] = useState(false);
+            
+            // Randomize right side on mount
+            const [rightOptions, setRightOptions] = useState([]);
+            useEffect(() => { setRightOptions([...pairs].sort(() => Math.random() - 0.5)); }, []);
+
+            const handleLeft = (id) => { if(!solved.includes(id)) { setSelectedLeft(id); checkMatch(id, selectedRight); } };
+            const handleRight = (id) => { if(!solved.includes(id)) { setSelectedRight(id); checkMatch(selectedLeft, id); } };
+
+            const checkMatch = (l, r) => {
+                if (l && r) {
+                    if (l === r) {
+                        setSolved([...solved, l]); setSelectedLeft(null); setSelectedRight(null);
+                        speakThai(pairs.find(p => p.id === l).th);
+                    } else {
+                        setShaking(true);
+                        setTimeout(() => { setShaking(false); setSelectedLeft(null); setSelectedRight(null); }, 500);
+                    }
+                }
+            };
+
+            return (
+                <div className={`bg-emerald-50 p-5 rounded-[2rem] shadow-sm border border-emerald-100 mb-6 ${shaking ? 'animate-shake' : ''}`}>
+                    <SmartText th="จับคู่ความหมาย" ipa="jàp-kûu kwaam-mǎi" en="Matching" emoji="🔗" size="lg" />
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="space-y-3">
+                            {pairs.map(p => (
+                                <button key={p.id} onClick={() => handleLeft(p.id)} disabled={solved.includes(p.id)}
+                                    className={`w-full p-4 rounded-xl border-2 font-bold text-left btn-press transition-colors
+                                        ${solved.includes(p.id) ? 'bg-emerald-200 border-emerald-500 text-emerald-800 opacity-60' : 
+                                          selectedLeft === p.id ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white border-slate-200 text-slate-700'}`}
+                                >
+                                    {p.th}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="space-y-3">
+                            {rightOptions.map(p => (
+                                <button key={p.id} onClick={() => handleRight(p.id)} disabled={solved.includes(p.id)}
+                                    className={`w-full p-4 rounded-xl border-2 font-medium text-left btn-press transition-colors flex items-center justify-center
+                                        ${solved.includes(p.id) ? 'bg-emerald-200 border-emerald-500 text-emerald-800 opacity-60' : 
+                                          selectedRight === p.id ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white border-slate-200 text-slate-500'}`}
+                                >
+                                    {p.emoji}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ErrorCorrection = ({ items }) => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [isCorrect, setIsCorrect] = useState(false);
+            const [showError, setShowError] = useState(false);
+
+            useEffect(() => { setIsCorrect(false); setShowError(false); }, [currentIdx]);
+
+            const q = items[currentIdx];
+
+            const handleSelect = (idx) => {
+                if (idx === q.wrongIdx) { setIsCorrect(true); setShowError(false); speakThai(q.full.th); } 
+                else { setIsCorrect(false); setShowError(true); }
+            };
+
+            return (
+                <div className="bg-rose-50 p-5 rounded-[2rem] shadow-sm border border-rose-100 mb-6">
+                    <SmartText th="หาคำที่ผิด" ipa="hǎa kam tîi pìt" en="Find the mistake" emoji="🔍" size="lg" />
+                    <div className="text-right mb-2 text-sm text-slate-400 font-bold">{currentIdx + 1} / {items.length}</div>
+                    
+                    <div className="flex flex-wrap justify-center gap-2 mb-6 bg-white p-6 rounded-xl border border-rose-200 shadow-sm">
+                        {q.sentence.map((w, i) => (
+                            <button 
+                                key={i} onClick={() => handleSelect(i)} disabled={isCorrect}
+                                className={`text-xl font-bold p-2 rounded-lg transition-colors btn-press ${isCorrect && i === q.wrongIdx ? 'bg-rose-500 text-white line-through' : 'text-slate-800 hover:bg-slate-100'}`}
+                            >
+                                {w}
+                            </button>
+                        ))}
+                    </div>
+
+                    {showError && <div className="text-rose-500 font-bold text-center animate-shake text-sm mb-4">❌ คำนี้ยังไม่ใช่ ลองหาดูดีๆ</div>}
+
+                    {isCorrect && (
+                        <div className="animate-slide bg-white p-4 rounded-xl border border-emerald-200 mb-4">
+                            <div className="text-emerald-600 font-bold mb-2">ประโยคที่ถูกต้อง:</div>
+                            <SmartText th={q.full.th} ipa={q.full.ipa} en={q.full.en} emoji="✅" />
+                        </div>
+                    )}
+
+                    <div className="flex justify-end">
+                        {isCorrect && currentIdx < items.length - 1 && <button onClick={() => setCurrentIdx(c => c + 1)} className="px-6 py-2 bg-rose-500 text-white rounded-xl font-bold btn-press shadow-md">ข้อต่อไป ➡️</button>}
+                        {isCorrect && currentIdx === items.length - 1 && <span className="text-emerald-600 font-bold">🎉 จบแล้ว</span>}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Data ---
+        // (Only using provided vocab)
+        const qaData = [
+            {
+                q: { th: "คุณชอบไปเที่ยวทะเลไหม?", ipa: "kun chɔ̂ɔp bpai tîao tá-lee mǎi?", en: "Do you like going to the sea?" },
+                a: { th: "ชอบมากค่ะ ทะเลสวย", ipa: "chɔ̂ɔp mâak kâ, tá-lee sǔuai", en: "I like it very much. The sea is beautiful." }
+            },
+            {
+                q: { th: "เมื่อวานเกิดอะไรขึ้น?", ipa: "mʉ̂ʉa waan gə̀ət à rai kʉ̂n?", en: "What happened yesterday?" },
+                a: { th: "รถชนกัน รถพยาบาลมา", ipa: "rót chon gan, rót pá yaa baan maa", en: "Cars collided, an ambulance came." }
+            },
+            {
+                q: { th: "ตอนกลางคืนคุณทำอะไร?", ipa: "dtɔɔn glaang kʉʉn kun tam à rai?", en: "What do you do at night?" },
+                a: { th: "ฉันนอน ไม่ก็ดูทีวี", ipa: "chǎn nɔɔn, mâi gɔ̂ɔ duu tii wii", en: "I sleep, or watch TV." }
+            },
+            {
+                q: { th: "คุณหิวไหม มีอะไรกินบ้าง?", ipa: "kun hǐu mǎi, mii à rai gin bâang?", en: "Are you hungry? What is there to eat?" },
+                a: { th: "มีข้าวผัดรวมมิตร กินให้อร่อยนะ", ipa: "mii kâao pàt ruam mít, gin hâi à rɔ̀ɔi ná", en: "There is mixed seafood fried rice. Enjoy your meal." }
+            },
+            {
+                q: { th: "ปวดคอ ทำยังไงดี?", ipa: "bpùat kɔɔ, tam yang ngai dii?", en: "My neck hurts, what should I do?" },
+                a: { th: "ก็ต้องไปปรึกษาหมอ หรือทายา", ipa: "gɔ̂ɔ dtɔ̂ɔng bpai bprʉ̀k sǎa mɔ̌ɔ, rʉ̌ʉ taa yaa", en: "You have to consult a doctor, or apply medicine." }
+            }
+        ];
+
+        const orderData = [
+            {
+                jumbled: [{th:"พี่คะ "}, {th:"ช่วยนวด "}, {th:"หน่อยค่ะ "}, {th:"บ่า "}],
+                target: { th: "พี่คะ ช่วยนวด บ่า หน่อยค่ะ ", ipa: "pîi ká chûai nûat bàa nɔ̀ɔi kâ", en: "Sister, please massage my shoulder a bit." }
+            },
+            {
+                jumbled: [{th:"ไป "}, {th:"ตอนกลางคืน "}, {th:"ตกหมึก "}],
+                target: { th: "ไป ตกหมึก ตอนกลางคืน ", ipa: "bpai dtòk mʉ̀k dtɔɔn glaang kʉʉn", en: "Go squid fishing at night." }
+            },
+            {
+                jumbled: [{th:"แดดแรง "}, {th:"ทา "}, {th:"ต้อง "}, {th:"ครีมกันแดด "}],
+                target: { th: "แดดแรง ต้อง ทา ครีมกันแดด ", ipa: "dɛ̀ɛt rɛɛng dtɔ̂ng taa kriim-gan-dɛ̀ɛt", en: "Strong sun, must apply sunscreen." }
+            },
+            {
+                jumbled: [{th:"ขอ "}, {th:"เช่า "}, {th:"รถ "}, {th:"ขับ "}],
+                target: { th: "ขอ เช่า รถ ขับ ", ipa: "kɔ̌ɔ châo rót kàp", en: "Can I rent a car to drive?" }
+            },
+            {
+                jumbled: [{th:"จอง "}, {th:"โรงแรม "}, {th:"ไว้ "}, {th:"แล้ว "}],
+                target: { th: "จอง โรงแรม ไว้ แล้ว ", ipa: "jɔɔng roong rɛɛm wái lɛ́ɛo", en: "Booked the hotel already." }
+            }
+        ];
+
+        const gapFillData = [
+            {
+                pre: "ไม่ได้เจอ", post: "นานเลย สบายดีไหม?",
+                options: [
+                    { th: "กอด", correct: false },
+                    { th: "กัน", correct: true },
+                    { th: "ใกล้", correct: false }
+                ],
+                full: { th: "ไม่ได้เจอกันนานเลย สบายดีไหม?", ipa: "mâi dâi jəə gan naan ləəi sà-baai-dii mǎi?", en: "Haven't seen each other for a long time. Are you well?" }
+            },
+            {
+                pre: "ขับรถช้าๆ นะคะ ทาง", post: "",
+                options: [
+                    { th: "ปลอดภัย", correct: false },
+                    { th: "อันตราย", correct: true },
+                    { th: "สะอาด", correct: false }
+                ],
+                full: { th: "ขับรถช้าๆ นะคะ ทางอันตราย", ipa: "kàp rót cháa-cháa ná ká taang an-dtà-raai", en: "Drive slowly please, the road is dangerous." }
+            },
+            {
+                pre: "ขอกุญแจ", post: "หน่อยได้ไหมคะ",
+                options: [
+                    { th: "ห้อง", correct: true },
+                    { th: "เงิน", correct: false },
+                    { th: "หมอ", correct: false }
+                ],
+                full: { th: "ขอกุญแจห้องหน่อยได้ไหมคะ", ipa: "kɔ̌ɔ gun-jɛɛ hɔ̂ng nɔ̀ɔi dâi mǎi ká", en: "Can I have the room key please?" }
+            },
+            {
+                pre: "น้ำใสมาก เห็นก้น", post: "เลย",
+                options: [
+                    { th: "แก้ว", correct: false },
+                    { th: "ทะเล", correct: true },
+                    { th: "ขวด", correct: false }
+                ],
+                full: { th: "น้ำใสมาก เห็นก้นทะเลเลย", ipa: "náam sǎi mâak hěn gôn tá-lee ləəi", en: "The water is very clear, can see the bottom of the sea." }
+            },
+            {
+                pre: "มี", post: "อะไรกินบ้าง?",
+                options: [
+                    { th: "ใคร", correct: false },
+                    { th: "หมา", correct: false },
+                    { th: "อาหาร", correct: true }
+                ],
+                full: { th: "มีอาหารอะไรกินบ้าง?", ipa: "mii aa-hǎan à-rai gin bâang?", en: "Is there any food to eat?" }
+            }
+        ];
+
+        const matchingData = [
+            { id: 1, th: "ปวดคอ", emoji: "🤕" },
+            { id: 2, th: "กุญแจ", emoji: "🔑" },
+            { id: 3, th: "ทะเล", emoji: "🌊" },
+            { id: 4, th: "โรงแรม", emoji: "🏨" }
+        ];
+
+        const errorData = [
+            {
+                sentence: ["เขา", "บอก", "ว่า", "กินยา", "ไม่", "สบายดี"],
+                wrongIdx: 3,
+                full: { th: "เขาบอกว่าไม่สบายดี", ipa: "kǎo bɔ̀ɔk wâa mâi sà-baai dii", en: "He said he is not well." }
+            },
+            {
+                sentence: ["ขับรถ", "หมอ", "ช้าๆ", "นะ", "อันตราย"],
+                wrongIdx: 1,
+                full: { th: "ขับรถช้าๆ นะ อันตราย", ipa: "kàp rót cháa-cháa ná an-dtà-raai", en: "Drive slowly, it's dangerous." }
+            },
+            {
+                sentence: ["ฉัน", "จอง", "ร่ม", "โรงแรม", "ไว้"],
+                wrongIdx: 2,
+                full: { th: "ฉันจองโรงแรมไว้", ipa: "chǎn jɔɔng roong-rɛɛm wái", en: "I booked a hotel." }
+            },
+            {
+                sentence: ["เห็น", "ก้น", "แว่นตา", "ทะเล", "ไหม"],
+                wrongIdx: 2,
+                full: { th: "เห็นก้นทะเลไหม", ipa: "hěn gôn tá-lee mǎi", en: "Do you see the bottom of the sea?" }
+            },
+            {
+                sentence: ["เพื่อน", "เก่า", "ตกหมึก", "ไม่ได้", "เจอ", "กัน", "นาน"],
+                wrongIdx: 2,
+                full: { th: "เพื่อนเก่า ไม่ได้เจอกันนาน", ipa: "pʉ̂an gào mâi dâi jəə gan naan", en: "Old friend, haven't seen each other for a long time." }
+            }
+        ];
+
+        const extensionData = [
+            {
+                icon: "🎭",
+                title: { th: "บทบาทสมมติ (Role-play)", ipa: "bòt-bàat sǒm-mút", en: "Role-play" },
+                items: [
+                    { th: "คุณเช่ารถขับไปหาเพื่อนที่โฮมสเตย์ แต่แอร์ไม่เย็น", ipa: "kun châo rót kàp bpai hǎa pʉ̂an tîi hoom sà-dtee dtɛ̀ɛ ɛɛ mâi yen", en: "You rent a car to drive to your friend's homestay, but the AC isn't cold." },
+                    { th: "เพื่อน: ทำไมมาถึงสาย เกิดอะไรขึ้น?", ipa: "pʉ̂an: tam-mai maa tʉ̌ng sǎai gə̀ət à-rai kʉ̂n?", en: "Friend: Why did you arrive late? What happened?" },
+                    { th: "คุณ: เล่าปัญหา (รถแอร์ไม่เย็น, ขับหลงทาง)", ipa: "kun: lâo bpan-hǎa (rót ɛɛ mâi yen, kàp lǒng taang)", en: "You: Tell the problem (car AC not cold, drove lost)." }
+                ]
+            },
+            {
+                icon: "🗣️",
+                title: { th: "เกมพูดคุย (Speaking Game)", ipa: "geem pûut kui", en: "Speaking Game" },
+                items: [
+                    { th: "ผลัดกันแต่งประโยคจากคำศัพท์ 3 คำ", ipa: "plàt gan dtɛ̀ng bprà-yòok jàak kam-sàp sǎam kam", en: "Take turns making a sentence from 3 vocabulary words." },
+                    { th: "คำ: ทะเล, กลางคืน, ตกหมึก", ipa: "kam: tá-lee, glaang kʉʉn, dtòk mʉ̀k", en: "Words: Sea, Night, Squid fishing" },
+                    { th: "คำ: ปวดคอ, หมอ, ยา", ipa: "kam: bpùat kɔɔ, mɔ̌ɔ, yaa", en: "Words: Neck pain, Doctor, Medicine" }
+                ]
+            },
+            {
+                icon: "⚖️",
+                title: { th: "โต้วาที (Debate)", ipa: "dtôo waa tii", en: "Debate" },
+                items: [
+                    { th: "เที่ยว 'โรงแรม' หรือ 'โฮมสเตย์' ดีกว่ากัน?", ipa: "tîao 'roong rɛɛm' rʉ̌ʉ 'hoom sà-dtee' dii gwàa gan?", en: "Is traveling to a 'Hotel' or 'Homestay' better?" },
+                    { th: "หาข้อดีและข้อเสีย (แพง, สะดวก, เพื่อนเยอะ)", ipa: "hǎa kɔ̂ɔ-dii lɛ́ kɔ̂ɔ-sǐa (pɛɛng, sà-dùak, pʉ̂an yə́)", en: "Find pros and cons (expensive, convenient, lots of friends)." }
+                ]
+            },
+            {
+                icon: "💬",
+                title: { th: "คำถามชวนคุย (Discussion)", ipa: "kam tǎam chuan kui", en: "Discussion" },
+                items: [
+                    { th: "1. เวลาไปทะเล คุณชอบทำกิจกรรมอะไรมากที่สุด?", ipa: "wee-laa bpai tá-lee, kun chɔ̂ɔp tam gìt-jà-gam à-rai mâak tîi-sùt?", en: "When going to the sea, what activity do you like doing the most?" },
+                    { th: "2. คุณเคยเกิดอุบัติเหตุตอนไปเที่ยวไหม?", ipa: "kun kəəi gə̀ət ù-bàt-dtì-hèet dtɔɔn bpai tîao mǎi?", en: "Have you ever had an accident while traveling?" },
+                    { th: "3. อาหารทะเลที่คุณชอบที่สุดคืออะไร?", ipa: "aa-hǎan tá-lee tîi kun chɔ̂ɔp tîi-sùt kʉʉ à-rai?", en: "What is your favorite seafood?" },
+                    { th: "4. ปกติชอบไปเที่ยวกับเพื่อนหรือครอบครัว?", ipa: "bpòk-gà-dtì chɔ̂ɔp bpai tîao gàp pʉ̂an rʉ̌ʉ krɔ̂ɔp-krua?", en: "Normally, do you like traveling with friends or family?" },
+                    { th: "5. ถ้าเพื่อนคนไทยมาเยี่ยม คุณจะพาไปเที่ยวที่ไหน?", ipa: "tâa pʉ̂an kon tai maa yîam, kun jà paa bpai tîao tîi nǎi?", en: "If a Thai friend visits, where will you take them?" }
+                ]
+            },
+            {
+                icon: "🎤",
+                title: { th: "สัมภาษณ์ (Interview)", ipa: "sǎm-pâat", en: "Interview" },
+                items: [
+                    { th: "คุณเป็นเจ้าของโรงแรม ตอบคำถามลูกค้า", ipa: "kun bpen jâo kɔ̌ɔng roong rɛɛm dtɔ̀ɔp kǎm-tǎam lûuk-káa", en: "You are a hotel owner. Answer customer's questions." },
+                    { th: "Q: มีอาหารเช้ากี่โมง? A: ...", ipa: "Q: mii aa-hǎan cháo gìi moong? A: ...", en: "Q: What time is breakfast? A: ..." },
+                    { th: "Q: แถวนี้มีร้านอาหารแนะนำไหม? A: ...", ipa: "Q: tɛ̌o níi mii ráan aa-hǎan nɛ́-nam mǎi? A: ...", en: "Q: Are there any recommended restaurants around here? A: ..." }
+                ]
+            },
+            {
+                icon: "📖",
+                title: { th: "เล่าเรื่อง (Story-telling)", ipa: "lâo rʉ̂ang", en: "Story-telling" },
+                items: [
+                    { th: "เล่าประสบการณ์การไปเที่ยวเกาะที่สนุกที่สุด", ipa: "lâo bprà-sòp-gaan gaan bpai tîao gɔ̀ tîi sà-nùk tîi sùt", en: "Tell an experience of the most fun island trip." },
+                    { th: "บอกว่าไปกับใคร ทำอะไรบ้าง กินอะไรบ้าง", ipa: "bɔ̀ɔk wâa bpai gàp krai tam à-rai bâang gin à-rai bâang", en: "Say who you went with, what you did, what you ate." }
+                ]
+            },
+            {
+                icon: "📊",
+                title: { th: "นำเสนอ (Presentation)", ipa: "nam sà-nə̌ə", en: "Presentation" },
+                items: [
+                    { th: "แนะนำสถานที่ท่องเที่ยวในประเทศของคุณ 1 แห่ง", ipa: "nɛ́-nam sà-tǎan tîi tɔ̂ng tîao nai bprà-têet kɔ̌ɔng kun nʉ̀ng hɛ̀ng", en: "Recommend 1 tourist attraction in your country." },
+                    { th: "บอกเหตุผลว่าทำไมคนไทยควรไปเที่ยว", ipa: "bɔ̀ɔk hèet-pǒn wâa tam-mai kon tai kuan bpai tîao", en: "Give reasons why Thai people should travel there." }
+                ]
+            }
+        ];
+
+        // --- Main App ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState("review"); // review | scenarios | extension
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen pb-20">
+                    
+                    {/* Header */}
+                    <div className="bg-sky-500 p-6 text-white rounded-b-3xl shadow-md sticky top-0 z-50">
+                        <SmartText th="ทบทวน" ipa="tóp-tuan" en="Review" emoji="🇹🇭" size="xl" isTitle={true} />
+                        
+                        {/* Tabs */}
+                        <div className="flex bg-white/20 p-1 rounded-xl mt-2 backdrop-blur-sm shadow-inner">
+                            <button onClick={() => setActiveTab("review")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "review" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <span>แบบฝึกหัด</span>
+                            </button>
+                            <button onClick={() => setActiveTab("scenarios")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "scenarios" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <span>บทสนทนา</span>
+                            </button>
+                            <button onClick={() => setActiveTab("extension")} className={`flex-1 py-3 rounded-lg text-sm font-bold btn-press flex flex-col items-center gap-1 ${activeTab === "extension" ? "bg-white text-sky-600 shadow-sm" : "text-white hover:bg-white/20"}`}>
+                                <span>กิจกรรมเสริม</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="px-4 mt-6">
+                        
+                        {/* TAB 1: Review Exercises */}
+                        {activeTab === "review" && (
+                            <div className="animate-slide">
+                                <QandA items={qaData} />
+                                <OrderSentence items={orderData} />
+                                <GapFill items={gapFillData} />
+                                <Matching pairs={matchingData} />
+                                <ErrorCorrection items={errorData} />
+                            </div>
+                        )}
+
+                        {/* TAB 2: Scenarios */}
+                        {activeTab === "scenarios" && (
+                            <div className="animate-slide">
+                                <div className="text-center mb-6">
+                                    <SmartText th="สถานการณ์จำลอง" ipa="sà-tǎan-ná-gaan jam lɔɔng" en="Simulated Situations" size="xl" isTitle={true} />
+                                </div>
+                                {scenarios.map((scene, i) => (
+                                    <SimpleCard key={i} title={{th: scene.title.split(' (')[0], ipa:"", en:""}} emoji="" items={scene.items.map(item => ({th: item.thai, ipa: item.ipa, en: item.en, emoji: "💬"}))} bgColor={scene.color} />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* TAB 3: Extension */}
+                        {activeTab === "extension" && (
+                            <div className="animate-slide">
+                                 <div className="text-center mb-6">
+                                    <SmartText th="กิจกรรมเพิ่มเติม" ipa="gìt-jà-gam pêem dtəəm" en="Extension Activities" size="xl" isTitle={true} />
+                                </div>
+                                {extensionData.map((ext, i) => (
+                                    <SimpleCard key={i} title={ext.title} emoji={ext.icon} items={ext.items} bgColor="bg-white" />
+                                ))}
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+```eof
