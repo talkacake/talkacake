@@ -888,11 +888,21 @@
                 
                 const utterance = new SpeechSynthesisUtterance(cleanText);
                 utterance.lang = lang;
-                utterance.rate = 0.9; 
+                
+                // Use normal speed for English to prevent raspy stretching, slightly slower for Thai learners
+                utterance.rate = lang === 'en-US' ? 1.0 : 0.9; 
 
                 const voices = window.speechSynthesis.getVoices();
-                // Prefer non-Google voices if possible to sound more natural, or fallback
-                const voice = voices.find(v => v.lang === lang && !v.name.includes("Google")); 
+                let voice;
+
+                if (lang === 'th-TH') {
+                    // For Thai: Prefer Apple/native voices if available, but fallback to any Thai voice
+                    voice = voices.find(v => v.lang === lang && !v.name.includes("Google")) || voices.find(v => v.lang === lang);
+                } else {
+                    // For English: explicitly allow high-quality Google or Apple voices
+                    voice = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Alex') || v.name.includes('Daniel'))) || voices.find(v => v.lang.includes('en'));
+                }
+
                 if (voice) utterance.voice = voice;
 
                 window.speechSynthesis.speak(utterance);
