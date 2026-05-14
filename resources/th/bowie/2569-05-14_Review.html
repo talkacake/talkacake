@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทบทวน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        thai: ['Noto Sans Thai', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5', // Indigo 600
+                        secondary: '#10B981', // Emerald 500
+                        bglight: '#F3F4F6', // Gray 100
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent; /* Removes tap highlight on iOS */
+            background-color: #F9FAFB;
+        }
+        .content-transition {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .content-transition.open {
+            max-height: 200px; /* Arbitrary large height for expansion */
+            opacity: 1;
+            margin-top: 0.5rem;
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active-ipa {
+            background-color: #EEF2FF; /* Light indigo */
+            color: #4F46E5;
+            border-color: #4F46E5;
+        }
+        .btn-toggle.active-en {
+            background-color: #ECFDF5; /* Light emerald */
+            color: #10B981;
+            border-color: #10B981;
+        }
+        .emoji-large {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            letter-spacing: 0.1em;
+        }
+        .thai-text {
+            font-size: 1.5rem;
+            color: #1F2937; /* Gray 800 */
+        }
+        /* Pulse animation for the play button to draw attention */
+        @keyframes subtlePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .play-btn:active {
+            animation: subtlePulse 0.2s;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800 pb-12">
+
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-3xl mx-auto px-4 py-6 text-center">
+            <h1 class="text-3xl font-thai font-bold text-gray-900 tracking-wide">ทบทวน</h1>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 mt-8" id="app-container">
+        <!-- Content will be injected here by JavaScript -->
+    </main>
+
+    <script>
+        const lessonData = [
+            {
+                sectionTitle: "1. ทักทายและครอบครัว (Greetings & Family)",
+                items: [
+                    {
+                        emoji: "👋 🇬🇧 ❓↔️❓ 🇯🇵",
+                        thai: "ทักค่ะ/ครับ คุณ มา จาก ประเทศ อังกฤษ หรือ ญี่ปุ่น คะ/ครับ?",
+                        ipa: "thák khâ/khráp, khun maa jàak prà-têt ung-grìt rǔu yî-bpùn khá/khráp?",
+                        en: "Hi, do you come from England or Japan?",
+                        followUp: {
+                            emoji: "🤝😊✨ 🏷️👶🗣️ ❓",
+                            thai: "ยินดีที่ได้รู้จัก ชื่อเล่น อะไร คะ/ครับ?",
+                            ipa: "yin-dii-tîi-dâi-rúu-jàk, chʉ̂ʉ-lên à-rai khá/khráp?",
+                            en: "Nice to meet you, what is your nickname?"
+                        }
+                    },
+                    {
+                        emoji: "👧 ❓↔️❓ 👦",
+                        thai: "คุณ มี พี่สาว หรือ พี่ชาย คะ/ครับ?",
+                        ipa: "khun mii pîi-sǎao rǔu pîi-chaai khá/khráp?",
+                        en: "Do you have an older sister or an older brother?",
+                        followUp: {
+                            emoji: "👶🧝❓",
+                            thai: "เด็ก กับ ผู้ใหญ่ กี่คน คะ/ครับ?",
+                            ipa: "dèk gàp pôo-yài gèe kon khá/khráp?",
+                            en: "How many children and adults?"
+                        }
+                    },
+                    {
+                        emoji: "👶 ❓↔️❓ 👵",
+                        thai: "คุณ ชอบ เด็ก หรือ คนแก่ มากกว่า คะ/ครับ?",
+                        ipa: "khun châwp dèk rǔu kon gâae mâak-gwàa khá/khráp?",
+                        en: "Do you like children or old people more?",
+                        followUp: {
+                            emoji: "📅❓🔢",
+                            thai: "อายุเท่าไร คะ/ครับ?",
+                            ipa: "aa-yú tâo-rài khá/khráp?",
+                            en: "How old are you?"
+                        }
+                    },
+                    {
+                        emoji: "💔 ❓↔️❓ 💑✨",
+                        thai: "คุณ คิดถึง แฟนเก่า หรือ แฟนใหม่ คะ/ครับ?",
+                        ipa: "khun kít-tǔeng faen-gào rǔu faen-mài khá/khráp?",
+                        en: "Do you miss your ex or your new partner?",
+                        followUp: {
+                            emoji: "🏳️‍🌈 ❓↔️❓ 🏳️‍⚧️👨",
+                            thai: "คุณ เป็น ทอม หรือ ผู้ชายข้ามเพศ คะ/ครับ?",
+                            ipa: "khun bpen tôm rǔu pôo-chaai kâam-pêt khá/khráp?",
+                            en: "Are you a tom or a trans man?"
+                        }
+                    }
+                ]
+            },
+            {
+                sectionTitle: "2. การเรียนและการทำงาน (Study & Work)",
+                items: [
+                    {
+                        emoji: "🀄️🇨🇳 ❓↔️❓ 🗣️",
+                        thai: "คุณ เรียน จีนกลาง หรือ จีนกวางตุ้ง คะ/ครับ?",
+                        ipa: "khun riian jin glaang rǔu jin gwaang-dtûng khá/khráp?",
+                        en: "Do you study Mandarin or Cantonese?",
+                        followUp: {
+                            emoji: "🀄️🇨🇳 🤏 ❓",
+                            thai: "พูด จีนฮากกานิดหน่อย ไหมคะ/ครับ?",
+                            ipa: "pûut jiin haak-gaa nit-nɔ̀i mái khá/khráp?",
+                            en: "Do you speak a little Hakka Chinese?"
+                        }
+                    },
+                    {
+                        emoji: "📖 ❓↔️❓ ✍️📝",
+                        thai: "คุณ ชอบ อ่าน หรือ เขียน หนังสือ คะ/ครับ?",
+                        ipa: "khun châwp àan rǔu khǐan nǎng-sǔe khá/khráp?",
+                        en: "Do you like to read or write books?",
+                        followUp: {
+                            emoji: "👩‍🏫🍰 🧠 ❓",
+                            thai: "เค้กเป็นครูภาษาไทยของคุณ คุณ เข้าใจ ไหมคะ/ครับ?",
+                            ipa: "kéek bpen kruu paa-săa Tai kăwng khun, khun kâo-jai mái khá/khráp?",
+                            en: "Cake is your Thai teacher, do you understand?"
+                        }
+                    },
+                    {
+                        emoji: "➕ ❓↔️❓ ➖",
+                        thai: "คุณ ชอบบวก หรือ ชอบลบ คะ/ครับ?",
+                        ipa: "khun châwp bùuak rǔu châwp lóp khá/khráp?",
+                        en: "Do you like adding or subtracting?",
+                        followUp: {
+                            emoji: "➗ ➕🤝🔗 ✖️ ❓",
+                            thai: "ชอบหาร และ ชอบคูณ ด้วยไหม คะ/ครับ?",
+                            ipa: "châwp hǎan láe châwp khoon dthûai mái khá/khráp?",
+                            en: "Do you like dividing and multiplying too?"
+                        }
+                    },
+                    {
+                        emoji: "🗣️📚 ❓↔️❓ 🧪⚗️🧬",
+                        thai: "คุณ เรียน ภาษา หรือ เคมี คะ/ครับ?",
+                        ipa: "khun riian phaa-sǎa rǔu kee-mii khá/khráp?",
+                        en: "Do you study languages or chemistry?",
+                        followUp: {
+                            emoji: "🤔🧠 ❓",
+                            thai: "จำไม่ได้ หรือ ลืม คะ/ครับ?",
+                            ipa: "jam-mâi-dâi rǔu leum khá/khráp?",
+                            en: "Can't remember or forgot?"
+                        }
+                    },
+                    {
+                        emoji: "💼🛠️❓ ❓↔️❓ 💼🔎",
+                        thai: "คุณ ทำงานอะไร หรือ หางาน คะ/ครับ?",
+                        ipa: "khun tam-ngaan a-rai rǔu hǎa ngaan khá/khráp?",
+                        en: "What do you do for work, or are you looking for a job?",
+                        followUp: {
+                            emoji: "👋🕰️ ❓😟",
+                            thai: "ไม่เจอกันนานเลยนะ เป็นยังไงบ้าง คะ/ครับ?",
+                            ipa: "mâi jəə gan naan ləəi ná, bpen yang-ngai bâang khá/khráp?",
+                            en: "Long time no see, how are you?"
+                        }
+                    },
+                    {
+                        emoji: "🪖📜 ❓↔️❓ 😞📝",
+                        thai: "คุณไป เกณฑ์ทหาร หรือ สัมภาษณ์ไม่ผ่าน คะ/ครับ?",
+                        ipa: "khun bpai geen-ta-hăan rǔu sǎm-pâat mâi pàan khá/khráp?",
+                        en: "Did you go for military conscription or didn't pass the interview?",
+                        followUp: {
+                            emoji: "🙋‍♂️🆘❓",
+                            thai: "ให้ช่วยไหม คะ/ครับ?",
+                            ipa: "hâi chûay mái khá/khráp?",
+                            en: "Can I help?"
+                        }
+                    },
+                    {
+                        emoji: "🚌 ❓↔️❓ 🚆",
+                        thai: "คุณ ไป ทำงาน รถเมล์ หรือ รถไฟ คะ/ครับ?",
+                        ipa: "khun bpai tam-ngaan rót-mee rǔu rót fai khá/khráp?",
+                        en: "Do you commute to work by bus or train?",
+                        followUp: {
+                            emoji: "📏🌍 ❓",
+                            thai: "ไกล ไหมคะ/ครับ?",
+                            ipa: "glaai mái khá/khráp?",
+                            en: "Is it far?"
+                        }
+                    }
+                ]
+            },
+            {
+                sectionTitle: "3. อาหารและเครื่องดื่ม (Food & Drinks)",
+                items: [
+                    {
+                        emoji: "🐷🥓🐖 ❓↔️❓ 🥩🐄🍖",
+                        thai: "หิวอะไร อยาก สั่ง หมู หรือ เนื้อ คะ/ครับ?",
+                        ipa: "hǐw à-rai, yàak Sàng mǔu rǔu nʉ́ʉa khá/khráp?",
+                        en: "Hungry for what? Do you want to order pork or beef?",
+                        followUp: {
+                            emoji: "🍽️🥣⚪ 📥👕👖 🌶️🔥🥵 🤏 ❓",
+                            thai: "จาน นี้ ใส่ พริก นิดหน่อย ไหมคะ/ครับ?",
+                            ipa: "jaan níi Sài prík nít-nòi mái khá/khráp?",
+                            en: "Does this dish add a little chillies?"
+                        }
+                    },
+                    {
+                        emoji: "🐟 ❓↔️❓ 🍤🍘",
+                        thai: "คุณ ชอบ ปลาทอด หรือ ทอดมันกุ้ง คะ/ครับ?",
+                        ipa: "khun châwp bplaa thâwt rǔu tɔ̂ɔt man gûng khá/khráp?",
+                        en: "Do you like fried fish or fried shrimp cakes?",
+                        followUp: {
+                            emoji: "♨️🍲☁️ ❓↔️❓ 🍟 💸 ➕📈",
+                            thai: "อาหาร นึ่ง หรือ ทอด แพง กว่า กัน คะ/ครับ?",
+                            ipa: "aa-hǎan nûng rǔu thâwt pâaeng gwàa gan khá/khráp?",
+                            en: "Is steamed or fried food more expensive?"
+                        }
+                    },
+                    {
+                        emoji: "🍚 ❓↔️❓ 🥟",
+                        thai: "ไปกินกัน คุณ เอา ข้าว หรือ ขนมจีบ คะ/ครับ?",
+                        ipa: "bpai gin gan, khun ao kâao rǔu khà-nŏm jìip khá/khráp?",
+                        en: "Let's go eat, will you take rice or siu mai?",
+                        followUp: {
+                            emoji: "🥦🔥🍳 ❓",
+                            thai: "สั่ง ผัดผักบุ้ง ด้วยไหม คะ/ครับ?",
+                            ipa: "Sàng pàt-pàk-bûng dthûai mái khá/khráp?",
+                            en: "Order stir-fried morning glory too?"
+                        }
+                    },
+                    {
+                        emoji: "🫖☕ ❓↔️❓ 🍋🧋",
+                        thai: "คุณ ดื่ม ชาดำ หรือ ชามะนาว คะ/ครับ?",
+                        ipa: "khun dʉ̀ʉm chaa dam rǔu chaa-má-naao khá/khráp?",
+                        en: "Do you drink black tea or lemon tea?",
+                        followUp: {
+                            emoji: "🍋😖😝 ❓",
+                            thai: "เปรี้ยว ไหมคะ/ครับ?",
+                            ipa: "bpîaw mái khá/khráp?",
+                            en: "Is it sour?"
+                        }
+                    },
+                    {
+                        emoji: "☕️ ❓↔️❓ 🧋",
+                        thai: "คุณ ชอบ กาแฟไม่หวาน หรือ ชานมไข่มุก คะ/ครับ?",
+                        ipa: "khun châwp gaa-faae mâi wăan rǔu chaa-nom kài-múk khá/khráp?",
+                        en: "Do you like unsweetened coffee or bubble tea?",
+                        followUp: {
+                            emoji: "🥥🥤💧 ❓↔️❓ 💧",
+                            thai: "ดื่ม น้ำรสมะพร้าว หรือ น้ำเปล่า คะ/ครับ?",
+                            ipa: "dʉ̀ʉm náam rót má-práao rǔu náam bplào khá/khráp?",
+                            en: "Drink coconut flavored water or plain water?"
+                        }
+                    },
+                    {
+                        emoji: "🇰🇷 🍺 ❓↔️❓ 🥛🐄",
+                        thai: "คน เกาหลี ดื่ม เบียร์สิงห์ หรือ นม คะ/ครับ?",
+                        ipa: "kon gao-lǐ dʉ̀ʉm bia-sǐng rǔu nom khá/khráp?",
+                        en: "Do Korean people drink Singha beer or milk?",
+                        followUp: {
+                            emoji: "🍻 🍀🧃 ❓",
+                            thai: "ไปดื่มกัน น้ำใบเตย ไหมคะ/ครับ?",
+                            ipa: "bpai dèum gan náam bai dtoei mái khá/khráp?",
+                            en: "Let's go drink pandan juice?"
+                        }
+                    },
+                    {
+                        emoji: "🍰🍮 ❓↔️❓ 🍍",
+                        thai: "รับ ของหวาน หรือ สัปปะรด คะ/ครับ?",
+                        ipa: "ráp khǎawng wǎan rǔu sàp-bpà-ròt khá/khráp?",
+                        en: "Will you have dessert or pineapple?",
+                        followUp: {
+                            emoji: "🫄 ❓",
+                            thai: "อิ่ม ไหมคะ/ครับ?",
+                            ipa: "ìm mái khá/khráp?",
+                            en: "Are you full?"
+                        }
+                    },
+                    {
+                        emoji: "🥭🍚 ❓↔️❓ 🥭🍚🌈",
+                        thai: "อยาก สั่ง ข้าวเหนียวมะม่วง หรือ ข้าวเหนียวมะม่วง 3 สี คะ/ครับ?",
+                        ipa: "yàak Sàng kâao nǐeow má-mûang rǔu kâao nĭeow má-mûang sǎam sĕe khá/khráp?",
+                        en: "Want to order mango sticky rice or 3-colored mango sticky rice?",
+                        followUp: {
+                            emoji: "💸🛍️ ❓",
+                            thai: "ลดได้ไหม คะ/ครับ?",
+                            ipa: "lot daai măi khá/khráp?",
+                            en: "Can I get a discount?"
+                        }
+                    }
+                ]
+            },
+            {
+                sectionTitle: "4. งานอดิเรกและความบันเทิง (Hobbies & Entertainment)",
+                items: [
+                    {
+                        emoji: "🎵 ❓↔️❓ 📜",
+                        thai: "คุณ ชอบฟังอะไร เพลง หรือ สารคดี คะ/ครับ?",
+                        ipa: "khun chôp fang à-rai, pleeng rǔu săa-rá-ká-dee khá/khráp?",
+                        en: "What do you like to listen to, songs or documentaries?",
+                        followUp: {
+                            emoji: "🎧🎵🎼 👂 🔊👂🎼 ❓",
+                            thai: "คุณฟัง R&B บางเพลง ได้ยิน เสียง ไหมคะ/ครับ?",
+                            ipa: "khun fang R&B baang pleeng, dâi-yin sǐang mái khá/khráp?",
+                            en: "Do you listen to some R&B songs, do you hear the sound?"
+                        }
+                    },
+                    {
+                        emoji: "🌃🍻 ❓↔️❓ 🏃‍♂️🏋️‍♀️💪",
+                        thai: "คุณ ชอบ เที่ยวกลางคืน หรือ ออกกำลังกาย คะ/ครับ?",
+                        ipa: "khun chɔ̂ɔp tîao glaang-kuuen rǔu ɔ̀ɔk-gam-lang-gaai khá/khráp?",
+                        en: "Do you like nightlife or exercising?",
+                        followUp: {
+                            emoji: "🏁🏃‍♂️ 🤝 🗓️🔄☀️ ❓",
+                            thai: "แข่ง กัน ทุกวัน ไหมคะ/ครับ?",
+                            ipa: "kàeng gan túk-wan mái khá/khráp?",
+                            en: "Compete with each other everyday?"
+                        }
+                    },
+                    {
+                        emoji: "🐱 ❓↔️❓ 🐶",
+                        thai: "คุณ เลี้ยง แมว หรือ หมาปั๊ค คะ/ครับ?",
+                        ipa: "khun lîiang maaeo rǔu măa bpák khá/khráp?",
+                        en: "Do you raise cats or pug dogs?",
+                        followUp: {
+                            emoji: "🐠🏵️🧡 👯 ❓",
+                            thai: "เลี้ยง ปลาทอง เหมือนกัน ไหมคะ/ครับ?",
+                            ipa: "lîiang bplaa-toong mʉ̌an-gan mái khá/khráp?",
+                            en: "Raise goldfish too?"
+                        }
+                    },
+                    {
+                        emoji: "🥄🐠🕸️ ❓↔️❓ 🎟️🎩",
+                        thai: "วันหยุด เล่น ช้อนปลาทอง หรือ จับฉลาก คะ/ครับ?",
+                        ipa: "wan-yùt lên chɔ́n bplaa-tɔng rǔu jàp chà-làak khá/khráp?",
+                        en: "On holiday, do you play goldfish scoop or draw lots?",
+                        followUp: {
+                            emoji: "🥳🎢✨ ❓",
+                            thai: "สนุก ไหมคะ/ครับ?",
+                            ipa: "sà-nùk mái khá/khráp?",
+                            en: "Is it fun?"
+                        }
+                    }
+                ]
+            },
+            {
+                sectionTitle: "5. ลักษณะนิสัยและความรู้สึก (Personalities & Feelings)",
+                items: [
+                    {
+                        emoji: "😊🤝 ❓↔️❓ 💪📚",
+                        thai: "คุณ เป็น คน ใจดี หรือ ขยัน คะ/ครับ?",
+                        ipa: "khun bpen kon jai-dii rǔu khà-yǎn khá/khráp?",
+                        en: "Are you a kind or hardworking person?",
+                        followUp: {
+                            emoji: "😤🙅 ❓",
+                            thai: "ดื้อ ไหมคะ/ครับ?",
+                            ipa: "dʉ̂ʉ mái khá/khráp?",
+                            en: "Are you stubborn?"
+                        }
+                    },
+                    {
+                        emoji: "🗣️🤫 ❓↔️❓ 🤥🙄",
+                        thai: "เพื่อนร่วมงาน นินทา หรือ เป็น คนไม่ตรงไปตรงมา คะ/ครับ?",
+                        ipa: "pʉ̂ʉan-rûam-ngaan nin-taa rǔu bpen kon mâi dtrong-bpai-dtrong-maa khá/khráp?",
+                        en: "Do your colleagues gossip or are they a dishonest person?",
+                        followUp: {
+                            emoji: "😤😡 🚫🌑💨 ❓",
+                            thai: "น่าโมโห เลย ไหมคะ/ครับ?",
+                            ipa: "nâa-moo-hǒh loei mái khá/khráp?",
+                            en: "Is it infuriating at all?"
+                        }
+                    },
+                    {
+                        emoji: "😂 ❓↔️❓ 😎✨",
+                        thai: "คุณ ชอบ นักแสดง ตลก หรือ หล่อ คะ/ครับ?",
+                        ipa: "khun châwp nák-sà-daeng dtà-lòk rǔu làw khá/khráp?",
+                        en: "Do you like funny or handsome actors?",
+                        followUp: {
+                            emoji: "😊😁✨ 😊💖 ❓",
+                            thai: "เขา ยิ้ม น่าดีใจ ไหมคะ/ครับ?",
+                            ipa: "kǎo yím, nâa dee jai mái khá/khráp?",
+                            en: "He smiles, is it delightful?"
+                        }
+                    },
+                    {
+                        emoji: "😫💨📉 ❓↔️❓ 😰😣",
+                        thai: "วันนี้ รู้สึก เหนื่อย หรือ เครียด คะ/ครับ?",
+                        ipa: "wan-níi rúu-sùek nùai rǔu krîat khá/khráp?",
+                        en: "Today, do you feel tired or stressed?",
+                        followUp: {
+                            emoji: "😮‍💨🥱 ❓↔️❓ 😴🙄",
+                            thai: "ทำงาน น่าเหนื่อย หรือ น่าเบื่อ คะ/ครับ?",
+                            ipa: "tam-ngaan nâa-nùai rǔu nâa-bʉ̀a khá/khráp?",
+                            en: "Is working tiring or boring?"
+                        }
+                    },
+                    {
+                        emoji: "😠 ❓↔️❓ 😒🥱",
+                        thai: "ฝนตก อากาศ ร้อน โกรธ หรือ เบื่อ คะ/ครับ?",
+                        ipa: "fǒn-dtòk aa-gàat rɔ́ɔn, gròht rǔu bʉ̀a khá/khráp?",
+                        en: "It rains, the weather is hot, are you angry or bored?",
+                        followUp: {
+                            emoji: "🤷‍♂️💬 ❓",
+                            thai: "ไม่รู้ว่า เขาพูดอะไร ใช่ไหมคะ/ครับ?",
+                            ipa: "mâi rúu wâa káo pûut a-rai, châi mái khá/khráp?",
+                            en: "You don't know what they are saying, right?"
+                        }
+                    },
+                    {
+                        emoji: "🤢🩺 ❓↔️❓ 🤒🦠",
+                        thai: "ไม่สบาย เป็น โรคกระเพาะ หรือ ไข้หวัดใหญ่ คะ/ครับ?",
+                        ipa: "mâi sà-baai, bpen rôok-grà-pɔ́ rǔu kâi wàt yài khá/khráp?",
+                        en: "Unwell, do you have gastritis or the flu?",
+                        followUp: {
+                            emoji: "🤒💐 🧑‍⚕️🛠️ ❓",
+                            thai: "หายไวๆ ดูแล ตัวเอง ไหมคะ/ครับ?",
+                            ipa: "hǎai wai wai, duu-lair dtua-eeng mái khá/khráp?",
+                            en: "Get well soon, do you take care of yourself?"
+                        }
+                    },
+                    {
+                        emoji: "😨 👻 ❓↔️❓ 😞",
+                        thai: "คุณ กลัว ผี หรือ ผิดหวัง คะ/ครับ?",
+                        ipa: "khun glua pǐi rǔu phìt wăng khá/khráp?",
+                        en: "Are you afraid of ghosts or disappointed?",
+                        followUp: {
+                            emoji: "😱 ❓↔️❓ 😔",
+                            thai: "มัน น่ากลัว หรือ น่าเสียใจ คะ/ครับ?",
+                            ipa: "man nâa-glua rǔu nâa-sĭa-jai khá/khráp?",
+                            en: "Is it scary or sad to say?"
+                        }
+                    }
+                ]
+            },
+            {
+                sectionTitle: "6. เวลา สถานที่ และอื่นๆ (Time, Places & Misc)",
+                items: [
+                    {
+                        emoji: "🎁 ❓↔️❓ 💸",
+                        thai: "คุณ ขอ ของขวัญ หรือ เงิน คะ/ครับ?",
+                        ipa: "khun Khǎw kɔ̌ɔng-kwǎn rǔu ngen khá/khráp?",
+                        en: "Do you ask for a gift or money?",
+                        followUp: {
+                            emoji: "💸🤝 ❓↔️❓ 💸",
+                            thai: "เพื่อนยืมเงิน หรือ คุณ ไม่มีเงิน คะ/ครับ?",
+                            ipa: "pʉ̂an yʉem ngən rǔu khun mâi mii ngen khá/khráp?",
+                            en: "Did a friend borrow money or do you have no money?"
+                        }
+                    },
+                    {
+                        emoji: "🎂🥳🎈 ❓↔️❓ 💖🌹🍫",
+                        thai: "คุณ ชอบ สุขสันต์วันเกิด หรือ สุขสันต์วันวาเลนไทน์ คะ/ครับ?",
+                        ipa: "khun châwp sùk-sǎn wan-gèrt rǔu sùk-sǎn wan waa-len-tai khá/khráp?",
+                        en: "Do you like Happy Birthday or Happy Valentine's Day?",
+                        followUp: {
+                            emoji: "📅 ❓↔️❓ ♈️✨ 🦁",
+                            thai: "คุณ เกิด เดือน หรือ ราศี สิงห์ คะ/ครับ?",
+                            ipa: "khun gèrt dʉ̄an rǔu raa-sǐi sĭng khá/khráp?",
+                            en: "Were you born in the month or zodiac sign of Leo?"
+                        }
+                    },
+                    {
+                        emoji: "🧧🏮🎉 ❓↔️❓ 🎉🇹🇭🌸",
+                        thai: "คุณ ชอบ สุขสันต์วันตรุษจีน หรือ สวัสดีปีใหม่ไทย คะ/ครับ?",
+                        ipa: "khun châwp sùk-sǎn wan Dtrùt-jeen rǔu sà-wàt-dee bpee mài tai khá/khráp?",
+                        en: "Do you like Happy Chinese New Year or Happy Thai New Year?",
+                        followUp: {
+                            emoji: "📅➡️ 🏃‍♂️➡️📍 ❓",
+                            thai: "เดือนหน้า อยากไป เที่ยว ไหมคะ/ครับ?",
+                            ipa: "deuan-nâa yàak bpai tîiao mái khá/khráp?",
+                            en: "Next month, do you want to go travel?"
+                        }
+                    },
+                    {
+                        emoji: "🇬🇧 ❓↔️❓ 🇯🇵",
+                        thai: "อยากไปที่ไหน อังกฤษ หรือ ญี่ปุ่น คะ/ครับ?",
+                        ipa: "yàak bpai tîi nǎi, ung-grìt rǔu yî-bpùn khá/khráp?",
+                        en: "Where do you want to go, England or Japan?",
+                        followUp: {
+                            emoji: "🙅‍♂️🚫 🏳️ ❓ 📑❓✨",
+                            thai: "ไม่เคยไป ประเทศ อะไร บ้าง คะ/ครับ?",
+                            ipa: "mâi koei bpai prà-têt à-rai bâang khá/khráp?",
+                            en: "What countries have you never been to?"
+                        }
+                    },
+                    {
+                        emoji: "🏠🏠🏠 ❓↔️❓ 🚪🛋️🏠",
+                        thai: "คุณ จะ กลับ บ้าน หรือ ห้อง คะ/ครับ?",
+                        ipa: "khun jà glàp bâan rǔu hông khá/khráp?",
+                        en: "Will you return to the house or room?",
+                        followUp: {
+                            emoji: "✅💼 🕙❓⌚",
+                            thai: "ทำงานเสร็จ กี่โมง คะ/ครับ?",
+                            ipa: "tam-ngaan set gèe mohng khá/khráp?",
+                            en: "What time do you finish work?"
+                        }
+                    },
+                    {
+                        emoji: "🏪🍽️🥂 👥 ❓↔️❓ ⏳🚫",
+                        thai: "ร้านอาหาร นี้ คนเยอะ หรือ ยังไม่เปิด คะ/ครับ?",
+                        ipa: "ráan aa-hǎan níi kon-yə́ rǔu yang-mâi-bpèrt khá/khráp?",
+                        en: "Is this restaurant crowded or not open yet?",
+                        followUp: {
+                            emoji: "⏳🚶‍♂️🕙 ❓↔️❓ 🗣️💬🔜",
+                            thai: "เรา รอ หรือ เดี๋ยวพูดกัน ครั้งหน้า คะ/ครับ?",
+                            ipa: "rao rɔɔ rǔu dǐao pûut gan kráng nâa khá/khráp?",
+                            en: "Shall we wait or talk later next time?"
+                        }
+                    },
+                    {
+                        emoji: "🤓👓 🫵 💬 ❓↔️❓ 🆘🤝",
+                        thai: "แว่นมานี่มา คุณ จะ ตอบ หรือ ช่วย เขา คะ/ครับ?",
+                        ipa: "wâen maa nêe maa, khun jà dtòp rǔu chûay káo khá/khráp?",
+                        en: "The one with glasses, come here! Will you answer or help him?",
+                        followUp: {
+                            emoji: "〰️❤️👋 😊💖 ❓",
+                            thai: "มีไลน์ มีใจ มีอะไรก็ทักมาเลย น่าดีใจ ไหมคะ/ครับ?",
+                            ipa: "mee lai mee jai mee a-rai gôr ták maa loie, nâa dee jai mái khá/khráp?",
+                            en: "If you have Line, if you're interested, just message me, is it delightful?"
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // Text-to-Speech Function using Web Speech API
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech to prevent queuing massive amounts if clicked repeatedly
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                // Adjusting rate slightly slower for A1 learners
+                utterance.rate = 0.85; 
+                utterance.pitch = 1;
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn("Text-to-Speech is not supported in this browser.");
+            }
+        }
+
+        // Toggle visibility of IPA or EN sections
+        function toggleSection(button, targetId, type) {
+            const targetDiv = document.getElementById(targetId);
+            const isOpening = !targetDiv.classList.contains('open');
+            
+            if (isOpening) {
+                targetDiv.classList.add('open');
+                if (type === 'ipa') button.classList.add('active-ipa');
+                if (type === 'en') button.classList.add('active-en');
+            } else {
+                targetDiv.classList.remove('open');
+                if (type === 'ipa') button.classList.remove('active-ipa');
+                if (type === 'en') button.classList.remove('active-en');
+            }
+        }
+
+        function renderApp() {
+            const container = document.getElementById('app-container');
+            let htmlContent = '';
+
+            lessonData.forEach((section, sectionIndex) => {
+                // Section Header
+                htmlContent += `
+                    <div class="mb-10">
+                        <div class="flex items-center mb-6">
+                            <div class="h-px bg-gray-300 flex-1"></div>
+                            <h2 class="px-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">${section.sectionTitle}</h2>
+                            <div class="h-px bg-gray-300 flex-1"></div>
+                        </div>
+                        <div class="space-y-6">
+                `;
+
+                // Section Items
+                section.items.forEach((item, itemIndex) => {
+                    const uniqueId = `sec${sectionIndex}-item${itemIndex}`;
+                    // Combine text for TTS if there's a follow-up
+                    const textToSpeak = item.followUp ? `${item.thai} ${item.followUp.thai}` : item.thai;
+
+                    htmlContent += `
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6 transition-all hover:shadow-md">
+                            
+                            <!-- Emojis & Audio Button Row -->
+                            <div class="flex justify-between items-start mb-4 gap-4">
+                                <div class="emoji-large break-words flex-1">
+                                    <span>${item.emoji}</span>
+                                    ${item.followUp ? `<br><span class="text-3xl mt-1 block opacity-90">${item.followUp.emoji}</span>` : ''}
+                                </div>
+                                <button 
+                                    onclick="speakThai('${textToSpeak}')" 
+                                    class="play-btn shrink-0 w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                    aria-label="Play Thai Audio"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 ml-1">
+                                      <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Thai Text -->
+                            <div class="mb-5 space-y-3">
+                                <p class="font-thai thai-text font-medium leading-relaxed">${item.thai}</p>
+                                ${item.followUp ? `
+                                <div class="pl-4 border-l-4 border-primary/20">
+                                    <p class="font-thai thai-text font-medium text-primary/80 leading-relaxed">${item.followUp.thai}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-3 border-t border-gray-100 pt-4">
+                                <button 
+                                    onclick="toggleSection(this, 'ipa-${uniqueId}', 'ipa')" 
+                                    class="btn-toggle flex-1 py-2 px-4 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 focus:outline-none"
+                                >
+                                    IPA
+                                </button>
+                                <button 
+                                    onclick="toggleSection(this, 'en-${uniqueId}', 'en')" 
+                                    class="btn-toggle flex-1 py-2 px-4 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 focus:outline-none"
+                                >
+                                    EN
+                                </button>
+                            </div>
+
+                            <!-- Hidden Contents -->
+                            <div id="ipa-${uniqueId}" class="content-transition">
+                                <div class="p-4 bg-[#EEF2FF] rounded-lg border border-[#C7D2FE] space-y-3 mt-3">
+                                    <p class="text-[#4338CA] font-mono text-sm leading-relaxed">${item.ipa}</p>
+                                    ${item.followUp ? `
+                                    <div class="pl-3 border-l-2 border-[#4338CA]/30">
+                                        <p class="text-[#4338CA]/80 font-mono text-sm leading-relaxed">${item.followUp.ipa}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            
+                            <div id="en-${uniqueId}" class="content-transition">
+                                <div class="p-4 bg-[#ECFDF5] rounded-lg border border-[#A7F3D0] space-y-3 mt-3">
+                                    <p class="text-[#047857] font-medium text-sm leading-relaxed">${item.en}</p>
+                                    ${item.followUp ? `
+                                    <div class="pl-3 border-l-2 border-[#047857]/30">
+                                        <p class="text-[#047857]/80 font-medium text-sm leading-relaxed">${item.followUp.en}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                        </div>
+                    `;
+                });
+
+                htmlContent += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // Initialize the app when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', renderApp);
+
+    </script>
+</body>
+</html>
