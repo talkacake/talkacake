@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🇹🇭 ทบทวนแบบจัดเต็ม</title>
+    <title>🇹🇭ทบทวนแบบจัดเต็ม</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,6 +132,12 @@
                 <div class="flex items-center gap-2 w-full">
                     <i class="fa-solid fa-earth-americas w-5 text-center"></i>
                     <span class="font-medium text-sm whitespace-nowrap">สถานการณ์จริง</span>
+                </div>
+            </button>
+            <button onclick="switchTab('vocab')" id="nav-vocab" class="nav-btn flex flex-col items-start px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-book-open w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">คำศัพท์เพิ่มเติม</span>
                 </div>
             </button>
         </div>
@@ -432,6 +438,36 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="realworld-container"></div>
             </section>
 
+            <section id="sec-vocab" class="tab-section hidden">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">📚 คำศัพท์เพิ่มเติม</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('คำศัพท์เพิ่มเติม')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('vocab-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('vocab-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="vocab-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">kam-sàp pə̂əm-dtəəm</p>
+                    <p id="vocab-head-en" class="hidden text-indigo-600 italic text-lg mb-4">Additional Vocabulary</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">ทบทวนคำศัพท์ใหม่ที่คุณได้เรียนรู้</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('ทบทวนคำศัพท์ใหม่ที่คุณได้เรียนรู้')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('vocab-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('vocab-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="vocab-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">tóp-tuan kam-sàp mài tîi kun dâi rian rúu</p>
+                    <p id="vocab-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Review the new vocabulary you have learned.</p>
+                </header>
+
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+                    <div id="vocab-container" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+                </div>
+            </section>
+
         </div>
     </main>
 
@@ -549,6 +585,16 @@
             { wrong: "พี่หมอฟ้าลดาดื่มร้อนอเมริกาโน่ไม่หวาน", correct: "อเมริกาโน่ร้อน", hint: "Noun + Adjective" }
         ];
 
+        const vocabData = [
+            { emoji: "🕰️", th: "ช่วงนี้", ipa: "chûang-níi", en: "lately" },
+            { emoji: "📌✅", th: "ต้อง", ipa: "dtông", en: "Have to / Must" },
+            { emoji: "🤔💭", th: "ลืม", ipa: "lʉʉm", en: "forget" },
+            { emoji: "🏛️📚", th: "วัฒนธรรม", ipa: "wát-tá-ná-tam", en: "culture" },
+            { emoji: "🌍✨", th: "ทุกอย่าง", ipa: "túk yàang", en: "everything" },
+            { emoji: "🪤🔒", th: "กรง", ipa: "grong", en: "cages" },
+            { emoji: "🎯", th: "ไม่แม่น", ipa: "mâi-mâen", en: "not precise; not accurate" }
+        ];
+
         let selectedGapWord = null;
         let gapAnswers = {};
 
@@ -559,6 +605,7 @@
             renderCompleteSentence();
             renderGame();
             renderRealWorld();
+            renderVocab();
         });
 
         // Builder function for the title/ipa/en blocks to keep HTML clean and add TTS easily
@@ -972,14 +1019,26 @@
                                 <button onclick="speakThai('เล่าเรื่องสั้นๆ เกี่ยวกับทริปที่ผ่านมาโดยใช้คำเชื่อม: ก่อน, แล้วก็, สนุก')" class="btn-tts !bg-pink-200 !text-pink-700 hover:!bg-pink-300"><i class="fa-solid fa-volume-high"></i></button>
                                 <button onclick="toggleVisibility('rw-4b-d-ipa')" class="btn-ipa !bg-pink-200 !text-pink-700 hover:!bg-pink-300">IPA</button>
                                 <button onclick="toggleVisibility('rw-4b-d-en')" class="btn-en !bg-pink-200 !text-pink-700 hover:!bg-pink-300">EN</button>
-                            </div>
-                            <p id="rw-4b-d-ipa" class="hidden font-medium text-xs text-pink-700 mt-1">lâo rʉ̂ang sân sân gìao-gàp tríp tîi pàan maa dooi chái kam chʉ̂am: gɔ̀ɔn, lɛ́ɛo-gɔ̂ɔ, sà-nùk</p>
-                            <p id="rw-4b-d-en" class="hidden italic text-xs text-pink-700 mt-1">Tell a short story about a past trip using sequence words: before, and then, fun.</p>
                         </div>
+                        <p id="rw-4b-d-ipa" class="hidden font-medium text-xs text-pink-700 mt-1">lâo rʉ̂ang sân sân gìao-gàp tríp tîi pàan maa dooi chái kam chʉ̂am: gɔ̀ɔn, lɛ́ɛo-gɔ̂ɔ, sà-nùk</p>
+                        <p id="rw-4b-d-en" class="hidden italic text-xs text-pink-700 mt-1">Tell a short story about a past trip using sequence words: before, and then, fun.</p>
                     </div>
                 </div>
+            </div>
             `;
             document.getElementById('realworld-container').innerHTML = html;
+        }
+
+        function renderVocab() {
+            const container = document.getElementById('vocab-container');
+            container.innerHTML = vocabData.map((v, i) => `
+                <div class="border border-slate-100 rounded-xl p-5 flex gap-4 hover:shadow-md transition-shadow bg-slate-50 hover:bg-white items-center">
+                    <div class="text-4xl flex-shrink-0">${v.emoji}</div>
+                    <div class="flex-grow w-full overflow-hidden">
+                        ${buildTextBlock(v.th, v.ipa, v.en, `vocab-item-${i}`, "text-xl font-bold text-slate-800 break-words")}
+                    </div>
+                </div>
+            `).join('');
         }
     </script>
 </body>
