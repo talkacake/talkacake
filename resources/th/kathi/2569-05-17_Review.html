@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇹🇭 ทบทวนแบบจัดเต็ม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        .flashcard {
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .flashcard-container:hover .flashcard.flip-on-hover,
+        .flashcard-container.flipped .flashcard {
+            transform: rotateY(180deg);
+        }
+
+        /* Utility for toggle buttons */
+        .btn-tts {
+            @apply px-1.5 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors cursor-pointer inline-flex items-center justify-center;
+        }
+        .btn-ipa {
+            @apply px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-brand-100 text-brand-600 hover:bg-brand-200 transition-colors cursor-pointer inline-block tracking-wider;
+        }
+        .btn-en {
+            @apply px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors cursor-pointer inline-block tracking-wider;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <nav class="bg-white border-r border-slate-200 w-full md:w-72 flex-shrink-0 md:h-full flex flex-col z-20 shadow-sm">
+        <div class="p-6 border-b border-slate-100">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-xl shadow-inner flex-shrink-0">🇹🇭</div>
+                <div>
+                    <h1 class="font-bold text-slate-800 leading-tight text-lg">บทเรียนภาษาไทย</h1>
+                </div>
+            </div>
+            <div class="flex gap-1 ml-13">
+                <button onclick="speakThai('บทเรียนภาษาไทย')" class="btn-tts" title="Listen"><i class="fa-solid fa-volume-high"></i></button>
+                <button onclick="toggleVisibility('nav-title-ipa')" class="btn-ipa">IPA</button>
+                <button onclick="toggleVisibility('nav-title-en')" class="btn-en">EN</button>
+            </div>
+            <div id="nav-title-ipa" class="hidden text-brand-600 text-xs mt-1 ml-13 font-medium">bòt rian paa-sǎa tai</div>
+            <div id="nav-title-en" class="hidden text-indigo-600 text-xs mt-1 ml-13 italic">Thai Lesson: Ultimate Review</div>
+        </div>
+        
+        <div class="flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto p-4 gap-2 flex-grow no-scrollbar">
+            <button onclick="switchTab('warmup')" id="nav-warmup" class="nav-btn active flex flex-col items-start px-4 py-3 rounded-xl transition-all bg-brand-50 text-brand-600 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-mug-hot w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">อุ่นเครื่อง</span>
+                </div>
+            </button>
+            <button onclick="switchTab('mcq')" id="nav-mcq" class="nav-btn flex flex-col items-start px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-list-check w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">เลือกคำตอบ</span>
+                </div>
+            </button>
+            <button onclick="switchTab('gapfill')" id="nav-gapfill" class="nav-btn flex flex-col items-start px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-pen-to-square w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">เติมคำในช่องว่าง</span>
+                </div>
+            </button>
+            <button onclick="switchTab('writing')" id="nav-writing" class="nav-btn flex flex-col items-start px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-keyboard w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">เขียนและแก้ประโยค</span>
+                </div>
+            </button>
+            <button onclick="switchTab('game')" id="nav-game" class="nav-btn flex flex-col items-start px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-gamepad w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">เกมการพูด</span>
+                </div>
+            </button>
+            <button onclick="switchTab('realworld')" id="nav-realworld" class="nav-btn flex flex-col items-start px-4 py-3 rounded-xl transition-all text-slate-600 hover:bg-slate-50 w-full min-w-[200px]">
+                <div class="flex items-center gap-2 w-full">
+                    <i class="fa-solid fa-earth-americas w-5 text-center"></i>
+                    <span class="font-medium text-sm whitespace-nowrap">สถานการณ์จริง</span>
+                </div>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow h-full overflow-y-auto bg-slate-50 p-4 md:p-8">
+        <div class="max-w-4xl mx-auto pb-20">
+
+            <!-- WARM UP SECTION -->
+            <section id="sec-warmup" class="tab-section block">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">🗣️ อุ่นเครื่องและนำเข้าสู่บทเรียน</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('อุ่นเครื่องและนำเข้าสู่บทเรียน')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('wu-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('wu-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="wu-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">ùn-krʉ̂ang lɛ́ nam kâo sùu bòt rian</p>
+                    <p id="wu-head-en" class="hidden text-indigo-600 italic text-lg mb-4">Warm-up & Lead-in</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">พูดคุยสบายๆ กับคำถามประจำวัน</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('พูดคุยสบายๆ กับคำถามประจำวัน')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('wu-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('wu-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="wu-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">pûut kui sà-baai sà-baai gàp kam-tǎam bprà-jam wan</p>
+                    <p id="wu-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Get speaking comfortably with these daily questions.</p>
+                </header>
+                
+                <div class="grid gap-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center flex-shrink-0 text-xl">☀️</div>
+                            <div class="flex-grow">
+                                <div class="flex items-start justify-between flex-wrap gap-2">
+                                    <h3 class="text-xl font-medium text-slate-800">วันนี้อากาศเป็นยังไงบ้าง ฝนตกหรือแดดออก?</h3>
+                                    <div class="flex gap-1">
+                                        <button onclick="speakThai('วันนี้อากาศเป็นยังไงบ้าง ฝนตกหรือแดดออก?')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                                        <button onclick="toggleVisibility('q1-ipa')" class="btn-ipa">IPA</button>
+                                        <button onclick="toggleVisibility('q1-en')" class="btn-en">EN</button>
+                                    </div>
+                                </div>
+                                <p id="q1-ipa" class="hidden text-brand-600 font-medium mt-2">wan-níi aa-gàat bpen yang-ngai bâang, fǒn dtòk rʉ̌ʉ dɛ̀ɛt ɔ̀ɔk?</p>
+                                <p id="q1-en" class="hidden text-indigo-600 italic mt-2">How is the weather today? Is it raining or sunny?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center flex-shrink-0 text-xl">🍛</div>
+                            <div class="flex-grow">
+                                <div class="flex items-start justify-between flex-wrap gap-2">
+                                    <h3 class="text-xl font-medium text-slate-800">คุณเพิ่งกินข้าวมาใช่ไหม วันนี้กินอะไร?</h3>
+                                    <div class="flex gap-1">
+                                        <button onclick="speakThai('คุณเพิ่งกินข้าวมาใช่ไหม วันนี้กินอะไร?')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                                        <button onclick="toggleVisibility('q2-ipa')" class="btn-ipa">IPA</button>
+                                        <button onclick="toggleVisibility('q2-en')" class="btn-en">EN</button>
+                                    </div>
+                                </div>
+                                <p id="q2-ipa" class="hidden text-brand-600 font-medium mt-2">kun pə̂əng gin kâao maa châi mǎi, wan-níi gin à-rai?</p>
+                                <p id="q2-en" class="hidden text-indigo-600 italic mt-2">You just ate, right? What did you eat today?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center flex-shrink-0 text-xl">🛋️</div>
+                            <div class="flex-grow">
+                                <div class="flex items-start justify-between flex-wrap gap-2">
+                                    <h3 class="text-xl font-medium text-slate-800">เสาร์อาทิตย์ที่แล้ว คุณทำอะไรบ้าง?</h3>
+                                    <div class="flex gap-1">
+                                        <button onclick="speakThai('เสาร์อาทิตย์ที่แล้ว คุณทำอะไรบ้าง?')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                                        <button onclick="toggleVisibility('q3-ipa')" class="btn-ipa">IPA</button>
+                                        <button onclick="toggleVisibility('q3-en')" class="btn-en">EN</button>
+                                    </div>
+                                </div>
+                                <p id="q3-ipa" class="hidden text-brand-600 font-medium mt-2">sǎo aa-tít tîi lɛ́ɛo kun tam à-rai bâang?</p>
+                                <p id="q3-en" class="hidden text-indigo-600 italic mt-2">What did you do last weekend? (Rest, watch series, travel?)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sec-mcq" class="tab-section hidden">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">📝 เลือกคำตอบที่ถูกต้อง</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('เลือกคำตอบที่ถูกต้อง')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('mcq-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('mcq-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="mcq-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">lʉ̂ak kam dtɔ̀ɔp tîi dtùuk dtɔ̂ɔng</p>
+                    <p id="mcq-head-en" class="hidden text-indigo-600 italic text-lg mb-4">Multiple Choice</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">เลือกวลีภาษาไทยที่ถูกต้องสำหรับแต่ละสถานการณ์</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('เลือกวลีภาษาไทยที่ถูกต้องสำหรับแต่ละสถานการณ์')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('mcq-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('mcq-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="mcq-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">lʉ̂ak wá-lii paa-sǎa tai tîi dtùuk dtɔ̂ɔng sǎm-ràp dtɛ̀ɛ lá sà-tǎa-ná-gaan</p>
+                    <p id="mcq-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Select the correct Thai phrase for each situation.</p>
+                </header>
+
+                <div id="mcq-container" class="grid gap-8"></div>
+            </section>
+
+            <section id="sec-gapfill" class="tab-section hidden">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">🧩 เติมคำในช่องว่าง</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('เติมคำในช่องว่าง')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('gap-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('gap-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="gap-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">dtəəm kam nai chɔ̂ɔng wâang</p>
+                    <p id="gap-head-en" class="hidden text-indigo-600 italic text-lg mb-4">Gap-Fill</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">คลิกคำศัพท์จากคลังคำศัพท์ แล้วคลิกที่ช่องว่างเพื่อเติมคำ</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('คลิกคำศัพท์จากคลังคำศัพท์ แล้วคลิกที่ช่องว่างเพื่อเติมคำ')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('gap-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('gap-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="gap-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">klík kam-sàp jàak klang kam-sàp, lɛ́ɛo klík tîi chɔ̂ɔng wâang pʉ̂a dtəəm kam</p>
+                    <p id="gap-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Click a word from the bank, then click a blank space to fill it in.</p>
+                </header>
+
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">คลังคำศัพท์</h3>
+                            <div class="flex gap-1">
+                                <button onclick="speakThai('คลังคำศัพท์')" class="btn-tts !bg-slate-100 !text-slate-500 hover:!bg-slate-200"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('bank-ipa')" class="btn-ipa !bg-slate-100 !text-slate-500 hover:!bg-slate-200">IPA</button>
+                                <button onclick="toggleVisibility('bank-en')" class="btn-en !bg-slate-100 !text-slate-500 hover:!bg-slate-200">EN</button>
+                            </div>
+                        </div>
+                        <p id="bank-ipa" class="hidden text-slate-500 text-xs mb-2">klang kam-sàp</p>
+                        <p id="bank-en" class="hidden text-slate-500 text-xs italic mb-4">Word Bank</p>
+                        
+                        <div id="word-bank" class="flex flex-wrap gap-3"></div>
+                    </div>
+
+                    <div class="w-full h-px bg-slate-100 mb-8"></div>
+
+                    <div id="gapfill-sentences" class="space-y-8 text-lg"></div>
+
+                    <div class="mt-10 flex justify-end">
+                        <button onclick="checkGapFill()" class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md shadow-brand-200 transition-all active:scale-95">
+                            ตรวจสอบคำตอบ (Check Answers)
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="gapfill-feedback" class="hidden mt-6 p-4 rounded-xl text-center font-medium"></div>
+            </section>
+
+            <section id="sec-writing" class="tab-section hidden">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">✍️ เขียนและแก้ไขข้อผิดพลาด</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('เขียนและแก้ไขข้อผิดพลาด')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('write-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('write-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="write-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">kǐan lɛ́ gɛ̂ɛ kǎi kɔ̂ɔ pìt plâat</p>
+                    <p id="write-head-en" class="hidden text-indigo-600 italic text-lg mb-4">Writing & Error Correction</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">แก้ไขข้อผิดพลาดและเติมประโยคให้สมบูรณ์</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('แก้ไขข้อผิดพลาดและเติมประโยคให้สมบูรณ์')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('write-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('write-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="write-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">gɛ̂ɛ-kǎi kɔ̂ɔ pìt-plâat lɛ́ dtəəm bprà-yòok hâi sǒm-buun</p>
+                    <p id="write-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Fix the mistakes and complete the sentences.</p>
+                </header>
+
+                <div class="grid gap-8">
+                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+                        <div class="flex items-center flex-wrap gap-3 mb-6">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="bg-red-100 text-red-500 w-8 h-8 rounded-lg flex items-center justify-center text-sm">A</span>
+                                แก้ประโยค
+                            </h3>
+                            <div class="flex gap-1">
+                                <button onclick="speakThai('แก้ประโยค')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('err-head-ipa')" class="btn-ipa">IPA</button>
+                                <button onclick="toggleVisibility('err-head-en')" class="btn-en">EN</button>
+                            </div>
+                        </div>
+                        <p id="err-head-ipa" class="hidden text-brand-600 font-medium text-sm mb-1 -mt-4">gɛ̂ɛ bprà-yòok</p>
+                        <p id="err-head-en" class="hidden text-indigo-600 italic text-sm mb-6 -mt-1">Fix the Mistakes</p>
+                        
+                        <div id="error-correction-container" class="space-y-8"></div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+                        <div class="flex items-center flex-wrap gap-3 mb-6">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span class="bg-brand-100 text-brand-500 w-8 h-8 rounded-lg flex items-center justify-center text-sm">B</span>
+                                เติมประโยคให้สมบูรณ์
+                            </h3>
+                            <div class="flex gap-1">
+                                <button onclick="speakThai('เติมประโยคให้สมบูรณ์')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('comp-head-ipa')" class="btn-ipa">IPA</button>
+                                <button onclick="toggleVisibility('comp-head-en')" class="btn-en">EN</button>
+                            </div>
+                        </div>
+                        <p id="comp-head-ipa" class="hidden text-brand-600 font-medium text-sm mb-1 -mt-4">dtəəm bprà-yòok hâi sǒm-buun</p>
+                        <p id="comp-head-en" class="hidden text-indigo-600 italic text-sm mb-6 -mt-1">Complete the Sentence</p>
+                        
+                        <div class="space-y-6">
+                            <div id="comp1"></div>
+                            <div id="comp2"></div>
+                            <div id="comp3"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sec-game" class="tab-section hidden">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">🎲 ฉันคืออะไร?</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('ฉันคืออะไร?')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('game-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('game-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="game-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">chǎn kʉʉ à-rai?</p>
+                    <p id="game-head-en" class="hidden text-indigo-600 italic text-lg mb-4">What Am I?</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">ครูอธิบายคำศัพท์ นักเรียนทายคำ คลิกที่การ์ดเพื่อดูเฉลย!</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('ครูอธิบายคำศัพท์ นักเรียนทายคำ คลิกที่การ์ดเพื่อดูเฉลย!')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('game-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('game-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="game-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">kruu à-tí-baai kam-sàp, nák-rian taai kam. klík tîi gáat pʉ̂a duu chə̌-lə̌əi!</p>
+                    <p id="game-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Teacher describes the word. Student guesses. Click card to reveal!</p>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div id="game-cards-container" class="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+            </section>
+
+            <section id="sec-realworld" class="tab-section hidden">
+                <header class="mb-8">
+                    <div class="flex items-center flex-wrap gap-3 mb-2">
+                        <h2 class="text-3xl font-bold text-slate-800">🎭 การนำไปใช้ในชีวิตจริง</h2>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('การนำไปใช้ในชีวิตจริง')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('rw-head-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('rw-head-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="rw-head-ipa" class="hidden text-brand-600 font-medium text-lg mb-1">gaan nam bpai chái nai chii-wít jing</p>
+                    <p id="rw-head-en" class="hidden text-indigo-600 italic text-lg mb-4">Real-Life Applications</p>
+
+                    <div class="flex items-center flex-wrap gap-3 mt-4">
+                        <p class="text-slate-700 text-lg">นำภาษาไทยที่คุณรู้ไปใช้ในสถานการณ์จริง</p>
+                        <div class="flex gap-1">
+                            <button onclick="speakThai('นำภาษาไทยที่คุณรู้ไปใช้ในสถานการณ์จริง')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('rw-desc-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('rw-desc-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <p id="rw-desc-ipa" class="hidden text-brand-600 text-sm mt-1 mb-1">nam paa-sǎa tai tîi kun rúu bpai chái nai sà-tǎa-ná-gaan jing</p>
+                    <p id="rw-desc-en" class="hidden text-indigo-600 italic text-sm mt-1">Put your Thai into practice in these real-world scenarios.</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="realworld-container"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // --- TTS Functionality ---
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; // slightly slower for learners
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn('Text-to-speech is not supported in this browser.');
+            }
+        }
+
+        // --- Helper Function for Toggles ---
+        function toggleVisibility(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('hidden');
+            }
+        }
+
+        // --- Data for Interactive Sections ---
+        const mcqData = [
+            {
+                th: "ถ้าคุณต้องการขอส่วนลดที่ตลาด คุณจะพูดว่าอะไร?",
+                ipa: "tâa kun dtɔ̂ɔng gaan kɔ̌ɔ sùan-lót tîi dtà-làat, kun jà pûut wâa à-rai?",
+                en: "If you want to ask for a discount at the market, what do you say?",
+                options: [
+                    "มีโปรโมชั่นไหม (mii bproo-moo-chân mǎi)",
+                    "ลดได้ไหม (lót dâi mǎi)",
+                    "หมดแล้ว (mòt lɛ́ɛo)"
+                ],
+                correct: 1
+            },
+            {
+                th: "เพื่อนของคุณดูอารมณ์ไม่ดีแต่ไม่ยอมบอกว่าทำไม คุณจะถามเขาว่าอะไร?",
+                ipa: "pʉ̂an kɔ̌ɔng kun duu aa-rom mâi dii dtɛ̀ɛ mâi yɔɔm bɔ̀ɔk wâa tam-mai, kun jà tǎam kǎo wâa à-rai?",
+                en: "Your friend is clearly upset but won't say why. What do you ask them?",
+                options: [
+                    "งอนไร (ngɔɔn rai)",
+                    "เหนื่อยไหม (nʉ̀ai mǎi)",
+                    "เป็นหวัดเหรอ (bpen wàt rə̌ə)"
+                ],
+                correct: 0
+            },
+            {
+                th: "คุณต้องการสั่งกาแฟที่ไม่หวานมาก คุณจะสั่งว่าอะไร?",
+                ipa: "kun dtɔ̂ɔng gaan sàng gaa-fɛɛ tîi mâi wǎan mâak, kun jà sàng wâa à-rai?",
+                en: "You want to order a coffee that is not too sweet. What do you order?",
+                options: [
+                    "หวานร้อยเปอร์เซ็นต์ (wǎan rɔ́ɔi bpəə-sen)",
+                    "หวาน 50% (wǎan hâa-sìp bpəə-sen)",
+                    "น้ำอัดลม (náam àt-lom)"
+                ],
+                correct: 1
+            },
+            {
+                th: "คำว่า 'Traffic jam' ในภาษาไทยพูดว่าอะไร?",
+                ipa: "kam wâa 'Traffic jam' nai paa-sǎa tai pûut wâa à-rai?",
+                en: "How do you say 'Traffic jam' in Thai?",
+                options: [
+                    "รถไฟ (rót fai)",
+                    "สวนทาง (sǔan taang)",
+                    "รถติด (rót dtìt)"
+                ],
+                correct: 2
+            }
+        ];
+
+        const gapFillData = {
+            bank: [
+                { word: "คนเดียว", ipa: "kon-diao", en: "alone" },
+                { word: "เครียด", ipa: "krîat", en: "stressed" },
+                { word: "ยืม", ipa: "yʉʉm", en: "borrow" },
+                { word: "รสชาติ", ipa: "rót-châat", en: "taste" },
+                { word: "จ่ายเงินสด", ipa: "jàai ngəən sòt", en: "pay cash" }
+            ],
+            sentences: [
+                { 
+                    id: 0, textParts: ["ช่วงนี้งานเยอะมาก ฉันรู้สึก ", " มากเลย"], correctWord: "เครียด",
+                    fullIpa: "chûang-níi ngaan yə́ mâak, chǎn rúu-sʉ̀k krîat mâak ləəi",
+                    fullEn: "There's a lot of work lately. I feel very stressed."
+                },
+                { 
+                    id: 1, textParts: ["อาหารร้านนี้ ", " เป็นยังไง อร่อยไหม?"], correctWord: "รสชาติ",
+                    fullIpa: "aa-hǎan ráan níi rót-châat bpen yang-ngai à-rɔ̀ɔi mǎi?",
+                    fullEn: "How is the taste of this restaurant's food? Is it delicious?"
+                },
+                { 
+                    id: 2, textParts: ["ขอโทษครับ ที่นี่ ", " ได้ไหม หรือต้องจ่ายบัตร?"], correctWord: "จ่ายเงินสด",
+                    fullIpa: "kɔ̌ɔ-tôot kráp, tîi nîi jàai ngəən sòt dâi mǎi rʉ̌ʉ dtɔ̂ɔng jàai bàt?",
+                    fullEn: "Excuse me, can I pay cash here or do I have to pay by card?"
+                },
+                { 
+                    id: 3, textParts: ["ฉันลืมเอากระเป๋าตังค์มา ขอ ", " เงินหน่อยได้ไหม?"], correctWord: "ยืม",
+                    fullIpa: "chǎn lʉʉm ao grà-bpǎo dtang maa, kɔ̌ɔ yʉʉm ngəən nɔ̀ɔi dâi mǎi?",
+                    fullEn: "I forgot my wallet. Can I borrow some money?"
+                },
+                { 
+                    id: 4, textParts: ["แมวของฉันชอบอยู่ ", " มันไม่ชอบเล่นกับหมา"], correctWord: "คนเดียว",
+                    fullIpa: "mɛɛo kɔ̌ɔng chǎn chɔ̂ɔp yùu kon-diao, man mâi chɔ̂ɔp lên gàp mǎa",
+                    fullEn: "My cat likes to be alone. It doesn't like playing with dogs."
+                }
+            ]
+        };
+
+        const errorData = [
+            { wrong: "ฉันมีหมาป่าสองตัวเลข", correct: "ตัว", hint: "Classifier for animals" },
+            { wrong: "อาหารเยอรมันแพงกว่าอาหารอเมริกาอาหาร", correct: "อาหารอเมริกา", hint: "Word order" },
+            { wrong: "ฉันขับทำงานไปรถทุกวัน", correct: "ขับรถไปทำงาน", hint: "Verb + Object" },
+            { wrong: "พี่หมอฟ้าลดาดื่มร้อนอเมริกาโน่ไม่หวาน", correct: "อเมริกาโน่ร้อน", hint: "Noun + Adjective" }
+        ];
+
+        let selectedGapWord = null;
+        let gapAnswers = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMCQs();
+            renderGapFill();
+            renderErrorCorrection();
+            renderCompleteSentence();
+            renderGame();
+            renderRealWorld();
+        });
+
+        // Builder function for the title/ipa/en blocks to keep HTML clean and add TTS easily
+        function buildTextBlock(th, ipa, en, id, extraClasses="text-lg text-slate-700") {
+            // Strip leading numbers (e.g. "1. ") and Emojis for TTS to prevent messy readouts
+            const textToSpeak = th.replace(/[\uD83C-\uDBFF\uDC00-\uDFFF]+/g, '') // Emojis
+                                  .replace(/[0-9]+\.\s*/, '') // Numbers like "1. "
+                                  .replace(/'/g, "\\'") // escape quotes
+                                  .trim();
+            return `
+                <div>
+                    <div class="flex items-start flex-wrap gap-2">
+                        <span class="${extraClasses}">${th}</span>
+                        <div class="flex gap-1 mt-1">
+                            <button onclick="speakThai('${textToSpeak}')" class="btn-tts" title="ฟังเสียง (Listen)"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('${id}-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('${id}-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <div id="${id}-ipa" class="hidden text-brand-600 font-medium text-sm mt-1 mb-1">${ipa}</div>
+                    <div id="${id}-en" class="hidden text-indigo-600 italic text-sm mt-1">${en}</div>
+                </div>
+            `;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-50', 'text-brand-600');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+            });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-50');
+            activeBtn.classList.add('active', 'bg-brand-50', 'text-brand-600');
+
+            document.querySelectorAll('.tab-section').forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            container.innerHTML = mcqData.map((mcq, qIndex) => `
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100" id="mcq-card-${qIndex}">
+                    <div class="mb-6">
+                        ${buildTextBlock(`${qIndex + 1}. ${mcq.th}`, mcq.ipa, mcq.en, `mcq-q-${qIndex}`, "text-xl font-medium text-slate-800")}
+                    </div>
+                    <div class="space-y-3">
+                        ${mcq.options.map((opt, oIndex) => `
+                            <button onclick="checkMCQ(${qIndex}, ${oIndex})" id="mcq-btn-${qIndex}-${oIndex}" class="w-full text-left px-5 py-4 rounded-xl border-2 border-slate-100 hover:border-brand-300 hover:bg-brand-50 transition-all font-medium text-slate-700">
+                                ${['a', 'b', 'c'][oIndex]}) ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="mcq-feedback-${qIndex}" class="hidden mt-4 text-sm font-bold"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkMCQ(qIndex, oIndex) {
+            const mcq = mcqData[qIndex];
+            const isCorrect = mcq.correct === oIndex;
+            
+            mcq.options.forEach((_, i) => {
+                const btn = document.getElementById(`mcq-btn-${qIndex}-${i}`);
+                btn.disabled = true;
+                btn.classList.remove('hover:border-brand-300', 'hover:bg-brand-50');
+                if (i === mcq.correct) {
+                    btn.classList.add('bg-green-50', 'border-green-400', 'text-green-800');
+                } else if (i === oIndex && !isCorrect) {
+                    btn.classList.add('bg-red-50', 'border-red-400', 'text-red-800');
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            const fb = document.getElementById(`mcq-feedback-${qIndex}`);
+            fb.classList.remove('hidden');
+            if (isCorrect) {
+                fb.innerText = "✅ ถูกต้อง! เยี่ยมมาก (Correct! Excellent)";
+                fb.classList.add('text-green-600');
+            } else {
+                fb.innerText = "❌ ไม่ถูกต้อง คำตอบที่ถูกอยู่ด้านบน (Incorrect. The correct answer is highlighted above.)";
+                fb.classList.add('text-red-500');
+            }
+        }
+
+        function renderGapFill() {
+            renderWordBank();
+            const container = document.getElementById('gapfill-sentences');
+            container.innerHTML = gapFillData.sentences.map(sent => {
+                const fullThSentence = `${sent.textParts[0]} ${sent.correctWord} ${sent.textParts[1]}`;
+                return `
+                <div class="mb-6 pb-6 border-b border-slate-100 last:border-0 last:pb-0">
+                    <div class="flex flex-wrap items-center gap-2 text-slate-700 mb-2">
+                        <span class="font-bold text-slate-400 w-6">${sent.id + 1}.</span>
+                        <span class="text-xl">${sent.textParts[0]}</span>
+                        <button id="gap-${sent.id}" onclick="handleGapClick(${sent.id})" class="inline-block min-w-[120px] h-10 border-b-2 border-dashed border-slate-300 bg-slate-50 rounded px-3 text-brand-600 font-bold hover:bg-slate-100 transition-colors focus:outline-none text-xl"></button>
+                        <span class="text-xl">${sent.textParts[1]}</span>
+                    </div>
+                    <div class="pl-8">
+                        <div class="flex gap-1 mb-1">
+                            <button onclick="speakThai('${fullThSentence.replace(/'/g, "\\'")}')" class="btn-tts !bg-slate-100 !text-slate-500 hover:!bg-slate-200" title="Listen Full Sentence"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('gap-sent-${sent.id}-ipa')" class="btn-ipa !bg-slate-100 !text-slate-500 hover:!bg-slate-200">Full IPA</button>
+                            <button onclick="toggleVisibility('gap-sent-${sent.id}-en')" class="btn-en !bg-slate-100 !text-slate-500 hover:!bg-slate-200">Full EN</button>
+                        </div>
+                        <div id="gap-sent-${sent.id}-ipa" class="hidden text-brand-600 font-medium text-sm mt-1">${sent.fullIpa}</div>
+                        <div id="gap-sent-${sent.id}-en" class="hidden text-indigo-600 italic text-sm mt-1">${sent.fullEn}</div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function renderWordBank() {
+            const container = document.getElementById('word-bank');
+            container.innerHTML = gapFillData.bank.map(item => {
+                const isUsed = Object.values(gapAnswers).includes(item.word);
+                if (isUsed) return ''; 
+                
+                const isSelected = selectedGapWord === item.word;
+                return `
+                    <div class="inline-flex flex-col items-center">
+                        <div class="flex flex-col items-center gap-1">
+                            <button onclick="selectWord('${item.word}')" class="px-4 py-2 text-lg rounded-lg font-medium transition-all ${isSelected ? 'bg-brand-500 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-700 hover:border-brand-300 hover:shadow-sm'}">
+                                ${item.word}
+                            </button>
+                            <button onclick="speakThai('${item.word}')" class="text-[10px] text-slate-400 hover:text-brand-500 transition-colors" title="Listen"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-0.5">${item.ipa} | ${item.en}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectWord(word) {
+            selectedGapWord = (selectedGapWord === word) ? null : word;
+            renderWordBank();
+        }
+
+        function handleGapClick(gapId) {
+            if (gapAnswers[gapId]) {
+                delete gapAnswers[gapId];
+                const gapEl = document.getElementById(`gap-${gapId}`);
+                gapEl.innerText = "";
+                gapEl.classList.remove('border-solid', 'border-brand-400', 'bg-brand-50');
+                gapEl.classList.add('border-dashed', 'border-slate-300', 'bg-slate-50');
+                if (selectedGapWord) {
+                    gapAnswers[gapId] = selectedGapWord;
+                    selectedGapWord = null;
+                }
+            } else if (selectedGapWord) {
+                gapAnswers[gapId] = selectedGapWord;
+                selectedGapWord = null;
+            }
+            
+            if (gapAnswers[gapId]) {
+                const gapEl = document.getElementById(`gap-${gapId}`);
+                gapEl.innerText = gapAnswers[gapId];
+                gapEl.classList.remove('border-dashed', 'border-slate-300', 'bg-slate-50');
+                gapEl.classList.add('border-solid', 'border-brand-400', 'bg-brand-50');
+            }
+            renderWordBank();
+        }
+
+        function checkGapFill() {
+            let correctCount = 0;
+            gapFillData.sentences.forEach(sent => {
+                const gapEl = document.getElementById(`gap-${sent.id}`);
+                if (gapAnswers[sent.id] === sent.correctWord) {
+                    correctCount++;
+                    gapEl.classList.remove('border-brand-400', 'bg-brand-50', 'text-brand-600', 'border-red-400', 'bg-red-50', 'text-red-600');
+                    gapEl.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                } else if (gapAnswers[sent.id]) {
+                    gapEl.classList.remove('border-brand-400', 'bg-brand-50', 'text-brand-600');
+                    gapEl.classList.add('border-red-400', 'bg-red-50', 'text-red-600');
+                }
+            });
+
+            const fb = document.getElementById('gapfill-feedback');
+            fb.classList.remove('hidden');
+            if (correctCount === gapFillData.sentences.length) {
+                fb.className = "mt-6 p-4 rounded-xl text-center font-bold bg-green-100 text-green-800 border border-green-200 block";
+                fb.innerText = "🎉 สมบูรณ์แบบ! ถูกต้องทั้งหมด (Perfect! All correct)";
+            } else {
+                fb.className = "mt-6 p-4 rounded-xl text-center font-bold bg-amber-100 text-amber-800 border border-amber-200 block";
+                fb.innerText = `คุณได้ ${correctCount} จาก ${gapFillData.sentences.length} คะแนน พยายามต่อไป! (You got ${correctCount} out of ${gapFillData.sentences.length}. Keep trying!)`;
+            }
+        }
+
+        function renderErrorCorrection() {
+            const container = document.getElementById('error-correction-container');
+            container.innerHTML = errorData.map((item, index) => `
+                <div class="border-b border-slate-100 pb-5 last:border-0 last:pb-0">
+                    <div class="flex items-center gap-2 mb-2">
+                        <p class="text-slate-700 text-lg"><span class="font-bold text-slate-400">${index + 1}.</span> ❌ ${item.wrong}</p>
+                        <button onclick="speakThai('${item.wrong}')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3 italic">Hint: ${item.hint}</p>
+                    <div class="flex gap-3">
+                        <input type="text" id="error-input-${index}" class="flex-grow bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all font-sans text-lg" placeholder="พิมพ์ประโยคที่ถูกต้องที่นี่...">
+                        <button onclick="showErrorAnswer(${index})" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl font-medium transition-all text-sm whitespace-nowrap">
+                            ดูเฉลย
+                        </button>
+                    </div>
+                    <p id="error-ans-${index}" class="hidden mt-2 text-green-600 font-medium text-sm flex items-center gap-2">
+                        <span>✅ คำตอบมีคำว่า: <span class="bg-green-100 px-2 py-1 rounded text-lg">${item.correct}</span></span>
+                        <button onclick="speakThai('${item.correct}')" class="btn-tts !bg-green-200 !text-green-700"><i class="fa-solid fa-volume-high"></i></button>
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        function showErrorAnswer(index) {
+            document.getElementById(`error-ans-${index}`).classList.remove('hidden');
+        }
+
+        function renderCompleteSentence() {
+            const data = [
+                { id: 1, th: "1. วันหยุด ฉันชอบไป...", ipa: "wan yùt chǎn chɔ̂ɔp bpai...", en: "On holidays, I like to go..." },
+                { id: 2, th: "2. อาหารไทยที่ฉันชอบที่สุดคือ...", ipa: "aa-hǎan tai tîi chǎn chɔ̂ɔp tîi sùt kʉʉ...", en: "My favorite Thai food is..." },
+                { id: 3, th: "3. ฉันคิดว่า นักเรียนไทย...", ipa: "chǎn kít wâa nák-rian tai...", en: "I think that Thai students..." }
+            ];
+            
+            data.forEach(item => {
+                document.getElementById(`comp${item.id}`).innerHTML = `
+                    <div class="mb-2">
+                        ${buildTextBlock(item.th, item.ipa, item.en, `comp-q${item.id}`, "text-slate-700 font-medium text-lg")}
+                    </div>
+                    <textarea class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all resize-none h-14 font-sans text-lg" placeholder="คำตอบของคุณ..."></textarea>
+                `;
+            });
+        }
+
+        function renderGame() {
+            const cards = [
+                { emoji: "🦁🦓", hintTH: "เป็นที่ที่มีสัตว์เยอะมาก เช่น หมาป่า สิงโต ม้าลาย", hintIPA: "bpen tîi tîi mii sàt yə́ mâak, chên mǎa-bpàa sǐng-dtoo máa-laai", ansTH: "สวนสัตว์", ansIPA: "sǔan sàt", ansEN: "Zoo" },
+                { emoji: "🔮✨", hintTH: "คนนี้ดูดวงให้เรา รู้อนาคตของเรา", hintIPA: "kon níi duu duang hâi rao, rúu a-naa-kót kɔ̌ɔng rao", ansTH: "หมอดู", ansIPA: "mɔ̌ɔ-duu", ansEN: "Fortune teller" },
+                { emoji: "🧊🥤", hintTH: "เวลากินกาแฟ หรือชา เราใส่อันนี้ให้มันเย็น", hintIPA: "wee-laa gin gaa-fɛɛ rʉ̌ʉ chaa, rao sài an níi hâi man yen", ansTH: "น้ำแข็ง", ansIPA: "nám-kɛ̌ng", ansEN: "Ice" }
+            ];
+
+            document.getElementById('game-cards-container').innerHTML = cards.map((c, i) => `
+                <div class="flashcard-container perspective-1000 w-full h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard transform-style-3d relative w-full h-full rounded-2xl shadow-sm border border-slate-200">
+                        <div class="backface-hidden absolute w-full h-full bg-white rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+                            <div class="text-4xl mb-4">${c.emoji}</div>
+                            <p class="text-slate-700 font-medium leading-relaxed text-lg mb-2">"${c.hintTH}"</p>
+                            <div onclick="event.stopPropagation()" class="flex gap-1 mb-2">
+                                <button onclick="speakThai('${c.hintTH}')" class="btn-tts"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('card-ipa-${i}')" class="btn-ipa">IPA</button>
+                            </div>
+                            <p id="card-ipa-${i}" class="hidden text-brand-600 text-sm mt-1">${c.hintIPA}</p>
+                            <p class="text-slate-400 text-sm mt-auto absolute bottom-4">คลิกเพื่อดูเฉลย (Click to reveal)</p>
+                        </div>
+                        <div class="backface-hidden rotate-y-180 absolute w-full h-full bg-brand-500 text-white rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+                            <div class="flex items-center justify-center gap-3 mb-2">
+                                <h3 class="text-4xl font-bold">${c.ansTH}</h3>
+                                <button onclick="event.stopPropagation(); speakThai('${c.ansTH}')" class="btn-tts !bg-brand-400 !text-white hover:!bg-brand-300"><i class="fa-solid fa-volume-high"></i></button>
+                            </div>
+                            <p class="text-brand-100 text-xl font-medium">${c.ansIPA}</p>
+                            <p class="text-brand-200 text-lg">(${c.ansEN})</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRealWorld() {
+            const html = `
+                <!-- Scenario 1 -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 flex flex-col h-full">
+                    <div class="mb-4">
+                        <span class="text-3xl">☕🛍️</span>
+                        ${buildTextBlock("บทบาทสมมติในคาเฟ่และตลาด", "bòt-bàat sǒm-mút nai kaa-fêe lɛ́ dtà-làat", "Cafe & Market Roleplay", "rw-1", "text-xl font-bold text-slate-800 block mt-2")}
+                    </div>
+                    <div class="space-y-4 flex-grow">
+                        <div class="bg-orange-50 p-4 rounded-xl">
+                            ${buildTextBlock("สถานการณ์ A (คาเฟ่)", "sà-tǎa-ná-gaan ei (kaa-fêe)", "Scenario A (Cafe)", "rw-1a", "font-bold text-orange-800")}
+                            <div class="mt-2 text-sm text-orange-900 leading-relaxed">
+                                <p>คุณอยู่ที่คาเฟ่ ครูเป็นบาริสต้า สั่งเครื่องดื่มที่คุณชอบ ระบุไซส์และความหวาน ถามราคาและถามว่าจ่ายผ่านบัตรได้ไหม</p>
+                                <div class="mt-1 flex gap-1">
+                                    <button onclick="speakThai('คุณอยู่ที่คาเฟ่ ครูเป็นบาริสต้า สั่งเครื่องดื่มที่คุณชอบ ระบุไซส์และความหวาน ถามราคาและถามว่าจ่ายผ่านบัตรได้ไหม')" class="btn-tts !bg-orange-200 !text-orange-700 hover:!bg-orange-300"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-1a-d-ipa')" class="btn-ipa !bg-orange-200 !text-orange-700 hover:!bg-orange-300">IPA</button>
+                                    <button onclick="toggleVisibility('rw-1a-d-en')" class="btn-en !bg-orange-200 !text-orange-700 hover:!bg-orange-300">EN</button>
+                                </div>
+                                <p id="rw-1a-d-ipa" class="hidden font-medium mt-1">kun yùu tîi kaa-fêe. kruu bpen baa-rít-dtâa. sàng krʉ̂ang dʉ̀ʉm tîi kun chɔ̂ɔp. rá-bù sái lɛ́ kwaam wǎan. tǎam raa-kaa lɛ́ tǎam wâa jàai pàan bàt dâi mǎi.</p>
+                                <p id="rw-1a-d-en" class="hidden italic mt-1">You are at a cafe. The teacher is the barista. Order your favorite drink. Specify the size and sweetness level. Ask how much it is and if you can pay by card.</p>
+                            </div>
+                        </div>
+                        <div class="bg-emerald-50 p-4 rounded-xl">
+                            ${buildTextBlock("สถานการณ์ B (ตลาด)", "sà-tǎa-ná-gaan bii (dtà-làat)", "Scenario B (Market)", "rw-1b", "font-bold text-emerald-800")}
+                            <div class="mt-2 text-sm text-emerald-900 leading-relaxed">
+                                <p>คุณกำลังซื้อผลไม้ ถามว่ากิโลละเท่าไหร่ ลองต่อราคาดู</p>
+                                <div class="mt-1 flex gap-1">
+                                    <button onclick="speakThai('คุณกำลังซื้อผลไม้ ถามว่ากิโลละเท่าไหร่ ลองต่อราคาดู')" class="btn-tts !bg-emerald-200 !text-emerald-700 hover:!bg-emerald-300"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-1b-d-ipa')" class="btn-ipa !bg-emerald-200 !text-emerald-700 hover:!bg-emerald-300">IPA</button>
+                                    <button onclick="toggleVisibility('rw-1b-d-en')" class="btn-en !bg-emerald-200 !text-emerald-700 hover:!bg-emerald-300">EN</button>
+                                </div>
+                                <p id="rw-1b-d-ipa" class="hidden font-medium mt-1">kun gam-lang sʉ́ʉ pǒn-lá-mái. tǎam wâa gì-loo lá tâo-rài. lɔɔng dtɔ̀ɔ raa-kaa duu.</p>
+                                <p id="rw-1b-d-en" class="hidden italic mt-1">You are buying fruit. Ask how much it is per kilo. Try to bargain.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 2 -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-indigo-100 flex flex-col h-full">
+                    <div class="mb-4">
+                        <span class="text-3xl">📱😒</span>
+                        ${buildTextBlock("ดราม่าโซเชียลมีเดีย", "draa-mâa soo-chîal mii-dia", "Social Media Drama", "rw-2", "text-xl font-bold text-slate-800 block mt-2")}
+                    </div>
+                    <div class="flex-grow flex flex-col">
+                        <div class="bg-indigo-50 p-4 rounded-xl mb-4 flex-grow">
+                            <p class="text-indigo-900 leading-relaxed mb-1"><strong>สถานการณ์:</strong> แฟนของคุณเป็นคนขี้หวง มีคนมาคอมเมนต์จีบคุณใน Instagram แฟนของคุณงอน</p>
+                            <div class="mb-4 flex gap-1">
+                                <button onclick="speakThai('แฟนของคุณเป็นคนขี้หวง มีคนมาคอมเมนต์จีบคุณใน Instagram แฟนของคุณงอน')" class="btn-tts !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('rw-2-sit-ipa')" class="btn-ipa !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300">IPA</button>
+                                <button onclick="toggleVisibility('rw-2-sit-en')" class="btn-en !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300">EN</button>
+                            </div>
+                            <p id="rw-2-sit-ipa" class="hidden font-medium text-sm text-indigo-800 mb-2">fɛɛn kɔ̌ɔng kun bpen kon kîi hǔang. mii kon maa kɔm-mén jìip kun nai in-sà-dtaa-grɛɛm. fɛɛn kɔ̌ɔng kun ngɔɔn.</p>
+                            <p id="rw-2-sit-en" class="hidden italic text-sm text-indigo-800 mb-4">Situation: Your partner is possessive. Someone comments flirting with you on IG. Your partner sulks.</p>
+                            
+                            <p class="text-sm font-bold text-indigo-800">อภิปราย (Discuss):</p>
+                            <ul class="list-disc list-inside text-sm text-indigo-900 mt-2 space-y-2">
+                                <li>
+                                    คุณจะทำยังไง? 
+                                    <button onclick="speakThai('คุณจะทำยังไง?')" class="btn-tts !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300 ml-2"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-2-q1-en')" class="btn-en !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300 ml-1">EN</button>
+                                    <span id="rw-2-q1-en" class="hidden italic text-indigo-700 block ml-5 mt-1">What will you do?</span>
+                                </li>
+                                <li>
+                                    จะบล็อกคนนั้นไหม?
+                                    <button onclick="speakThai('จะบล็อกคนนั้นไหม?')" class="btn-tts !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300 ml-2"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-2-q2-en')" class="btn-en !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300 ml-1">EN</button>
+                                    <span id="rw-2-q2-en" class="hidden italic text-indigo-700 block ml-5 mt-1">Will you block them?</span>
+                                </li>
+                                <li>
+                                    จะง้อแฟนยังไง?
+                                    <button onclick="speakThai('จะง้อแฟนยังไง?')" class="btn-tts !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300 ml-2"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-2-q3-en')" class="btn-en !bg-indigo-200 !text-indigo-700 hover:!bg-indigo-300 ml-1">EN</button>
+                                    <span id="rw-2-q3-en" class="hidden italic text-indigo-700 block ml-5 mt-1">How will you make up with your partner?</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 3 -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-sky-100 flex flex-col h-full">
+                    <div class="mb-4">
+                        <span class="text-3xl">⚖️</span>
+                        ${buildTextBlock("เวลาโต้วาที", "wee-laa dtôo-waa-tii", "Debate Time", "rw-3", "text-xl font-bold text-slate-800 block mt-2")}
+                    </div>
+                    <div class="bg-sky-50 p-4 rounded-xl flex-grow">
+                        <p class="text-sm font-medium text-sky-900 mb-1">เลือกหนึ่งหัวข้อและให้เหตุผล 2 ข้อสำหรับความคิดเห็นของคุณ:</p>
+                        <div class="mb-3 flex gap-1">
+                            <button onclick="speakThai('เลือกหนึ่งหัวข้อและให้เหตุผล 2 ข้อสำหรับความคิดเห็นของคุณ')" class="btn-tts !bg-sky-200 !text-sky-800 hover:!bg-sky-300"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('rw-3-inst-en')" class="btn-en !bg-sky-200 !text-sky-800 hover:!bg-sky-300">EN</button>
+                        </div>
+                        <p id="rw-3-inst-en" class="hidden italic text-xs text-sky-800 mb-4">Choose ONE topic and give 2 reasons for your opinion:</p>
+
+                        <div class="space-y-3">
+                            <div class="bg-white p-3 rounded-lg border border-sky-200">
+                                <p class="text-sm font-bold text-slate-700 mb-1">หัวข้อ 1 (Topic 1):</p>
+                                <p class="text-sm text-slate-600">อาหารไทยมีรสชาติกว่าอาหารยุโรป เห็นด้วยหรือไม่?</p>
+                                <div class="mt-1 flex gap-1">
+                                    <button onclick="speakThai('อาหารไทยมีรสชาติกว่าอาหารยุโรป เห็นด้วยหรือไม่?')" class="btn-tts !bg-sky-100 !text-sky-600 hover:!bg-sky-200"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-3-t1-ipa')" class="btn-ipa !bg-sky-100 !text-sky-600 hover:!bg-sky-200">IPA</button>
+                                    <button onclick="toggleVisibility('rw-3-t1-en')" class="btn-en !bg-sky-100 !text-sky-600 hover:!bg-sky-200">EN</button>
+                                </div>
+                                <p id="rw-3-t1-ipa" class="hidden font-medium text-xs text-sky-600 mt-1">aa-hǎan tai mii rót-châat gwàa aa-hǎan yú-rôop. hěn dûai rʉ̌ʉ mâi?</p>
+                                <p id="rw-3-t1-en" class="hidden italic text-xs text-sky-600 mt-1">Thai food is more flavorful than European food. Agree or Disagree?</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-sky-200">
+                                <p class="text-sm font-bold text-slate-700 mb-1">หัวข้อ 2 (Topic 2):</p>
+                                <p class="text-sm text-slate-600">ชีวิตของคนเมือง กับ ชนบท อันไหนดีกว่ากัน เพราะอะไร?</p>
+                                <div class="mt-1 flex gap-1">
+                                    <button onclick="speakThai('ชีวิตของคนเมือง กับ ชนบท อันไหนดีกว่ากัน เพราะอะไร?')" class="btn-tts !bg-sky-100 !text-sky-600 hover:!bg-sky-200"><i class="fa-solid fa-volume-high"></i></button>
+                                    <button onclick="toggleVisibility('rw-3-t2-ipa')" class="btn-ipa !bg-sky-100 !text-sky-600 hover:!bg-sky-200">IPA</button>
+                                    <button onclick="toggleVisibility('rw-3-t2-en')" class="btn-en !bg-sky-100 !text-sky-600 hover:!bg-sky-200">EN</button>
+                                </div>
+                                <p id="rw-3-t2-ipa" class="hidden font-medium text-xs text-sky-600 mt-1">chii-wít kɔ̌ɔng kon mʉang gàp chon-ná-bòt. an nǎi dii gwàa gan prɔ́ à-rai?</p>
+                                <p id="rw-3-t2-en" class="hidden italic text-xs text-sky-600 mt-1">City life VS Countryside. Which one is better and why?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 4 -->
+                <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 flex flex-col h-full">
+                    <div class="mb-4">
+                        <span class="text-3xl">🌟🗺️</span>
+                        ${buildTextBlock("นำเสนอและเล่าเรื่อง", "nam sà-nə̌ə lɛ́ lâo rʉ̂ang", "Presentation & Story", "rw-4", "text-xl font-bold text-slate-800 block mt-2")}
+                    </div>
+                    <div class="bg-pink-50 p-4 rounded-xl flex-grow flex flex-col justify-center space-y-4">
+                        <div>
+                            ${buildTextBlock("ชีวิตในฝันของฉัน (1-2 นาที)", "chii-wít nai fǎn kɔ̌ɔng chǎn", "My Dream Life", "rw-4a", "font-bold text-pink-800")}
+                            <p class="text-sm text-pink-900 mt-2">อยากใช้ชีวิตยังไง? อยากอยู่ที่ไหน? ทำงานหรือไม่ทำงาน? อยากอยู่กับใคร?</p>
+                            <div class="mt-1 flex gap-1">
+                                <button onclick="speakThai('อยากใช้ชีวิตยังไง? อยากอยู่ที่ไหน? ทำงานหรือไม่ทำงาน? อยากอยู่กับใคร?')" class="btn-tts !bg-pink-200 !text-pink-700 hover:!bg-pink-300"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('rw-4a-d-ipa')" class="btn-ipa !bg-pink-200 !text-pink-700 hover:!bg-pink-300">IPA</button>
+                                <button onclick="toggleVisibility('rw-4a-d-en')" class="btn-en !bg-pink-200 !text-pink-700 hover:!bg-pink-300">EN</button>
+                            </div>
+                            <p id="rw-4a-d-ipa" class="hidden font-medium text-xs text-pink-700 mt-1">yàak chái chii-wít yang-ngai? yàak yùu tîi nǎi? tam-ngaan rʉ̌ʉ mâi tam-ngaan? yàak yùu gàp krai?</p>
+                            <p id="rw-4a-d-en" class="hidden italic text-xs text-pink-700 mt-1">How do you want to live? Where to live? Work or no work? Who to live with?</p>
+                        </div>
+                        <div class="h-px w-full bg-pink-200"></div>
+                        <div>
+                            ${buildTextBlock("เรื่องราวการท่องเที่ยว", "rʉ̂ang-raao gaan dtɔ̂ɔng tîao", "Travel Story", "rw-4b", "font-bold text-pink-800")}
+                            <p class="text-sm text-pink-900 mt-2">เล่าเรื่องสั้นๆ เกี่ยวกับทริปที่ผ่านมาโดยใช้คำเชื่อม: ก่อน, แล้วก็, สนุก</p>
+                            <div class="mt-1 flex gap-1">
+                                <button onclick="speakThai('เล่าเรื่องสั้นๆ เกี่ยวกับทริปที่ผ่านมาโดยใช้คำเชื่อม: ก่อน, แล้วก็, สนุก')" class="btn-tts !bg-pink-200 !text-pink-700 hover:!bg-pink-300"><i class="fa-solid fa-volume-high"></i></button>
+                                <button onclick="toggleVisibility('rw-4b-d-ipa')" class="btn-ipa !bg-pink-200 !text-pink-700 hover:!bg-pink-300">IPA</button>
+                                <button onclick="toggleVisibility('rw-4b-d-en')" class="btn-en !bg-pink-200 !text-pink-700 hover:!bg-pink-300">EN</button>
+                            </div>
+                            <p id="rw-4b-d-ipa" class="hidden font-medium text-xs text-pink-700 mt-1">lâo rʉ̂ang sân sân gìao-gàp tríp tîi pàan maa dooi chái kam chʉ̂am: gɔ̀ɔn, lɛ́ɛo-gɔ̂ɔ, sà-nùk</p>
+                            <p id="rw-4b-d-en" class="hidden italic text-xs text-pink-700 mt-1">Tell a short story about a past trip using sequence words: before, and then, fun.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('realworld-container').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
