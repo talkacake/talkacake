@@ -200,6 +200,27 @@
         </div>
     </section>
 
+    <!-- SECTION 2.5: Additional Vocab -->
+    <section class="mb-12">
+        <div class="header-row mb-4">
+            <div class="header-title" onclick="speak('คำศัพท์เพิ่มเติม', 'th-TH')">
+                <span class="text-2xl">📝</span>
+                <h2 class="text-2xl font-bold text-gray-800">คำศัพท์เพิ่มเติม</h2>
+                <button class="text-indigo-500">🔊</button>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleVisibility('sec-add-vocab-ipa')" class="toggle-btn btn-ipa">IPA</button>
+                <button onclick="toggleVisibility('sec-add-vocab-en')" class="toggle-btn btn-en">EN</button>
+            </div>
+        </div>
+        <div id="sec-add-vocab-ipa" class="hidden-content text-orange-600 italic mb-2 ml-10">kam-sàp pêrm-dtəəm</div>
+        <div id="sec-add-vocab-en" class="hidden-content text-gray-500 mb-4 ml-10 cursor-pointer hover:text-indigo-600" onclick="speak('Additional Vocabulary', 'en-US')">Additional Vocabulary 🔊</div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="add-vocab-list">
+            <!-- Content injected via JS -->
+        </div>
+    </section>
+
     <!-- SECTION 3: Main Activities -->
     <section class="mb-12">
         <div class="header-row mb-4">
@@ -386,6 +407,26 @@
             { t: "🤬 สปอยล์", i: "sà-bpɔɔi", e: "Spoil" }
         ];
 
+        // --- DATA: Additional Vocabulary ---
+        const additionalVocabData = [
+            { emoji: "🧂🥢", t: "ซีอิ๊วขาว", i: "sii-íu kăao", e: "soy sauce" },
+            { emoji: "📻", t: "วิทยุ", i: "wít-thá-yú", e: "radio" },
+            { emoji: "🚑💥", t: "อุบัติเหตุ", i: "ù-bàt-dtì-hèt", e: "accident" },
+            { emoji: "🧑‍🏫👩‍🎓", t: "เพื่อนร่วมชั้น", i: "pêuan-rûuam-chán", e: "classmate" },
+            { emoji: "📈", t: "ขยาย", i: "kà-yăai", e: "expand" },
+            { emoji: "📈💹", t: "หุ้น", i: "hôon", e: "stocks" },
+            { emoji: "🎬🍿", t: "ภาพยนตร์", i: "pâap-phá-yon", e: "movies (formal)" },
+            { emoji: "🎨🎭", t: "แนว", i: "naew", e: "style; genre" },
+            { emoji: "🛣️", t: "ช่องทาง", i: "chɔ̂ng-thaang", e: "platform" },
+            { emoji: "🚫⚖️", t: "ผิดกฎหมาย", i: "pìt gòt-mǎai", e: "illegal" },
+            { emoji: "📺🍿", t: "ดูรวดเดียวจบ", i: "doo-rûat-diao-jòp", e: "watch to the end in one go; binge watch (times)" },
+            { emoji: "🎙️🎬", t: "พากย์", i: "phâak", e: "audio dub" },
+            { emoji: "🎭💭", t: "อารมณ์", i: "aa-rom", e: "emotions" },
+            { emoji: "😮🔀", t: "พลิกล็อก", i: "plík-lók", e: "There's a plot twist." },
+            { emoji: "⏳✋", t: "อย่าเพิ่ง", i: "yàa-pêung", e: "Don't...just yet." },
+            { emoji: "🈵", t: "เต็ม", i: "dtem", e: "full; all over" }
+        ];
+
         // --- DATA: Extension Activities ---
         const interviewData = [
             { t: "อะไรทำให้คอนเทนต์ของคุณกำลังฮิต?", i: "à-rai tam hâi kɔn-tén kɔ̌ɔng kun gam-lang hít?", e: "What makes your content trending?" },
@@ -397,7 +438,7 @@
         const presInst = { t: "ถ้าจะเปิดช่อง YouTube จะทำคอนเทนต์เกี่ยวกับอะไร? กลุ่มเป้าหมายคือใคร?", i: "tâa jà bpə̀ət chɔ̂ng YouTube, jà tam kɔn-tén gìiao gàp à-rai? glùm bpâo-mǎai kʉʉ krai?", e: "If you were to open a YouTube channel, what content would you make? Who is the target audience?" };
         // --- Functions ---
 
-        function createBlock(text, ipa, en, idPrefix, isDialogue = false, prefix = "") {
+        function createBlock(text, ipa, en, idPrefix, isDialogue = false, prefix = "", emoji = "") {
             const safeThai = text.replace(/'/g, "\\'");
             const safeEng = en.replace(/'/g, "\\'");
             
@@ -419,10 +460,11 @@
                     </div>
                 `;
             } else {
+                const emojiSpan = emoji ? `<span class="mr-2">${emoji}</span>` : '';
                 displayHtml = `
                     <div class="bg-indigo-50 p-3 rounded hover:bg-indigo-100 transition">
                         <div class="font-bold text-gray-800 mb-1 cursor-pointer hover:text-indigo-600 transition" onclick="speak('${safeThai}', 'th-TH')">
-                            ${text} 🔊
+                            ${emojiSpan}${text} 🔊
                         </div>
                         <div class="flex gap-2">
                              <button onclick="toggleVisibility('${idPrefix}-ipa')" class="text-xs bg-orange-100 px-2 rounded">IPA</button>
@@ -536,6 +578,12 @@
             const discCont = document.getElementById('disc-list');
             discData.forEach((item, i) => {
                 discCont.innerHTML += createBlock(`❓ Q: ${item.t}`, item.i, item.e, `disc-${i}`);
+            });
+
+            // Additional Vocab
+            const addVocabCont = document.getElementById('add-vocab-list');
+            additionalVocabData.forEach((item, i) => {
+                addVocabCont.innerHTML += createBlock(item.t, item.i, item.e, `add-vocab-${i}`, false, "", item.emoji);
             });
 
             // Role Play
