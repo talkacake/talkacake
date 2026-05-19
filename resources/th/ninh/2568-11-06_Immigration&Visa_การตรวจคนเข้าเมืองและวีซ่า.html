@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thai Conversation: Immigration & Visa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; }
+    .sarabun-thai { font-family: 'Sarabun', sans-serif; }
+    .hidden { display: none; }
+    .interactive-thai { transition: background-color 0.2s ease-in-out; }
+    .interactive-thai:hover { background-color: #eef2f7; }
+    .phonetic { color: #d946ef; font-style: italic; }
+    .translation { color: #1f2937; }
+    .speaker-icon, .toggle-btn {
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid #cbd5e1; border-radius: 9999px; padding: 0.15rem 0.5rem;
+      font-size: 0.8rem; margin-left: 0.35rem; background: #fff; color: #475569;
+      transition: background-color .2s, color .2s, border-color .2s;
+    }
+    .speaker-icon:hover, .toggle-btn:hover { background-color: #e2e8f0; }
+    .speaker-icon svg { width: 1rem; height: 1rem; }
+    /* Custom modal for alerts */
+    #alert-modal {
+      position: fixed; inset: 0; background-color: rgba(0,0,0,.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; pointer-events: none; transition: opacity .3s ease;
+    }
+    #alert-modal.visible { opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="text-center mb-8 p-6 bg-white rounded-xl shadow-lg">
+      <h1 id="header-title" class="text-3xl md:text-4xl font-bold text-gray-800 sarabun-thai"></h1>
+    </header>
+    
+    <!-- Instructions (Thai) -->
+    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg mb-8 shadow">
+      <h3 class="font-bold sarabun-thai">วิธีใช้หน้านี้:</h3>
+      <ul class="list-disc list-inside mt-2 sarabun-thai">
+        <li>คลิก <strong>🔊</strong> ถัดจากข้อความภาษาไทยหรือภาษาอังกฤษเพื่อฟังเสียง</li>
+        <li>คลิก <strong>IPA</strong> เพื่อแสดงคำอ่าน (สัทอักษร IPA) และคลิก <strong>EN</strong> เพื่อแสดงคำแปลภาษาอังกฤษ</li>
+      </ul>
+    </div>
+
+    <!-- Part 1: Vocabulary -->
+    <section class="mb-8">
+      <h2 id="part-1-title" class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 sarabun-thai"></h2>
+      <div id="vocab-grid" class="bg-white p-6 rounded-xl shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Vocabulary items injected here -->
+      </div>
+    </section>
+
+    <!-- Additional Vocabulary (NEW) -->
+    <section class="mb-8">
+      <h2 id="part-1b-title" class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 sarabun-thai"></h2>
+      <div id="extra-vocab-grid" class="bg-white p-6 rounded-xl shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Additional vocab items injected here -->
+      </div>
+    </section>
+
+    <!-- Part 2: Conversation Dialogue -->
+    <section class="mb-8">
+      <h2 id="part-2-title" class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 sarabun-thai"></h2>
+      <div id="dialogue-container" class="bg-white p-6 rounded-xl shadow-lg space-y-4">
+        <!-- Dialogues injected here -->
+      </div>
+    </section>
+    
+    <!-- Part 3: Speaking Practice -->
+    <section>
+      <h2 id="part-3-title" class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 sarabun-thai"></h2>
+      <div class="space-y-6">
+        <!-- Discussion -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <h3 id="discussion-title" class="text-xl font-semibold text-gray-800 mb-3 sarabun-thai"></h3>
+          <p id="discussion-intro" class="text-gray-600 mb-4 sarabun-thai"></p>
+          <ul class="space-y-4">
+            <li id="q1" class="sarabun-thai"></li>
+            <li id="q2" class="sarabun-thai"></li>
+            <li id="q3" class="sarabun-thai"></li>
+            <li id="q4" class="sarabun-thai"></li>
+            <li id="q5" class="sarabun-thai"></li>
+          </ul>
+        </div>
+        <!-- Role-play -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+          <h3 id="roleplay-title" class="text-xl font-semibold text-gray-800 mb-3 sarabun-thai"></h3>
+          <div class="space-y-4">
+            <div>
+              <h4 id="scenario-1-title" class="font-semibold text-gray-700 sarabun-thai"></h4>
+              <p id="scenario-1-desc" class="text-gray-600 sarabun-thai"></p>
+            </div>
+            <div>
+              <h4 id="scenario-2-title" class="font-semibold text-gray-700 sarabun-thai"></h4>
+              <p id="scenario-2-desc" class="text-gray-600 sarabun-thai"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+  
+  <!-- Alert Modal -->
+  <div id="alert-modal">
+    <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+      <p id="alert-message" class="text-gray-700"></p>
+      <button id="alert-close" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">OK</button>
+    </div>
+  </div>
+
+  <script>
+    /* -------------------- DATA -------------------- */
+    const dialogue = {
+      "scenarioA": {
+        "title": "สถานการณ์ A: ที่สนามบิน",
+        "phonetic": "sà-tăa-ná-gaan A: tîi sà-năam-bin",
+        "english": "Scenario A: At the Airport",
+        "lines": [
+          { speaker: 'ตม.', thai: 'สวัสดีครับ ขอพาสปอร์ตด้วยครับ', phonetic: 'sà-wàt-dee kráp, kɔ̌ɔ páat-sà-bpòot dûay kráp', english: 'Hello, passport please.' },
+          { speaker: 'นักท่องเที่ยว', thai: 'นี่ค่ะ', phonetic: 'nêe kâ', english: 'Here you are (female speaker).' },
+          { speaker: 'ตม.', thai: 'มาทำอะไรที่ประเทศไทยครับ', phonetic: 'maa tam à-rai tîi bprà-têet tai kráp', english: 'What is your purpose for coming to Thailand?' },
+          { speaker: 'นักท่องเที่ยว', thai: 'มาเที่ยวค่ะ', phonetic: 'maa tîao kâ', english: 'To travel.' },
+          { speaker: 'ตม.', thai: 'จะอยู่กี่วันครับ', phonetic: 'jà yùu gìi wan kráp', english: 'How many days will you stay?' },
+          { speaker: 'นักท่องเที่ยว', thai: 'ประมาณ 30 วันค่ะ', phonetic: 'bprà-maan sǎam-sìp wan kâ', english: 'About 30 days.' },
+          { speaker: 'ตม.', thai: 'มีตั๋วไปกลับไหมครับ', phonetic: 'mii dtǔa bpai-glàp mǎi kráp', english: 'Do you have a round-trip ticket?' },
+          { speaker: 'นักท่องเที่ยว', thai: 'มีค่ะ นี่ค่ะ', phonetic: 'mii kâ, nêe kâ', english: 'Yes, here it is.' },
+          { speaker: 'ตม.', thai: 'พักที่ไหนครับ', phonetic: 'pák tîi nǎi kráp', english: 'Where are you staying?' },
+          { speaker: 'นักท่องเที่ยว', thai: 'พักที่บ้านสามีค่ะ', phonetic: 'pák tîi bâan sǎa-mii kâ', english: 'Staying at my husband\'s house.' },
+          { speaker: 'ตม.', thai: 'โอเคครับ เชิญครับ', phonetic: 'oo-kay kráp, chəən kráp', english: 'OK, you may go.' },
+          { speaker: 'นักท่องเที่ยว', thai: 'ขอบคุณค่ะ', phonetic: 'kʰɔ̀ɔp-khun kâ', english: 'Thank you.' }
+        ]
+      },
+      "scenarioB": {
+        "title": "สถานการณ์ B: ที่สำนักงาน ตม. (ต่อวีซ่า)",
+        "phonetic": "sà-tăa-ná-gaan B: tîi sǎm-nák-ngaan dtɔɔ-mɔɔ (dtɔ̀ɔ wii-sâa)",
+        "english": "Scenario B: At the Immigration Office (Visa Extension)",
+        "lines": [
+          { speaker: 'นักท่องเที่ยว', thai: 'สวัสดีค่ะ มาขอต่อวีซ่าค่ะ', phonetic: 'sà-wàt-dee kâ, maa kɔ̌ɔ dtɔ̀ɔ wii-sâa kâ', english: 'Hello, I\'m here to extend my visa.' },
+          { speaker: 'เจ้าหน้าที่', thai: 'วีซ่าอะไรครับ', phonetic: 'wii-sâa à-rai kráp', english: 'What visa is it?' },
+          { speaker: 'นักท่องเที่ยว', thai: 'วีซ่าแต่งงาน (Non-O) ค่ะ สามีเป็นคนไทย', phonetic: 'wii-sâa dtàeng-ngaan (non-oh) kâ. sǎa-mii bpen khon thai', english: 'Marriage visa (Non-O). My husband is Thai.' },
+          { speaker: 'เจ้าหน้าที่', thai: 'ขอดูเอกสารหน่อยครับ มีทะเบียนสมรสไหมครับ', phonetic: 'kɔ̌ɔ duu èek-gà-sǎan nòi kráp. mii thabian sǒm-rót mǎi kráp', english: 'May I see the documents? Do you have the marriage certificate?' },
+          { speaker: 'นักท่องเที่ยว', thai: 'มีค่ะ นี่ค่ะเอกสารทั้งหมด', phonetic: 'mii kâ. nêe kâ èek-gà-sǎan thâng-mòt', english: 'Yes. Here are all the documents.' },
+          { speaker: 'เจ้าหน้าที่', thai: 'โอเคครับ นั่งรอเรียกคิวนะครับ', phonetic: 'oo-kay kráp. nâng rɔɔ rîak khiu ná kráp', english: 'OK. Please have a seat and wait for your queue number.' }
+        ]
+      }
+    };
+
+    const vocabulary = [
+      { thai: 'วีซ่า', phonetic: 'wii-sâa', english: 'Visa' },
+      { thai: 'หนังสือเดินทาง', phonetic: 'nǎng-sʉ̌ʉ-dəən-taang', english: 'Passport' },
+      { thai: 'ตม. (ตรวจคนเข้าเมือง)', phonetic: 'dtɔɔ-mɔɔ (dtrùuat khon khâo mʉang)', english: 'Immigration' },
+      { thai: 'วีซ่าท่องเที่ยว', phonetic: 'wii-sâa thɔ̂ɔng-tîao', english: 'Tourist Visa' },
+      { thai: 'วีซ่าแต่งงาน (Non-O)', phonetic: 'wii-sâa dtàeng-ngaan', english: 'Marriage Visa (Non-O)' },
+      { thai: 'วีซ่าทำงาน (Non-B)', phonetic: 'wii-sâa tham-ngaan', english: 'Work Visa (Non-B)' },
+      { thai: 'ต่อวีซ่า', phonetic: 'dtɔ̀ɔ wii-sâa', english: 'To extend visa' }
+    ];
+
+    /* ---------- Additional Vocabulary (NEW) ---------- */
+    const additionalVocabulary = [
+      { thai: 'ทำงานบ้าน', phonetic: 'tam-ngaan bâan', english: 'Do housework' },
+      { thai: 'ตากผ้า', phonetic: 'tàak pâa', english: 'hang clothes' },
+      { thai: 'ความแตกต่าง', phonetic: 'kwaam dtàek-dtàang', english: 'diffrerence' },
+      { thai: 'พิธีน้ำชา', phonetic: 'pí-tii náam-chaa', english: 'tea ceremony' },
+      { thai: 'ประตูเงินประตูทอง', phonetic: 'bprà-tuu ngern bprà-tuu tong', english: 'silver and golden gates' },
+      { thai: 'กั้น', phonetic: 'gân', english: 'block' },
+      { thai: 'เต้น', phonetic: 'dtên', english: 'dance' },
+      { thai: 'ตัวหนังสือ', phonetic: 'dtua nang-sǔe', english: 'alphabet' },
+      { thai: 'แห่ขันหมาก', phonetic: 'hàae kǎn-màak', english: 'wedding procession' },
+      { thai: 'สินสอด', phonetic: 'sǐn-sòt', english: 'bride price' },
+      { thai: 'ถือ', phonetic: 'tǔe', english: 'hold / carry' },
+      { thai: 'แบก', phonetic: 'bàek', english: "put somthing on one's back / carry sth on the shoulder" },
+      { thai: 'บรรพบุรุษ', phonetic: 'ban-pá-bù-rùt', english: 'ancestors' },
+      { thai: 'รวม', phonetic: 'ruam', english: 'combine' },
+      { thai: 'พิธีหมั้น', phonetic: 'pí-tii mân', english: 'engagement ceremony' },
+      { thai: 'ประโยค', phonetic: 'bprà-yòk', english: 'sentence' },
+      { thai: 'ผ่าน', phonetic: 'pàan', english: 'go past / pass' },
+      { thai: 'จดหมายเชิญ', phonetic: 'jòt-máai chern', english: 'invitation letter' },
+      { thai: 'พฤศจิกา(ยน)', phonetic: 'prúet-sà-jì-gaa (yon)', english: 'Nov(ember)' },
+      { thai: 'เอกสาร', phonetic: 'èek-gà-săan', english: 'documents' },
+      { thai: 'ทะเบียนสมรส', phonetic: 'tá-bian sǒm-rót', english: 'marriage certificate' },
+      { thai: 'แปล', phonetic: 'bplaae', english: 'translate' },
+      { thai: 'จดทะเบียน', phonetic: 'jòt tá-bian', english: 'register' },
+      { thai: '...อื่น', phonetic: '... euhn', english: 'other' }
+    ];
+
+    const interactivePhrases = {
+      'header-title': { thai: 'การตรวจคนเข้าเมืองและวีซ่า', phonetic: 'kaan dtrùuat khon khâo mʉang lɛ́ wii-sâa', english: 'Immigration and Visa' },
+      'part-1-title': { thai: 'ส่วนที่ 1: คำศัพท์เกี่ยวกับวีซ่า', phonetic: 'sùan thîi nʉ̀ng: kham-sàp kìeow-kàp wii-sâa', english: 'Part 1: Visa Vocabulary' },
+
+      /* New label for Additional Vocabulary */
+      'part-1b-title': { thai: 'ส่วนเพิ่มเติม: คำศัพท์เพิ่มเติม', phonetic: 'sùan phœ̂ɛm-tə̂əm: kham-sàp phœ̂ɛm-tə̂əm', english: 'Additional Vocabulary' },
+
+      'part-2-title': { thai: 'ส่วนที่ 2: บทสนทนา', phonetic: 'sùan thîi sɔ̌ɔng: bòt sŏn-tha-naa', english: 'Part 2: Conversation' },
+      'part-3-title': { thai: 'ส่วนที่ 3: ฝึกพูด', phonetic: 'sùan thîi sǎam: fʉ̀k phûut', english: 'Part 3: Speaking Practice' },
+      'discussion-title': { thai: '🗣️ คำถามเพื่อการสนทนา', phonetic: 'kham-thăam phʉ̂a kaan sŏn-tha-naa', english: 'Discussion Questions' },
+      'discussion-intro': { thai: 'มาฝึกกัน! ตอบคำถามเกี่ยวกับประสบการณ์วีซ่าของคุณ', phonetic: 'maa fʉ̀k kan! tɔ̀ɔp kham-thăam kìeow-kàp bprà-sòp-gaan wii-sâa khɔ̌ɔng khun', english: 'Let’s practice! Answer questions about your visa experiences.' },
+      'roleplay-title': { thai: '🎭 การแสดงบทบาทสมมติ', phonetic: 'kaan sà-dɛɛng bòt-bàat sŏm-mút', english: 'Role-Plays' },
+      'scenario-1-title': { thai: 'สถานการณ์ที่ 1: ที่เคาน์เตอร์ ตม. (สนามบิน)', phonetic: 'sà-thăa-ná-gaan thîi nʉ̀ng: thîi kháo-dtə̂ə dtɔɔ-mɔɔ (sà-năam-bin)', english: 'Scenario 1: At the Immigration Counter (Airport)' },
+      'scenario-1-desc': { thai: 'คุณเพิ่งมาถึงไทย ครูจะเป็นเจ้าหน้าที่ ตม. (ใช้บทสนทนา 2A)', phonetic: 'khun phœ̀ng maa tʉ̌ng thai, khruu jà bpen jâo-nâa-thîi dtɔɔ-mɔɔ (chái bòt sŏn-tha-naa sɔ̌ɔng A)', english: 'You’ve just arrived in Thailand. I will be the immigration officer. (Use Dialogue 2A)' },
+      'scenario-2-title': { thai: 'สถานการณ์ที่ 2: ที่สำนักงาน ตม. (ต่อวีซ่า)', phonetic: 'sà-thăa-ná-gaan thîi sɔ̌ɔng: thîi sǎm-nák-ngaan dtɔɔ-mɔɔ (dtɔ̀ɔ wii-sâa)', english: 'Scenario 2: At the Immigration Office (Visa Extension)' },
+      'scenario-2-desc': { thai: 'คุณต้องการต่อวีซ่าแต่งงาน ครูจะเป็นเจ้าหน้าที่ (ใช้บทสนทนา 2B และคำศัพท์ใหม่)', phonetic: 'khun tɔ̂ng-kaan dtɔ̀ɔ wii-sâa dtàeng-ngaan, khruu jà bpen jâo-nâa-thîi (chái bòt sŏn-tha-naa sɔ̌ɔng B lɛ́ kham-sàp mài)', english: 'You want to extend your marriage visa. I will be the officer. (Use Dialogue 2B and new vocabulary)' },
+      'q1': { thai: 'คุณเคยขอวีซ่าประเภทไหนบ้าง (วีซ่าท่องเที่ยว, วีซ่าแต่งงาน)', phonetic: 'khun khoei khɔ̌ɔ wii-sâa bprà-phêet nǎi bâang (wii-sâa thɔ̂ɔng-tîao, wii-sâa dtàeng-ngaan)', english: 'What types of visas have you applied for? (Tourist visa, marriage visa)' },
+      'q2': { thai: 'การยื่นเอกสารขอวีซ่าแต่งงานยุ่งยากไหม', phonetic: 'kaan yʉ̂ʉn èek-gà-sǎan khɔ̌ɔ wii-sâa dtàeng-ngaan yûng-yâak măi', english: 'Is submitting documents for a marriage visa complicated?' },
+      'q3': { thai: 'ถ้าคุณอยากทำงานในไทย คุณต้องมีวีซ่าทำงาน และ ใบอนุญาตทำงาน ใช่ไหม', phonetic: 'thâa khun yàak tham-ngaan nai thai, khun tɔ̂ng mii wii-sâa tham-ngaan lɛ́ bai à-nú-yâat tham-ngaan, châi măi', english: 'If you want to work in Thailand, you need a work visa and a work permit, right?' },
+      'q4': { thai: 'ถ้าเพื่อนของคุณมาเที่ยว ต้องขอวีซ่าท่องเที่ยวไหม', phonetic: 'thâa phʉ̂an khɔ̌ɔng khun maa thîao, tɔ̂ng khɔ̌ɔ wii-sâa thɔ̂ɔng-tîao măi', english: 'If your friends come to visit, do they need a tourist visa?' },
+      'q5': { thai: 'คุณเคยไปต่อวีซ่าที่ ตม. ไหม เป็นอย่างไรบ้าง', phonetic: 'khun khoei bpai dtɔ̀ɔ wii-sâa thîi dtɔɔ-mɔɔ măi? bpen yàang-rai bâang', english: 'Have you ever extended a visa at immigration? How was it?' }
+    };
+
+    /* -------------------- TTS -------------------- */
+    const synth = 'speechSynthesis' in window ? window.speechSynthesis : null;
+    let voices = [];
+    let thVoice = null, enVoice = null;
+    let voicesReadyResolve; const voicesReady = new Promise(res => voicesReadyResolve = res);
+
+    function pickVoices() {
+      if (!voices.length) return;
+      thVoice = voices.find(v => v.lang === 'th-TH') || voices.find(v => v.lang?.toLowerCase().startsWith('th')) || null;
+      enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang?.toLowerCase().startsWith('en')) || null;
+    }
+    function loadVoices() {
+      if (!synth) return;
+      const list = synth.getVoices();
+      if (list && list.length) {
+        voices = list; pickVoices();
+        if (voicesReadyResolve) { voicesReadyResolve = voicesReadyResolve(); }
+      }
+    }
+    if (synth) { loadVoices(); if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices; }
+
+    async function speak(text, lang = 'th') {
+      if (!synth) { showCustomAlert('เบราว์เซอร์ของคุณไม่รองรับการอ่านออกเสียง'); return; }
+      await voicesReady;
+      const u = new SpeechSynthesisUtterance(text);
+      if (lang === 'en') { u.lang = 'en-US'; if (enVoice) u.voice = enVoice; u.rate = 1.0; }
+      else { u.lang = 'th-TH'; if (thVoice) u.voice = thVoice; u.rate = 0.9; }
+      synth.cancel(); synth.speak(u);
+    }
+
+    /* -------------------- Helpers -------------------- */
+    function iconSvg() {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path d="M19.07 5.93a10 10 0 0 1 0 14.14"></path>
+      </svg>`;
+    }
+
+    function createInteractiveThaiElement(item, customClasses = '', tag = 'div') {
+      const container = document.createElement(tag);
+      container.className = `interactive-thai sarabun-thai ${customClasses}`.trim();
+
+      const thai = item.thai ?? item.title ?? '';
+      const ipa  = item.phonetic ?? '';
+      const en   = item.english ?? '';
+      const thaiTTS = item.tts_text || thai;
+
+      container.innerHTML = `
+        <span class="thai-text text-lg">${thai}</span>
+        <button class="speaker-icon" data-lang="th" aria-label="Speak Thai">${iconSvg()}</button>
+        <button class="toggle-btn btn-ipa" aria-expanded="false">IPA</button>
+        <button class="toggle-btn btn-en" aria-expanded="false">EN</button>
+        <span class="phonetic hidden block mt-1 text-md">${ipa}</span>
+        <span class="translation hidden block mt-1 text-md">
+          <span class="en-text">${en}</span>
+          <button class="speaker-icon ml-2 align-middle" data-lang="en" aria-label="Speak English">${iconSvg()}</button>
+        </span>
+      `;
+
+      const thaiBtn = container.querySelector('.speaker-icon[data-lang="th"]');
+      thaiBtn.addEventListener('click', (e) => { e.stopPropagation(); speak(thaiTTS, 'th'); });
+
+      const ipaBtn = container.querySelector('.btn-ipa');
+      const ipaEl = container.querySelector('.phonetic');
+      ipaBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = ipaEl.classList.contains('hidden');
+        ipaEl.classList.toggle('hidden');
+        ipaBtn.setAttribute('aria-expanded', String(isHidden));
+      });
+
+      const enBtn = container.querySelector('.btn-en');
+      const enWrap = container.querySelector('.translation');
+      const enSpeak = container.querySelector('.speaker-icon[data-lang="en"]');
+      enBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = enWrap.classList.contains('hidden');
+        enWrap.classList.toggle('hidden');
+        enBtn.setAttribute('aria-expanded', String(isHidden));
+      });
+      enSpeak.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = enWrap.querySelector('.en-text')?.textContent?.trim() || '';
+        if (text) speak(text, 'en');
+      });
+
+      return container;
+    }
+
+    function createInteractiveFor(targetEl, data, customClasses = '') {
+      const tagName = ['H1','H2','H3','H4','H5','H6','LI','SPAN'].includes(targetEl.tagName) ? 'span' : 'div';
+      return createInteractiveThaiElement(data, customClasses, tagName);
+    }
+
+    /* -------------------- Page population -------------------- */
+    const speakerMap = {
+      'ตม.': { thai: 'ตม.', phonetic: 'dtɔɔ-mɔɔ', english: 'Immigration Officer (Airport)', tts_text: 'ตอมอ' },
+      'นักท่องเที่ยว': { thai: 'นักท่องเที่ยว', phonetic: 'nák-thɔ̂ɔng-tîao', english: 'Tourist' },
+      'เจ้าหน้าที่': { thai: 'เจ้าหน้าที่', phonetic: 'jâo-nâa-thîi', english: 'Officer (Immigration Office)' }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Header & section labels
+      for (const id in interactivePhrases) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const block = createInteractiveFor(el, interactivePhrases[id]);
+        el.innerHTML = '';
+        el.appendChild(block);
+      }
+
+      // Vocabulary
+      const vocabContainer = document.getElementById('vocab-grid');
+      vocabContainer.innerHTML = '';
+      vocabulary.forEach(word => {
+        const item = createInteractiveThaiElement(word, 'border rounded-lg p-3 bg-slate-50');
+        vocabContainer.appendChild(item);
+      });
+
+      // Additional Vocabulary (NEW)
+      const extraVocabContainer = document.getElementById('extra-vocab-grid');
+      if (extraVocabContainer) {
+        extraVocabContainer.innerHTML = '';
+        additionalVocabulary.forEach(word => {
+          const item = createInteractiveThaiElement(word, 'border rounded-lg p-3 bg-slate-50');
+          extraVocabContainer.appendChild(item);
+        });
+      }
+
+      // Dialogue
+      const dialogueContainer = document.getElementById('dialogue-container');
+      dialogueContainer.innerHTML = '';
+      for (const key in dialogue) {
+        const scen = dialogue[key];
+
+        const scenTitle = createInteractiveThaiElement(
+          { thai: scen.title, phonetic: scen.phonetic, english: scen.english, tts_text: scen.title },
+          'text-xl font-bold text-sky-700 mb-2',
+          'div'
+        );
+        dialogueContainer.appendChild(scenTitle);
+
+        const linesWrap = document.createElement('div');
+        linesWrap.className = 'pl-4 border-l-2 border-sky-200 space-y-4';
+        scen.lines.forEach(line => {
+          const row = document.createElement('div');
+          row.className = 'flex items-start gap-4 p-2';
+
+          const speakerCol = document.createElement('div');
+          speakerCol.className = 'w-1/4 md:w-1/6 text-right flex items-center justify-end';
+          const speakerData = speakerMap[line.speaker] || { thai: line.speaker, phonetic: '', english: '' };
+          const spk = createInteractiveThaiElement(speakerData, 'font-bold text-gray-700', 'span');
+          speakerCol.appendChild(spk);
+          const colon = document.createElement('span');
+          colon.className = 'ml-1 font-bold text-gray-600 sarabun-thai';
+          colon.textContent = ':';
+          speakerCol.appendChild(colon);
+
+          const contentCol = createInteractiveThaiElement(line, 'p-3 rounded-lg flex-1 text-lg bg-slate-50', 'div');
+
+          row.appendChild(speakerCol);
+          row.appendChild(contentCol);
+          linesWrap.appendChild(row);
+        });
+
+        dialogueContainer.appendChild(linesWrap);
+        const hr = document.createElement('hr');
+        hr.className = 'my-4 border-t-2 border-gray-100';
+        dialogueContainer.appendChild(hr);
+      }
+    });
+
+    /* -------------------- Alerts -------------------- */
+    const alertModal = document.getElementById('alert-modal');
+    const alertMessage = document.getElementById('alert-message');
+    const alertClose = document.getElementById('alert-close');
+    function showCustomAlert(msg){ alertMessage.textContent = msg; alertModal.classList.add('visible'); }
+    alertClose.addEventListener('click', () => alertModal.classList.remove('visible'));
+  </script>
+</body>
+</html>
