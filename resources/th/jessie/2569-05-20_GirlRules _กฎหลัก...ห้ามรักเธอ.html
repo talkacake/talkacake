@@ -1,90 +1,1648 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Girl Rules กฎหลัก...ห้ามรักเธอ</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ให้ซีนแบมบี้</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
-        .btn-press { transition: transform 0.1s; }
-        .btn-press:active { transform: scale(0.95); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf5ff; /* fuchsia-50 */
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .section-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .tts-button {
+            background: none; border: none; padding: 0;
+            margin-left: 8px; cursor: pointer; color: #cbd5e1;
+            transition: color 0.2s; display: inline-flex;
+            align-items: center; justify-content: center;
+            vertical-align: middle;
+        }
+        .tts-button:hover, .tts-button:active { color: #d946ef; } /* fuchsia-500 */
+        .tts-button svg { width: 22px; height: 22px; }
+        
+        .toggle-btn {
+             font-size: 0.75rem; font-weight: 600;
+             background-color: #fdf4ff; color: #a21caf;
+             padding: 4px 10px; border-radius: 9999px;
+             transition: all 0.2s; margin-right: 6px;
+             border: 1px solid #fbcfe8;
+        }
+        .toggle-btn:hover, .toggle-btn:active { background-color: #fbcfe8; }
+        .toggle-btn.active { background-color: #d946ef; color: white; border-color: #d946ef;}
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="text-slate-800 pb-20">
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+    <div class="max-w-3xl mx-auto p-4 sm:p-6">
 
-        const speakThai = (text, e) => {
-            if(e) e.stopPropagation();
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'th-TH';
-            utterance.rate = 0.85; 
-            window.speechSynthesis.speak(utterance);
-        };
+        <!-- Header -->
+        <header class="text-center mb-8 bg-fuchsia-600 p-8 rounded-2xl shadow-lg relative overflow-hidden">
+            <div class="relative z-10">
+                <h1 class="thai text-3xl sm:text-4xl font-bold text-white flex items-center justify-center flex-wrap gap-2">
+                    <span>🎬 ให้ซีนแบมบี้ ✨</span>
+                    <button class="tts-button !text-fuchsia-200 hover:!text-white" onclick="speak('ให้ซีนแบมบี้')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg>
+                    </button>
+                </h1>
+                <div class="flex space-x-2 mt-4 justify-center">
+                    <button class="toggle-btn !bg-fuchsia-800 !text-fuchsia-100 !border-fuchsia-700" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn !bg-fuchsia-800 !text-fuchsia-100 !border-fuchsia-700" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <div class="mt-3">
+                    <p class="ipa-target hidden text-fuchsia-200 text-lg">hâi siin bɛɛm-bîi</p>
+                    <p class="en-target hidden text-white font-medium text-lg">Giving Bambi a Scene</p>
+                </div>
+            </div>
+        </header>
 
-        const SmartText = ({ th, ipa, en, size = "md", isTitle = false }) => {
-            const [showIPA, setShowIPA] = useState(false);
-            const [showEN, setShowEN] = useState(false);
-            const textSize = size === "lg" ? "text-xl font-bold" : "text-lg font-medium";
+        <!-- Section 1: Review Vocab -->
+        <section class="section-card border-t-4 border-fuchsia-500">
+            <div class="mb-4">
+                <h2 class="thai text-2xl font-bold text-fuchsia-700 flex items-center flex-wrap">
+                    <span>🎲 ทบทวนคำศัพท์เก่า</span>
+                    <button class="tts-button" onclick="speak('ทบทวนคำศัพท์เก่า')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 mb-1">tóp-tuan kam-sàp gào</p>
+                <p class="en-target hidden text-fuchsia-600 mb-1">Review Old Vocabulary</p>
+            </div>
 
-            return (
-                <div className={`bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-3 w-full ${isTitle ? 'text-center' : ''}`}>
-                    <div className="flex items-center gap-3">
-                        <button onClick={(e) => speakThai(th, e)} className="p-2 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200 transition">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            <div class="bg-slate-50 p-4 rounded-xl text-center">
+                <div class="mb-4">
+                    <p class="thai text-lg text-slate-700">
+                        กดปุ่มเพื่อสุ่มคำศัพท์ แล้วแต่งประโยค 1 ประโยค 🗣️
+                        <button class="tts-button" onclick="speak('กดปุ่มเพื่อสุ่มคำศัพท์ แล้วแต่งประโยค 1 ประโยค')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex justify-center mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-500 mb-1 text-sm">gòt bpùm pʉ̂a sùm kam-sàp, lɛ́ɛo dtɛ̀ng bprà-yòok nʉ̀ng bprà-yòok</p>
+                    <p class="en-target hidden text-fuchsia-600 mb-1 text-sm">Press the button to randomize a word, then make 1 sentence.</p>
+                </div>
+
+                <button onclick="generateRandomVocab()" class="bg-fuchsia-600 hover:bg-fuchsia-700 text-white thai font-bold py-3 px-6 rounded-full shadow-md transition transform active:scale-95 mb-6 text-lg">
+                    สุ่มคำศัพท์ 🎲
+                </button>
+
+                <div id="random-vocab-display" class="hidden bg-white border-2 border-fuchsia-200 p-6 rounded-xl shadow-inner min-h-[120px] flex flex-col justify-center items-center">
+                    <h3 id="rv-thai" class="thai text-3xl font-bold text-fuchsia-700 mb-2 flex items-center">
+                        <span id="rv-thai-text"></span>
+                        <button class="tts-button" id="rv-tts" onclick="">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg>
                         </button>
-                        <span className={`${textSize} text-slate-800`}>{th}</span>
+                    </h3>
+                    <div class="flex justify-center mb-3">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa', 'random-vocab-display')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en', 'random-vocab-display')">EN</button>
                     </div>
-                    <div className="flex gap-2 mt-2">
-                        <button onClick={() => setShowIPA(!showIPA)} className={`px-2 py-1 rounded text-xs font-bold ${showIPA ? 'bg-indigo-600 text-white' : 'bg-slate-200'}`}>IPA</button>
-                        <button onClick={() => setShowEN(!showEN)} className={`px-2 py-1 rounded text-xs font-bold ${showEN ? 'bg-emerald-600 text-white' : 'bg-slate-200'}`}>EN</button>
-                    </div>
-                    {showIPA && <div className="mt-2 text-indigo-600 font-mono text-sm border-l-2 border-indigo-200 pl-2">/{ipa}/</div>}
-                    {showEN && <div className="mt-1 text-emerald-700 italic text-sm border-l-2 border-emerald-200 pl-2">{en}</div>}
+                    <p id="rv-ipa" class="ipa-target hidden text-slate-500 text-lg mb-1"></p>
+                    <p id="rv-en" class="en-target hidden text-fuchsia-600 font-medium text-lg"></p>
                 </div>
-            );
-        };
+            </div>
+        </section>
 
-        const App = () => {
-            const [activeTab, setActiveTab] = useState("review");
+        <!-- Section 2: Lead-in -->
+        <section class="section-card">
+            <div class="mb-4">
+                <h2 class="thai text-2xl font-bold text-fuchsia-700 flex items-center flex-wrap">
+                    <span>🤔 ก่อนดูวิดีโอ</span>
+                    <button class="tts-button" onclick="speak('ก่อนดูวิดีโอ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 mb-1">gɔ̀ɔn duu wí-dii-oo</p>
+                <p class="en-target hidden text-fuchsia-600 mb-1">Before watching the video</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <p class="thai text-lg">
+                        1. คุณเคยไปงานแสดงความยินดีกับเพื่อนไหม 🥳
+                        <button class="tts-button" onclick="speak('คุณเคยไปงานแสดงความยินดีกับเพื่อนไหม')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-500 text-sm mb-1">kun kəəi bpai ngaan sà-dɛɛng kwaam yin-dii gàp pʉ̂an mái?</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Have you ever been to a congratulatory event for a friend?</p>
+                </div>
+                
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <p class="thai text-lg">
+                        2. คุณคิดว่า 'อินฟลูเอนเซอร์' ชอบเป็นจุดสนใจไหม 📸
+                        <button class="tts-button" onclick="speak('คุณคิดว่า อินฟลูเอนเซอร์ ชอบเป็นจุดสนใจไหม')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-500 text-sm mb-1">kun kít wâa 'in-fuu-en-sə̂ə' chɔ̂ɔp bpen jùt sǒn-jai mái?</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Do you think 'influencers' like being the center of attention?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Video & Vocab -->
+        <section class="section-card">
+            <div class="mb-4">
+                <h2 class="thai text-2xl font-bold text-fuchsia-700 flex items-center flex-wrap">
+                    <span>📺 วิดีโอและคำศัพท์ใหม่</span>
+                    <button class="tts-button" onclick="speak('วิดีโอและคำศัพท์ใหม่')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-4">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 mb-2">wí-dii-oo lɛ́ kam-sàp mài</p>
+                <p class="en-target hidden text-fuchsia-600 mb-2">Video and New Vocabulary</p>
+            </div>
+
+            <a href="https://www.tiktok.com/@gmmtvofficial/video/7638658706154081552" target="_blank" class="block w-full bg-slate-900 text-white text-center py-4 rounded-xl hover:bg-slate-800 transition mb-6 shadow-md thai text-lg font-bold">
+                ▶️ คลิกเพื่อดูวิดีโอ (Click to watch video)
+            </a>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Vocab 1 -->
+                <div class="border border-fuchsia-200 rounded-xl p-4 bg-fuchsia-50">
+                    <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center">
+                        🎉 ยินดีด้วย 
+                        <button class="tts-button" onclick="speak('ยินดีด้วย')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </h3>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-600">yin-dii dûuai</p>
+                    <p class="en-target hidden text-fuchsia-600 font-medium">Congratulations</p>
+                </div>
+                <!-- Vocab 2 -->
+                <div class="border border-fuchsia-200 rounded-xl p-4 bg-fuchsia-50">
+                    <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center">
+                        📸 สื่อ 
+                        <button class="tts-button" onclick="speak('สื่อ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </h3>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-600">sʉ̀ʉ</p>
+                    <p class="en-target hidden text-fuchsia-600 font-medium">Media</p>
+                </div>
+                <!-- Vocab 3 -->
+                <div class="border border-fuchsia-200 rounded-xl p-4 bg-fuchsia-50">
+                    <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center">
+                        🎬 ซีน 
+                        <button class="tts-button" onclick="speak('ซีน')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </h3>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-600">siin</p>
+                    <p class="en-target hidden text-fuchsia-600 font-medium">Scene / Spotlight / Center of attention</p>
+                </div>
+                <!-- Vocab 4 -->
+                <div class="border border-fuchsia-200 rounded-xl p-4 bg-fuchsia-50">
+                    <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center">
+                        🏆 ความสำเร็จ 
+                        <button class="tts-button" onclick="speak('ความสำเร็จ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </h3>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-600">kwaam-sǎm-rèt</p>
+                    <p class="en-target hidden text-fuchsia-600 font-medium">Success</p>
+                </div>
+                <!-- Vocab 5 -->
+                <div class="border border-fuchsia-200 rounded-xl p-4 bg-fuchsia-50 sm:col-span-2">
+                    <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center">
+                        😤 ภูมิใจ 
+                        <button class="tts-button" onclick="speak('ภูมิใจ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </h3>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-600">puum-jai</p>
+                    <p class="en-target hidden text-fuchsia-600 font-medium">Proud</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Script -->
+        <section class="section-card">
+            <div class="mb-4">
+                <h2 class="thai text-2xl font-bold text-fuchsia-700 flex items-center flex-wrap">
+                    <span>📜 สคริปต์</span>
+                    <button class="tts-button" onclick="speak('สคริปต์')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 mb-1">sà-kríp</p>
+                <p class="en-target hidden text-fuchsia-600 mb-1">Script</p>
+            </div>
+
+            <div class="space-y-3">
+                <!-- Line 1 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: ยินดีด้วยนะแบมบี้ 👏
+                        <button class="tts-button" onclick="speak('แอรี่: ยินดีด้วยนะแบมบี้')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: yin-dii dûuai ná bɛɛm-bîi</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: Congratulations, Bambi.</p>
+                </div>
+                <!-- Line 2 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-sky-600">แบมบี้: ขอบคุณนะ 🙏
+                        <button class="tts-button" onclick="speak('แบมบี้: ขอบคุณนะ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Bambi: kɔ̀ɔp-kun ná</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Bambi: Thank you.</p>
+                </div>
+                <!-- Line 3 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-sky-600">แบมบี้: อันนี้มาทำไมเหรอ 🤨
+                        <button class="tts-button" onclick="speak('แบมบี้: อันนี้มาทำไมเหรอ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Bambi: an-níi maa tam-mai rə̌ə</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Bambi: What are you here for?</p>
+                </div>
+                <!-- Line 4 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-sky-600">แบมบี้: เป็นสื่อ อินฟลู 📸
+                        <button class="tts-button" onclick="speak('แบมบี้: เป็นสื่อ อินฟลู')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Bambi: bpen sʉ̀ʉ, in-fuu</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Bambi: Are you media? An influencer?</p>
+                </div>
+                <!-- Line 5 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-sky-600">แบมบี้: ไม่น่าใช่นะ ฉันไม่รู้จัก 🤷‍♀️
+                        <button class="tts-button" onclick="speak('แบมบี้: ไม่น่าใช่นะ ฉันไม่รู้จัก')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Bambi: mâi nâa châi ná, chǎn mâi rúu-jàk</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Bambi: Probably not, I don't know you.</p>
+                </div>
+                <!-- Line 6 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: ก็มาให้ซีนเธอไง 🎬
+                        <button class="tts-button" onclick="speak('แอรี่: ก็มาให้ซีนเธอไง')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: gɔ̂ maa hâi siin təə ngai</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: Well, I came to give you a scene/spotlight.</p>
+                </div>
+                <!-- Line 7 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: เธอชอบมีซีนไม่ใช่เหรอแบมบี้ 🌟
+                        <button class="tts-button" onclick="speak('แอรี่: เธอชอบมีซีนไม่ใช่เหรอแบมบี้')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: təə chɔ̂ɔp mii siin mâi-châi rə̌ə bɛɛm-bîi</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: You like having the spotlight, don't you Bambi?</p>
+                </div>
+                <!-- Line 8 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: ยินดีกับความสำเร็จของเธอด้วยนะ 🏆
+                        <button class="tts-button" onclick="speak('แอรี่: ยินดีกับความสำเร็จของเธอด้วยนะ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: yin-dii gàp kwaam-sǎm-rèt kɔ̌ɔng təə dûuai ná</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: Congratulations on your success too.</p>
+                </div>
+                <!-- Line 9 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: เธอคงภูมิใจกับมันแย่เลย 😤
+                        <button class="tts-button" onclick="speak('แอรี่: เธอคงภูมิใจกับมันแย่เลย')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: təə kong puum-jai gàp man yɛ̂ɛ ləəi</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: You must be so terribly proud of it.</p>
+                </div>
+                <!-- Line 10 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: แต่ ลืมอะไรไปหรือเปล่า 🤫
+                        <button class="tts-button" onclick="speak('แอรี่: แต่ ลืมอะไรไปหรือเปล่า')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: dtɛ̀ɛ lʉʉm à-rai bpai rʉ̌ʉ bplào</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: But did you forget something?</p>
+                </div>
+                <!-- Line 11 -->
+                <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <p class="thai text-lg font-bold text-rose-600">แอรี่: ว่าทำอะไรกับใครไว้บ้าง 😈
+                        <button class="tts-button" onclick="speak('แอรี่: ว่าทำอะไรกับใครไว้บ้าง')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1"><button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button><button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button></div>
+                    <p class="ipa-target hidden text-slate-500 text-sm">Airy: wâa tam à-rai gàp krai wái bâang</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Airy: What you did to whom.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Comprehension -->
+        <section class="section-card">
+            <div class="mb-4">
+                <h2 class="thai text-2xl font-bold text-fuchsia-700 flex items-center flex-wrap">
+                    <span>✅ เข้าใจไหมเอ่ย</span>
+                    <button class="tts-button" onclick="speak('เข้าใจไหมเอ่ย')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 mb-1">kâo-jai mái ə̀əi</p>
+                <p class="en-target hidden text-fuchsia-600 mb-1">Comprehension Check</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <p class="thai text-lg">
+                        1. แอรี่มางานของแบมบี้ทำไม 🤨
+                        <button class="tts-button" onclick="speak('แอรี่มางานของแบมบี้ทำไม')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-500 text-sm mb-1">Airy maa ngaan kɔ̌ɔng Bambi tam-mai?</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Why did Airy come to Bambi's event?</p>
+                </div>
+                
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <p class="thai text-lg">
+                        2. แบมบี้คิดว่าแอรี่เป็นใครตอนแรก 🧐
+                        <button class="tts-button" onclick="speak('แบมบี้คิดว่าแอรี่เป็นใครตอนแรก')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-2">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-500 text-sm mb-1">Bambi kít wâa Airy bpen krai dtɔɔn rɛ̂ɛk?</p>
+                    <p class="en-target hidden text-fuchsia-600 text-sm">Who did Bambi think Airy was at first?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Speaking Tasks -->
+        <section class="section-card">
+            <div class="mb-4">
+                <h2 class="thai text-2xl font-bold text-fuchsia-700 flex items-center flex-wrap">
+                    <span>🗣️ กิจกรรมฝึกพูด</span>
+                    <button class="tts-button" onclick="speak('กิจกรรมฝึกพูด')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 mb-1">gìt-jà-gam fʉ̀k pûut</p>
+                <p class="en-target hidden text-fuchsia-600 mb-1">Speaking Tasks</p>
+            </div>
+
+            <!-- Task 1 -->
+            <div class="mb-6 p-4 bg-fuchsia-50 border border-fuchsia-100 rounded-xl">
+                <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center mb-2">
+                    🎭 บทบาทสมมติ (Role-play)
+                    <button class="tts-button" onclick="speak('บทบาทสมมติ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h3>
+                <p class="thai text-lg">
+                    นักเรียนรับบทเป็น 'แบมบี้' ส่วนครูรับบทเป็น 'แอรี่' ครูจะพูดว่า "ยินดีด้วยกับความสำเร็จนะ!" ให้นักเรียนตอบกลับโดยใช้คำว่า "สื่อ" หรือ "ภูมิใจ" แบบมั่นใจสุดๆ 😎
+                    <button class="tts-button" onclick="speak('นักเรียนรับบทเป็น แบมบี้ ส่วนครูรับบทเป็น แอรี่ ครูจะพูดว่า ยินดีด้วยกับความสำเร็จนะ ให้นักเรียนตอบกลับโดยใช้คำว่า สื่อ หรือ ภูมิใจ แบบมั่นใจสุดๆ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </p>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 text-sm mb-1">nák-rian ráp bòt bpen 'Bambi' sùan kruu ráp bòt bpen 'Airy'. kruu jà pûut wâa "yin-dii dûuai gàp kwaam-sǎm-rèt ná!" hâi nák-rian dtɔ̀ɔp glàp dooi chái kam wâa "sʉ̀ʉ" rʉ̌ʉ "puum-jai" bàep mân-jai sùt sùt</p>
+                <p class="en-target hidden text-fuchsia-600 text-sm">Student plays 'Bambi', teacher plays 'Airy'. Teacher says "Congrats on your success!". Student replies using "media" or "proud" very confidently.</p>
+            </div>
+
+            <!-- Task 2 -->
+            <div class="mb-6 p-4 bg-fuchsia-50 border border-fuchsia-100 rounded-xl">
+                <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center mb-2">
+                    🎙️ สัมภาษณ์สื่อ (Interview)
+                    <button class="tts-button" onclick="speak('สัมภาษณ์สื่อ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h3>
+                <p class="thai text-lg">
+                    นักเรียนรับบทเป็น 'สื่อ' กำลังสัมภาษณ์คนดัง (ครู) เรื่อง 'ความสำเร็จ' ลองตั้งคำถาม 2 คำถามเกี่ยวกับการได้ 'ซีน' ของเขา 🎤
+                    <button class="tts-button" onclick="speak('นักเรียนรับบทเป็น สื่อ กำลังสัมภาษณ์คนดัง เรื่อง ความสำเร็จ ลองตั้งคำถาม 2 คำถามเกี่ยวกับการได้ ซีน ของเขา')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </p>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 text-sm mb-1">nák-rian ráp bòt bpen 'sʉ̀ʉ' gam-lang sǎm-pâat kon dang (kruu) rʉ̂ang 'kwaam-sǎm-rèt'. lɔɔng dtâng kǎm-tǎam 2 kǎm-tǎam gìao gàp gaan dâai 'siin' kɔ̌ɔng kǎo</p>
+                <p class="en-target hidden text-fuchsia-600 text-sm">Student plays 'media' interviewing a famous person (teacher) about 'success'. Try making 2 questions about them getting the 'scene/spotlight'.</p>
+            </div>
+
+            <!-- Task 3 -->
+            <div class="p-4 bg-fuchsia-50 border border-fuchsia-100 rounded-xl">
+                <h3 class="thai text-xl font-bold text-fuchsia-800 flex items-center mb-2">
+                    📖 เล่าเรื่อง (Story-telling)
+                    <button class="tts-button" onclick="speak('เล่าเรื่อง')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h3>
+                <p class="thai text-lg">
+                    เล่าเรื่องในชีวิตของคุณที่คุณรู้สึก 'ภูมิใจ' และเป็น 'ความสำเร็จ' มากที่สุดในตอนนั้น ✨
+                    <button class="tts-button" onclick="speak('เล่าเรื่องในชีวิตของคุณที่คุณรู้สึก ภูมิใจ และเป็น ความสำเร็จ มากที่สุดในตอนนั้น')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </p>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-500 text-sm mb-1">lâo rʉ̂ang nai chii-wít kɔ̌ɔng kun tîi kun rúu-sʉ̀k 'puum-jai' lɛ́ bpen 'kwaam-sǎm-rèt' mâak tîi sùt nai dtɔɔn nán</p>
+                <p class="en-target hidden text-fuchsia-600 text-sm">Tell a story in your life that you felt 'proud' of and was your biggest 'success' at that time.</p>
+            </div>
+        </section>
+
+        <!-- Section 7: Extension Activities -->
+        <section class="section-card border-t-4 border-slate-300 bg-slate-50 opacity-90">
+            <div class="mb-4">
+                <h2 class="thai text-xl font-bold text-slate-600 flex items-center flex-wrap">
+                    <span>➕ กิจกรรมเสริม (Extension)</span>
+                    <button class="tts-button" onclick="speak('กิจกรรมเสริม')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                </h2>
+                <div class="flex mt-2 mb-2">
+                    <button class="toggle-btn !bg-slate-200 !text-slate-600 !border-slate-300" onclick="toggleParent(this, 'ipa')">IPA</button>
+                    <button class="toggle-btn !bg-slate-200 !text-slate-600 !border-slate-300" onclick="toggleParent(this, 'en')">EN</button>
+                </div>
+                <p class="ipa-target hidden text-slate-400 mb-1 text-sm">gìt-jà-gam sə̌əm</p>
+                <p class="en-target hidden text-slate-500 mb-1 text-sm">Extension Activities (if time permits)</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-200">
+                    <p class="thai text-lg text-slate-700">
+                        🗣️ ถกเถียง (Debate): การอยากมี 'ซีน' ตลอดเวลา เป็นเรื่องดีหรือไม่ดี เพราะอะไร?
+                        <button class="tts-button" onclick="speak('ถกเถียง การอยากมี ซีน ตลอดเวลา เป็นเรื่องดีหรือไม่ดี เพราะอะไร')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-400 text-sm">tòk-tǐang: gaan yàak mii 'siin' dtà-lɔ̀ɔt wee-laa bpen rʉ̂ang dii rʉ̌ʉ mâi dii prór à-rai?</p>
+                    <p class="en-target hidden text-slate-500 text-sm">Debate: Is wanting to have the 'scene' (spotlight) all the time a good or bad thing? Why?</p>
+                </div>
+
+                <div class="p-3 bg-white rounded-lg shadow-sm border border-slate-200">
+                    <p class="thai text-lg text-slate-700">
+                        📊 นำเสนอ (Presentation): ลองคิดไอเดียเปิดช่อง 'สื่อ' หรือเพจของตัวเอง เพื่อให้คนมาแสดงความ 'ยินดีด้วย' กับคุณ 
+                        <button class="tts-button" onclick="speak('นำเสนอ ลองคิดไอเดียเปิดช่อง สื่อ หรือเพจของตัวเอง เพื่อให้คนมาแสดงความ ยินดีด้วย กับคุณ')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7.125 5.433c.338-.178.75-.178 1.088 0l5.25 2.776a.75.75 0 0 1 0 1.342l-5.25 2.776a.75.75 0 0 1-1.088 0V5.433Z" /></svg></button>
+                    </p>
+                    <div class="flex mt-2 mb-1">
+                        <button class="toggle-btn" onclick="toggleParent(this, 'ipa')">IPA</button>
+                        <button class="toggle-btn" onclick="toggleParent(this, 'en')">EN</button>
+                    </div>
+                    <p class="ipa-target hidden text-slate-400 text-sm">nam-sà-nə̌ə: lɔɔng kít ai-dia bpə̀ət chɔ̂ng 'sʉ̀ʉ' rʉ̌ʉ pèet kɔ̌ɔng dtua eeng pʉ̂a hâi kon maa sà-dɛɛng kwaam 'yin-dii dûuai' gàp kun</p>
+                    <p class="en-target hidden text-slate-500 text-sm">Presentation: Pitch an idea to open your own 'media' channel or page so people will 'congratulate' you.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Data for Random Vocab Review
+        const vocabList = [
+            { thai: '... กว่า', ipa: 'gwàa', en: 'ish / more than' },
+            { thai: 'ก็ต้องไปปรึกษาหมอ', ipa: 'gɔ̂ɔ dtɔ̂ɔng bpai bprʉ̀k sǎa mɔ̌ɔ', en: 'you have to consult the doctor.' },
+            { thai: 'ก้นทะเล', ipa: 'gôn tá lee', en: 'Bottom of the sea' },
+            { thai: 'กบ', ipa: 'gòp', en: 'frog' },
+            { thai: 'กรกฎาคม', ipa: 'gà rá gà daa kom', en: 'July' },
+            { thai: 'กระจก', ipa: 'grà jòk', en: 'car window / mirror' },
+            { thai: 'กระเช้า', ipa: 'grà cháo', en: 'Gondola / Cable car' },
+            { thai: 'กระดาษ', ipa: 'grà dàat', en: 'paper' },
+            { thai: 'กระทิงแดง', ipa: 'grà ting dɛɛng', en: 'Red bull' },
+            { thai: 'กระเทียม', ipa: 'grà tiam', en: 'garlic' },
+            { thai: 'กระป๋อง', ipa: 'grà bpɔ̌ɔng', en: 'can' },
+            { thai: 'กระเป๋ากางเกง', ipa: 'grà bpǎo gaang geeng', en: 'pant pocket' },
+            { thai: 'กล่อง', ipa: 'glɔ̀ɔng', en: 'Box' },
+            { thai: 'กลาง', ipa: 'glaang', en: 'Mid / Central' },
+            { thai: 'กลางคืน', ipa: 'glaang kʉʉn', en: 'nighttime / in the middle of the night' },
+            { thai: 'กลางวัน', ipa: 'glaang wan', en: 'daytime / during the day' },
+            { thai: 'กลิ่น', ipa: 'glìn', en: 'Smell' },
+            { thai: 'ก็เลย', ipa: 'gɔ̂ɔ ləəi', en: 'So' },
+            { thai: 'กองไฟ', ipa: 'gɔɔng fai', en: 'A pile of fire' },
+            { thai: 'กอด', ipa: 'gɔ̀ɔt', en: 'Hug' },
+            { thai: 'ก่อน', ipa: 'gɔ̀ɔn', en: 'Before' },
+            { thai: 'กะทิ', ipa: 'gà tí', en: 'coconut milk' },
+            { thai: 'กันน้ำ', ipa: 'gan náam', en: 'Waterproof' },
+            { thai: 'กันยายน', ipa: 'gan yaa yon', en: 'September' },
+            { thai: 'กา', ipa: 'gaa', en: 'Crows' },
+            { thai: 'กางเกง', ipa: 'gaang geeng', en: 'Pants' },
+            { thai: 'กายภาพ', ipa: 'gaai yá pâap', en: 'Physiotherapy' },
+            { thai: 'การจ่ายเงิน', ipa: 'gaan jàai ngəən', en: 'Payment' },
+            { thai: 'การรักษา', ipa: 'gaan rák sǎa', en: 'Treatment' },
+            { thai: 'ก้าว', ipa: 'gâao', en: '(foot)Steps' },
+            { thai: 'กิจวัตร', ipa: 'gìt jà wát', en: 'Routines' },
+            { thai: 'กินดูสิ', ipa: 'gin duu sì', en: 'Try eating it.' },
+            { thai: 'กินเถอะ', ipa: 'gin tə̀', en: 'Let\'s eat.' },
+            { thai: 'กินยา', ipa: 'gin yaa', en: 'Take medicine' },
+            { thai: 'กินให้อร่อย', ipa: 'gin hâi à rɔ̀ɔi', en: 'Enjoy the meal!' },
+            { thai: 'กินอาหารให้ตรงเวลา', ipa: 'gin aa hǎan hâi dtrong wee laa', en: 'Eat right on time.' },
+            { thai: 'กิโลเมตร', ipa: 'gì loo mét', en: 'Kilometres' },
+            { thai: 'กุญแจ', ipa: 'gun jɛɛ', en: 'Keys' },
+            { thai: 'กุมภาพันธ์', ipa: 'gum paa pan', en: 'February' },
+            { thai: 'เก็บ', ipa: 'gèp', en: 'Keep / Collect' },
+            { thai: 'เกลือ', ipa: 'glʉa', en: 'salt' },
+            { thai: 'เกาะกลางถนน', ipa: 'gɔ̀ glaang tà nǒn', en: 'traffic island' },
+            { thai: 'เกิดอะไรขึ้น', ipa: 'gə̀ət à rai kʉ̂n', en: 'What happened?' },
+            { thai: 'เกี๊ยว', ipa: 'gíao', en: 'Dumpling / Wonton' },
+            { thai: 'เกี่ยวกับ', ipa: 'gìao gàp', en: 'About' },
+            { thai: 'เกือบ', ipa: 'gʉ̀ap', en: 'Almost' },
+            { thai: 'แก่', ipa: 'gɛ̀ɛ', en: 'Old (age)' },
+            { thai: 'โกรธ', ipa: 'gròot', en: 'angry' },
+            { thai: 'ขนมจีบ', ipa: 'kà nǒm jìip', en: 'Shumai' },
+            { thai: 'ขนมถุง', ipa: 'ká nǒm tǔng', en: 'Bagged chips (snacks)' },
+            { thai: 'ขนมผักกาด', ipa: 'kà nǒm pàk gàat', en: 'Turnip cake' },
+            { thai: 'ขนมไหว้พระจันทร์', ipa: 'kà nǒm wâi prá jan', en: 'Mooncake' },
+            { thai: 'ขนสัตว์', ipa: 'kǒn sàt', en: 'wool' },
+            { thai: 'ขยับ', ipa: 'kà yàp', en: 'Move' },
+            { thai: 'ข้อความ', ipa: 'kɔ̂ɔ kwaam', en: 'Texts / Messages' },
+            { thai: 'ของเล่น', ipa: 'kɔ̌ɔng lên', en: 'Toys' },
+            { thai: 'ของหวาน', ipa: 'kɔ̌ɔng wǎan', en: 'Sweet things' },
+            { thai: 'ขอให้ขายได้', ipa: 'kɔ̌ɔ hâi kǎai dâi', en: 'I hope you can sell it.' },
+            { thai: 'ขัน', ipa: 'kǎn', en: 'Bowl (not used for food)' },
+            { thai: 'ขับรถเป็นป่ะเนี่ย', ipa: 'kàp rót bpen bpà nîa', en: 'Can you drive?!' },
+            { thai: 'ขับหนี', ipa: 'kàp nǐi', en: 'drive away (escape)' },
+            { thai: 'ข้างถนน', ipa: 'kâang tà nǒn', en: 'on the side of the road' },
+            { thai: 'ข้างนอก', ipa: 'kâang nɔ̂ɔk', en: 'outside' },
+            { thai: 'ข้างหน้า', ipa: 'kâang nâa', en: 'in front' },
+            { thai: 'ข้ามถนน', ipa: 'kâam tà nǒn', en: 'cross the road' },
+            { thai: 'ขาย', ipa: 'kǎai', en: 'Sell' },
+            { thai: 'ข่าว', ipa: 'kàao', en: 'news' },
+            { thai: 'ข้าวเที่ยง', ipa: 'kâao tîang', en: 'Lunch' },
+            { thai: 'ข้าวผัดรวมมิตร', ipa: 'kâao pàt ruam mít', en: 'Mixed seafood fried rice' },
+            { thai: 'ขิง', ipa: 'kǐng', en: 'ginger' },
+            { thai: 'ขี้', ipa: 'kîi', en: 'poop' },
+            { thai: 'ขี้โมโห', ipa: 'kîi moo hǒo', en: 'Get angry easily' },
+            { thai: 'ขี้ร้อน', ipa: 'kîi rɔ́ɔn', en: 'Get hot easily' },
+            { thai: 'ขี้หนาว', ipa: 'kîi nǎao', en: 'Get cold easily' },
+            { thai: 'ขึ้น', ipa: 'kʉ̂n', en: '(Go) up' },
+            { thai: 'เขต', ipa: 'kèet', en: 'district' },
+            { thai: 'เข้ากันดี', ipa: 'kâo gan dii', en: 'go well together' },
+            { thai: 'เขาชอบเผือก', ipa: 'kǎo chɔ̂ɔp pʉ̀ak', en: 'They like to mind other people\'s business.' },
+            { thai: 'เขียนเรื่องนี้เองได้', ipa: 'kǐan rʉ̂ang níi eeng dâi', en: 'You can write this story yourself.' },
+            { thai: 'เขื่อน', ipa: 'kʉ̀an', en: 'Dam/Reservoir' },
+            { thai: 'ไข่กวน', ipa: 'kài guan', en: 'Scrambled eggs' },
+            { thai: 'ไข่คน', ipa: 'kài kon', en: 'Scrambled eggs (stir)' },
+            { thai: 'ไข้หวัด', ipa: 'kâi wàt', en: 'Flu' },
+            { thai: 'คน', ipa: 'kon', en: 'People' },
+            { thai: 'คนแก่ไม่ควรขับรถ', ipa: 'kon gɛ̀ɛ mâi kuan kàp rót', en: 'Old people shouldn\'t drive.' },
+            { thai: 'คนไข้', ipa: 'kon kâi', en: 'Patients' },
+            { thai: 'คนไม่เยอะ', ipa: 'kon mâi yə́', en: 'Not a lot of people' },
+            { thai: 'คนเยอะไป', ipa: 'kon yə́ bpai', en: 'Too many people' },
+            { thai: 'คนรุ่นใหม่', ipa: 'kon rûn mài', en: 'People in younger generations' },
+            { thai: 'ครบ', ipa: 'króp', en: 'Complete / All of it' },
+            { thai: 'ครอบแก้ว', ipa: 'krɔ̂ɔp gɛ̂ɛo', en: 'Cupping' },
+            { thai: 'ครั้งที่แล้ว', ipa: 'kráng tîi lɛ́ɛo', en: 'Last time' },
+            { thai: 'ครั้งที่หนึ่ง', ipa: 'kráng tîi nʉ̀ng', en: 'First time' },
+            { thai: 'ครั้งหน้า', ipa: 'kráng nâa', en: 'Next time' },
+            { thai: 'ครีมกันแดด', ipa: 'kriim gan dɛ̀ɛt', en: 'suncream' },
+            { thai: 'คล้าย', ipa: 'kláai', en: 'Similar' },
+            { thai: 'คลายเครียด', ipa: 'klaai krîat', en: 'relieve stress' },
+            { thai: 'คลาสที่สิบ', ipa: 'klâat tîi sìp', en: '10th class' },
+            { thai: 'ควร', ipa: 'kuan', en: 'Should' },
+            { thai: 'ควรนอนมากกว่านี้', ipa: 'kuan nɔɔn mâak gwàa níi', en: 'Should sleep more than this' },
+            { thai: 'ควรนอนเร็วกว่าเดิม', ipa: 'kuan nɔɔn reo gwàa dəəm', en: 'should sleep earlier than usual' },
+            { thai: 'ควรนอนเร็วขึ้น', ipa: 'kuan nɔɔn reo kʉ̂n', en: 'Should sleep faster than before' },
+            { thai: 'ความงาม', ipa: 'kwaam ngaam', en: 'Beauty' },
+            { thai: 'ความแตกต่าง', ipa: 'kwaam dtɛ̀ɛk dtàang', en: 'Difference' },
+            { thai: 'ความสูง', ipa: 'kwaam sǔung', en: 'Height' },
+            { thai: 'ความหมาย', ipa: 'kwaam mǎai', en: 'Meaning' },
+            { thai: 'คอ', ipa: 'kɔɔ', en: 'Neck' },
+            { thai: 'คะน้า', ipa: 'ká náa', en: 'Chinese brocoli' },
+            { thai: 'คัน', ipa: 'kan', en: 'Classifier for cars' },
+            { thai: 'ค่าเงินบาทแข็ง', ipa: 'kâa ngəən bàat kɛ̌ng', en: 'Baht currency is strong.' },
+            { thai: 'ค่าธรรมเนียม', ipa: 'kâa tam niam', en: 'Fees' },
+            { thai: 'ค่าไฟ', ipa: 'kâa fai', en: 'electricity bill' },
+            { thai: 'ค่าส่ง', ipa: 'kâa sòng', en: 'Delivery fees' },
+            { thai: 'คิด', ipa: 'kít', en: 'think' },
+            { thai: 'คิดเงิน', ipa: 'kít ngəən', en: 'Calculate the money' },
+            { thai: 'คิดมาก', ipa: 'kít mâak', en: 'Think too much.' },
+            { thai: 'คืน', ipa: 'kʉʉn', en: 'Return / Night' },
+            { thai: 'คุณลูกค้าเชิญค่ะ', ipa: 'kun lûuk káa chəən kâ', en: 'Please come in, dear customer.' },
+            { thai: 'คุ้ม', ipa: 'kúm', en: 'Value for money' },
+            { thai: 'คุยอะไรกัน', ipa: 'kui à rai gan', en: 'What are you talking about?' },
+            { thai: 'คู่แข่ง', ipa: 'kûu kɛ̀ng', en: 'Competitors' },
+            { thai: 'คู่จิ้น', ipa: 'kûu jîn', en: 'Ship pairing' },
+            { thai: 'คนงาน', ipa: 'kon ngaan', en: 'worker' },
+            { thai: 'เคย', ipa: 'kəəi', en: 'Ever / Used to' },
+            { thai: 'เคยไปครั้งแรก', ipa: 'kəəi bpai kráng rɛ̂ɛk', en: 'Ever been the first time' },
+            { thai: 'เคยเรียนที่ไต้หวันเหมือนกัน แต่ไม่ได้เรียนโรงเรียนเดียวกัน', ipa: 'kəəi rian tîi dtâi wǎn mʉ̌an gan dtɛ̀ɛ mâi dâi rian roong rian diao gan', en: 'We both used to study in Taiwan but not in the same school.' },
+            { thai: 'เครื่อง', ipa: 'krʉ̂ang', en: 'Machine' },
+            { thai: 'เครื่องกระตุ้นไฟฟ้า', ipa: 'krʉ̂ang grà dtûn fai fáa', en: 'Electrical Stimulation' },
+            { thai: 'เครื่องเทศ', ipa: 'krʉ̂ang têet', en: 'Seasonings' },
+            { thai: 'เครื่องใน', ipa: 'krʉ̂ang nai', en: 'offal / internal organs' },
+            { thai: 'เครื่องฟอกอากาศ', ipa: 'krʉ̂ang fɔ̂ɔk aa gàat', en: 'Air purifier' },
+            { thai: 'เครื่องลดความชื้น', ipa: 'krʉ̂ang lót kwaam chʉ́ʉn', en: 'Dehumidifier' },
+            { thai: 'เครื่องสำอาง', ipa: 'krʉ̂ang sǎm aang', en: 'cosmetics' },
+            { thai: 'เคี้ยว', ipa: 'kíao', en: 'chew' },
+            { thai: 'แค่ล้อเล่น', ipa: 'kɛ̂ɛ lɔ́ɔ lên', en: 'Just kidding' },
+            { thai: 'โฆษณา', ipa: 'kôot sà naa', en: 'Ads / Commercials' },
+            { thai: 'งง', ipa: 'ngong', en: 'Confused' },
+            { thai: 'งานนี้ไม่ดีต่อตา', ipa: 'ngaan níi mâi dii dtɔ̀ɔ dtaa', en: 'This job isn\'t good for the eyes.' },
+            { thai: 'ง่าย', ipa: 'ngâai', en: 'Easy' },
+            { thai: 'งู', ipa: 'nguu', en: 'Snakes' },
+            { thai: 'เงียบ', ipa: 'ngîap', en: 'quiet' },
+            { thai: 'จด', ipa: 'jòt', en: 'jot' },
+            { thai: 'จริงๆ ต้องบอกเลยว่า', ipa: 'jing jing dtɔ̂ɔng bɔ̀ɔk ləəi wâa', en: 'Actually, I must tell you right away that' },
+            { thai: 'จอง', ipa: 'jɔɔng', en: 'book / reserve' },
+            { thai: 'จะซื้ออย่างอื่น', ipa: 'jà sʉ́ʉ yàang ʉ̀ʉn', en: 'I\'m going to buy something else.' },
+            { thai: 'จักรยาน', ipa: 'jàk grà yaan', en: 'Bicycle' },
+            { thai: 'จับคู่', ipa: 'jàp kûu', en: 'Matching' },
+            { thai: 'จาก', ipa: 'jàak', en: 'from' },
+            { thai: 'จ้าง', ipa: 'jâang', en: 'Hire' },
+            { thai: 'จ่ายเงิน', ipa: 'jàai ngən', en: 'pay' },
+            { thai: 'จิตรกร', ipa: 'jìt dtrà gɔɔn', en: 'Painter' },
+            { thai: 'จีนกลาง', ipa: 'jiin glaang', en: 'Mandarin' },
+            { thai: 'จุด', ipa: 'jùt', en: 'Point' },
+            { thai: 'จุดแข็ง', ipa: 'jùt kɛ̌ng', en: 'Strengths' },
+            { thai: 'จุดไฟ', ipa: 'jùt fai', en: 'light up the fire' },
+            { thai: 'จุดอ่อน', ipa: 'jùt ɔ̀ɔn', en: 'Weaknesses' },
+            { thai: 'จูบ', ipa: 'jùup', en: 'Kiss' },
+            { thai: 'เจ๊ มีแหนมไหม', ipa: 'jé mii nɛ̌ɛm mǎi', en: 'Do you have lao pork sausages?' },
+            { thai: 'เจ็บคอ', ipa: 'jèp kɔɔ', en: 'Sore throat' },
+            { thai: 'เจ้าของ', ipa: 'jâo kɔ̌ɔng', en: 'Owner' },
+            { thai: 'เจ้าของวันเกิด', ipa: 'jâo kɔ̌ɔng wan gə̀ət', en: 'The owner of the birthday' },
+            { thai: 'ใจร้อน', ipa: 'jai rɔ́ɔn', en: 'hot-tempered' },
+            { thai: 'ฉบับ', ipa: 'chà bàp', en: 'Version' },
+            { thai: 'ฉลอง', ipa: 'chà lɔ̌ɔng', en: 'Celebrate' },
+            { thai: 'ฉลองวันเกิดหลานชายคนเล็ก', ipa: 'chà lɔ̌ɔng wan gə̀ət lǎan chaai kon lék', en: 'Celebrate the birthday of the younger nephew' },
+            { thai: 'ฉลาด', ipa: 'chà làat', en: 'Smart' },
+            { thai: 'เฉยๆ', ipa: 'chə̌əi chə̌əi', en: 'so so' },
+            { thai: 'ชน', ipa: 'chon', en: 'Clash into' },
+            { thai: 'ชนบท', ipa: 'chon ná bòt', en: 'countryside' },
+            { thai: 'ชนิด', ipa: 'chá nít', en: 'Types' },
+            { thai: 'ช่วงนี้นอนไม่พอหรือเปล่า', ipa: 'chûang níi nɔɔn mâi pɔɔ rʉ̌ʉ bplào', en: 'You don\'t get enough sleep lately or not?' },
+            { thai: 'ชวน', ipa: 'chuan', en: 'Invite' },
+            { thai: 'ช่วยกันๆ', ipa: 'chûai gan chûai gan', en: 'Help each other' },
+            { thai: 'ช่อง', ipa: 'chɔ̂ɔng', en: 'Channel' },
+            { thai: 'ช้อนหุ้น', ipa: 'chɔ́ɔn hûn', en: 'buy the dip (stocks)' },
+            { thai: 'ชั้น', ipa: 'chán', en: 'Layers / Floors' },
+            { thai: 'ชั่วโมง', ipa: 'chûa moong', en: 'Hours' },
+            { thai: 'ชา', ipa: 'chaa', en: 'numb / tea' },
+            { thai: 'ช้า', ipa: 'cháa', en: 'slow' },
+            { thai: 'ช่างแต่งหน้า', ipa: 'châang dtɛ̀ng nâa', en: 'Makeup artist' },
+            { thai: 'ชานมไข่มุก', ipa: 'chaa nom kài múk', en: 'Bubble tea' },
+            { thai: 'ชิ้น', ipa: 'chín', en: 'piece' },
+            { thai: 'ชีวิต', ipa: 'chii wít', en: 'Life' },
+            { thai: 'ชื้น', ipa: 'chʉ́ʉn', en: 'Humid' },
+            { thai: 'ชุด', ipa: 'chút', en: 'set' },
+            { thai: 'เช่า', ipa: 'châo', en: 'Rent' },
+            { thai: 'เชื่อ', ipa: 'chʉ̂a', en: 'Believe' },
+            { thai: 'โชคดี', ipa: 'chôok dii', en: 'Good luck / Lucky' },
+            { thai: 'ใช้', ipa: 'chái', en: 'Use' },
+            { thai: 'ใช้เงิน', ipa: 'chái ngən', en: 'spend money' },
+            { thai: 'ซักผ้า', ipa: 'sák pâa', en: 'wash clothes' },
+            { thai: 'ซึมซับ', ipa: 'sʉm sáp', en: 'absorb' },
+            { thai: 'ซื้อไม่ได้', ipa: 'sʉ́ʉ mâi dâi', en: 'Cannot buy' },
+            { thai: 'ซื้อหุ้นไม่พอ', ipa: 'sʉ́ʉ hûn mâi pɔɔ', en: 'Didn\'t buy enough stocks' },
+            { thai: 'แซง', ipa: 'sɛɛng', en: 'overtake' },
+            { thai: 'ไซต์ก่อสร้าง', ipa: 'sái gɔ̀ɔ sâang', en: 'construction sites' },
+            { thai: 'ดัง', ipa: 'dang', en: 'famous / loud' },
+            { thai: 'ดัด', ipa: 'dàt', en: 'Curl / perm (hair)' },
+            { thai: 'ดับไฟ', ipa: 'dàp fai', en: 'To put off the fire' },
+            { thai: 'ดาว', ipa: 'daao', en: 'Stars' },
+            { thai: 'ดำ', ipa: 'dam', en: 'black' },
+            { thai: 'ดำน้ำ', ipa: 'dam náam', en: 'Scuba diving' },
+            { thai: 'ดินถล่ม', ipa: 'din tà lòm', en: 'Landslide' },
+            { thai: 'ดึก', ipa: 'dʉ̀k', en: 'late in the night' },
+            { thai: 'ดื้อ', ipa: 'dʉ̂ʉ', en: 'Stubborn' },
+            { thai: 'ดุ', ipa: 'dù', en: 'Scold / Fierce' },
+            { thai: 'ดูก่อน', ipa: 'duu gɔ̀ɔn', en: 'Let\'s wait and see.' },
+            { thai: 'ดูดวง', ipa: 'duu duang', en: 'Look at fortune reading' },
+            { thai: 'ดูเถอะ', ipa: 'duu tə̀', en: 'Let\'s look.' },
+            { thai: 'ดูแลร่างกายตัวเองให้ดีๆหน่อย', ipa: 'duu lɛɛ râang gaai dtua eeng hâi dii dii nɔ̀ɔi', en: 'Take care of your body well, please.' },
+            { thai: 'ดูให้ดี', ipa: 'duu hâi dii', en: 'Look carefully!' },
+            { thai: 'เด็ก', ipa: 'dèk', en: 'child / kid' },
+            { thai: 'เดินทาง', ipa: 'dəən taang', en: 'Travel' },
+            { thai: 'เดินป่า', ipa: 'dəən bpàa', en: 'Hike' },
+            { thai: 'เดียวกัน', ipa: 'diao gan', en: 'Exact same' },
+            { thai: 'แดดออก', ipa: 'dɛ̀ɛt ɔ̀ɔk', en: 'sunny' },
+            { thai: 'โดนดุ', ipa: 'doon dù', en: 'get scolded' },
+            { thai: 'จัด', ipa: 'jàt', en: 'Organise / Host' },
+            { thai: 'ดึง', ipa: 'dʉng', en: 'Pull' },
+            { thai: 'ได้กำไร', ipa: 'dâi gam rai', en: 'gain profits' },
+            { thai: 'ได้ยิน', ipa: 'dâi yin', en: 'hear' },
+            { thai: 'ต้น', ipa: 'dtôn', en: 'The beginning of …' },
+            { thai: 'ต้นเดือน', ipa: 'dtôn dʉan', en: 'The beginning of the month' },
+            { thai: 'ต้นไม้', ipa: 'dtôn mái', en: 'Trees' },
+            { thai: 'ต้นไม้ล้ม', ipa: 'dtôn mái lóm', en: 'Fallen trees' },
+            { thai: 'ต้ม', ipa: 'dtôm', en: 'Boil' },
+            { thai: 'ตม.', ipa: 'dtɔɔ mɔɔ', en: 'Immigration' },
+            { thai: 'ต่อ', ipa: 'dtɔ̀ɔ', en: 'per (unit) / continue' },
+            { thai: 'ต้องการ', ipa: 'dtɔ̂ng (gaan)', en: 'Need / Want' },
+            { thai: 'ต้องใส่เสื้อสองตัวข้างใต้', ipa: 'dtɔ̂ɔng sài sʉ̂a sɔ̌ɔng dtua kâang dtâi', en: 'Have to wear 2 tops underneath' },
+            { thai: 'ต้องเอาของไปหลายอย่าง', ipa: 'dtɔ̂ɔng ao kɔ̌ɔng bpai lǎai yàang', en: 'Have to bring a lot of things with.' },
+            { thai: 'ต่อจากเนี้ยะ', ipa: 'dtɔ̀ɔ jàak nía', en: 'Next from this point on' },
+            { thai: 'ตอน', ipa: 'dtɔɔn', en: 'when' },
+            { thai: 'ตอนจบของเรื่อง', ipa: 'dtɔɔn jòp kɔ̌ɔng rʉ̂ang', en: 'The end of the story' },
+            { thai: 'ตอนบ่าย', ipa: 'dtɔɔn bàai', en: 'Afternoon' },
+            { thai: 'ตอนมืด', ipa: 'dtɔɔn mʉ̂ʉt', en: 'when dark' },
+            { thai: 'ตอนแรก', ipa: 'dtɔɔn rɛ̂ɛk', en: 'At first' },
+            { thai: 'ตอบ', ipa: 'dtɔ̀ɔp', en: 'Reply' },
+            { thai: 'ต่อไป', ipa: 'dtɔ̀ɔ bpai', en: 'Next' },
+            { thai: 'ต่อวัน', ipa: 'dtɔ̀ɔ wan', en: 'Per day' },
+            { thai: 'ตะเกียบ', ipa: 'dtà gìap', en: 'chopsticks' },
+            { thai: 'ตะวันตกเฉียงใต้', ipa: 'dtà wan dtòk chǐang dtâai', en: 'Southwest' },
+            { thai: 'ตั้ง', ipa: 'dtâng', en: 'To set' },
+            { thai: 'ตัดต่อ', ipa: 'dtàt dtɔ̀ɔ', en: 'Edit (video)' },
+            { thai: 'ตัดสินใจ', ipa: 'dtàt sǐn jai', en: 'decide' },
+            { thai: 'ตัว', ipa: 'dtua', en: 'Classifier for clothes/animals' },
+            { thai: 'ตัวก็ไม่ร้อนหนิ', ipa: 'dtua gɔ̂ɔ mâi rɔ́ɔn nì', en: 'The body also isn\'t hot at all.' },
+            { thai: 'ตั๋วไฟไหม้', ipa: 'dtǔa fai mâI', en: 'Last-minute tickets' },
+            { thai: 'ตัวเอก', ipa: 'dtua èek', en: 'Main character' },
+            { thai: 'ตา', ipa: 'dtaa', en: 'Eyes' },
+            { thai: 'ตาโต', ipa: 'dtaa dtoo', en: 'big eyes' },
+            { thai: 'ตาม', ipa: 'dtaam', en: 'Follow' },
+            { thai: 'ต่ำ', ipa: 'dtàm', en: 'Low' },
+            { thai: 'ตำรวจ', ipa: 'dtam rùat', en: 'Police' },
+            { thai: 'ติด', ipa: 'dtìt', en: 'To attach / install' },
+            { thai: 'ติดหวัด', ipa: 'dtìt wàt', en: 'Catch a cold' },
+            { thai: 'ตี', ipa: 'dtii', en: 'To hit' },
+            { thai: 'ตีสอง', ipa: 'dtii sɔ̌ɔng', en: '2 AM' },
+            { thai: 'ตีหนึ่ง', ipa: 'dtii nʉ̀ng', en: '1 AM' },
+            { thai: 'ตีห้า', ipa: 'dtii hâa', en: '5 AM' },
+            { thai: 'ตื่น', ipa: 'dtʉ̀ʉn', en: 'Get up / wake up' },
+            { thai: 'ตื่นเต้น', ipa: 'dtʉ̀ʉn dtên', en: 'Excited' },
+            { thai: 'ตื่นสาย', ipa: 'dtʉ̀ʉn sǎai', en: 'wake up late' },
+            { thai: 'ตุลาคม', ipa: 'dtù laa kom', en: 'October' },
+            { thai: 'ตู้เย็น', ipa: 'dtûu yen', en: 'Fridge' },
+            { thai: 'เตรียมคอนเท้นต์ล่วงหน้าหนึ่งอาทิตย์', ipa: 'dtriam kɔɔn tén lûang nâa nʉ̀ng aa tít', en: 'Prepare content 1 week in advance' },
+            { thai: 'เตรียมพร้อม', ipa: 'dtriam prɔ́ɔm', en: 'To get ready' },
+            { thai: 'เตะ', ipa: 'dtè', en: 'Kick' },
+            { thai: 'เต่า', ipa: 'dtào', en: 'Turtle' },
+            { thai: 'เต้าหู้', ipa: 'dtâo hûu', en: 'tofu' },
+            { thai: 'เตียงพับได้', ipa: 'dtiang páp dâi', en: 'Foldable bed' },
+            { thai: 'แตก', ipa: 'dtɛ̀ɛk', en: 'broken' },
+            { thai: 'แต่งนิทาน', ipa: 'dtɛ̀ng ní taan', en: 'Write up a folk tale.' },
+            { thai: 'โตแล้ว', ipa: 'dtoo lɛ́ɛo', en: 'All grown up' },
+            { thai: 'โต๊ะกลม', ipa: 'dtó glom', en: 'Round table' },
+            { thai: 'ไต้หวันมีร้านสะดวกซื้อเกือบทุกมุม', ipa: 'dtâi wǎn mii ráan sà dùak sʉ́ʉ gʉ̀ap túk mum', en: 'Taiwan has convenience stores almost in every corner.' },
+            { thai: 'ถอย', ipa: 'tɔ̌ɔi', en: 'reverse' },
+            { thai: 'ถัง', ipa: 'tǎng', en: 'bucket' },
+            { thai: 'ถั่ว', ipa: 'tùa', en: 'nuts' },
+            { thai: 'ถั่วแดง', ipa: 'tùa dɛɛng', en: 'Red beans' },
+            { thai: 'ถ้าเขาไม่หนี อุบัติเหตุนี้คงไม่เกิด', ipa: 'tâa kǎo mâi nǐi ù bàt dtì hèet níi kong mâi gə̀ət', en: 'If he hadn\'t escaped, this accident probably wouldn\'t have happened.' },
+            { thai: 'ถ้านอนไม่หลับบ่อยๆอ่ะ', ipa: 'tâa nɔɔn mâi làp bɔ̀ɔi bɔ̀ɔi à', en: 'If you often can\'t sleep well,' },
+            { thai: 'ถามดูว่ามีหรือเปล่า', ipa: 'tǎam duu wâa mii rʉ̌ʉ bplào', en: 'Just asking if you have them or not.' },
+            { thai: 'ถึง', ipa: 'tʉ̌ng', en: 'To / Until' },
+            { thai: 'ถุง', ipa: 'tǔng', en: 'bag' },
+            { thai: 'ถูกปรับ', ipa: 'tùuk bpràp', en: 'get fined' },
+            { thai: 'ถูกปล่อย', ipa: 'tùuk bplɔ̀ɔi', en: 'get released' },
+            { thai: 'ถูกสัมภาษณ์', ipa: 'tùuk sǎm pâat', en: 'Get interviewed' },
+            { thai: 'ทรง', ipa: 'song', en: 'Hairstyle / shape' },
+            { thai: 'ทรัมป์อยากให้ TSMC เปิดโรงงานในอเมริกา', ipa: 'Trump yàak hâi TSMC bpə̀ət roong ngaan nai à mee rí gaa', en: 'Trump wants TSMC to open a factory in America.' },
+            { thai: 'ทราย', ipa: 'saai', en: 'Sand' },
+            { thai: 'ทะเลสาบ', ipa: 'tá lee sàap', en: 'lake' },
+            { thai: 'ทั้ง', ipa: 'táng', en: 'The whole / all' },
+            { thai: 'ทั้งคู่', ipa: 'táng kûu', en: 'Both' },
+            { thai: 'ทาง', ipa: 'taang', en: 'Way' },
+            { thai: 'ทางด่วน', ipa: 'taang dùan', en: 'Toll/highway' },
+            { thai: 'ทาเจลแก้ปวด', ipa: 'taa jew gɛ̂ɛ bpùat', en: 'Apply pain killer gel' },
+            { thai: 'ทำกายภาพ', ipa: 'tam gaai yá pâap', en: 'Do physiotherapy' },
+            { thai: 'ทำงานเหมือนกัน แต่ไม่ได้อยู่ออฟฟิศเดียวกัน', ipa: 'tam ngaan mʉ̌an gan dtɛ̀ɛ mâi dâi yùu ɔ̀ɔf fít diao gan', en: 'We both have a job but not in the same office.' },
+            { thai: 'ทำดูสิ', ipa: 'tam duu sì', en: 'Try doing it.' },
+            { thai: 'ทำตาม', ipa: 'tam dtaam', en: 'Do as they did' },
+            { thai: 'ทำโทษ', ipa: 'tam tôot', en: 'punish' },
+            { thai: 'ทำไมคุณอยากมาทำงานกับเราอ่ะ', ipa: 'tam mai kun yàak maa tam ngaan gàp rao à', en: 'Why do you wanna work with us?' },
+            { thai: 'ทำยังไงดี', ipa: 'tam yang ngai dii', en: 'What should I do?' },
+            { thai: 'ทำหลายอย่าง', ipa: 'tam lǎai yàang', en: 'Do many things' },
+            { thai: 'ทำให้', ipa: 'tam hâi', en: 'make sb be sth' },
+            { thai: 'ทำให้ดี', ipa: 'tam hâi dii', en: 'Do it well!' },
+            { thai: 'ทำเอง', ipa: 'tam eeng', en: 'make it yourself' },
+            { thai: 'ทิ้ง', ipa: 'tíng', en: 'leave / throw away' },
+            { thai: 'ที่จอดรถ', ipa: 'tîi jɔ̀ɔt rót', en: 'Parking lot' },
+            { thai: 'ที่ตั้งแคมป์', ipa: 'tîi dtâng kɛɛm', en: 'place set up camp' },
+            { thai: 'ที่ผ่านมา', ipa: 'tîi pàan maa', en: 'Previous' },
+            { thai: 'ทีละประโยค', ipa: 'tii lá bprà yôok', en: 'One sentence at a time' },
+            { thai: 'ที่สุด', ipa: 'tîi sùt', en: 'The most' },
+            { thai: 'ที่อุดหู', ipa: 'tîi ùt hǔu', en: 'ear plugs' },
+            { thai: 'เท่ากัน', ipa: 'tâo gan', en: 'equal' },
+            { thai: 'เที่ยงคืน', ipa: 'tîang kʉʉn', en: 'midnight' },
+            { thai: 'เที่ยวให้สนุก', ipa: 'tîao hâi sà núk', en: 'Have fun travelling' },
+            { thai: 'แทบจะไม่', ipa: 'tɛ̂ɛp jà mâi', en: 'Seldom / Barely' },
+            { thai: 'โทร', ipa: 'too', en: 'To make a phone call' },
+            { thai: 'ธรณีวิทยา', ipa: 'tɔɔ rá nii wít tá yaa', en: 'Geology' },
+            { thai: 'ธรรมชาติ', ipa: 'tam má châat', en: 'nature' },
+            { thai: 'ธันวาคม', ipa: 'tan waa kom', en: 'December' },
+            { thai: 'ธุรกิจ', ipa: 'tú rá gìt', en: 'Business' },
+            { thai: 'นก', ipa: 'nók', en: 'bird' },
+            { thai: 'นกตัวนี้อยู่ในแบงค์พันไต้หวัน', ipa: 'nók dtua níi yùu nai bɛ́ɛng pan dtâi wǎn', en: 'This bird is in Taiwan\'s 1000 bank notes.' },
+            { thai: 'นมข้น', ipa: 'nom kôn', en: 'condense milk' },
+            { thai: 'นวด', ipa: 'nûat', en: 'massage' },
+            { thai: 'น้องเขย', ipa: 'nɔ́ɔng kə̌əi', en: 'younger brother-in-law' },
+            { thai: 'นอนดึก', ipa: 'nɔɔn dʉ̀k', en: 'sleep late' },
+            { thai: 'นอนต่อ', ipa: 'nɔɔn dtɔ̀ɔ', en: 'Continue to sleep' },
+            { thai: 'นอนไม่ค่อยหลับนิดหน่อยค่ะ', ipa: 'nɔɔn mâi kɔ̂ɔi làp nít nɔ̀ɔi kâ', en: 'I didn\'t really sleep well a bit.' },
+            { thai: 'นอนให้หลับ', ipa: 'nɔɔn hâi làp', en: 'Sleep well!' },
+            { thai: 'น้อย', ipa: 'nɔ́ɔi', en: 'Less' },
+            { thai: 'นักบินอวกาศ', ipa: 'nák bin à wá gàat', en: 'Astronaut' },
+            { thai: 'นักบุญ', ipa: 'nák bun', en: 'Saint' },
+            { thai: 'นักร้อง', ipa: 'nák rɔ́ɔng', en: 'Singer' },
+            { thai: 'นักแสดง', ipa: 'nák sà dɛɛng', en: 'Actors' },
+            { thai: 'นั่ง', ipa: 'nâng', en: 'sit' },
+            { thai: 'นั่งเถอะ', ipa: 'nâng tə̀', en: 'Let\'s sit.' },
+            { thai: 'นั่งสมาธิ', ipa: 'nâng sà maa tí', en: 'Meditate' },
+            { thai: 'นา', ipa: 'naa', en: 'Rice field' },
+            { thai: 'น่าจะแค่เพลีย', ipa: 'nâa jà kɛ̂ɛ plia', en: 'Seems like you\'re just drained.' },
+            { thai: 'นาน', ipa: 'naan', en: 'Long time' },
+            { thai: 'นานๆครั้ง', ipa: 'naan naan kráng', en: 'Every once in a while' },
+            { thai: 'นาฬิกาปลุก', ipa: 'naa lí gaa bplùk', en: 'alarm clock' },
+            { thai: 'น้ำท่วม', ipa: 'náam tûam', en: 'Flooding' },
+            { thai: 'นำ้ผึ้ง', ipa: 'náam pʉ̂ng', en: 'Honey' },
+            { thai: 'น้ําพึ่งเรือเสือพึ่งป่า', ipa: 'náam pʉ̂ng rʉa sʉ̌a pʉ̂ng bpàa', en: 'You scratch my back and I\'ll scratch yours.' },
+            { thai: 'นิยาย', ipa: 'ní yaai', en: 'Novel' },
+            { thai: 'นี่ทำบุญด้วยกันก่อนไหมล่ะ', ipa: 'nîi tam bun dûai gan gɔ̀ɔn mǎi lâ', en: 'Would you like to make merit together first?' },
+            { thai: 'นี่เป็นครั้งที่สอง', ipa: 'nîi bpen kráng tîi sɔ̌ɔng', en: 'This is the second time' },
+            { thai: 'นุ่ม', ipa: 'nûm', en: 'tender / soft' },
+            { thai: 'เนื้อเพลง', ipa: 'nʉ́a pleeng', en: 'lyrics' },
+            { thai: 'ในอดีต', ipa: 'nai à dìit', en: 'in the past' },
+            { thai: 'ในอนาคต', ipa: 'nai à naa kót', en: 'In the future' },
+            { thai: 'บท', ipa: 'bòt', en: 'Lesson / Chapter' },
+            { thai: 'บน', ipa: 'bon', en: 'on' },
+            { thai: 'บ่น', ipa: 'bòn', en: 'Complain' },
+            { thai: 'บรรยากาศ', ipa: 'ban yaa gàat', en: 'atmosphere' },
+            { thai: 'บริษัท', ipa: 'bɔ̀ rí sàt', en: 'company' },
+            { thai: 'บอก', ipa: 'bɔ̀ɔk', en: 'tell' },
+            { thai: 'บ่อย', ipa: 'bɔ̀ɔi', en: 'often' },
+            { thai: 'บัวลอย', ipa: 'bua lɔɔi', en: 'Taro ball with coconut milk' },
+            { thai: 'บ้า', ipa: 'bâa', en: 'Crazy' },
+            { thai: 'บ่า ไหล่', ipa: 'bàa lài', en: 'Shoulders' },
+            { thai: 'บางครั้ง', ipa: 'baang kráng', en: 'sometimes' },
+            { thai: 'บาดเจ็บ', ipa: 'bàat jèp', en: 'Get injured' },
+            { thai: 'บาน', ipa: 'baan', en: 'bloom' },
+            { thai: 'ที่ปรึกษา', ipa: 'tîi-bprʉ̀k-sǎa', en: 'consultant' },
+            { thai: 'เบอร์', ipa: 'bəə', en: 'Number' },
+            { thai: 'แบงค์', ipa: 'bɛ́ɛng', en: 'bank notes' },
+            { thai: 'แบบ', ipa: 'bɛ̀ɛp', en: 'Types / Style' },
+            { thai: 'โบราณ', ipa: 'boo raan', en: 'ancient' },
+            { thai: 'โบสถ์', ipa: 'bòot', en: 'Church' },
+            { thai: 'ปกติ', ipa: 'bpà gà dtì', en: 'normal' },
+            { thai: 'ประคบร้อน', ipa: 'bprà kóp rɔ́ɔn', en: 'Wear heat pack' },
+            { thai: 'ประชุม', ipa: 'bprà chum', en: 'meetings' },
+            { thai: 'ประแป้ง', ipa: 'bprà bpɛ̂ɛng', en: 'put powder' },
+            { thai: 'ประโยค', ipa: 'bprà yòok', en: 'Sentence' },
+            { thai: 'ประวัติศาสตร์', ipa: 'bprà wàt sàat', en: 'History' },
+            { thai: 'ประสบการณ์', ipa: 'bprà sòp gaan', en: 'Experience' },
+            { thai: 'ประหยัด', ipa: 'bprà yàt', en: 'Save / Frugal' },
+            { thai: 'ประหยัดน้ำมัน', ipa: 'bprà yàt náam man', en: 'Saves gas' },
+            { thai: 'ปรับอุณหภูมิได้', ipa: 'bpràp un hà puum dâi', en: 'Can adjust the temperature' },
+            { thai: 'ปริญญาตรี', ipa: 'bpà rin yaa dtrii', en: 'Bachelor\'s degree' },
+            { thai: 'ปริญญาเอก', ipa: 'bpà rin yaa èek', en: 'PhD' },
+            { thai: 'ปลอดภัย', ipa: 'bplɔ̀ɔt pai', en: 'safe' },
+            { thai: 'ปลุก', ipa: 'bplùk', en: 'Wake up (someone)' },
+            { thai: 'ปวด', ipa: 'bpùat', en: 'Muscle strain/ache' },
+            { thai: 'ปวดคอ', ipa: 'bpùat kɔɔ', en: 'Neck pain' },
+            { thai: 'ป่วย', ipa: 'bpùai', en: 'Sick' },
+            { thai: 'ปัญหา', ipa: 'bpan hǎa', en: 'Problems' },
+            { thai: 'ปั๊ม', ipa: 'bpám', en: 'Gas station' },
+            { thai: 'ป้า', ipa: 'bpâa', en: 'aunt' },
+            { thai: 'ป้ายทะเบียนรถ', ipa: 'bpâai tá bian rót', en: 'car license plate' },
+            { thai: 'ปีเดียวกัน', ipa: 'bpii diao gan', en: 'same year' },
+            { thai: 'ปุ๊บปั๊บ', ipa: 'bpúp bpáp', en: 'Sudden' },
+            { thai: 'ปู', ipa: 'bpuu', en: 'Crab' },
+            { thai: 'เป็ด', ipa: 'bpèt', en: 'Duck' },
+            { thai: 'เป็นโควิดได้ยังไง', ipa: 'bpen koo wít dâi yang ngai', en: 'How did you get COVID?' },
+            { thai: 'เป็นที่นิยม', ipa: 'bpen tîi ní yom', en: 'popular' },
+            { thai: 'เป็นเวลา', ipa: 'bpen wee laa', en: 'on time / for a period of time' },
+            { thai: 'เป็นส่วนหนึ่งในการเริ่มต้นอะไรใหม่ๆ', ipa: 'bpen sùan nʉ̀ng nai gaan rə̂əm dtôn à rai mài mài', en: 'I’m a part of new beginnings.' },
+            { thai: 'เป่า', ipa: 'bpào', en: 'Blow' },
+            { thai: 'เป่าผม', ipa: 'bpào pǒm', en: 'Blow dry hair' },
+            { thai: 'เป้าหมาย', ipa: 'bpâo mǎai', en: 'Goal' },
+            { thai: 'เปิด', ipa: 'bpə̀ət', en: 'Open / Turn on' },
+            { thai: 'แปลว่าอะไร', ipa: 'bplɛɛ wâa à rai', en: 'What does it translate to?' },
+            { thai: 'ไปคนละร้าน', ipa: 'bpai kon lá ráan', en: 'Go to different shops' },
+            { thai: 'ไปดูสิ', ipa: 'bpai duu sì', en: 'Try going there.' },
+            { thai: 'ไปได้ไม่ไกล', ipa: 'bpai dâi mâi glai', en: 'Cannot go far' },
+            { thai: 'ไปเถอะ', ipa: 'bpai tə̀', en: 'Let\'s go.' },
+            { thai: 'ไปหายาย', ipa: 'bpai hǎa yaai', en: 'Go visit maternal grandma' },
+            { thai: 'ไปเหอะพี่', ipa: 'bpai hə̀ pîi', en: 'Let\'s go.' },
+            { thai: 'ไปอีกที่', ipa: 'bpai ìik tîi', en: 'go to another place' },
+            { thai: 'ผงชูรส', ipa: 'pǒng chuu rót', en: 'MSG' },
+            { thai: 'ผมอยากทำงานกับบริษัทสตาร์ทอัพ', ipa: 'pǒm yàak tam ngaan gàp bɔ̀ rí sàt sà dtáat àp', en: 'I really want to work with a start-up company' },
+            { thai: 'ผสม', ipa: 'pà sǒm', en: 'Mix' },
+            { thai: 'ผักกาด', ipa: 'pàk gàat', en: 'Lettuce' },
+            { thai: 'ผักรวม', ipa: 'pàk ruam', en: 'Mixed veggies' },
+            { thai: 'ผัด', ipa: 'pàt', en: 'Stir-fry' },
+            { thai: 'ผันผวน', ipa: 'pǎn pǔan', en: 'volatile' },
+            { thai: 'ผ่าตัด', ipa: 'pàa dtàt', en: 'Have surgery' },
+            { thai: 'ผ้าใบ', ipa: 'pâa bai', en: 'Tarp / Canvas' },
+            { thai: 'ผิด', ipa: 'pìt', en: 'wrong' },
+            { thai: 'ผิวน้ำ', ipa: 'pǐu náam', en: 'surface of water' },
+            { thai: 'ผู้ชาย', ipa: 'pûu chaai', en: 'Man' },
+            { thai: 'เผ็ดน้อย', ipa: 'pèt nɔ́ɔi', en: 'Less spicy' },
+            { thai: 'เผ็ดนิดหน่อย', ipa: 'pèt nít nɔ̀ɔi', en: 'a little bit spicy' },
+            { thai: 'เผือก', ipa: 'pʉ̀ak', en: 'Taro / being nosy (slang)' },
+            { thai: 'แผลเป็น', ipa: 'plɛ̌ɛ bpen', en: 'scars' },
+            { thai: 'ฝนตกปรอยๆ', ipa: 'fǒn dtòk bprɔɔi bprɔɔi', en: 'Drizzling' },
+            { thai: 'ฝ่าไฟแดง', ipa: 'fàa fai dɛɛng', en: 'run a red light' },
+            { thai: 'พยากรณ์อากาศ', ipa: 'pá yaa gɔɔn aa gàat', en: 'weather forecast' },
+            { thai: 'พยาธิ', ipa: 'pá yâat', en: 'Parasites' },
+            { thai: 'พยายาม', ipa: 'pá yaa yaam', en: 'Try' },
+            { thai: 'พยายามไม่ใช้มือถือ', ipa: 'pá yaa yaam mâi chái mʉʉ tʉ̌ʉ', en: 'Try not to use phones' },
+            { thai: 'พร้อมกัน', ipa: 'prɔ́ɔm gan', en: 'Together' },
+            { thai: 'พระอาทิตย์ขึ้น', ipa: 'prá aa tít kʉ̂n', en: 'sunrise' },
+            { thai: 'พฤศจิกายน', ipa: 'prʉ́t sà jì gaa yon', en: 'November' },
+            { thai: 'พฤษภาคม', ipa: 'prʉ́t sà paa kom', en: 'May' },
+            { thai: 'พลังพิเศษ', ipa: 'pa lang pí sèet', en: 'special power' },
+            { thai: 'พอถึง', ipa: 'pɔɔ tʉ̌ng', en: 'By the time we reach' },
+            { thai: 'พัดลม', ipa: 'pát lom', en: 'Fan' },
+            { thai: 'พา', ipa: 'paa', en: 'Take/Lead' },
+            { thai: 'พี่ชายเราก็เป็นหมอ', ipa: 'pîi chaai rao gɔ̂ɔ bpen mɔ̌ɔ', en: 'Your older brother is also a doctor.' },
+            { thai: 'พื้นเปียก', ipa: 'pʉ́ʉn bpìak', en: 'Wet floor' },
+            { thai: 'พูดเถอะ', ipa: 'pûut tə̀', en: 'Just say it.' },
+            { thai: 'พูดให้ดี', ipa: 'pûut hâi dii', en: 'Speak well!' },
+            { thai: 'เพราะผมอยากรู้สึกว่า', ipa: 'prɔ́ pǒm yàak rúu sʉ̀k wâa', en: 'Because I want to feel that' },
+            { thai: 'เพิ่ง', ipa: 'pə̂əng', en: 'Just / Recently' },
+            { thai: 'เพิ่ม', ipa: 'pə̂əm', en: 'Add' },
+            { thai: 'เพิ่มอย่างละหนึ่ง', ipa: 'pə̂əm yàang lá nʉ̀ng', en: 'Add 1 each' },
+            { thai: 'เพื่อน', ipa: 'pʉ̂an', en: 'Friends' },
+            { thai: 'เพื่อนที่เหลือ', ipa: 'pʉ̂an tîi lʉ̌a', en: 'The rest of the friends' },
+            { thai: 'เพื่อนร่วมงาน', ipa: 'pʉ̂an rûam ngaan', en: 'co-worker' },
+            { thai: 'เพื่อนร่วมชั้น', ipa: 'pʉ̂an rûam chán', en: 'Classmate' },
+            { thai: 'เพื่อนส่วนใหญ่', ipa: 'pʉ̂an sùan yài', en: 'Most friends' },
+            { thai: 'นำเข้า', ipa: 'nam kâo', en: 'Import' },
+            { thai: 'ฟังคลิปเดิมซ้ำ', ipa: 'fang klíp dəəm sáam', en: 'Listen to the same clip repeatedly' },
+            { thai: 'ฟังเถอะ', ipa: 'fang tə̀', en: 'Let\'s listen.' },
+            { thai: 'แฟนเก่า', ipa: 'fɛɛn gào', en: 'ex (old partner)' },
+            { thai: 'ไฟแดง', ipa: 'fai dɛɛng', en: 'red lights' },
+            { thai: 'ไฟป่า', ipa: 'fai bpàa', en: 'Wild fire' },
+            { thai: 'ภรรยา', ipa: 'pan yaa', en: 'Wife' },
+            { thai: 'ภาษี', ipa: 'paa sǐi', en: 'Tax' },
+            { thai: 'ภูมิแพ้', ipa: 'puum pɛ́ɛ', en: 'Allergies' },
+            { thai: 'มกราคม', ipa: 'mók gà raa kom', en: 'January' },
+            { thai: 'ม้วน', ipa: 'múan', en: 'To roll' },
+            { thai: 'มองกลับไป', ipa: 'mɔɔng glàp bpai', en: 'Look back' },
+            { thai: 'มะเขือเทศ', ipa: 'má kʉ̌a têet', en: 'Tomatoes' },
+            { thai: 'มะนาว', ipa: 'má naao', en: 'Lemon / Lime' },
+            { thai: 'มะระ', ipa: 'má rá', en: 'Bitter melon' },
+            { thai: 'มะรืนนี้', ipa: 'má rʉʉn níi', en: 'The day after tomorrow' },
+            { thai: 'มั่นใจ', ipa: 'mân jai', en: 'Confident' },
+            { thai: 'มากกว่า', ipa: 'mâak gwàa', en: 'more than' },
+            { thai: 'มาหา', ipa: 'maa hǎa', en: 'Come visit' },
+            { thai: 'มิถุนายน', ipa: 'mí tù naa yon', en: 'June' },
+            { thai: 'มีเค้าโครงมาจากเรื่องจริง', ipa: 'mii káao kroong maa jàak rʉ̂ang jing', en: 'It\'s based on a true story.' },
+            { thai: 'มีจ้ะ', ipa: 'mii jâ', en: 'Yes.' },
+            { thai: 'มีแดด', ipa: 'mii dɛ̀ɛt', en: 'Sunny' },
+            { thai: 'มีน้องสาวแค่หนึ่งคน', ipa: 'mii nɔ́ɔng sǎao kɛ̂ɛ nʉ̀ng kon', en: 'I only have 1 sister.' },
+            { thai: 'มีนาคม', ipa: 'mii naa kom', en: 'March' },
+            { thai: 'มีเมฆ', ipa: 'mii mêek', en: 'Cloudy' },
+            { thai: 'มีลมนิดหน่อย', ipa: 'mii lom nít nɔ̀ɔi', en: 'There is a little wind.' },
+            { thai: 'มีเสมหะ', ipa: 'mii sěem hà', en: 'phlegm' },
+            { thai: 'มืด', ipa: 'mʉ̂ʉt', en: 'Dark' },
+            { thai: 'มุม', ipa: 'mum', en: 'Corner' },
+            { thai: 'เมษายน', ipa: 'mee sǎa yon', en: 'April' },
+            { thai: 'เม้าท์มอย', ipa: 'máao mɔɔi', en: 'chit-chat' },
+            { thai: 'เมื่อก่อน', ipa: 'mʉ̂a gɔ̀ɔn', en: 'Back then' },
+            { thai: 'เมืองหลวง', ipa: 'mʉang lǔang', en: 'Capital city' },
+            { thai: 'เมื่อวานซืน', ipa: 'mʉ̂a waan sʉʉn', en: 'The day before yesterday' },
+            { thai: 'โมโห', ipa: 'moo hǒo', en: 'Angry' },
+            { thai: 'ไม่เข้าเรียน', ipa: 'mâi kâo rian', en: 'Not attend the class' },
+            { thai: 'ไม่ค่อย', ipa: 'mâi kɔ̂ɔi', en: 'Not really' },
+            { thai: 'ไม่ได้ซื้อ', ipa: 'mâi dâi sʉ́ʉ', en: 'Didn\'t get to buy' },
+            { thai: 'ไม่ได้ไปข้างนอก', ipa: 'mâi dâi bpai kâang nɔ̂ɔk', en: 'Didn\'t go outside' },
+            { thai: 'ไม่มีไข้', ipa: 'mâi mii kâi', en: 'Don\'t have fever.' },
+            { thai: 'ไม่มีใครชอบหาหมอ', ipa: 'mâi mii krai chɔ̂ɔp hǎa mɔ̌ɔ', en: 'Nobody likes to see the doctor.' },
+            { thai: 'ไม่สบายก็ไปหาพี่เขา', ipa: 'mâi sà baai gɔ̂ɔ bpai hǎa pîi kǎo', en: 'Not well, go look for him.' },
+            { thai: 'ไม่เอามือถือไป', ipa: 'mâi ao mʉʉ tʉ̌ʉ bpai', en: 'Don\'t bring cell phone.' },
+            { thai: 'ยกตัวอย่าง', ipa: 'yók dtua yàang', en: 'Give an example' },
+            { thai: 'ยังสล็อตว่างเยอะอยู่', ipa: 'yang sà lɔ́t wâang yə́ yùu', en: 'Still have a lot of available slots' },
+            { thai: 'ยาย', ipa: 'yaai', en: 'Maternal grandma' },
+            { thai: 'ย้าย', ipa: 'yáai', en: 'To relocate' },
+            { thai: 'ยาว', ipa: 'yaao', en: 'Long' },
+            { thai: 'ยำลูกชิ้นทะเล', ipa: 'yam lûuk chín tá lee', en: 'Meatball seafood spicy salad' },
+            { thai: 'ยืด', ipa: 'yʉ̂ʉt', en: 'Straighten' },
+            { thai: 'ยืน', ipa: 'yʉʉn', en: 'stand' },
+            { thai: 'เยอะเกินไป', ipa: 'yə́ gəən bpai', en: 'too much' },
+            { thai: 'รถเข็น', ipa: 'rót kěn', en: 'Cart' },
+            { thai: 'รถคันหลัง', ipa: 'rót kan lǎng', en: 'the car behind' },
+            { thai: 'รถพยาบาล', ipa: 'rót pá yaa baan', en: 'Ambulance' },
+            { thai: 'รถไฟขบวนสุดท้าย', ipa: 'rót fai kà buan sùt táai', en: 'The last train' },
+            { thai: 'รถไฟความเร็วสูง', ipa: 'rót fai kwaam reo sǔung', en: 'High-speed train' },
+            { thai: 'ร่ม', ipa: 'rôm', en: 'umbrella' },
+            { thai: 'ร่วง', ipa: 'rûang', en: 'fall' },
+            { thai: 'รส', ipa: 'rót', en: 'Flavours' },
+            { thai: 'รสจัด', ipa: 'rót jàt', en: 'Strong flavour' },
+            { thai: 'รสชาติ', ipa: 'rót châat', en: 'Taste' },
+            { thai: 'รสชาติจะกลับมา', ipa: 'rót chaa dtì jà glàp maa', en: 'Flavours will come back.' },
+            { thai: 'รอ', ipa: 'rɔɔ', en: 'Wait' },
+            { thai: 'ร้องเพลง', ipa: 'rɔ́ɔng pleeng', en: 'sing' },
+            { thai: 'ร้องไห้', ipa: 'rɔ́ɔng hâi', en: 'Cry' },
+            { thai: 'รอเถอะ', ipa: 'rɔɔ tə̀', en: 'Let\'s wait.' },
+            { thai: 'ร้อนกว่าเดิม', ipa: 'rɔ́ɔn gwàa dəəm', en: 'Hotter than before' },
+            { thai: 'รอบ', ipa: 'rɔ̂ɔp', en: 'around' },
+            { thai: 'ระเบิด', ipa: 'rá bə̀ət', en: 'Bomb' },
+            { thai: 'รัฐบาล', ipa: 'rát tà baan', en: 'Government' },
+            { thai: 'รับ', ipa: 'ráp', en: 'Take in / Accept' },
+            { thai: 'รา', ipa: 'raa', en: 'Molds' },
+            { thai: 'ร่างกายจะได้จดจำ', ipa: 'râang gaai jà dâi jòt jam', en: 'Body will remember.' },
+            { thai: 'ร้านสะดวกซื้อ', ipa: 'ráan sà dùak sʉ́ʉ', en: 'Convenience store' },
+            { thai: 'รู้', ipa: 'rúu', en: 'To know' },
+            { thai: 'รู้จัก', ipa: 'rúu jàk', en: 'To be familiar with' },
+            { thai: 'รู้ว่าจะเกิดอะไรขึ้น', ipa: 'rúu wâa jà gə̀ət à rai kʉ̂n', en: 'Know what\'s going to happen' },
+            { thai: 'เราต้องพักผ่อนให้เพียงพอ', ipa: 'rao dtɔ̂ɔng pák pɔ̀ɔn hâi piang pɔɔ', en: 'You have to rest enough' },
+            { thai: 'เริ่ม', ipa: 'rə̂əm', en: 'start' },
+            { thai: 'เริ่มพูดเรื่องแคมปิ้ง', ipa: 'rə̂əm pûut rʉ̂ang kɛɛm bpîng', en: 'Start talking about camping' },
+            { thai: 'เรียนเถอะ', ipa: 'rian tə̀', en: 'Let\'s study.' },
+            { thai: 'เรือ', ipa: 'rʉa', en: 'Boat' },
+            { thai: 'เรือล่ม', ipa: 'rʉa lôm', en: 'Sunken ship' },
+            { thai: 'แรง', ipa: 'rɛɛng', en: 'Strong' },
+            { thai: 'แรงงาน', ipa: 'rɛɛng ngaan', en: 'Labour' },
+            { thai: 'โรงงาน', ipa: 'roong ngaan', en: 'Factory' },
+            { thai: 'โรงแรม', ipa: 'roong rɛɛm', en: 'Hotel' },
+            { thai: 'ลง', ipa: 'long', en: 'sign up for / go down' },
+            { thai: 'ลดราคา', ipa: 'lót raa kaa', en: 'Give a discount' },
+            { thai: 'ลบ', ipa: 'lóp', en: 'Minus' },
+            { thai: 'ล่วงหน้า', ipa: 'lûang nâa', en: 'in advance' },
+            { thai: 'ลองดู', ipa: 'lɔɔng duu', en: 'Try' },
+            { thai: 'ลัทธิเต๋า', ipa: 'lát tí dtǎo', en: 'Taoism' },
+            { thai: 'ลิ้น', ipa: 'lín', en: 'tongue' },
+            { thai: 'ลืม', ipa: 'lʉʉm', en: 'forget' },
+            { thai: 'ลูก', ipa: 'lûuk', en: 'Classifier for fruits/balls' },
+            { thai: 'ลูกครึ่ง', ipa: 'lûuk krʉ̂ng', en: 'Half / mixed race' },
+            { thai: 'ลูกชิ้น', ipa: 'lûuk chín', en: 'meatballs' },
+            { thai: 'ลูกพี่ลูกน้อง', ipa: 'lûuk pîi lûuk nɔ́ɔng', en: 'Cousin' },
+            { thai: 'ลูกอม', ipa: 'lûuk om', en: 'Candies' },
+            { thai: 'ลู่วิ่ง', ipa: 'lûu wîng', en: 'Treadmill' },
+            { thai: 'เลข', ipa: 'lêek', en: 'Numbers' },
+            { thai: 'เล่นดูสิ', ipa: 'lên duu sì', en: 'Try playing it.' },
+            { thai: 'เล่ห์', ipa: 'lê', en: 'Tricks' },
+            { thai: 'เล่าเรื่อง', ipa: 'lâo rʉ̂ang', en: 'Tell stories' },
+            { thai: 'เล่าเรื่องที่โกหก', ipa: 'lâo rʉ̂ang tîi goo hòk', en: 'Tell a story that you lied' },
+            { thai: 'เลือก', ipa: 'lʉ̂ak', en: 'Choose' },
+            { thai: 'เลือด', ipa: 'lʉ̂at', en: 'Blood' },
+            { thai: 'แลกเปลี่ยน', ipa: 'lɛ̂ɛk bplìan', en: 'Exchange' },
+            { thai: 'แล้วก็กินอาหารที่มีประโยชน์', ipa: 'lɛ́ɛo gɔ̂ɔ gin aa hǎan tîi mîi bprà yòot', en: 'And eat nutritious meals' },
+            { thai: 'แล้วก็สร้างภูมิ', ipa: 'lɛ́ɛo gɔ̂ɔ sâang puum', en: 'And create immunity' },
+            { thai: 'แล้วแต่', ipa: 'lɛ́ɛo dtɛ̀ɛ', en: 'Up to you / Depends' },
+            { thai: 'โลก', ipa: 'lôok', en: 'World' },
+            { thai: 'โลมา', ipa: 'loo maa', en: 'Dolphin' },
+            { thai: 'วันชาติ', ipa: 'wan châat', en: 'National Day' },
+            { thai: 'วันเดียวกัน', ipa: 'wan diao gan', en: 'The same day' },
+            { thai: 'วันที่', ipa: 'wan tîi', en: 'Date' },
+            { thai: 'วันธรรมดา', ipa: 'wan tam má daa', en: 'Weekdays' },
+            { thai: 'วันอังคาร', ipa: 'wan ang kaan', en: 'Tuesday' },
+            { thai: 'วัสดุ', ipa: 'wát sà dù', en: 'Materials' },
+            { thai: 'วิ่งหนีให้เร็ว', ipa: 'wîng nǐi hâi reo', en: 'Run away fast!' },
+            { thai: 'วิชา', ipa: 'wí chaa', en: 'subject' },
+            { thai: 'วินาที', ipa: 'wí naa tii', en: 'seconds' },
+            { thai: 'เวลาเดิม', ipa: 'wee laa dəəm', en: 'usual time' },
+            { thai: 'เวลาเดียวกัน', ipa: 'wee laa diao gan', en: 'Same time' },
+            { thai: 'เวลาที่ดีที่สุด', ipa: 'wee laa tîi dii tîi sùt', en: 'The best time' },
+            { thai: 'เวลาว่าง', ipa: 'wee laa wâang', en: 'Free time' },
+            { thai: 'เวลาส่วนตัว', ipa: 'wee laa sùan dtua', en: 'Private time' },
+            { thai: 'เวียนหัว', ipa: 'wian hǔa', en: 'Dizzy' },
+            { thai: 'แว่นกันแดด', ipa: 'wɛ̂ɛn gan dɛ̀ɛt', en: 'sunglasses' },
+            { thai: 'ศอก', ipa: 'sɔ̀ɔk', en: 'elbow' },
+            { thai: 'ศาสนา', ipa: 'sàat sà nǎa', en: 'Religion' },
+            { thai: 'ศิลปะ', ipa: 'sǐn lá bpà', en: 'art' },
+            { thai: 'ส่ง', ipa: 'sòng', en: 'Send' },
+            { thai: 'ส่งข้อความ', ipa: 'sòng kɔ̂ɔ kwaam', en: 'send messages' },
+            { thai: 'สงสัยเรานี่จะชอบให้พี่ดุ', ipa: 'sǒng sǎi rao nîi jà chɔ̂ɔp hâi pîi dù', en: 'I guess you like me to scold you.' },
+            { thai: 'ส่งออก', ipa: 'sòng ɔ̀ɔk', en: 'Export' },
+            { thai: 'สน.', ipa: 'sɔ̌ɔ nɔɔ', en: 'police station' },
+            { thai: 'สภาพ', ipa: 'sà pâap', en: 'Conditions' },
+            { thai: 'สมัคร', ipa: 'sà màk', en: 'Apply' },
+            { thai: 'สมาชิก', ipa: 'sà maa chík', en: 'Member' },
+            { thai: 'สระ', ipa: 'sà rà', en: 'vowels' },
+            { thai: 'สระผม', ipa: 'sà pǒm', en: 'Wash hair' },
+            { thai: 'สระว่ายน้ำ', ipa: 'sà wâai náam', en: 'Swimming pool' },
+            { thai: 'สวน', ipa: 'sǔan', en: 'Park' },
+            { thai: 'สวนสนุก', ipa: 'sǔan sà nùk', en: 'Amusement park' },
+            { thai: 'ส่วนใหญ่', ipa: 'sùan yài', en: 'Mostly' },
+            { thai: 'สองทุ่ม', ipa: 'sɔ̌ɔng tûm', en: '8 PM' },
+            { thai: 'สองสามวันนี้', ipa: 'sɔ̌ɔng sǎam wan níi', en: 'These few days' },
+            { thai: 'สองสามวันแรก', ipa: 'sɔ̌ɔng sǎam wan rɛ̂ɛk', en: 'First 2-3 days' },
+            { thai: 'สอน', ipa: 'sɔ̌ɔn', en: 'Teach' },
+            { thai: 'สอนเหมือนได้เรียนสองครั้ง', ipa: 'sɔ̌ɔn mʉ̌an dâi rian sɔ̌ɔng kráng', en: 'To teach is to learn twice.' },
+            { thai: 'สะดวก', ipa: 'sà dùak', en: 'Convenient' },
+            { thai: 'สั่ง', ipa: 'sàng', en: 'order' },
+            { thai: 'สังเกต', ipa: 'sǎng gèet', en: 'Notice / observe' },
+            { thai: 'สัญญาณ', ipa: 'sǎn yaan', en: 'Signal' },
+            { thai: 'สัตว์', ipa: 'sàt', en: 'animals' },
+            { thai: 'สัตว์เลี้ยง', ipa: 'sàt líang', en: 'Pets' },
+            { thai: 'สั้น', ipa: 'sân', en: 'Short' },
+            { thai: 'บ้านเกิด', ipa: 'bâan gə̀ət', en: 'Hometown' },
+            { thai: 'สาขา', ipa: 'sǎa kǎa', en: 'Branch' },
+            { thai: 'สิงหาคม', ipa: 'sǐng hǎa kom', en: 'August' },
+            { thai: 'สิ้นเดือน', ipa: 'sîn dʉan', en: 'End of the month' },
+            { thai: 'สิบบาทยี่สิบบาทก็ได้', ipa: 'sìp bàat yîi sìp bàat gɔ̂ɔ dâi', en: '10 or 20 baht is ok.' },
+            { thai: 'สีเหลือง', ipa: 'sǐi lʉ̌ang', en: 'yellow' },
+            { thai: 'สื่อการสอน', ipa: 'sʉ̀ʉ gaan sɔ̌ɔn', en: 'Materials' },
+            { thai: 'สุก', ipa: 'sùk', en: 'cooked' },
+            { thai: 'สุดท้าย', ipa: 'sùt táai', en: 'last / Final' },
+            { thai: 'เสาร์ที่สองของปี', ipa: 'sǎo tîi sɔ̌ɔng kɔ̌ɔng bpii', en: 'The second Saturday of the year' },
+            { thai: 'เสาร์อาทิตย์', ipa: 'sǎo aa tít', en: 'Weekend' },
+            { thai: 'เสียง', ipa: 'sǐang', en: 'sound' },
+            { thai: 'เสียงดัง', ipa: 'sǐang dang', en: 'noisy' },
+            { thai: 'เสียใจ', ipa: 'sǐa jai', en: 'Sorry / Regret' },
+            { thai: 'เสียชีวิต', ipa: 'sǐa chii wít', en: 'Pass away' },
+            { thai: 'เสียตังค์', ipa: 'sǐa dtang', en: 'waste money' },
+            { thai: 'เสือ', ipa: 'sʉ̌a', en: 'Tiger' },
+            { thai: 'เสื้อกันหนาว', ipa: 'sʉ̂a gan nǎao', en: 'winter clothes' },
+            { thai: 'เสื้อแขนสั้น', ipa: 'sʉ̂a kɛ̌ɛn sân', en: 'Short-sleeved shirts' },
+            { thai: 'เสื้อยืด', ipa: 'sʉ̂a yʉ̂ʉt', en: 't-shirt' },
+            { thai: 'แสน', ipa: 'sɛ̌ɛn', en: 'Hundred thousand' },
+            { thai: 'งา', ipa: 'ngaa', en: 'sesame' },
+            { thai: 'ไส้กรอง', ipa: 'sâi grɔɔng', en: 'Filter' },
+            { thai: 'หน่อไม้', ipa: 'nɔ̀ɔ mái', en: 'Bamboo shoots' },
+            { thai: 'หนัง', ipa: 'nǎng', en: 'Movie' },
+            { thai: 'หนา', ipa: 'nǎa', en: 'Thick' },
+            { thai: 'หน้า', ipa: 'nâa', en: 'in front of / face' },
+            { thai: 'หน้าจอ', ipa: 'nâa jɔɔ', en: 'screen' },
+            { thai: 'หน้าต่าง', ipa: 'nâa dtàang', en: 'Window' },
+            { thai: 'หน้าแล้ง', ipa: 'nâa lɛ́ɛng', en: 'Dry season' },
+            { thai: 'หนึ่งแถมหนึ่ง', ipa: 'nʉ̀ng tɛ̌ɛm nʉ̀ng', en: '1 free 1' },
+            { thai: 'หนึ่งทุ่ม', ipa: 'nʉ̀ng tûm', en: '7 PM' },
+            { thai: 'หนึ่งในสาม', ipa: 'nʉ̀ng nai sǎam', en: '1 in 3' },
+            { thai: 'หนึ่งหมื่น', ipa: 'nʉ̀ng mʉ̀ʉn', en: '10000' },
+            { thai: 'หนูตะเภา', ipa: 'nǔu dtà pao', en: 'guinea pig' },
+            { thai: 'หมวกกันน็อค', ipa: 'mùak gan nɔ́k', en: 'helmet' },
+            { thai: 'หมี', ipa: 'mǐi', en: 'bears' },
+            { thai: 'หมูสับ', ipa: 'mǔu sàp', en: 'minced pork' },
+            { thai: 'หยักศก', ipa: 'yàk sòk', en: 'Wavy' },
+            { thai: 'บัญชี', ipa: 'ban chii', en: 'Accounts' },
+            { thai: 'หยุด', ipa: 'yùt', en: 'stop' },
+            { thai: 'หยุดเถอะ', ipa: 'yùt tə̀', en: 'Let\'s stop.' },
+            { thai: 'หลอด', ipa: 'lɔ̀ɔt', en: 'Straws' },
+            { thai: 'หลัง', ipa: 'lǎng', en: 'after' },
+            { thai: 'หลังจากนั้น', ipa: 'lǎng jàak nán', en: 'After that' },
+            { thai: 'หลังเลิกเรียน', ipa: 'lǎng lə̂ək rian', en: 'after school' },
+            { thai: 'หลาน', ipa: 'lǎan', en: 'nephew / niece' },
+            { thai: 'หลานชาย', ipa: 'lǎan chaai', en: 'Nephews' },
+            { thai: 'หลานชายอีกคน', ipa: 'lǎan chaai ìik kon', en: 'Another nephew' },
+            { thai: 'ห้องเก็บของ', ipa: 'hɔ̂ɔng gèp kɔ̌ɔng', en: 'Storage room' },
+            { thai: 'หอย', ipa: 'hɔ̌ɔi', en: 'clams' },
+            { thai: 'หอยเชลล์', ipa: 'hɔ̌ɔi cheew', en: 'scallop' },
+            { thai: 'หัก', ipa: 'hàk', en: 'To crack / break' },
+            { thai: 'หัน', ipa: 'hǎn', en: 'Turn' },
+            { thai: 'หัวใจ', ipa: 'hǔa jai', en: 'heart' },
+            { thai: 'หัวเราะ', ipa: 'hǔa rɔ́', en: 'Laugh' },
+            { thai: 'หา', ipa: 'hǎa', en: 'search' },
+            { thai: 'ห้าง', ipa: 'hâang', en: 'Mall' },
+            { thai: 'หาย', ipa: 'hǎai', en: 'Recover' },
+            { thai: 'หิมะ', ipa: 'hì má', en: 'snow' },
+            { thai: 'หู', ipa: 'hǔu', en: 'Ears' },
+            { thai: 'เหงื่อออก', ipa: 'ngʉ̀a ɔ̀ɔk', en: 'To sweat' },
+            { thai: 'เห็ด', ipa: 'hèt', en: 'Mushrooms' },
+            { thai: 'เห็นด้วย', ipa: 'hěn dûai', en: 'Agree' },
+            { thai: 'เหนื่อย', ipa: 'nʉ̀ai', en: 'Tired' },
+            { thai: 'เหมาะ', ipa: 'mɔ̀', en: 'appropriate' },
+            { thai: 'เหมือนเดิม', ipa: 'mʉ̌an dəəm', en: 'Same as usual' },
+            { thai: 'แห้ง', ipa: 'hɛ̂ɛng', en: 'Dry' },
+            { thai: 'โหวต', ipa: 'wòot', en: 'Vote' },
+            { thai: 'ให้คำปรึกษา', ipa: 'hâi kam bprʉ̀k sǎa', en: 'give advice' },
+            { thai: 'ไหนดูซิ', ipa: 'nǎi duu sí', en: 'Let me see' },
+            { thai: 'องศา', ipa: 'ong sǎa', en: 'degrees' },
+            { thai: 'อนุบาล', ipa: 'à nú baan', en: 'Kindergarten' },
+            { thai: 'อย่างแรก', ipa: 'yàang rɛ̂ɛk', en: 'First thing' },
+            { thai: 'อย่าไปเอาของเจ๊เขาเลย', ipa: 'yàa bpai ao kɔ̌ɔng jé kǎo ləəi', en: 'Don\'t take her stuff.' },
+            { thai: 'อยู่ห่างไปหนึ่งก้าว', ipa: 'yùu hàang bpai nʉ̀ng gâao', en: 'They are one step away.' },
+            { thai: 'อ่อน', ipa: 'ɔ̀ɔn', en: 'Weak' },
+            { thai: 'อักษรกลาง', ipa: 'àk sɔ̌ɔn glaang', en: 'Mid consonant' },
+            { thai: 'อัน', ipa: 'an', en: 'Universal classifier' },
+            { thai: 'อันตราย', ipa: 'an dtà raai', en: 'dangerous' },
+            { thai: 'อา', ipa: 'aa', en: 'Dad\'s younger siblings' },
+            { thai: 'อาการ', ipa: 'aa gaan', en: 'symptoms' },
+            { thai: 'อาจจะ', ipa: 'àat jà', en: 'maybe' },
+            { thai: 'อาทิตย์', ipa: 'aa tít', en: 'Week' },
+            { thai: 'อายุห่างกันกี่ปี', ipa: 'aa yú hàang gan gìi bpii', en: 'How many years apart?' },
+            { thai: 'อารี', ipa: 'aa rii', en: 'Helpful / Kind' },
+            { thai: 'อิสระ', ipa: 'ìt sà rà', en: 'Freedom' },
+            { thai: 'อีกที่นึง', ipa: 'ìik tîi nʉng', en: 'Another place' },
+            { thai: 'อีกเมือง', ipa: 'ìik mʉang', en: 'another city' },
+            { thai: 'อีกโรงเรียน', ipa: 'ìik roong rian', en: 'Another school' },
+            { thai: 'อื่น', ipa: 'ʉ̀ʉn', en: 'Other' },
+            { thai: 'อุณหภูมิ', ipa: 'un hà puum', en: 'temperature' },
+            { thai: 'อุทยานแห่งชาติ', ipa: 'ùt tá yaan hɛ̀ng châat', en: 'National Park' },
+            { thai: 'อุ่น', ipa: 'ùn', en: 'warm' },
+            { thai: 'อุปกรณ์', ipa: 'ù bpà gɔɔn', en: 'Equipment' },
+            { thai: 'เอา', ipa: 'ao', en: 'Bring / Take' },
+            { thai: 'เอ้า ไม่ได้จะเอา', ipa: 'âo mâi dâi jà ao', en: 'Oh, I\'m not getting it.' },
+            { thai: 'เอา...ไป', ipa: 'ao bpai', en: 'Bring' },
+            { thai: 'โอกาสหน้า เชิญใหม่นะคะ', ipa: 'oo gàat nâa chəən mài ná ká', en: 'Please come again.' },
+            { thai: 'โอน', ipa: 'oon', en: 'Transfer' },
+            { thai: 'ไอ', ipa: 'ai', en: 'cough' },
+            { thai: 'เกษียณ', ipa: 'gà sǐan', en: 'Retired' },
+            { thai: 'วง', ipa: 'wong', en: 'band' },
+            { thai: 'พื้น', ipa: 'pʉ́ʉn', en: 'floor' },
+            { thai: 'สด', ipa: 'sòt', en: 'live' },
+            { thai: 'รักสามเศร้า', ipa: 'rák sǎam sâo', en: 'Love triangle' },
+            { thai: 'สะใภ้', ipa: 'sà pái', en: 'in-law (fem)' },
+            { thai: 'เขย', ipa: 'kə̌əi', en: 'in-law (masc)' },
+            { thai: 'ลิขสิทธิ์', ipa: 'lík kà sìt', en: 'Copyrights' },
+            { thai: 'ผ่าน', ipa: 'pàan', en: 'Pass' },
+            { thai: 'ราคา', ipa: 'raa kaa', en: 'Price' },
+            { thai: 'เฝ้า', ipa: 'fâo', en: 'Watch (place)' },
+            { thai: 'เฉลี่ย', ipa: 'chà lìa', en: 'average' },
+            { thai: 'ให้ยืม', ipa: 'hâi yʉʉm', en: 'To lend' },
+            { thai: 'ค่าเทอม', ipa: 'kâa təəm', en: 'Tuition fees' },
+            { thai: 'ผ้าปูที่นอน', ipa: 'pâa bpuu tîi nɔɔn', en: 'Bed sheets' },
+            { thai: 'ผ้าห่ม', ipa: 'pâa hòm', en: 'Blankets' },
+            { thai: 'อบแห้ง', ipa: 'òp hɛ̂ɛng', en: 'To dry' },
+            { thai: 'เครื่องอบผ้า', ipa: 'krʉ̂ang òp pâa', en: 'Dryer' },
+            { thai: 'พื้นที่เก็บข้อมูล', ipa: 'pʉ́ʉn tîi gèp kɔ̂ɔ muun', en: 'Storage space' },
+            { thai: 'ที่เจาะกระดาษ', ipa: 'tîi jɔ̀ grà dàat', en: 'Hole puncher' },
+            { thai: 'เลื่อยไฟฟ้า', ipa: 'lʉ̂ai fai fáa', en: 'Sawing machine' },
+            { thai: 'เครื่องเจียระไน', ipa: 'krʉ̂ang jia rá nai', en: 'Grinding machine' },
+            { thai: 'พัฒนาตัวเอง', ipa: 'pát tà naa dtua eeng', en: 'To improve self' },
+            { thai: 'หลักสูตร', ipa: 'làk sùut', en: 'Curriculum' },
+            { thai: 'กำไร', ipa: 'gam rai', en: 'profit' },
+            { thai: 'ทุกวันนี้', ipa: 'túk wan níi', en: 'These days' },
+            { thai: 'กล้อง', ipa: 'glɔ̂ɔng', en: 'Camera' },
+            { thai: 'ลงทุน', ipa: 'long tun', en: 'To invest' },
+            { thai: 'โอกาสธุรกิจ', ipa: 'oo gàat tú rá gìt', en: 'Business opportunity' },
+            { thai: 'ต่อมา', ipa: 'dtɔ̀ɔ maa', en: 'Later' },
+            { thai: 'หัวมุม', ipa: 'hǔa mum', en: 'Corner' },
+            { thai: 'ด้วย', ipa: 'dûai', en: 'with' },
+            { thai: 'นามบัตร', ipa: 'naam bàt', en: 'Business card' },
+            { thai: 'ทอง', ipa: 'tɔɔng', en: 'gold' },
+            { thai: 'มิลลิเมตร', ipa: 'min lí mêet', en: 'millimetres' },
+            { thai: 'เคลือบ', ipa: 'klʉ̂ap', en: 'laminate' },
+            { thai: 'ขาดทุน', ipa: 'kàat tun', en: 'Face a loss' },
+            { thai: 'ตัด', ipa: 'dtàt', en: 'Cut' },
+            { thai: 'เพื่อนบ้าน', ipa: 'pʉ̂an bâan', en: 'Neighbour' },
+            { thai: 'บุหรี่', ipa: 'bù rìi', en: 'Cigarette' },
+            { thai: 'นิทรรศการ', ipa: 'ní tát sà gaan', en: 'exhibition' },
+            { thai: 'ไปกันเลยไหมคะ', ipa: 'bpai gan ləəi mǎi ká', en: 'Let\'s go.' },
+            { thai: 'สะใจ', ipa: 'sà jai', en: 'Satisfied' },
+            { thai: 'ไพ่', ipa: 'pâi', en: 'Cards' },
+            { thai: 'เนื้อ', ipa: 'nʉ́a', en: 'Beef' },
+            { thai: 'ดีใจที่ได้เรียนภาษาไทย', ipa: 'dii-jai thîi dâi rian paa sǎa tai', en: 'I\'m happy that I got to learn Thai.' },
+            { thai: 'ห่างจาก', ipa: 'hàang jàak', en: 'far from' },
+            { thai: 'โทรหาน้อง', ipa: 'toon hǎa nɔ́ɔng', en: 'Call younger brother' },
+            { thai: 'ฟ้าแลบ', ipa: 'fáa lɛ̂ɛp', en: 'lightning' },
+            { thai: 'ตะวันออก', ipa: 'dtà wan ɔ̀ɔk', en: 'East' },
+            { thai: 'ตะวันตก', ipa: 'dtà wan dtòk', en: 'West' },
+            { thai: 'ชายฝั่ง', ipa: 'chaai fàng', en: 'Coast' },
+            { thai: 'ต่อหน้า', ipa: 'dtɔ̀ɔ nâa', en: 'in person' },
+            { thai: 'ต่าง', ipa: 'dtàang', en: 'Different' },
+            { thai: 'คนกลาง', ipa: 'kon glaang', en: 'middleman' },
+            { thai: 'ขายส่ง', ipa: 'kǎai sòng', en: 'wholesale' },
+            { thai: 'ซื้อตรงจากโรงงาน', ipa: 'sʉ́ʉ dtrong jàak roong ngaan', en: 'Buy directly from factory' },
+            { thai: 'ติดต่อ', ipa: 'dtìt dtɔ̀ɔ', en: 'To contact' },
+            { thai: 'ของปลอม', ipa: 'kɔ̌ɔng bplɔɔm', en: 'Counterfeits' },
+            { thai: 'สมุนไพร', ipa: 'sà-mǔn-prai', en: 'herbs' },
+            { thai: 'นักบัญชี', ipa: 'nák-ban-chii', en: 'Accountant' },
+            { thai: 'ใบเสร็จ', ipa: 'bai sèt', en: 'receipt' },
+            { thai: 'สลับร่าง', ipa: 'sà-làp-râang', en: 'swap bodies' },
+            { thai: 'เลี้ยง', ipa: 'líiang', en: 'Treat' },
+            { thai: 'ดอง', ipa: 'dɔɔng', en: 'fermented' },
+            { thai: 'ลายเซ็นต์', ipa: 'laai sen', en: 'autograph' },
+            { thai: 'มัน', ipa: 'man', en: 'Fat' },
+            { thai: 'หยิบ', ipa: 'yìp', en: 'Grab' },
+            { thai: 'ถ้วย', ipa: 'tûai', en: 'Bowl' },
+            { thai: 'เครื่องเคียง', ipa: 'krʉ̂ang kiang', en: 'Side dishes' },
+            { thai: 'บิน', ipa: 'bin', en: 'Fly' },
+            { thai: 'พากย์', ipa: 'pâak', en: 'To dub' },
+            { thai: 'น่ากลัว', ipa: 'nâa glua', en: 'Scary' },
+            { thai: 'ความละเอียด', ipa: 'kwaam lá ìat', en: 'Resolution' },
+            { thai: 'หมอนรองคอ', ipa: 'mɔ̌ɔn rɔɔng kɔɔ', en: 'Head rest' },
+            { thai: 'ดิบ', ipa: 'dìp', en: 'Raw' },
+            { thai: 'น้ำอัดลม', ipa: 'nám àt lom', en: 'Soft drinks' },
+            { thai: 'ตู้ขายของ', ipa: 'dtûu kǎai kɔ̌ɔng', en: 'Vending machine' },
+            { thai: 'หนังสือพิมพ์', ipa: 'nǎng sʉ̌ʉ pim', en: 'Newspaper' },
+            { thai: 'ตุ๊กตา', ipa: 'dtúk gà dtaa', en: 'Dolls' },
+            { thai: 'รักษาสุขภาพ', ipa: 'rák sǎa sùk kà pâap', en: 'Take care of health' },
+            { thai: 'ร่วมมือ', ipa: 'rûuam-mʉʉ', en: 'Cooperate' },
+            { thai: 'แนะนำ', ipa: 'nɛ́-nam', en: 'Recommend' },
+            { thai: 'หวย', ipa: 'hǔay', en: 'Lottery' },
+            { thai: 'ถูกหวย', ipa: 'tùuk hǔai', en: 'win the lottery' },
+            { thai: 'สลากออมสิน', ipa: 'sà-làak om-sĭn', en: 'GSB Lottery' },
+            { thai: 'ฝากประจำ', ipa: 'fàak bprà-jam', en: 'Fixed Deposit' },
+            { thai: 'ดอกเบี้ย', ipa: 'dɔ̀ɔk bîa', en: 'Interest rate' },
+            { thai: 'หุ้นกู้', ipa: 'hûn-gûu', en: 'Corporate Bond' },
+            { thai: 'เปลี่ยนง่าย', ipa: 'bplìan ngâai', en: 'Volatile' },
+            { thai: 'ทองคำ', ipa: 'tong-kham', en: 'Gold' },
+            { thai: 'เพชร', ipa: 'phét', en: 'Diamond' },
+            { thai: 'หุ้นปันผล', ipa: 'hûn bpan-phŏn', en: 'Dividend Stock' },
+            { thai: 'หุ้นเติบโต', ipa: 'hûn dtoep-dtoo', en: 'Growth stock' },
+            { thai: 'หุ้นธนาคาร', ipa: 'hûn thá-naa-khaan', en: 'Bank Stock' },
+            { thai: 'หุ้นโทรคม', ipa: 'hûn thoo-rá-khom', en: 'Telecom stock' },
+            { thai: 'เครื่องมือแพทย์', ipa: 'krʉ̂ang mʉʉ pɛ̂ɛt', en: 'Medical equipment' },
+            { thai: 'ข้าวโพด', ipa: 'kâao-pôot', en: 'corn' },
+            { thai: 'แยก', ipa: 'yâɛk', en: 'separate' },
+            { thai: 'เศร้า', ipa: 'sâo', en: 'sad' },
+            { thai: 'วิทย์', ipa: 'wít', en: 'Science' },
+            { thai: 'คณิต', ipa: 'ká nít', en: 'Maths' },
+            { thai: 'มีประสิทธิภาพ', ipa: 'mii bprà sìt tí pâap', en: 'efficient' },
+            { thai: 'ผ่อน', ipa: 'pɔ̀ɔn', en: 'pay in instalments' },
+            { thai: 'เพดาน', ipa: 'pee daan', en: 'Ceiling' },
+            { thai: 'โสม', ipa: 'sǒom', en: 'ginseng' },
+            { thai: 'ต้นปี', ipa: 'dtôn-bpii', en: 'beginning of the year' },
+            { thai: 'ผอม', ipa: 'pɔ̌ɔm', en: 'skinny' },
+            { thai: 'สุ่ม', ipa: 'sùm', en: 'random' },
+            { thai: 'คนละ', ipa: 'kon-lá', en: 'different (person per)' },
+            { thai: 'หมายเลข', ipa: 'mǎi-lêek', en: 'Numbers' },
+            { thai: 'เหนือ', ipa: 'nʉ̌a', en: 'North' },
+            { thai: 'การบัญชี', ipa: 'gaan-ban-chii', en: 'Accounting' },
+            { thai: 'จำเป็น', ipa: 'jam-bpen', en: 'necessary' },
+            { thai: 'สำหรับ', ipa: 'sǎm-ràp', en: 'for' },
+            { thai: 'ไม่ทราบว่า', ipa: 'mâi sâap wâa', en: 'May I ask ...?' },
+            { thai: 'ข้อมูล', ipa: 'kɔ̂ɔ-muun', en: 'info' },
+            { thai: 'ชื่อจริง', ipa: 'chʉ̂ʉ-jing', en: 'First name' },
+            { thai: 'นามสกุล', ipa: 'naam-sà-gun', en: 'Family name' },
+            { thai: 'เต็ม', ipa: 'dtem', en: 'full' },
+            { thai: 'คลาสประจำ', ipa: 'kláat-bprà-jam', en: 'regular classes' },
+            { thai: 'คาว', ipa: 'kaao', en: 'fishy' },
+            { thai: 'อ่างเก็บน้ำ', ipa: 'àang-gèp-nám', en: 'reservoir' },
+            { thai: 'เป็นผู้ใหญ่', ipa: 'bpen pûu-yài', en: 'mature' },
+            { thai: 'แขก', ipa: 'kàɛk', en: 'guest / Indian people' },
+            { thai: 'การเรียน', ipa: 'gaan riian', en: 'learning' },
+            { thai: 'ยกเลิก', ipa: 'yók-lə̂ək', en: 'cancel' },
+            { thai: 'นักข่าว', ipa: 'nák-kàao', en: 'journalist' },
+            { thai: 'ปริญญาโท', ipa: 'bpà-rin-yaa too', en: 'Master\'s degree' },
+            { thai: 'ทักทาย', ipa: 'ták-taai', en: 'To greet' },
+            { thai: 'กลุ่ม', ipa: 'glùm', en: 'Group' },
+            { thai: 'เทศกาล', ipa: 'têet-sà-gaan', en: 'festival' },
+            { thai: 'ศัลยกรรม', ipa: 'sǎn-yá-gam', en: 'surgery' },
+            { thai: 'อาสา', ipa: 'aa-sǎa', en: 'Volunteers' },
+            { thai: 'โรงเรียนรัฐ', ipa: 'roong-rian rát', en: 'public school' },
+            { thai: 'ประถม', ipa: 'bprà-tǒm', en: 'primary' },
+            { thai: 'มัธยม', ipa: 'mát-tá-yom', en: 'Secondary' },
+            { thai: 'ทรงพลัง', ipa: 'song pá-lang', en: 'Powerful' },
+            { thai: 'ตัวอักษร', ipa: 'dtua àk-sɔ̌ɔn', en: 'Alphabet' },
+            { thai: 'ภูเขาไฟ', ipa: 'phuu-kăo-fai', en: 'volcanoes' },
+            { thai: 'อัดเสียง', ipa: 'àt-sĭang', en: 'record audio' },
+            { thai: 'เจ้าบ่าว', ipa: 'jâo-bàao', en: 'groom' },
+            { thai: 'ท้อง', ipa: 'tóng', en: 'pregnant' },
+            { thai: 'สำนวน', ipa: 'săm-nuuan', en: 'idioms' },
+            { thai: 'การนอกใจ', ipa: 'gaan nôk-jai', en: 'cheating' },
+            { thai: 'สวมเขา', ipa: 'suuam kăo', en: 'trick/deceive' },
+            { thai: 'หญ้า', ipa: 'yâa', en: 'grass' },
+            { thai: 'แทน', ipa: 'taen', en: 'instead of' },
+            { thai: 'คู่หมั้น', ipa: 'kôo-mân', en: 'fiance' },
+            { thai: 'ตลอด', ipa: 'dtà-làawt', en: 'always' },
+            { thai: 'เจ้าสาว', ipa: 'jâo-săao', en: 'bride' },
+            { thai: 'ใส่ซอง', ipa: 'sài sɔɔng', en: 'Put money in envelopes' },
+            { thai: 'เพื่อนเจ้าสาว', ipa: 'peûuan jâo-săao', en: 'bridesmaid' },
+            { thai: 'ปลอบใจ', ipa: 'bplòp-jai', en: 'console' },
+            { thai: 'ความช่วยเหลือ', ipa: 'kwaam chûuay-leŭua', en: 'help' },
+            { thai: 'หย่า', ipa: 'yàa', en: 'get divorced' },
+            { thai: 'ปฏิทิน', ipa: 'bpà-dtì-tin', en: 'calendar' },
+            { thai: 'คลาสทดลอง', ipa: 'kláat tót-long', en: 'trial class' },
+            { thai: 'จำนวน', ipa: 'jam-nuuan', en: 'number / amount' },
+            { thai: 'ลูกเพจ', ipa: 'lûuk-pèet', en: 'page followers' },
+            { thai: 'ทั่วไป', ipa: 'tûua bpai', en: 'general' },
+            { thai: 'เพื่อ', ipa: 'pêuua', en: 'for / in order to' },
+            { thai: 'เดา', ipa: 'dao', en: 'to guess' },
+            { thai: 'ข้อเท้าพลิก', ipa: 'kôr-táao plík', en: 'sprained ankle' },
+            { thai: 'ปลิว', ipa: 'bplio', en: 'to be blown away' },
+            { thai: 'ว่า', ipa: 'wâa', en: 'to say/that' },
+            { thai: 'โดยบังเอิญ', ipa: 'doi bang-oen', en: 'accidentally' },
+            { thai: 'รุ้ง', ipa: 'rúng', en: 'rainbow' },
+            { thai: 'การอักเสบ', ipa: 'gaan àk-sèp', en: 'inflammation' },
+            { thai: 'ลา', ipa: 'laa', en: 'take leave / donkey' },
+            { thai: 'เป็นลม', ipa: 'bpen lom', en: 'faint' },
+            { thai: 'ปล่อย', ipa: 'bplòi', en: 'release' },
+            { thai: 'ขี้กังวล', ipa: 'kêe gang-won', en: 'anxious' },
+            { thai: 'โรค', ipa: 'rôhk', en: 'disease' },
+            { thai: 'โหด', ipa: 'hòht', en: 'cruel' },
+            { thai: 'วิธีการ', ipa: 'wí-têe-gaan', en: 'method' },
+            { thai: 'ทา', ipa: 'taa', en: 'apply' },
+            { thai: 'บันได', ipa: 'ban-dai', en: 'stairs' },
+            { thai: 'ฤาษี', ipa: 'reuu-sěe', en: 'hermit' },
+            { thai: 'หน่องไก่', ipa: 'nòng gài', en: 'drumsticks' },
+            { thai: 'แอบ', ipa: 'âep', en: 'secretly' },
+            { thai: 'ซื่อบื่อ', ipa: 'seû-beû', en: 'dumb' },
+            { thai: 'ขัดจังหวะ', ipa: 'kàt jang-wà', en: 'interrupt' },
+            { thai: 'จัดซื้อ', ipa: 'jàt-sʉ́ʉ', en: 'Purchasing' },
+            { thai: 'คะแนน', ipa: 'ká-naan', en: 'scores' },
+            { thai: 'เสมอ', ipa: 'sà-mǒer', en: 'It\'s a draw.' },
+            { thai: 'ชนะ', ipa: 'chá-ná', en: 'win' },
+            { thai: 'นางแบบ', ipa: 'naang-bàep', en: 'model (fem)' },
+            { thai: 'นายแบบ', ipa: 'naai-bàep', en: 'model (masc)' },
+            { thai: 'ปล้น', ipa: 'bplôhn', en: 'To rob' },
+            { thai: 'เบา', ipa: 'bao', en: 'lightweight' },
+            { thai: 'ขโมย', ipa: 'kà-mooy', en: 'to steal' },
+            { thai: 'ถอน', ipa: 'tɔ̌ɔn', en: 'withdraw' },
+            { thai: 'สมุดบัญชี', ipa: 'sà-mùt ban-chii', en: 'Bank book' },
+            { thai: 'เอกสาร', ipa: 'èek-gà-sǎan', en: 'documents' },
+            { thai: 'แพ้', ipa: 'pɛ́ɛ', en: 'allergic to / lose' },
+            { thai: 'ขยัน', ipa: 'kà-yǎn', en: 'hardworking' },
+            { thai: 'กะทันหัน', ipa: 'gà-tan-hǎn', en: 'suddenly' },
+            { thai: 'อธิบาย', ipa: 'à-tí-baai', en: 'explain' },
+            { thai: 'หัวหอม', ipa: 'hŭua-hŏm', en: 'onions' },
+            { thai: 'แมงมุม', ipa: 'maeng-mum', en: 'spiders' },
+            { thai: 'โรงหนัง', ipa: 'roong nǎng', en: 'Cinema' },
+            { thai: 'ต้นขา', ipa: 'tôn kǎa', en: 'thigh' },
+            { thai: 'เสี่ยง', ipa: 'sìang', en: 'risky' },
+            { thai: 'ขึ้นศาล', ipa: 'kʉ̂n sǎan', en: 'go to court' },
+            { thai: 'ฆ่า', ipa: 'kâa', en: 'kill' },
+            { thai: 'ทำร้าย', ipa: 'tam ráai', en: 'To harm' },
+            { thai: 'สัมภาษณ์', ipa: 'sǎm pâat', en: 'Interview' },
+            { thai: 'ซ่อม', ipa: 'sɔ̂m', en: 'repair' },
+            { thai: 'ประตู', ipa: 'bprà-dtuu', en: 'gate /door' },
+            { thai: 'บอบบาง', ipa: 'bɔ̀ɔp baang', en: 'fragile' },
+            { thai: 'ปลอบ', ipa: 'plɔ̀ɔp', en: 'console' },
+            { thai: 'สาย', ipa: 'sǎai', en: 'Late' },
+            { thai: 'ซาลาเปา', ipa: 'saa-laa-bpao', en: 'buns' },
+            { thai: 'หมั่น', ipa: 'màn', en: 'often' },
+            { thai: 'เหงา', ipa: 'ngǎo', en: 'lonely' },
+            { thai: 'ขนลุก', ipa: 'kǒn-lúk', en: 'goose bumps' },
+            { thai: 'นึ่ง', ipa: 'nʉ̂ng', en: 'steam' },
+            { thai: 'พก', ipa: 'pók', en: 'carry' },
+            { thai: 'ตาเปล่า', ipa: 'dtaa-bplào', en: 'naked eyes' },
+            { thai: 'อธิษฐาน', ipa: 'à-tít-tǎan', en: 'make a wish' },
+            { thai: 'สมหวัง', ipa: 'sǒm-wǎng', en: 'come true' },
+            { thai: 'ย้อนเวลา', ipa: 'yɔ́ɔn we-laa', en: 'travel back in time' },
+            { thai: 'แก้ไข', ipa: 'gɛ̂ɛ-kǎi', en: 'solve / fix' },
+            { thai: 'ไส้', ipa: 'sâi', en: 'filling' },
+            { thai: 'โต้คลื่น', ipa: 'dtôo khlʉ̂ʉn', en: 'surf' },
+            { thai: 'อายุยืน', ipa: 'aa-yú yʉʉn', en: 'have a long life' },
+            { thai: 'ตรงข้าม', ipa: 'dtrong-khâam', en: 'opposite' },
+            { thai: 'พรหมลิขิต', ipa: 'prom-lí-kìt', en: 'destiny' },
+            { thai: 'ความทรงจำ', ipa: 'khwaam song-jam', en: 'memories' },
+            { thai: 'ฝันร้าย', ipa: 'fǎn-ráai', en: 'nightmares' },
+            { thai: 'ความกดดัน', ipa: 'khwaam gòt-dan', en: 'pressure' },
+            { thai: 'สาหร่าย', ipa: 'sǎa-rài', en: 'seaweed' },
+            { thai: 'ซน', ipa: 'son', en: 'naughty' },
+            { thai: 'ลักพาตัว', ipa: 'lák-paa-dtuua', en: 'kidnap' },
+            { thai: 'เอาชนะ', ipa: 'ao chá-ná', en: 'beat' },
+            { thai: 'แข่ง', ipa: 'kàeng', en: 'race / compete' },
+            { thai: 'หน้าผาก', ipa: 'nâa-pàak', en: 'forehead' },
+            { thai: 'ดีด', ipa: 'deet', en: 'To flick' },
+            { thai: 'วิ่งไล่จับ', ipa: 'wîng lâi jàp', en: 'play tag' },
+            { thai: 'แคบ', ipa: 'kâep', en: 'narrow' },
+            { thai: 'สะดุด', ipa: 'sà-dùt', en: 'trip' },
+            { thai: 'ล้ม', ipa: 'lóm', en: 'Fall down' },
+            { thai: 'แตงกวา', ipa: 'dtang-gwaa', en: 'cucumber' },
+            { thai: 'กรุณา', ipa: 'gà-rú-naa', en: 'Please' },
+            { thai: 'เครื่องราง', ipa: 'krêuang-raang', en: 'amulet' },
+            { thai: 'สร้อยคอ', ipa: 'sâawy-kaaw', en: 'necklace' },
+            { thai: 'หลอก', ipa: 'làawk', en: 'trick' },
+            { thai: 'ขี้อาย', ipa: 'kêe-aai', en: 'timid' },
+            { thai: 'สืบ', ipa: 'sʉ̀ʉp', en: 'investigate' },
+            { thai: 'หน่วย', ipa: 'nùai', en: 'unit' },
+            { thai: 'อาชญากรรม', ipa: 'aat-chá-yaa-gam', en: 'Crime' },
+            { thai: 'รบกวน', ipa: 'róp-guan', en: 'bother' },
+            { thai: 'กระทบ', ipa: 'grà-tóp', en: 'To affect' },
+            { thai: 'หลัก', ipa: 'làk', en: 'main' },
+            { thai: 'อบรม', ipa: 'òp-rom', en: 'To train' },
+            { thai: 'เข้าร่วม', ipa: 'kâo-rûam', en: 'To join' },
+            { thai: 'ตั้งแต่', ipa: 'dtâng-dtɛ̀ɛ', en: 'since' },
+            { thai: 'คง', ipa: 'kong', en: 'probably' },
+            { thai: 'หน้าที่', ipa: 'nâa-têe', en: 'duty' },
+            { thai: 'แม่มด', ipa: 'mâe-mót', en: 'witch' },
+            { thai: 'พระ', ipa: 'prá', en: 'monk' },
+            { thai: 'อด', ipa: 'òt', en: 'miss out on' },
+            { thai: 'ขู่', ipa: 'kòo', en: 'threaten' },
+            { thai: 'ความสงบ', ipa: 'kwaam-sà-ngòp', en: 'Peace' },
+            { thai: 'กังวล', ipa: 'gang-won', en: 'worried' },
+            { thai: 'เพศ', ipa: 'pêet', en: 'gender' },
+            { thai: 'หนี', ipa: 'nĕe', en: 'escape' },
+            { thai: 'กระโดด', ipa: 'grà-dòt', en: 'jump' },
+            { thai: 'หน้าอก', ipa: 'nâa-òk', en: 'chest' },
+            { thai: 'ของฝาก', ipa: 'kŏng-fàak', en: 'souvenirs' },
+            { thai: 'ลูกโป่ง', ipa: 'lôok-bpòhng', en: 'balloons' },
+            { thai: 'จน', ipa: 'jon', en: 'until / poor' },
+            { thai: 'อู่', ipa: 'òo', en: 'garage' },
+            { thai: 'รวย', ipa: 'ruay', en: 'rich' },
+            { thai: 'ถือ', ipa: 'tĕu', en: 'hold' },
+            { thai: 'หาง', ipa: 'hăang', en: 'tail' },
+            { thai: 'บวม', ipa: 'buam', en: 'swollen' },
+            { thai: 'ข้อเท้า', ipa: 'kɔ̂ɔ-táao', en: 'ankle' },
+            { thai: 'เหรียญ', ipa: 'rǐan', en: 'medals' },
+            { thai: 'ทองแดง', ipa: 'tɔɔng-dɛɛng', en: 'copper' },
+            { thai: 'ปู่', ipa: 'bpùu', en: 'dad\'s dad' },
+            { thai: 'อดีต', ipa: 'à-díit', en: 'Past' },
+            { thai: 'จอ', ipa: 'jɔɔ', en: 'Screen' },
+            { thai: 'ปัจจุบัน', ipa: 'bpàt-jù-bpan', en: 'Present' },
+            { thai: 'หน้าตา', ipa: 'nâa-dtaa', en: 'Appearance' },
+            { thai: 'เหยียบ', ipa: 'yìap', en: 'step on' },
+            { thai: 'ค้อน', ipa: 'kɔ́n', en: 'hammer' },
+            { thai: 'กล่าวหา', ipa: 'glàao-hǎa', en: 'accuse' },
+            { thai: 'พลัง', ipa: 'pá-lang', en: 'energy' },
+            { thai: 'ตอบแทน', ipa: 'dtɔ̀ɔp-tɛɛn', en: 'repay / reward' },
+            { thai: 'เทวดา', ipa: 'tee-wáa-daa', en: 'angel' },
+            { thai: 'สามารถ', ipa: 'sǎa-mâat', en: 'can' },
+            { thai: 'แลก', ipa: 'lâek', en: 'exchange' },
+            { thai: 'พร', ipa: 'pɔɔn', en: 'wish; blessing' },
+            { thai: 'สวรรค์', ipa: 'sà-wǎn', en: 'heaven' },
+            { thai: 'สงสัย', ipa: 'sǒng-sǎi', en: 'wonder' },
+            { thai: 'เนี่ย', ipa: 'nîa', en: 'Look at this' },
+            { thai: 'อย่างนี้', ipa: 'yàang-née', en: 'like this' },
+            { thai: 'เอง', ipa: 'eeng', en: 'self' },
+            { thai: 'เนื้อคู่', ipa: 'núa-kôo', en: 'soulmates' },
+            { thai: 'บริจาค', ipa: 'bɔɔ-rí-jàak', en: 'donate' },
+            { thai: 'ปีก', ipa: 'bpèek', en: 'wings' },
+            { thai: 'กรน', ipa: 'gron', en: 'snore' },
+            { thai: 'ล่าม', ipa: 'lâam', en: 'Interpreter' },
+            { thai: 'เตี้ย', ipa: 'dtîa', en: 'short' },
+            { thai: 'ข่าวลือ', ipa: 'kàao lʉʉ', en: 'Rumor' },
+            { thai: 'สรุป', ipa: 'sà-rùp', en: 'summarise' },
+            { thai: 'บุกรุก', ipa: 'bùk-róok', en: 'invade' },
+            { thai: 'สำเร็จ', ipa: 'sǎm-rèt', en: 'successful' },
+            { thai: 'คืนดี', ipa: 'keun-dee', en: 'get back together' },
+            { thai: 'สำคัญ', ipa: 'sǎm kan', en: 'Important' },
+            { thai: 'พระเอก', ipa: 'prá-èk', en: 'main hero' },
+            { thai: 'ชิน', ipa: 'chin', en: 'get used to' },
+            { thai: 'ตับ', ipa: 'dtàp', en: 'Liver' },
+            { thai: 'โขก', ipa: 'khòhk', en: 'To bang / pound' },
+            { thai: 'กำแพง', ipa: 'gam pɛɛng', en: 'Walls' },
+            { thai: 'สติ', ipa: 'sà-dtì', en: 'senses / mindfulness' },
+            { thai: 'เลิศ', ipa: 'lêrt', en: 'fabulous' },
+            { thai: 'พลุ', ipa: 'plú', en: 'Fireworks' },
+            { thai: 'ถูก', ipa: 'tùuk', en: 'Cheap' },
+            { thai: 'เต้น', ipa: 'dtêhn', en: 'dance' },
+            { thai: 'เตือน', ipa: 'dtʉan', en: 'warn' },
+            { thai: 'จับผิด', ipa: 'jàp-pìt', en: 'To catch someone out' },
+            { thai: 'สัญญา', ipa: 'sǎn-yaa', en: 'promise' },
+            { thai: 'ปลาทู', ipa: 'bplaa-too', en: 'mackerel' },
+            { thai: 'พวงกุญแจ', ipa: 'puang gun jɛɛ', en: 'Keychains' },
+            { thai: 'แต่งประโยค', ipa: 'dtàeng-bprà-yòhk', en: 'make a sentence' },
+            { thai: 'ชิดซ้าย', ipa: 'chít-sáai', en: 'keep left' },
+            { thai: 'ชิดขวา', ipa: 'chít-khwăa', en: 'keep right' },
+            { thai: 'ป้าย', ipa: 'bpâai', en: 'signs' },
+            { thai: 'นอนหงาย', ipa: 'nawn-ngǎai', en: 'lie on your back' },
+            { thai: 'นอนคว่ำ', ipa: 'nawn-kwâam', en: 'lie on your belly' },
+            { thai: 'โล่ง', ipa: 'lôhng', en: 'relieved' },
+            { thai: 'แช่น้ำ', ipa: 'châe-náam', en: 'To soak' },
+            { thai: 'ขัดขี้ไคล', ipa: 'khàt-kêe-khlai', en: 'scrub off dead skin' },
+            { thai: 'นิ้วเท้า', ipa: 'níu-táo', en: 'toes' },
+            { thai: 'ส้นเท้า', ipa: 'sôn-tháo', en: 'heels' },
+            { thai: 'สะอาด', ipa: 'sà-àat', en: 'clean' },
+            { thai: 'ยักษ์', ipa: 'yák', en: 'giant' },
+            { thai: 'ท่าเรือ', ipa: 'thâa-reuua', en: 'pier' },
+            { thai: 'เบ็ด', ipa: 'bèt', en: 'fishing rod' },
+            { thai: 'ปลอม', ipa: 'bplorm', en: 'fake' },
+            { thai: 'หนอน', ipa: 'nŏn', en: 'worm' },
+            { thai: 'ถุงมือ', ipa: 'tǔng-mʉʉ', en: 'gloves' },
+            { thai: 'หมุน', ipa: 'mŭn', en: 'rotate' },
+            { thai: 'เหวี่ยง', ipa: 'wìang', en: 'swing' },
+            { thai: 'งีบ', ipa: 'ngîip', en: 'nap' },
+            { thai: 'บังเอิญ', ipa: 'bang-ern', en: 'coincidentally' },
+            { thai: 'ตึง', ipa: 'dtʉng', en: 'stiff' },
+            { thai: 'ก้น', ipa: 'gôn', en: 'bottom' },
+            { thai: 'แว่นดำน้ำ', ipa: 'wâen-dam-náam', en: 'goggles' },
+            { thai: 'ฆาตกรรม', ipa: 'khàat-dtà-gram', en: 'murder' },
+            { thai: 'ใบ', ipa: 'bai', en: 'classifier for bags' },
+            { thai: 'การเมือง', ipa: 'gaan-mʉʉang', en: 'politics' },
+            { thai: 'เข็น', ipa: 'kĕn', en: 'push' },
+            { thai: 'หาร', ipa: 'hǎan', en: 'divide' },
+            { thai: 'ถาวร', ipa: 'tǎa-wɔɔn', en: 'permanent' },
+            { thai: 'ไฟฉาย', ipa: 'fai chǎai', en: 'flashlight' },
+            { thai: 'ตื้น', ipa: 'dtêun', en: 'shallow' },
+            { thai: 'แมวน้ำ', ipa: 'maew-náam', en: 'seal' },
+            { thai: 'เกาะ', ipa: 'gò', en: 'island' },
+            { thai: 'ใต้', ipa: 'dtâi', en: 'under' },
+            { thai: 'จืด', ipa: 'jʉ̀ʉt', en: 'bland' }
+        ];
+
+        function generateRandomVocab() {
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            const word = vocabList[randomIndex];
             
-            return (
-                <div className="max-w-md mx-auto min-h-screen p-4">
-                    <h1 className="text-2xl font-bold text-center mb-6 text-pink-700">Girl Rules กฎหลัก...ห้ามรักเธอ</h1>
-                    
-                    <div className="flex gap-2 mb-6">
-                        {['ทบทวน', 'บทเรียน', 'กิจกรรม'].map(tab => (
-                            <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-2 rounded-lg font-bold ${activeTab === tab ? 'bg-pink-600 text-white' : 'bg-white border'}`}>
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
+            document.getElementById('rv-thai-text').innerText = word.thai;
+            document.getElementById('rv-ipa').innerText = word.ipa;
+            document.getElementById('rv-en').innerText = word.en;
+            
+            // Set TTS
+            document.getElementById('rv-tts').setAttribute('onclick', `speak('${word.thai}')`);
+            
+            document.getElementById('random-vocab-display').classList.remove('hidden');
+        }
 
-                    {activeTab === 'ทบทวน' && <div className="animate-fadeIn"><p className="text-center mb-4">สุ่มคำศัพท์</p><RandomReview /></div>}
-                    {activeTab === 'บทเรียน' && <div className="animate-fadeIn"><p className="text-center mb-4">วิดีโอ & บทสนทนา</p></div>}
-                    {activeTab === 'กิจกรรม' && <div className="animate-fadeIn"><p className="text-center mb-4">กิจกรรมเสริม</p></div>}
-                </div>
-            );
-        };
-
-        const RandomReview = () => {
-            // Vocab list would be placed here
-            return <div className="text-center">ฝึกฝนคำศัพท์...</div>;
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        // --- Toggle Visibility Functionality ---
+        function toggleParent(button, targetClass, parentId = null) {
+            let container = parentId ? document.getElementById(parentId) : button.closest('div').parentElement;
+            if (container) {
+                const targetElement = container.querySelector('.' + targetClass + '-target');
+                if (targetElement) {
+                    targetElement.classList.toggle('hidden');
+                    button.classList.toggle('active');
+                }
+            }
+        }
     </script>
 </body>
 </html>
