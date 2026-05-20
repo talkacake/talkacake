@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ความรู้สึก</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        thai: ['"Noto Sans Thai"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
+        .toggle-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .toggle-content.active { display: block; }
+        .btn-active { background-color: #14b8a6 !important; color: white !important; border-color: #14b8a6 !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .playing { animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; color: #0d9488; }
+        @keyframes pulse-ring { 0% { transform: scale(0.95); } 50% { transform: scale(1.15); } 100% { transform: scale(0.95); } }
+    </style>
+</head>
+<body class="font-sans text-slate-800 antialiased pb-20">
+
+    <header id="main-header" class="bg-white shadow-sm sticky top-0 z-50">
+        <!-- Content injected by JS -->
+    </header>
+
+    <main id="app-container" class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+        <!-- Content will be injected here -->
+    </main>
+
+    <script>
+        let phraseIdCounter = 0;
+        const lessonData = {
+            header: {
+                title: "ความรู้สึก",
+                tts: "ความรู้สึก",
+                ipa: "khwaam-rúu-sùek",
+                en: "Feeling",
+                icon: "😌💭"
+            },
+            leadIn: {
+                title: "คำถามนำ",
+                tts: "คำถามนำ",
+                ipa: "kham-thǎam nam",
+                en: "Lead-in Questions",
+                icon: "💬",
+                phrases: [
+                    { thai: "วันนี้ รู้สึกยังไง บ้าง ❓", tts: "วันนี้ รู้สึกยังไง บ้าง", ipa: "wan-níi rúu-sùek yang-ngai bâang", en: "How do you feel today?" },
+                    { thai: "ทำไม รู้สึก แบบนั้น 🤔", tts: "ทำไม รู้สึก แบบนั้น", ipa: "tam-mai rúu-sùek baèp nán", en: "Why do you feel like that?" },
+                    { thai: "เมื่อคืน นอนไม่หลับ หรือ เปล่า 😴🌙", tts: "เมื่อคืน นอนไม่หลับ หรือ เปล่า", ipa: "mûea-kuen nɔɔn mâi làp rǔe bplào", en: "Did you have trouble sleeping last night?" }
+                ]
+            },
+            scenario: {
+                title: "สถานการณ์: คุย เรื่อง ความรู้สึก 👥",
+                tts: "สถานการณ์ คุย เรื่อง ความรู้สึก",
+                ipa: "sa-tǎa-na-gaan khui rûueang khwaam-rúu-sùek",
+                en: "Scenario: Talking about feelings",
+                dialogues: [
+                    { speaker: "A", thai: "วันนี้ ฉัน รู้สึก เครียด และ อารมณ์เสีย มาก 😖📉", tts: "วันนี้ ฉัน รู้สึก เครียด และ อารมณ์เสีย มาก", ipa: "wan-níi chǎn rúu-sùek khrîiat láe aa-rom-sǐia mâak", en: "Today I feel very stressed and upset." },
+                    { speaker: "B", thai: "ทำไม ล่ะ? คุณ โกรธ หรือ ประหม่า หรือ ไม่ พอใจ อะไร หรือ เปล่า ❓😡😰", tts: "ทำไม ล่ะ คุณ โกรธ หรือ ประหม่า หรือ ไม่ พอใจ อะไร หรือ เปล่า", ipa: "tam-mai lâ? kun gròot rǔe bpra-màa rǔe mâi pɔɔ-jai a-rai rǔe bplào?", en: "Why? Are you angry, nervous, or not satisfied about something?" },
+                    { speaker: "A", thai: "ฉัน ตื่นเต้น เพราะ งาน เยอะ แต่ ฟัง เพลง แล้ว รู้สึก ดี ขึ้น 👌😌", tts: "ฉัน ตื่นเต้น เพราะ งาน เยอะ แต่ ฟัง เพลง แล้ว รู้สึก ดี ขึ้น", ipa: "chǎn dtùen-dtên prór ngaan yór. dtàe fang pleng laéw rúu-sùek dii kûen", en: "I'm excited because of a lot of work, but listening to music makes me feel better." },
+                    { speaker: "B", thai: "ดีแล้ว พรุ่งนี้ เรา ต้อง มีความสุข นะ ไป หาอะไร กิน กัน 🍱✨", tts: "ดีแล้ว พรุ่งนี้ เรา ต้อง มีความสุข นะ ไป หาอะไร กิน กัน", ipa: "dii laéw! prûng-níi rao dtâung mii khwaam-sùk ná. bpai hǎa a-rai gin gan", en: "That's good. Tomorrow we must be happy! Let's go find something to eat." }
+                ]
+            },
+            comprehension: {
+                title: "คำถามความเข้าใจ",
+                tts: "คำถามความเข้าใจ",
+                ipa: "kham-thǎam khwaam-kâo-jai",
+                en: "Comprehension Questions",
+                icon: "🧠",
+                phrases: [
+                    { thai: "ทำไม A ถึง เครียด ❓🤔", tts: "ทำไม เอ ถึง เครียด", ipa: "tam-mai A tǔeng khrîiat?", en: "Why is A stressed?" },
+                    { thai: "A รู้สึก ยังไง หลัง ฟัง เพลง 🎶😊", tts: "เอ รู้สึก ยังไง หลัง ฟัง เพลง", ipa: "A rúu-sùek yang-ngai lǎng fang pleng?", en: "How does A feel after listening to music?" },
+                    { thai: "B ชวน A ไป ทำอะไร 🍱🤝", tts: "บี ชวน เอ ไป ทำอะไร", ipa: "B chuan A bpai tam a-rai?", en: "What did B invite A to do?" }
+                ]
+            },
+            discussion: {
+                title: "คำถามชวนคุย",
+                tts: "คำถามชวนคุย",
+                ipa: "kham-thǎam chuan khui",
+                en: "Discussion Questions",
+                icon: "🗣️",
+                phrases: [
+                    { thai: "เวลา เครียด คุณ ชอบ ทำอะไร 🧘‍♂️🎧", tts: "เวลา เครียด คุณ ชอบ ทำอะไร", ipa: "wee-laa khrîiat kun chôop tam a-rai?", en: "When stressed, what do you like to do?" },
+                    { thai: "วันนี้ คุณ รู้สึก ตื่นเต้น หรือ มีความสุข ไหม 🧐✨", tts: "วันนี้ คุณ รู้สึก ตื่นเต้น หรือ มีความสุข ไหม", ipa: "wan-níi kun rúu-sùek dtùen-dtên rǔe mii khwaam-sùk mǎi?", en: "Do you feel excited or happy today?" },
+                    { thai: "คุณ เคย อารมณ์เสีย เวลา ทำอาหาร ไหม 👩‍🍳🚫", tts: "คุณ เคย อารมณ์เสีย เวลา ทำอาหาร ไหม", ipa: "kun koey aa-rom-sǐia wee-laa tam aa-hăan mǎi?", en: "Have you ever been upset when cooking?" }
+                ]
+            }
+        };
+
+        function speakThai(text, buttonElement) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85;
+            buttonElement.classList.add('playing');
+            utterance.onend = () => buttonElement.classList.remove('playing');
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleSection(button, targetId) {
+            const target = document.getElementById(targetId);
+            target.classList.toggle('active');
+            button.classList.toggle('btn-active');
+        }
+
+        function createHeadingHTML(icon, title, tts, ipa, en, idPrefix, isMain = false) {
+            const ipaId = `${idPrefix}-ipa`;
+            const enId = `${idPrefix}-en`;
+            return `
+                <div class="${isMain ? 'max-w-3xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3' : 'mb-8'}">
+                    <div class="flex items-center gap-3 ${isMain ? '' : 'mb-3'}">
+                        ${icon ? `<span class="text-3xl">${icon}</span>` : ''}
+                        <h${isMain ? '1' : '2'} class="text-3xl font-bold font-thai text-slate-900">${title}</h${isMain ? '1' : '2'}>
+                        <button onclick="speakThai('${tts}', this)" class="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-brand-50 text-brand-600 hover:bg-brand-100"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="toggleSection(this, '${ipaId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">IPA</button>
+                        <button onclick="toggleSection(this, '${enId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">EN</button>
+                    </div>
+                    <div id="${ipaId}" class="toggle-content mt-2 p-3 bg-blue-50 rounded-lg w-full max-w-sm"><p class="text-blue-800 font-mono text-sm text-center">${ipa}</p></div>
+                    <div id="${enId}" class="toggle-content mt-2 p-3 bg-emerald-50 rounded-lg w-full max-w-sm"><p class="text-emerald-800 text-sm font-medium text-center">${en}</p></div>
+                </div>
+            `;
+        }
+
+        function createPhraseHTML(phrase, speaker = null) {
+            phraseIdCounter++;
+            const ipaId = `ipa-${phraseIdCounter}`;
+            const enId = `en-${phraseIdCounter}`;
+            const speakerBadge = speaker ? `<div class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-sm shadow-sm">${speaker}</div>` : '';
+
+            return `
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md mb-4 transition-all">
+                    <div class="flex items-start gap-4">
+                        ${speakerBadge}
+                        <div class="flex-1 space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-xl sm:text-2xl font-thai font-medium text-slate-800 leading-loose">${phrase.thai}</p>
+                                <button onclick="speakThai('${phrase.tts}', this)" class="shrink-0 mt-1 flex items-center justify-center w-10 h-10 rounded-full bg-brand-50 text-brand-600 hover:bg-brand-100"><i class="fas fa-volume-up"></i></button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="toggleSection(this, '${ipaId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">IPA</button>
+                                <button onclick="toggleSection(this, '${enId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">EN</button>
+                            </div>
+                            <div id="${ipaId}" class="toggle-content mt-2 p-3 bg-blue-50 rounded-lg"><p class="text-blue-800 font-mono text-sm">${phrase.ipa}</p></div>
+                            <div id="${enId}" class="toggle-content mt-2 p-3 bg-emerald-50 rounded-lg"><p class="text-emerald-800 text-sm font-medium">${phrase.en}</p></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderApp() {
+            document.getElementById('main-header').innerHTML = createHeadingHTML(lessonData.header.icon, lessonData.header.title, lessonData.header.tts, lessonData.header.ipa, lessonData.header.en, 'main', true);
+            
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <section>
+                    ${createHeadingHTML(lessonData.leadIn.icon, lessonData.leadIn.title, lessonData.leadIn.tts, lessonData.leadIn.ipa, lessonData.leadIn.en, 'leadIn')}
+                    ${lessonData.leadIn.phrases.map(p => createPhraseHTML(p)).join('')}
+                </section>
+                <hr class="my-10">
+                <section>
+                    ${createHeadingHTML('🎭', lessonData.scenario.title, lessonData.scenario.tts, lessonData.scenario.ipa, lessonData.scenario.en, 'scenario')}
+                    ${lessonData.scenario.dialogues.map(d => createPhraseHTML(d, d.speaker)).join('')}
+                </section>
+                <hr class="my-10">
+                <section>
+                    ${createHeadingHTML(lessonData.comprehension.icon, lessonData.comprehension.title, lessonData.comprehension.tts, lessonData.comprehension.ipa, lessonData.comprehension.en, 'comp')}
+                    ${lessonData.comprehension.phrases.map(p => createPhraseHTML(p)).join('')}
+                </section>
+                <hr class="my-10">
+                <section>
+                    ${createHeadingHTML(lessonData.discussion.icon, lessonData.discussion.title, lessonData.discussion.tts, lessonData.discussion.ipa, lessonData.discussion.en, 'disc')}
+                    ${lessonData.discussion.phrases.map(p => createPhraseHTML(p)).join('')}
+                </section>
+            `;
+        }
+
+        window.addEventListener('DOMContentLoaded', renderApp);
+    </script>
+</body>
+</html>
