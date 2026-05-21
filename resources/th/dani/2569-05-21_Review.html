@@ -3,1375 +3,988 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บทเรียนทบทวนภาษาไทย</title>
+    <title>Review</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Kanit', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .thai-font { font-family: 'Sarabun', sans-serif; }
-        .ipa-text { display: none; color: #64748b; font-style: italic; font-size: 0.95rem; margin-top: 6px; line-height: 1.4; }
-        .en-text { display: none; color: #059669; font-size: 0.95rem; font-weight: 500; margin-top: 6px; line-height: 1.4; }
-        .show { display: block !important; }
-        
-        .btn-control {
-            @apply px-3 py-1 rounded-full text-[11px] font-bold transition-all border border-gray-300 inline-flex items-center justify-center bg-white shadow-sm;
-            min-width: 48px;
-        }
-        .btn-ipa { @apply text-blue-600 hover:bg-blue-50 active:bg-blue-100; }
-        .btn-en { @apply text-green-600 hover:bg-green-50 active:bg-green-100; }
-        .btn-speak { @apply text-orange-600 hover:bg-orange-50 active:bg-orange-100; }
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX compilation in browser -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-        .card { @apply bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 mb-8 transition-all hover:shadow-md; }
-        .section-title { @apply text-2xl md:text-3xl font-bold text-blue-900 mt-12 mb-6 flex items-center gap-3 px-2; }
-        
-        hr { @apply border-t-2 border-slate-200 my-12 opacity-50; }
-        
-        /* Draggable / Jumbled Sentences specific styles */
-        .jumbled-container { @apply flex flex-wrap gap-2 mt-4 p-4 bg-slate-50 rounded-xl min-h-[80px]; }
-        .jumbled-word { @apply px-4 py-2 bg-white border-2 border-slate-200 rounded-lg font-bold text-lg cursor-pointer hover:border-blue-400 transition-colors shadow-sm select-none; }
-        .jumbled-target { @apply flex flex-wrap gap-2 mt-4 p-4 bg-blue-50 rounded-xl min-h-[80px] border-2 border-dashed border-blue-200; }
-        
-        /* Multiple Choice Styles */
-        .mc-option { @apply block w-full text-left px-4 py-3 bg-white border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all font-bold text-lg mt-2; }
-        .mc-correct { @apply border-green-500 bg-green-50 text-green-700 !important; }
-        .mc-wrong { @apply border-red-500 bg-red-50 text-red-700 !important; }
+    <style>
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
     </style>
 </head>
-<body class="max-w-2xl mx-auto bg-slate-50 pb-32">
+<body class="bg-slate-50 font-sans text-gray-800">
+    <div id="root"></div>
 
-    <!-- Header -->
-    <header class="p-6 md:p-8 bg-white border-b sticky top-0 z-50 shadow-sm">
-        <h1 class="text-2xl md:text-3xl font-black text-blue-950 flex items-center gap-3">
-            <span>🎓</span> ทบทวนทุกอย่าง
-        </h1>
-        <div class="mt-3 flex gap-2">
-            <button onclick="speak('ทบทวนทุกอย่าง')" class="btn-control btn-speak">🔊</button>
-            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-        </div>
-        <p class="ipa-text text-left">thóp-thuan túk-yàang</p>
-        <p class="en-text text-left">Review Everything</p>
-    </header>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-    <main class="p-4 md:p-8">
-        
-        <!-- 1. Review Section (Random Word) -->
-        <section id="review">
-            <h2 class="section-title">
-                <span>🔄</span> สร้างประโยค
-            </h2>
-            <div class="card text-center bg-gradient-to-br from-white to-blue-50 border-2 border-blue-100">
-                <div class="mb-4">
-                    <span class="text-slate-700 font-bold thai-font text-lg">แต่งประโยคจากคำศัพท์</span>
-                    <div class="mt-2 flex justify-center gap-2">
-                        <button onclick="speak('แต่งประโยคจากคำศัพท์')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">dtɛ̀ng prà-yòok jàak kham-sàp</p>
-                    <p class="en-text">Make a sentence from the vocabulary.</p>
-                </div>
-
-                <div id="random-vocab-display" class="min-h-[160px] flex flex-col justify-center items-center p-4">
-                    <span id="current-thai" class="thai-font text-5xl font-bold text-blue-900 mb-4">คลิก สุ่มคำศัพท์</span>
-                    <div id="current-controls" class="hidden flex gap-3 mb-2">
-                        <button onclick="speakCurrent()" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggleElement('current-ipa')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggleElement('current-en')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p id="current-ipa" class="ipa-text text-xl"></p>
-                    <p id="current-en" class="en-text text-xl"></p>
-                </div>
-                <button onclick="pickRandomVocab()" class="mt-4 w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xl shadow-lg shadow-blue-200 active:scale-95 transition-transform">
-                    สุ่มคำศัพท์ 🎲
+        // --- UI Components ---
+        const Button = ({ children, onClick, variant = 'primary', className = '', disabled = false }) => {
+            const baseStyle = "px-4 py-3 rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-2 text-lg active:scale-95";
+            const variants = {
+                primary: "bg-blue-500 text-white hover:bg-blue-600 disabled:bg-blue-300",
+                secondary: "bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-gray-200",
+                success: "bg-green-500 text-white hover:bg-green-600",
+                danger: "bg-red-100 text-red-700 hover:bg-red-200 border-2 border-red-200"
+            };
+            return (
+                <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant]} ${className}`}>
+                {children}
                 </button>
+            );
+        };
+
+        const Card = ({ children, className = '' }) => (
+            <div className={`bg-white rounded-3xl shadow-lg p-4 md:p-8 border border-gray-100 ${className}`}>
+                {children}
             </div>
-        </section>
+        );
 
-        <hr>
+        // --- Core Feature: Thai Text Block with TTS & Toggles ---
+        const ThaiText = ({ thai, ipa, en, icon = "", className = "", compact = false }) => {
+            const [showIpa, setShowIpa] = useState(false);
+            const [showEn, setShowEn] = useState(false);
 
-        <!-- 2. Integrated Speaking Tasks (Core) -->
-        <section id="tasks">
-            <h2 class="section-title"><span>🗣️</span> ฝึกพูดแบบต่างๆ</h2>
+            const speak = (e) => {
+                e.stopPropagation();
+                window.speechSynthesis.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(thai);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            };
 
-            <!-- Task 2.1: Jumbled Sentence -> Story-telling -->
-            <div class="card border-t-8 border-orange-500">
-                <div class="mb-4">
-                    <span class="thai-font text-2xl font-bold text-orange-900">1. เรียงประโยค และ เล่าเรื่อง 🧩</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('เรียงประโยค และ เล่าเรื่อง')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">riiang prà-yòok lɛ́ lâo-rʉ̂ang</p>
-                    <p class="en-text">Sentence order and story-telling.</p>
-                </div>
-                
-                <p class="text-sm text-slate-600 mb-2 font-medium">Click the words in the correct order to make a sentence about a trip.</p>
-                
-                <!-- Jumbled UI for: เมื่อวาน ผม ขับรถ ไป ทะเล กับ แฟน -->
-                <div id="jumble-source-1" class="jumbled-container">
-                    <span class="jumbled-word thai-font" onclick="moveWord(this, 'jumble-target-1')">ไป ทะเล 🏖️</span>
-                    <span class="jumbled-word thai-font" onclick="moveWord(this, 'jumble-target-1')">ผม 👨</span>
-                    <span class="jumbled-word thai-font" onclick="moveWord(this, 'jumble-target-1')">เมื่อวาน 📅</span>
-                    <span class="jumbled-word thai-font" onclick="moveWord(this, 'jumble-target-1')">กับ แฟน 👩‍❤️‍👨</span>
-                    <span class="jumbled-word thai-font" onclick="moveWord(this, 'jumble-target-1')">ขับรถ 🚗</span>
-                </div>
-                
-                <div id="jumble-target-1" class="jumbled-target" onclick="returnWord(event, 'jumble-source-1')">
-                    <!-- Words go here -->
-                </div>
-                
-                <div class="mt-4 flex gap-2 justify-between">
-                     <button onclick="checkJumble('jumble-target-1', ['เมื่อวาน 📅', 'ผม 👨', 'ขับรถ 🚗', 'ไป ทะเล 🏖️', 'กับ แฟน 👩‍❤️‍👨'], 'jumble-feedback-1')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-bold text-sm">Check</button>
-                     <button onclick="resetJumble('jumble-source-1', 'jumble-target-1')" class="px-4 py-2 text-slate-400 text-sm">Reset</button>
-                </div>
-                <p id="jumble-feedback-1" class="mt-2 text-sm font-bold hidden"></p>
+            const toggleBtnClass = (isActive, activeColor) => 
+                `px-2 py-1 md:px-3 md:py-2 rounded-lg font-bold text-xs md:text-sm transition-all shadow-sm border ${
+                isActive ? `${activeColor} text-white border-transparent` : 'bg-gray-50 text-gray-600 border-gray-200'
+                }`;
 
-                <!-- Prompt to continue story -->
-                <div class="mt-6 bg-orange-50 p-4 rounded-xl border border-orange-100">
-                    <span class="thai-font font-bold text-slate-800">เล่าเรื่อง ต่อ: ที่ ทะเล อากาศ เป็นยังไง? กิน อะไร?</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('เล่าเรื่อง ต่อ ที่ ทะเล อากาศ เป็นยังไง กิน อะไร')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">lâo rʉ̂ang dtɔ̀ɔ: thîi thá-lee aa-gàat bpen-yang-ngai? gin à-rai?</p>
-                    <p class="en-text">Continue the story: How was the weather at the sea? What did you eat?</p>
-                </div>
-            </div>
-
-            <!-- Task 2.2: Gap Fill -> Roleplay -->
-            <div class="card border-t-8 border-teal-500">
-                <div class="mb-4">
-                    <span class="thai-font text-2xl font-bold text-teal-900">2. เติมคำ และ บทบาทสมมติ 📝🎭</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('เติมคำ และ บทบาทสมมติ')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">dtəəm kham lɛ́ bòt-bàat sǒm-mút</p>
-                    <p class="en-text">Gap fill and Role-play.</p>
-                </div>
-
-                <p class="text-sm text-slate-600 mb-4 font-medium">Fill in the blanks to complete the doctor visit, then act it out.</p>
-                
-                <div class="bg-teal-50 p-5 rounded-2xl space-y-4">
-                    <div>
-                        <span class="thai-font text-lg text-slate-800 font-bold">หมอ: "สวัสดี ครับ คุณ เป็น อาการ... [ ❓ ]"</span>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('หมอ: สวัสดี ครับ คุณ เป็น อาการ อะไร')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                        </div>
-                        <p class="ipa-text">mɔ̌ɔ: sà-wàt-dii khráp, khun bpen aa-gaan... [à-rai?]</p>
-                        <p class="en-text">Doctor: Hello, what are your symptoms?</p>
-                    </div>
+            return (
+                <div className={`bg-white p-3 md:p-4 rounded-xl border-2 border-gray-100 shadow-sm w-full transition-all hover:border-blue-200 ${className}`}>
+                <div className={`flex flex-wrap items-center justify-between gap-3 ${compact ? 'flex-col items-start' : ''}`}>
                     
-                    <div>
-                        <span class="thai-font text-lg text-slate-800 font-bold">คนไข้: "ผม... [ ❓ ]... ตัวร้อน และ ไอ"</span>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('คนไข้ ผม ปวดหัว ตัวร้อน และ ไอ')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                        </div>
-                        <p class="ipa-text">khon-khâi: phǒm... [bpùat-hǔua]... dtua-rɔ́ɔn lɛ́ ai</p>
-                        <p class="en-text">Patient: I... [have a headache]... have a fever and cough.</p>
+                    {/* Main Thai Text & Icon */}
+                    <div className="flex items-center gap-3">
+                    {icon && <span className="text-3xl md:text-4xl">{icon}</span>}
+                    <span className="text-xl md:text-2xl font-black text-gray-800 tracking-wide">{thai}</span>
                     </div>
 
-                    <div>
-                        <span class="thai-font text-lg text-slate-800 font-bold">หมอ: "กิน... [ ❓ ]... หรือยัง ครับ?"</span>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('หมอ กิน ยา หรือยัง ครับ')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                        </div>
-                        <p class="ipa-text">mɔ̌ɔ: gin... [yaa]... rʉ̌ʉ-yang khráp?</p>
-                        <p class="en-text">Doctor: Have you taken... [medicine]... yet?</p>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 items-center w-full md:w-auto justify-end">
+                    <button 
+                        onClick={speak} 
+                        className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 active:scale-95 transition-all text-xl shadow-sm border border-blue-200" 
+                        aria-label="Play audio"
+                    >
+                        🔊
+                    </button>
+                    {ipa && (
+                        <button onClick={(e) => { e.stopPropagation(); setShowIpa(!showIpa); }} className={toggleBtnClass(showIpa, 'bg-purple-500')}>
+                        IPA
+                        </button>
+                    )}
+                    {en && (
+                        <button onClick={(e) => { e.stopPropagation(); setShowEn(!showEn); }} className={toggleBtnClass(showEn, 'bg-green-500')}>
+                        EN
+                        </button>
+                    )}
                     </div>
                 </div>
-            </div>
 
-            <!-- Task 2.3: Multiple Choice -> Debate -->
-            <div class="card border-t-8 border-rose-500">
-                <div class="mb-4">
-                    <span class="thai-font text-2xl font-bold text-rose-900">3. เลือกคำตอบ และ โต้วาที 🤔⚖️</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('เลือกคำตอบ และ โต้วาที')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                {/* Expanded Info */}
+                {(showIpa || showEn) && (
+                    <div className="pt-3 mt-2 border-t border-gray-100 flex flex-col gap-1 text-left animate-fade-in">
+                    {showIpa && <span className="text-purple-600 font-bold text-lg leading-relaxed">{ipa}</span>}
+                    {showEn && <span className="text-green-600 font-bold text-lg leading-relaxed">{en}</span>}
                     </div>
-                    <p class="ipa-text">lʉ̂ak kham-dtɔ̀ɔp lɛ́ dtôo-waa-thii</p>
-                    <p class="en-text">Multiple choice and Debate.</p>
+                )}
                 </div>
+            );
+        };
 
-                <p class="text-sm text-slate-600 mb-4 font-medium">Choose the best response, then prepare for a debate.</p>
+        // --- Main App Component ---
+        function App() {
+            const [currentStep, setCurrentStep] = useState(0);
 
-                <div class="bg-rose-50 p-5 rounded-2xl">
-                    <span class="thai-font font-bold text-lg text-slate-800">"วันหยุด หน้า คุณ อยาก ทำ อะไร?"</span>
-                    <div class="mt-2 flex gap-2 mb-4">
-                        <button onclick="speak('วันหยุด หน้า คุณ อยาก ทำ อะไร?')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+            const steps = [
+                { id: 'intro' },
+                { id: 'task1' },
+                { id: 'task2' },
+                { id: 'task3' },
+                { id: 'task4' },
+                { id: 'extension' }
+            ];
+
+            return (
+                <div className="min-h-screen pb-20">
+                {/* Top Navigation Bar */}
+                <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-sm z-50 px-4 py-3 flex justify-between items-center">
+                    <div className="font-bold text-xl text-blue-600 flex items-center gap-2">
+                    🇹🇭 <span className="hidden sm:inline">Review</span>
                     </div>
-                    <p class="ipa-text mb-4">wan-yùt nâa khun yàak tham à-rai?</p>
-                    <p class="en-text mb-4">What do you want to do next holiday?</p>
+                    <div className="flex items-center gap-4">
+                    <div className="px-4 py-2 bg-blue-50 text-blue-700 font-bold rounded-full border border-blue-200 shadow-sm">
+                        🎯 {currentStep} / {steps.length - 1}
+                    </div>
+                    </div>
+                </nav>
+
+                {/* Main Content Area */}
+                <main className="pt-24 px-4 max-w-3xl mx-auto">
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 h-3 rounded-full mb-8 overflow-hidden shadow-inner">
+                    <div 
+                        className="bg-blue-500 h-3 rounded-full transition-all duration-500 ease-out"
+                        style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+                    ></div>
+                    </div>
+
+                    {/* Step Routing */}
+                    <div className="animate-fade-in-up">
+                    {currentStep === 0 && <StepIntro setStep={setCurrentStep} />}
+                    {currentStep === 1 && <Task1_Matching setStep={setCurrentStep} />}
+                    {currentStep === 2 && <Task2_Jumbled setStep={setCurrentStep} />}
+                    {currentStep === 3 && <Task3_GapFill setStep={setCurrentStep} />}
+                    {currentStep === 4 && <Task4_InteractiveConvo setStep={setCurrentStep} />}
+                    {currentStep === 5 && <Task5_Extension setStep={setCurrentStep} />}
+                    </div>
+                </main>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // STEP COMPONENTS
+        // ==========================================
+
+        function StepIntro({ setStep }) {
+            return (
+                <div className="space-y-6">
+                <ThaiText 
+                    icon="👋" 
+                    thai="สวัสดี! ยินดีต้อนรับ" 
+                    ipa="sà-wàt-dii! yin-dii dtɔ̂ɔn-ráp" 
+                    en="Hello! Welcome" 
+                    className="text-center shadow-md bg-blue-50 border-blue-200" 
+                />
+                
+                <Card className="space-y-6">
+                    <ThaiText 
+                    icon="📖" 
+                    thai="คำแนะนำ" 
+                    ipa="kam nɛ́-nam" 
+                    en="Instructions" 
+                    />
                     
-                    <button class="mc-option thai-font" onclick="handleMC(this, false)">A. เมื่อวาน ผม ไป ทะเล</button>
-                    <button class="mc-option thai-font" onclick="handleMC(this, true)">B. ผม อยาก นอนหลับ อยู่ บ้าน</button>
-                    <button class="mc-option thai-font" onclick="handleMC(this, false)">C. ผม ไม่ หิว ข้าว</button>
-                </div>
-
-                <div class="mt-6 border-t-2 border-rose-200 pt-4">
-                    <span class="thai-font font-bold text-slate-800">โต้วาที: อยู่ บ้าน VS ไป เที่ยว ข้างนอก อันไหน ดีกว่า?</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('โต้วาที อยู่ บ้าน หรือ ไป เที่ยว ข้างนอก อันไหน ดีกว่า')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    <div className="space-y-4 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <ThaiText 
+                        icon="1️⃣" 
+                        thai="พยายามอ่านก่อน" 
+                        ipa="pá-yaa-yaam àan gɔ̀ɔn" 
+                        en="Try to read first" 
+                    />
+                    <ThaiText 
+                        icon="2️⃣" 
+                        thai="เดาความหมาย" 
+                        ipa="dao kwaam-mǎai" 
+                        en="Guess the meaning" 
+                    />
+                    <ThaiText 
+                        icon="3️⃣" 
+                        thai="กดปุ่ม IPA หรือ EN ถ้าไม่รู้" 
+                        ipa="gòt bpùm IPA rʉ̌ʉ EN tâa mâi rúu" 
+                        en="Press the IPA or EN button if you don't know" 
+                    />
                     </div>
-                    <p class="ipa-text">dtôo-waa-thii: yùu bâan VS bpai tîao khâang-nɔ̂ɔk, an-nǎi dii gwàa?</p>
-                    <p class="en-text">Debate: Staying home VS Going out, which is better?</p>
+
+                    <Button onClick={() => setStep(1)} className="w-full py-4 text-xl mt-8 shadow-md">
+                    🚀 เริ่มเรียน (rə̂əm rian / Start)
+                    </Button>
+                </Card>
                 </div>
-            </div>
+            );
+        }
 
-        </section>
+        // ------------------------------------------
+        // TASK 1: MATCHING & Q&A
+        // ------------------------------------------
+        function Task1_Matching({ setStep }) {
+            const pairs = [
+                { id: 1, thai: "กลัว", ipa: "glua", en: "Afraid", icon: "😨" },
+                { id: 2, thai: "รังเกียจ", ipa: "rang-gìat", en: "Disgusted", icon: "🤢" },
+                { id: 3, thai: "โกรธ", ipa: "gòh-roht", en: "Angry", icon: "😡" },
+                { id: 4, thai: "อาย", ipa: "aai", en: "Shy/Embarrassed", icon: "😳" },
+                { id: 5, thai: "งง", ipa: "ngong", en: "Confused", icon: "😵‍💫" },
+            ];
 
-        <hr>
+            const [selectedThai, setSelectedThai] = useState(null);
+            const [selectedIcon, setSelectedIcon] = useState(null);
+            const [matchedIds, setMatchedIds] = useState([]);
 
-        <!-- 3. Extension Activities (If time permits) -->
-        <section id="extensions">
-            <div class="content-group">
-                <h2 class="section-title"><span>🚀</span> กิจกรรม เพิ่มเติม</h2>
-                <div class="flex gap-2 px-2">
-                    <button onclick="speak('กิจกรรม เพิ่มเติม')" class="btn-control btn-speak">🔊</button>
-                    <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                    <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                </div>
-                <p class="ipa-text px-2">gìt-jà-gam phə̂əm-dtəəm</p>
-                <p class="en-text px-2">Extension Activities</p>
-            </div>
-            
-            <!-- Error Correction -> Interview -->
-            <div class="card border-l-8 border-indigo-500">
-                <div class="mb-4">
-                    <span class="thai-font text-2xl font-bold text-indigo-900">แก้ ประโยค และ สัมภาษณ์ 🛠️🎤</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('แก้ ประโยค และ สัมภาษณ์')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">gɛ̂ɛ prà-yòok lɛ́ sǎm-phâat</p>
-                    <p class="en-text">Fix the sentence and Interview.</p>
-                </div>
-                
-                <p class="text-sm text-slate-600 mb-4 font-medium">Find the mistake, correct it, then ask the teacher a similar question.</p>
+            const handleSelectThai = (item) => {
+                if (matchedIds.includes(item.id)) return;
+                setSelectedThai(item);
+                checkMatch(item, selectedIcon);
+            };
 
-                <div class="bg-indigo-50 p-4 rounded-xl space-y-4">
-                    <div class="p-3 bg-white rounded-lg border border-red-200">
-                        <span class="thai-font text-slate-500 line-through">"ฉัน ชอบ สัตว์ หมา เพราะ มัน น่ารัก"</span>
-                        <div class="mt-2 thai-font font-bold text-green-700">"ฉัน ชอบ หมา เพราะ มัน น่ารัก"</div>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('ฉัน ชอบ หมา เพราะ มัน น่ารัก')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+            const handleSelectIcon = (item) => {
+                if (matchedIds.includes(item.id)) return;
+                setSelectedIcon(item);
+                checkMatch(selectedThai, item);
+            };
+
+            const checkMatch = (tItem, iItem) => {
+                if (tItem && iItem) {
+                if (tItem.id === iItem.id) {
+                    setMatchedIds([...matchedIds, tItem.id]);
+                }
+                setTimeout(() => {
+                    setSelectedThai(null);
+                    setSelectedIcon(null);
+                }, 500);
+                }
+            };
+
+            const isComplete = matchedIds.length === pairs.length;
+
+            return (
+                <div className="space-y-6">
+                <ThaiText icon="🧠" thai="งานที่ 1: จับคู่ความรู้สึก" ipa="ngaan tîi nʉ̀ng: jàp-kûu kwaam-rúu-sʉ̀k" en="Task 1: Match the feelings" className="bg-blue-100 border-blue-300" />
+
+                <Card>
+                    <div className="grid grid-cols-2 gap-4 md:gap-8 mb-8">
+                    {/* Thai Column */}
+                    <div className="space-y-3">
+                        {[...pairs].sort((a,b) => a.thai.localeCompare(b.thai)).map(item => (
+                        <div 
+                            key={`t-${item.id}`} 
+                            onClick={() => handleSelectThai(item)}
+                            className={`cursor-pointer rounded-xl transition-all ${matchedIds.includes(item.id) ? 'opacity-40 grayscale pointer-events-none' : ''} ${selectedThai?.id === item.id ? 'ring-4 ring-blue-400' : ''}`}
+                        >
+                            <ThaiText thai={item.thai} ipa={item.ipa} en={item.en} compact={true} />
                         </div>
-                        <p class="ipa-text">chǎn chɔ̂ɔp mǎa prɔ́ man nâa-rák</p>
-                        <p class="en-text">I like dogs because they are cute.</p>
+                        ))}
                     </div>
+
+                    {/* Icons Column */}
+                    <div className="space-y-3">
+                        {[...pairs].sort((a,b) => b.id - a.id).map(item => (
+                        <button
+                            key={`i-${item.id}`}
+                            onClick={() => handleSelectIcon(item)}
+                            disabled={matchedIds.includes(item.id)}
+                            className={`w-full h-full min-h-[80px] rounded-xl text-5xl transition-all border-4 flex items-center justify-center bg-gray-50
+                            ${matchedIds.includes(item.id) ? 'border-green-400 bg-green-50 opacity-40 grayscale' : 
+                                selectedIcon?.id === item.id ? 'border-blue-400 shadow-md scale-105' : 
+                                'border-gray-200 hover:border-blue-300'}
+                            `}
+                        >
+                            {item.icon}
+                        </button>
+                        ))}
+                    </div>
+                    </div>
+
+                    {isComplete && (
+                    <div className="bg-green-50 p-4 md:p-6 rounded-2xl border-2 border-green-300 animate-fade-in text-center space-y-4 shadow-sm">
+                        <ThaiText icon="🎉" thai="ถูกต้อง! เก่งมาก" ipa="tùuk-dtɔ̂ɔng! gèng mâak" en="Correct! Very good" className="bg-green-100 border-green-400" />
+                        
+                        <div className="pt-4 border-t border-green-200 space-y-4">
+                        <ThaiText icon="🗣️" thai="ถามและตอบกับครู" ipa="tǎam lɛ́ dtɔ̀ɔp gàp kruu" en="Ask and answer with the teacher" />
+                        
+                        <div className="space-y-2">
+                            <ThaiText icon="🧑‍🏫" thai="ครั้งที่แล้วเมื่อไร" ipa="kráng tîi-lɛ́ɛo mʉ̂a-rài?" en="When was the last time?" />
+                            <ThaiText icon="👨" thai="ผม ... ครับ" ipa="pǒm ... kráp" en="I was ... (polite masc)" />
+                            <ThaiText icon="👉" thai="แล้วคุณล่ะ" ipa="lɛ́ɛw kun lâ?" en="And you?" />
+                        </div>
+                        </div>
+                        
+                        <Button onClick={() => setStep(2)} className="mt-6 mx-auto w-full">ต่อไป ➡️</Button>
+                    </div>
+                    )}
+                </Card>
+                </div>
+            );
+        }
+
+        // ------------------------------------------
+        // TASK 2: JUMBLED SENTENCES & INTERVIEW
+        // ------------------------------------------
+        function Task2_Jumbled({ setStep }) {
+            const sentences = [
+                {
+                id: 1,
+                words: [
+                    { id: 'w1', thai: 'ผม', ipa: 'pǒm', en: 'I (masc)' },
+                    { id: 'w2', thai: 'ชอบ', ipa: 'chɔ̂ɔp', en: 'like' },
+                    { id: 'w3', thai: 'กิน', ipa: 'gin', en: 'to eat' },
+                    { id: 'w4', thai: 'ข้าวกะเพรา', ipa: 'kâao gà-prao', en: 'basil rice' }
+                ],
+                correctOrder: ['w1', 'w2', 'w3', 'w4']
+                },
+                {
+                id: 2,
+                words: [
+                    { id: 'w5', thai: 'จอง', ipa: 'jaawng', en: 'book/reserve' },
+                    { id: 'w6', thai: 'โรงแรมหมา', ipa: 'roong-rɛɛm mǎa', en: 'dog hotel' },
+                    { id: 'w7', thai: 'กี่', ipa: 'gìi', en: 'how many' },
+                    { id: 'w8', thai: 'คืน', ipa: 'kʉʉn', en: 'nights' }
+                ],
+                correctOrder: ['w5', 'w6', 'w7', 'w8']
+                },
+                {
+                id: 3,
+                words: [
+                    { id: 'w9', thai: 'ขับรถ', ipa: 'kàp rót', en: 'drive' },
+                    { id: 'w10', thai: 'กลับบ้าน', ipa: 'glàp bâan', en: 'return home' },
+                    { id: 'w11', thai: 'กี่', ipa: 'gìi', en: 'how many' },
+                    { id: 'w12', thai: 'ชั่วโมง', ipa: 'chûa-moong', en: 'hours' }
+                ],
+                correctOrder: ['w9', 'w10', 'w11', 'w12']
+                },
+                {
+                id: 4,
+                words: [
+                    { id: 'w13', thai: 'ติดตั้ง', ipa: 'dtìt-dtâng', en: 'install' },
+                    { id: 'w14', thai: 'ถังอ็อกซิเจน', ipa: 'tǎng ɔ́k-sì-jen', en: 'oxygen tank' },
+                    { id: 'w15', thai: 'ให้', ipa: 'hâi', en: 'for/give' },
+                    { id: 'w16', thai: 'คนไทย', ipa: 'kon tai', en: 'Thai people' }
+                ],
+                correctOrder: ['w13', 'w14', 'w15', 'w16']
+                },
+                {
+                id: 5,
+                words: [
+                    { id: 'w17', thai: 'ขอ', ipa: 'kɔ̌ɔ', en: 'ask for' },
+                    { id: 'w18', thai: 'เมนู', ipa: 'mee-nuu', en: 'menu' },
+                    { id: 'w19', thai: 'ภาษาอังกฤษ', ipa: 'paa-sǎa ang-grìt', en: 'English language' },
+                    { id: 'w20', thai: 'หน่อย', ipa: 'nɔ̀ɔi', en: 'please/a bit' }
+                ],
+                correctOrder: ['w17', 'w18', 'w19', 'w20']
+                }
+            ];
+
+            const [activeSentence, setActiveSentence] = useState(0);
+            const [currentSlots, setCurrentSlots] = useState([]);
+            
+            const [availableWords, setAvailableWords] = useState(() => 
+                [...sentences[0].words].sort(() => Math.random() - 0.5)
+            );
+
+            const handleWordClick = (word) => {
+                setAvailableWords(availableWords.filter(w => w.id !== word.id));
+                setCurrentSlots([...currentSlots, word]);
+            };
+
+            const handleSlotClick = (word) => {
+                setCurrentSlots(currentSlots.filter(w => w.id !== word.id));
+                setAvailableWords([...availableWords, word]);
+            };
+
+            const currentData = sentences[activeSentence];
+            
+            const isSentenceCorrect = currentSlots.length === currentData?.words.length && 
+                currentSlots.every((w, i) => w.id === currentData.correctOrder[i]);
+
+            const nextSentence = () => {
+                if (activeSentence < sentences.length - 1) {
+                    const nextIdx = activeSentence + 1;
+                    setActiveSentence(nextIdx);
+                    setCurrentSlots([]); 
+                    setAvailableWords([...sentences[nextIdx].words].sort(() => Math.random() - 0.5)); 
+                } else {
+                    setActiveSentence(sentences.length);
+                }
+            };
+
+            return (
+                <div className="space-y-6">
+                <ThaiText icon="⏰" thai="งานที่ 2: เรียงประโยค" ipa="ngaan tîi sɔ̌ɔng: riang bprà-yòok" en="Task 2: Order Sentences" className="bg-blue-100 border-blue-300" />
+
+                <Card>
+                    {activeSentence < sentences.length ? (
+                    <div className="space-y-6">
+                        <ThaiText icon="🧩" thai="เรียงประโยคให้ถูกต้อง" ipa="riang bprà-yòok hâi tùuk-dtɔ̂ɔng" en="Order the sentence correctly" />
+                        
+                        {/* Answer Slots */}
+                        <div className="flex flex-wrap gap-2 min-h-[120px] p-4 bg-gray-100 rounded-2xl border-4 border-dashed border-gray-300 items-start">
+                        {currentSlots.length === 0 && <span className="text-gray-400 italic text-lg w-full text-center mt-4">👉 กดเลือกคำด้านล่าง</span>}
+                        {currentSlots.map(w => (
+                            <div key={w.id} onClick={() => handleSlotClick(w)} className="cursor-pointer hover:opacity-80 w-full sm:w-auto">
+                            <ThaiText thai={w.thai} ipa={w.ipa} en={w.en} className="bg-blue-50 border-blue-300 shadow-md" compact={true} />
+                            </div>
+                        ))}
+                        </div>
+
+                        {/* Available Words */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-gray-100">
+                        {availableWords.map(w => (
+                            <div key={w.id} onClick={() => handleWordClick(w)} className="cursor-pointer hover:scale-95 transition-transform">
+                            <ThaiText thai={w.thai} ipa={w.ipa} en={w.en} compact={true} />
+                            </div>
+                        ))}
+                        </div>
+
+                        {isSentenceCorrect && (
+                        <div className="text-center animate-fade-in mt-8 p-6 bg-green-50 rounded-2xl border border-green-200">
+                            <ThaiText icon="✅" thai="ถูกต้อง!" ipa="tùuk-dtɔ̂ɔng!" en="Correct!" className="bg-green-100 border-green-400 mb-4" />
+                            <Button onClick={nextSentence} className="mx-auto w-full">
+                                {activeSentence < sentences.length - 1 ? "ข้อต่อไป ➡️" : "ไปที่บทสัมภาษณ์ ➡️"}
+                            </Button>
+                        </div>
+                        )}
+                    </div>
+                    ) : (
+                    <div className="bg-yellow-50 p-4 md:p-6 rounded-2xl border-2 border-yellow-300 animate-fade-in space-y-6">
+                        <ThaiText icon="🎙️" thai="ถามคำถามครู" ipa="tǎam kǎm-tǎam kruu" en="Ask the teacher questions" className="bg-yellow-100 border-yellow-400" />
+                        
+                        <div className="space-y-4">
+                        <ThaiText icon="1️⃣" thai="ตื่นกี่โมง" ipa="dtʉ̀ʉn gìi moong?" en="What time do you wake up?" />
+                        <ThaiText icon="2️⃣" thai="ขับรถกลับบ้านกี่ชั่วโมง" ipa="kàp rót glàp bâan gìi chûa-moong?" en="How many hours to drive home?" />
+                        <ThaiText icon="3️⃣" thai="จองกี่ห้อง" ipa="jaawng gìi hɔ̂ɔng?" en="How many rooms did you book?" />
+                        <ThaiText icon="4️⃣" thai="ชอบกินอะไรบ้าง" ipa="chɔ̂ɔp gin à-rai bâang?" en="What do you like to eat?" />
+                        <ThaiText icon="5️⃣" thai="ทำงานเรียบร้อยไหม" ipa="tam-ngaan rîap-rɔ́ɔi mái?" en="Is the work finished/neat?" />
+                        </div>
+
+                        <Button onClick={() => setStep(3)} className="w-full mt-6">ต่อไป ➡️</Button>
+                    </div>
+                    )}
+                </Card>
+                </div>
+            );
+        }
+
+        // ------------------------------------------
+        // TASK 3: GAP FILL & ROLEPLAY (Various Situations)
+        // ------------------------------------------
+        function Task3_GapFill({ setStep }) {
+            const [answers, setAnswers] = useState({ q1: null, q2: null, q3: null, q4: null, q5: null });
+            
+            const questions = [
+                {
+                id: 'q1',
+                icon: '🤝',
+                sentenceBefore: 'พยายาม',
+                sentenceAfter: 'คน',
+                ipaBefore: 'pá-yaa-yaam ',
+                ipaAfter: ' kon',
+                options: [
+                    { thai: 'ช่วย', ipa: 'chûay', en: 'help' },
+                    { thai: 'ตี', ipa: 'dtii', en: 'hit' },
+                    { thai: 'ซ่อน', ipa: 'sɔ̂n', en: 'hide' }
+                ],
+                correct: 'ช่วย'
+                },
+                {
+                id: 'q2',
+                icon: '🏦',
+                sentenceBefore: 'มี',
+                sentenceAfter: 'ธนาคาร 2 บัญชี',
+                ipaBefore: 'mii ',
+                ipaAfter: ' tá-naa-kaan sɔ̌ɔng ban-chii',
+                options: [
+                    { thai: 'บัญชี', ipa: 'ban-chii', en: 'account' },
+                    { thai: 'เอกสาร', ipa: 'èek-gà-sǎan', en: 'document' },
+                    { thai: 'รหัส', ipa: 'rá-hàt', en: 'password' }
+                ],
+                correct: 'บัญชี'
+                },
+                {
+                id: 'q3',
+                icon: '🏠',
+                sentenceBefore: '',
+                sentenceAfter: 'ขึ้นราคา 10% ทุกปี',
+                ipaBefore: '',
+                ipaAfter: ' kʉ̂n raa-kaa sìp pboer-cen túk bpii',
+                options: [
+                    { thai: 'บ้าน', ipa: 'bâan', en: 'house' },
+                    { thai: 'พาสปอร์ต', ipa: 'páat-bpòt', en: 'passport' },
+                    { thai: 'ใบเสร็จ', ipa: 'bai-sèt', en: 'receipt' }
+                ],
+                correct: 'บ้าน'
+                },
+                {
+                id: 'q4',
+                icon: '🇪🇸',
+                sentenceBefore: 'ใครเรียนภาษา',
+                sentenceAfter: '?',
+                ipaBefore: 'krai rian paa-sǎa ',
+                ipaAfter: ' ?',
+                options: [
+                    { thai: 'แมลงวัน', ipa: 'má-lɛɛng wan', en: 'fly (insect)' },
+                    { thai: 'สเปน', ipa: 'sà-bpeen', en: 'Spanish' },
+                    { thai: 'สัตว์', ipa: 'sàt', en: 'animal' }
+                ],
+                correct: 'สเปน'
+                },
+                {
+                id: 'q5',
+                icon: '📦',
+                sentenceBefore: 'ส่งของให้',
+                sentenceAfter: 'บ่อย',
+                ipaBefore: 'sòng kɔ̌ɔng hâi ',
+                ipaAfter: ' bɔ̀i',
+                options: [
+                    { thai: 'ลูกค้า', ipa: 'lûuk-káa', en: 'customer' },
+                    { thai: 'ผี', ipa: 'pǐi', en: 'ghost' },
+                    { thai: 'โคลน', ipa: 'kloon', en: 'mud' }
+                ],
+                correct: 'ลูกค้า'
+                }
+            ];
+
+            const handleSelect = (qId, option) => {
+                setAnswers({ ...answers, [qId]: option.thai });
+            };
+
+            const isAllCorrect = questions.every(q => answers[q.id] === q.correct);
+
+            return (
+                <div className="space-y-6">
+                <ThaiText icon="📝" thai="งานที่ 3: เติมคำในช่องว่าง" ipa="ngaan tîi sǎam: dtəəm kam nai chɔ̂ng wâang" en="Task 3: Fill in the blanks" className="bg-blue-100 border-blue-300" />
+
+                <Card>
+                    <ThaiText icon="✏️" thai="เลือกคำตอบที่ถูกต้อง" ipa="lʉ̂ak kam-dtɔ̀ɔp tîi tùuk-dtɔ̂ɔng" en="Choose the correct answer" />
+
+                    <div className="mt-6 space-y-8">
+                    {questions.map((q) => (
+                        <div key={q.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-200">
+                        
+                        <div className="flex flex-col gap-1 mb-4 text-xl md:text-2xl font-bold text-gray-800">
+                            <div className="flex items-center flex-wrap gap-2">
+                                <span>{q.icon}</span>
+                                <span>{q.sentenceBefore}</span>
+                                <span className={`px-4 py-2 rounded-xl min-w-[100px] text-center border-b-4 ${answers[q.id] ? (answers[q.id] === q.correct ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700') : 'bg-white border-blue-300 text-gray-300'}`}>
+                                {answers[q.id] || "____"}
+                                </span>
+                                <span>{q.sentenceAfter}</span>
+                            </div>
+                            <div className="flex items-center flex-wrap gap-2 text-sm md:text-base text-purple-600 font-medium md:pl-10">
+                                <span>{q.ipaBefore}</span>
+                                <span className="text-purple-400">
+                                {answers[q.id] ? q.options.find(o => o.thai === answers[q.id])?.ipa : "____"}
+                                </span>
+                                <span>{q.ipaAfter}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {q.options.map(opt => (
+                            <div key={opt.thai} onClick={() => handleSelect(q.id, opt)} className="cursor-pointer hover:scale-95 transition-transform">
+                                <ThaiText thai={opt.thai} ipa={opt.ipa} en={opt.en} compact={true} className={answers[q.id] === opt.thai ? 'ring-2 ring-blue-500 bg-blue-50' : ''} />
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+
+                    {isAllCorrect && (
+                    <div className="mt-8 bg-green-50 p-6 rounded-2xl border-2 border-green-300 animate-fade-in space-y-6">
+                        <ThaiText icon="🎉" thai="เก่งมาก!" ipa="gèng mâak!" en="Very good!" className="bg-green-100 border-green-400" />
+                        
+                        <div className="border-t border-green-200 pt-6 space-y-4">
+                        <ThaiText icon="🎭" thai="แสดงบทบาทสมมติ" ipa="sà-dɛɛng bòt-bàat sǒm-mút" en="Role-play" />
+                        <ThaiText icon="💡" thai="แต่งประโยคใหม่ 2 ประโยคจากคำศัพท์ด้านบน" ipa="dtɛ̀ng bprà-yòok mài sɔ̌ɔng bprà-yòok jàak kam-sàp dâan-bon" en="Make 2 new sentences from the vocabulary above" />
+                        </div>
+                        
+                        <Button onClick={() => setStep(4)} className="w-full mt-4">ต่อไป ➡️</Button>
+                    </div>
+                    )}
+                </Card>
+                </div>
+            );
+        }
+
+        // ------------------------------------------
+        // TASK 4: INTERACTIVE CONVO & STORY
+        // ------------------------------------------
+        function Task4_InteractiveConvo({ setStep }) {
+            const [chatStep, setChatStep] = useState(0);
+
+            const convo = [
+                {
+                teacher: { thai: "ตอนเช้าทำอะไร", ipa: "dtɔɔn cháao tam à-rai?", en: "What do you do in the morning?" },
+                options: [
+                    { thai: "เล่นยา", ipa: "lên yaa", en: "Do drugs", correct: false },
+                    { thai: "กินอาหารเช้าอังกฤษ", ipa: "gin aa-hǎan cháao ang-grìt", en: "Eat English breakfast", correct: true }
+                ]
+                },
+                {
+                teacher: { thai: "วันหยุดไปเที่ยวไหน", ipa: "wan-yùt bpai tîao nǎi?", en: "Where do you go on holiday?" },
+                options: [
+                    { thai: "ไปโรงพยาบาล", ipa: "bpai roong-pá-yaa-baan", en: "Go to the hospital", correct: false },
+                    { thai: "ไปหาดกะตะ", ipa: "bpai hàat gà-dtà", en: "Go to Kata beach", correct: true }
+                ]
+                },
+                {
+                teacher: { thai: "ไปกับใคร", ipa: "bpai gàp krai?", en: "Who are you going with?" },
+                options: [
+                    { thai: "ไปกับแฟนและหมาสองตัว", ipa: "bpai gàp fɛɛn lɛ́ mǎa sɔ̌ɔng dtua", en: "Go with partner and 2 dogs", correct: true },
+                    { thai: "ตัวเล็ก", ipa: "dtua lék", en: "Small body", correct: false }
+                ]
+                },
+                {
+                teacher: { thai: "จองโรงแรมกี่ห้อง", ipa: "jaawng roong-rɛɛm gìi hɔ̂ɔng?", en: "How many hotel rooms did you book?" },
+                options: [
+                    { thai: "จองเตียงคู่หนึ่งห้อง", ipa: "jaawng dtiiang kûu nʉ̀ng hɔ̂ɔng", en: "Book 1 double bed room", correct: true },
+                    { thai: "แมงมุม", ipa: "mɛɛng-mum", en: "Spider", correct: false }
+                ]
+                },
+                {
+                teacher: { thai: "อากาศเป็นยังไงบ้าง", ipa: "aa-gàat bpen yang-ngai bâang?", en: "How is the weather?" },
+                options: [
+                    { thai: "หวานปกติ", ipa: "wǎan bpòk-gà-dtì", en: "Normal sweetness", correct: false },
+                    { thai: "พายุหนักและฝนตก", ipa: "paa-yú nàk lɛ́ fǒn dtòk", en: "Heavy storm and raining", correct: true }
+                ]
+                }
+            ];
+
+            const handleOption = (isCorrect) => {
+                if (isCorrect) {
+                setChatStep(chatStep + 1);
+                } else {
+                alert("❌ ไม่ใช่ (mâi châi / No). Try again!");
+                }
+            };
+
+            return (
+                <div className="space-y-6">
+                <ThaiText icon="✈️" thai="งานที่ 4: ไปเที่ยว" ipa="ngaan tîi sìi: bpai tîao" en="Task 4: Holiday Trip" className="bg-blue-100 border-blue-300" />
+
+                <Card>
+                    <ThaiText icon="💬" thai="เลือกคำตอบที่ถูก" ipa="lʉ̂ak kam-dtɔ̀ɔp tîi tùuk" en="Choose the correct answer" />
+
+                    <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mt-6 space-y-6 min-h-[300px]">
                     
-                    <div>
-                        <span class="thai-font font-bold text-slate-800">ถาม ครู: สัตว์ อะไร ที่ ครู ชอบ / ไม่ชอบ? ทำไม?</span>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('ถาม ครู สัตว์ อะไร ที่ ครู ชอบ หรือ ไม่ชอบ ทำไม')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    {/* Chat History */}
+                    {convo.slice(0, chatStep).map((turn, i) => (
+                        <div key={i} className="space-y-4">
+                        {/* Teacher message */}
+                        <div className="flex gap-3">
+                            <span className="text-4xl mt-2">🧑‍🦱</span>
+                            <ThaiText thai={turn.teacher.thai} ipa={turn.teacher.ipa} en={turn.teacher.en} className="w-[85%] border-blue-300" />
                         </div>
-                        <p class="ipa-text">thǎam khruu: sàt à-rai thîi khruu chɔ̂ɔp / mâi chɔ̂ɔp? tham-mai?</p>
-                        <p class="en-text">Ask teacher: What animal do you like / dislike? Why?</p>
-                    </div>
-                </div>
-            </div>
+                        {/* Correct Answer */}
+                        <div className="flex gap-3 justify-end">
+                            <ThaiText thai={turn.options.find(o => o.correct).thai} ipa={turn.options.find(o => o.correct).ipa} en={turn.options.find(o => o.correct).en} className="w-[85%] bg-blue-500 text-white border-blue-600" />
+                            <span className="text-4xl mt-2">👨</span>
+                        </div>
+                        </div>
+                    ))}
 
-            <!-- Matching -> Presentation -->
-            <div class="card border-l-8 border-purple-500">
-                <div class="mb-4">
-                    <span class="thai-font text-2xl font-bold text-purple-900">จับคู่ และ พรีเซนต์ 🔗📊</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('จับคู่ และ พรีเซนต์')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
+                    {/* Current Question */}
+                    {chatStep < convo.length && (
+                        <div className="flex gap-3 animate-fade-in">
+                        <span className="text-4xl mt-2">🧑‍🦱</span>
+                        <ThaiText thai={convo[chatStep].teacher.thai} ipa={convo[chatStep].teacher.ipa} en={convo[chatStep].teacher.en} className="w-[85%] border-blue-400 shadow-md ring-2 ring-blue-300" />
+                        </div>
+                    )}
+
+                    {/* Options */}
+                    {chatStep < convo.length && (
+                        <div className="flex flex-col gap-3 mt-6 animate-fade-in md:pl-14">
+                        {convo[chatStep].options.map((opt, i) => (
+                            <div key={i} onClick={() => handleOption(opt.correct)} className="cursor-pointer hover:-translate-y-1 transition-transform">
+                            <ThaiText thai={opt.thai} ipa={opt.ipa} en={opt.en} />
+                            </div>
+                        ))}
+                        </div>
+                    )}
                     </div>
-                    <p class="ipa-text">jàp-khûu lɛ́ pree-sen</p>
-                    <p class="en-text">Matching and Presentation.</p>
+
+                    {chatStep === convo.length && (
+                    <div className="mt-8 bg-purple-50 p-6 rounded-2xl border-2 border-purple-200 animate-fade-in space-y-6">
+                        <ThaiText icon="📖" thai="เล่าเรื่องการไปเที่ยวของคุณ" ipa="lâo rʉ̂ang gaan bpai tîao kɔ̌ɔng kun" en="Tell a story about your holiday" className="bg-purple-100 border-purple-300" />
+                        
+                        <div className="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-purple-100">
+                        <ThaiText icon="📍" thai="ไปไหน" ipa="bpai nǎi" en="Where?" />
+                        <ThaiText icon="👥" thai="ไปกับใคร" ipa="bpai gàp krai" en="Who with?" />
+                        <ThaiText icon="📅" thai="กี่วัน" ipa="gìi wan" en="How many days?" />
+                        <ThaiText icon="🍽️" thai="กินอะไร" ipa="gin à-rai" en="What did you eat?" />
+                        </div>
+                        
+                        <Button onClick={() => setStep(5)} variant="secondary" className="w-full mt-6 shadow-md border-purple-300 bg-purple-100 text-purple-800 hover:bg-purple-200">
+                        🌟 ไปกิจกรรมเสริม (Go to Extension)
+                        </Button>
+                    </div>
+                    )}
+                </Card>
                 </div>
+            );
+        }
+
+        // ------------------------------------------
+        // TASK 5: EXTENSION (Work Life)
+        // ------------------------------------------
+        function Task5_Extension({ setStep }) {
+            const errors = [
+                {
+                    id: 1,
+                    contextThai: "ทำงานเยอะ เหนื่อยมาก ผมก็เลย ",
+                    contextIpa: "tam-ngaan yə́, nʉ̀ai mâak. pǒm gôr-loie ",
+                    wrongWordThai: "ดีใจ",
+                    wrongWordIpa: "dee-jai",
+                    correctWordThai: "อยากนอน",
+                    correctWordIpa: "yàak nɔɔn",
+                    correctWordEn: "want to sleep",
+                    correctIcon: "😴",
+                    options: [
+                        { thai: "ดีใจ", ipa: "dee-jai", en: "happy", icon: "😁", correct: false },
+                        { thai: "อยากนอน", ipa: "yàak nɔɔn", en: "want to sleep", icon: "😴", correct: true }
+                    ]
+                },
+                {
+                    id: 2,
+                    contextThai: "อากาศร้อน ผมก็เลย ",
+                    contextIpa: "aa-gàat rɔ́ɔn. pǒm gôr-loie ",
+                    wrongWordThai: "ดื่มน้ำร้อน",
+                    wrongWordIpa: "dʉ̀ʉm náam rɔ́ɔn",
+                    correctWordThai: "ดื่มน้ำเย็น",
+                    correctWordIpa: "dʉ̀ʉm náam yen",
+                    correctWordEn: "drink cold water",
+                    correctIcon: "🧊",
+                    options: [
+                        { thai: "อาบแดด", ipa: "àap dɛ̀ɛt", en: "sunbathe", icon: "☀️", correct: false },
+                        { thai: "ดื่มน้ำเย็น", ipa: "dʉ̀ʉm náam yen", en: "drink cold water", icon: "🧊", correct: true }
+                    ]
+                },
+                {
+                    id: 3,
+                    contextThai: "รถติด 1 ชั่วโมง ผมก็เลย ",
+                    contextIpa: "rót dtìt nʉ̀ŋ chûa-moong. pǒm gôr-loie ",
+                    wrongWordThai: "มาเร็ว",
+                    wrongWordIpa: "maa reo",
+                    correctWordThai: "มาช้า",
+                    correctWordIpa: "maa cháa",
+                    correctWordEn: "arrive late",
+                    correctIcon: "🐢",
+                    options: [
+                        { thai: "มาช้า", ipa: "maa cháa", en: "arrive late", icon: "🐢", correct: true },
+                        { thai: "ขับรถ", ipa: "kàp rót", en: "drive", icon: "🚗", correct: false }
+                    ]
+                },
+                {
+                    id: 4,
+                    contextThai: "ลูกค้าเป็นคนเยอะ ผมก็เลย ",
+                    contextIpa: "lûuk-káa bpen kon yə́. pǒm gôr-loie ",
+                    wrongWordThai: "มีความสุข",
+                    wrongWordIpa: "mii kwaam-sùk",
+                    correctWordThai: "เครียด",
+                    correctWordIpa: "krîat",
+                    correctWordEn: "stressed",
+                    correctIcon: "🤯",
+                    options: [
+                        { thai: "เครียด", ipa: "krîat", en: "stressed", icon: "🤯", correct: true },
+                        { thai: "หัวเราะ", ipa: "hǔa-rɔ́", en: "laugh", icon: "🤣", correct: false }
+                    ]
+                },
+                {
+                    id: 5,
+                    contextThai: "พาสปอร์ตหาย ผมก็เลย ",
+                    contextIpa: "páat-bpòt hǎai. pǒm gôr-loie ",
+                    wrongWordThai: "ปลอดภัย",
+                    wrongWordIpa: "bplɔ̀ɔt-pai",
+                    correctWordThai: "มีปัญหา",
+                    correctWordIpa: "mii bpan-hǎa",
+                    correctWordEn: "have a problem",
+                    correctIcon: "⚠️",
+                    options: [
+                        { thai: "ปลอดภัย", ipa: "bplɔ̀ɔt-pai", en: "safe", icon: "🛡️", correct: false },
+                        { thai: "มีปัญหา", ipa: "mii bpan-hǎa", en: "have a problem", icon: "⚠️", correct: true }
+                    ]
+                },
+                {
+                    id: 6,
+                    contextThai: "ผมปวดหัว ผมก็เลย ",
+                    contextIpa: "pǒm bpùat hǔa. pǒm gôr-loie ",
+                    wrongWordThai: "ร้องเพลง",
+                    wrongWordIpa: "rɔ́ɔng pleeng",
+                    correctWordThai: "กินยา",
+                    correctWordIpa: "gin yaa",
+                    correctWordEn: "take medicine",
+                    correctIcon: "💊",
+                    options: [
+                        { thai: "กินยา", ipa: "gin yaa", en: "take medicine", icon: "💊", correct: true },
+                        { thai: "ทำอาหาร", ipa: "tam aa-hǎan", en: "cook food", icon: "🍳", correct: false }
+                    ]
+                },
+                {
+                    id: 7,
+                    contextThai: "มีประชุมกับลูกค้า ผมก็เลย ",
+                    contextIpa: "mii bprà-chum gàp lûuk-káa. pǒm gôr-loie ",
+                    wrongWordThai: "ใส่กางเกงขาสั้น",
+                    wrongWordIpa: "sài gaang-geeng kǎa-sân",
+                    correctWordThai: "เตรียมเอกสาร",
+                    correctWordIpa: "dtriam èek-gà-sǎan",
+                    correctWordEn: "prepare documents",
+                    correctIcon: "📄",
+                    options: [
+                        { thai: "นอนหลับ", ipa: "nɔɔn làp", en: "sleep", icon: "🛌", correct: false },
+                        { thai: "เตรียมเอกสาร", ipa: "dtriam èek-gà-sǎan", en: "prepare documents", icon: "📄", correct: true }
+                    ]
+                },
+                {
+                    id: 8,
+                    contextThai: "เงินหมด ผมก็เลย ",
+                    contextIpa: "ngən mòt. pǒm gôr-loie ",
+                    wrongWordThai: "ซื้อที่ดิน",
+                    wrongWordIpa: "sʉ́ʉ tîi-din",
+                    correctWordThai: "ถอนเงิน",
+                    correctWordIpa: "tɔ̌ɔn ngən",
+                    correctWordEn: "withdraw money",
+                    correctIcon: "🏧",
+                    options: [
+                        { thai: "ถอนเงิน", ipa: "tɔ̌ɔn ngən", en: "withdraw money", icon: "🏧", correct: true },
+                        { thai: "ซื้อที่ดิน", ipa: "sʉ́ʉ tîi-din", en: "buy land", icon: "🗺️", correct: false }
+                    ]
+                },
+                {
+                    id: 9,
+                    contextThai: "หมาเห่าตอนไฟไหม้บ้าน ผมก็เลย ",
+                    contextIpa: "mǎa hàao dtɔɔn fai mâi bâan. pǒm gôr-loie ",
+                    wrongWordThai: "ดูทีวี",
+                    wrongWordIpa: "duu tii-wii",
+                    correctWordThai: "วิ่งหนี",
+                    correctWordIpa: "wîng nǐi",
+                    correctWordEn: "run away",
+                    correctIcon: "🏃",
+                    options: [
+                        { thai: "วิ่งหนี", ipa: "wîng nǐi", en: "run away", icon: "🏃", correct: true },
+                        { thai: "อาบน้ำ", ipa: "àap náam", en: "take a shower", icon: "🚿", correct: false }
+                    ]
+                },
+                {
+                    id: 10,
+                    contextThai: "ผมหิวข้าวนิดหน่อย ผมก็เลย ",
+                    contextIpa: "pǒm hǐu kâao nít-nɔ̀i. pǒm gôr-loie ",
+                    wrongWordThai: "ล้างจาน",
+                    wrongWordIpa: "láang jaan",
+                    correctWordThai: "กินของหวาน",
+                    correctWordIpa: "gin kɔ̌ɔng wǎan",
+                    correctWordEn: "eat dessert",
+                    correctIcon: "🍰",
+                    options: [
+                        { thai: "กินของหวาน", ipa: "gin kɔ̌ɔng wǎan", en: "eat dessert", icon: "🍰", correct: true },
+                        { thai: "กินยา", ipa: "gin yaa", en: "take medicine", icon: "💊", correct: false }
+                    ]
+                }
+            ];
+
+            const [activeError, setActiveError] = useState(0);
+            const [isCorrected, setIsCorrected] = useState(false);
+
+            const handleFix = (isCorrect) => {
+                if(isCorrect) setIsCorrected(true);
+                else alert("❌ ไม่ใช่ (mâi châi / No). Try again!");
+            };
+
+            const nextError = () => {
+                if (activeError < errors.length - 1) {
+                    setActiveError(activeError + 1);
+                    setIsCorrected(false);
+                } else {
+                    setActiveError(errors.length);
+                }
+            };
+
+            const currentData = errors[activeError];
+
+            return (
+                <div className="space-y-6 pb-10">
+                <ThaiText icon="⭐" thai="กิจกรรมเสริม: ชีวิตการทำงาน" ipa="gìt-jà-gam sə̌əm: chii-wít gaan tam-ngaan" en="Extension: Work Life" className="bg-purple-100 border-purple-300" />
+
+                <Card className="border-purple-200 bg-purple-50">
+                    <ThaiText icon="🔍" thai="หาคำผิดและแก้ให้ถูก" ipa="hǎa kam pìt lɛ́ gɛ̂ɛ hâi tùuk" en="Find the wrong word and fix it" />
+
+                    {activeError < errors.length ? (
+                        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-purple-200 mt-6 text-center space-y-6">
+                        <div className="text-xl md:text-2xl font-black text-gray-800 border-b border-gray-100 pb-6">
+                            "{currentData.contextThai}<span className="text-red-500 line-through">{currentData.wrongWordThai}</span>"
+                            <p className="text-sm font-normal text-purple-600 mt-2">"{currentData.contextIpa}<span className="text-red-400 line-through">{currentData.wrongWordIpa}</span>"</p>
+                        </div>
+
+                        {!isCorrected ? (
+                            <div className="space-y-4">
+                            <ThaiText icon="❓" thai="ควรเปลี่ยนเป็นคำอะไร?" ipa="kuan bplìan bpen kam à-rai?" en="What word should it be changed to?" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {currentData.options.map((opt, i) => (
+                                    <div key={i} onClick={() => handleFix(opt.correct)} className="cursor-pointer">
+                                    <ThaiText thai={opt.thai} ipa={opt.ipa} en={opt.en} icon={opt.icon} />
+                                    </div>
+                                ))}
+                            </div>
+                            </div>
+                        ) : (
+                            <div className="animate-fade-in space-y-4">
+                            <ThaiText icon="✅" thai="ถูกต้อง!" ipa="tùuk-dtɔ̂ɔng!" en="Correct!" className="bg-green-100 border-green-400" />
+                            <ThaiText thai={`${currentData.contextThai}${currentData.correctWordThai}`} ipa={`${currentData.contextIpa}${currentData.correctWordIpa}`} en={currentData.correctWordEn} icon={currentData.correctIcon} />
+                            <Button onClick={nextError} className="mx-auto mt-4 w-full">
+                                {activeError < errors.length - 1 ? "ข้อต่อไป ➡️" : "ดูสรุป ➡️"}
+                            </Button>
+                            </div>
+                        )}
+                        </div>
+                    ) : (
+                        <div className="mt-8 pt-8 border-t border-purple-200 animate-fade-in space-y-6">
+                        <ThaiText icon="🗣️" thai="คุยและแสดงความคิดเห็น" ipa="kui lɛ́ sà-dɛɛng kwaam-kít-hěn" en="Discuss and share opinions" />
+                        
+                        <div className="space-y-4">
+                            <ThaiText icon="1️⃣" thai="ทำงานเยอะ ดีไหม?" ipa="tam-ngaan yə́, dii mái?" en="Is working a lot good?" className="bg-white border-blue-200" />
+                            <ThaiText icon="2️⃣" thai="ซื้อที่ดิน เป็นการลงทุนที่ดีไหม?" ipa="sʉ́ʉ tîi-din bpen gaan-long-tun tîi dii mái?" en="Is buying land a good investment?" className="bg-white border-blue-200" />
+                            <ThaiText icon="3️⃣" thai="ทำธุรกิจกับคนจีน ยากไหม?" ipa="tam tú-rá-gìt gàp kon jiin yâak mái?" en="Is doing business with Chinese people difficult?" className="bg-white border-blue-200" />
+                            <ThaiText icon="4️⃣" thai="เที่ยวรอบโลก ดีไหม?" ipa="tîao rɔ̂ɔp lôok dii mái?" en="Is traveling around the world good?" className="bg-white border-blue-200" />
+                            <ThaiText icon="5️⃣" thai="มีบ้านหลายหลัง ดีไหม?" ipa="mii bâan lǎai lǎng dii mái?" en="Is having many houses good?" className="bg-white border-blue-200" />
+                        </div>
+
+                        <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100 mt-6">
+                            <ThaiText icon="💡" thai="ตัวอย่างคำตอบ" ipa="dtua-yàang kam-dtɔ̀ɔp" en="Example Answers" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div className="space-y-2 p-4 bg-green-50 rounded-xl border border-green-200">
+                                    <ThaiText icon="👍" thai="ดี" ipa="dii" en="Good" />
+                                    <ThaiText thai="มีเงินเยอะ" ipa="mii ngən yə́" en="Have lots of money" icon="💰" />
+                                </div>
+                                <div className="space-y-2 p-4 bg-red-50 rounded-xl border border-red-200">
+                                    <ThaiText icon="👎" thai="ไม่ดี" ipa="mâi dii" en="Not good" />
+                                    <ThaiText thai="ไม่มีเวลา" ipa="mâi mii wee-laa" en="No time" icon="⏰" />
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
+                    )}
+                </Card>
                 
-                <p class="text-sm text-slate-600 mb-4 font-medium">Match the verbs to the nouns, then present your daily routine using them.</p>
-
-                <div class="bg-purple-50 p-4 rounded-xl flex justify-between items-center px-8 thai-font font-bold text-lg">
-                    <div class="space-y-4">
-                        <p>1. อาบ (àap)</p>
-                        <p>2. แปรง (bprang)</p>
-                        <p>3. แต่ง (dtàeng)</p>
+                {activeError >= errors.length && (
+                    <div className="text-center pb-10 space-y-6 mt-10">
+                    <ThaiText icon="🎉" thai="จบการเรียน" ipa="jòp gaan rian" en="End of lesson" className="text-center bg-yellow-100 border-yellow-400 max-w-sm mx-auto" />
+                    <Button onClick={() => setStep(0)} variant="secondary" className="mx-auto border-gray-300">เริ่มใหม่ (Restart)</Button>
                     </div>
-                    <div class="space-y-4 text-right text-slate-600">
-                        <p>A. ตัว (dtua)</p>
-                        <p>B. น้ำ (náam)</p>
-                        <p>C. ฟัน (fan)</p>
-                    </div>
+                )}
                 </div>
-
-                <div class="mt-6 border-t-2 border-purple-200 pt-4">
-                    <span class="thai-font font-bold text-slate-800">พรีเซนต์: ตอนเช้า คุณ ทำ อะไร บ้าง? (เรียงลำดับ)</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('พรีเซนต์ ตอนเช้า คุณ ทำ อะไร บ้าง เรียงลำดับ')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">pree-sen: dtaawn-cháao khun tham à-rai bâang? (riiang lam-dàp)</p>
-                    <p class="en-text">Presentation: What do you do in the morning? (in order)</p>
-                </div>
-            </div>
-
-            <!-- Discussion Questions -->
-            <div class="card border-l-8 border-pink-500">
-                <div class="mb-4">
-                    <span class="thai-font text-2xl font-bold text-pink-900">คุยกัน: ชีวิต และ งาน 💬💼</span>
-                    <div class="mt-2 flex gap-2">
-                        <button onclick="speak('คุยกัน ชีวิต และ งาน')" class="btn-control btn-speak">🔊</button>
-                        <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                        <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                    </div>
-                    <p class="ipa-text">khui-gan: chee-wít lɛ́ ngaan</p>
-                    <p class="en-text">Discussion: Life and Work.</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="p-4 bg-pink-50 rounded-xl">
-                        <span class="thai-font font-bold">"คุณ คิดว่า การลงทุน อะไร ดี ที่สุด ในตอนนี้?"</span>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('คุณ คิดว่า การลงทุน อะไร ดี ที่สุด ในตอนนี้')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                        </div>
-                        <p class="ipa-text">khun khít-wâa gaan-long-thun à-rai dii thîi-sùt nai dtaawn-níi?</p>
-                        <p class="en-text">What do you think is the best investment right now?</p>
-                    </div>
-                    <div class="p-4 bg-pink-50 rounded-xl">
-                        <span class="thai-font font-bold">"ระหว่าง งาน ที่ เหนื่อยแต่รวย กับ งาน สบายแต่เงินน้อย คุณ เลือก อะไร?"</span>
-                        <div class="mt-2 flex gap-2">
-                            <button onclick="speak('ระหว่าง งาน ที่ เหนื่อยแต่รวย กับ งาน สบายแต่เงินน้อย คุณ เลือก อะไร')" class="btn-control btn-speak">🔊</button>
-                            <button onclick="toggle(this, 'ipa-text')" class="btn-control btn-ipa">IPA</button>
-                            <button onclick="toggle(this, 'en-text')" class="btn-control btn-en">EN</button>
-                        </div>
-                        <p class="ipa-text">rá-wàang ngaan thîi nʉ̀ai-dtɛ̀ɛ-ruay gàp ngaan sà-baai-dtɛ̀ɛ-ngoen-nɔ́ɔi khun lʉ̂ak à-rai?</p>
-                        <p class="en-text">Between a tiring but rich job and a comfortable but low-paying job, what do you choose?</p>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-    </main>
-
-    <!-- Footer Fake Nav -->
-    <nav class="fixed bottom-0 left-0 w-full bg-white border-t p-4 flex justify-around items-center shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-50">
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-blue-600 font-bold px-4 py-2">Top ⬆️</button>
-        <button onclick="pickRandomVocab()" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-blue-200 active:scale-95 transition-all">Random 🎲</button>
-    </nav>
-
-    <script>
-        const vocabList = [
-            {t: "(แก้ว)ใหญ่ 🥤📏", p: "(gɛ̂ɛo) yài", e: "Large cup"},
-            {t: "1 ชั่วโมง 🕐⏳", p: "nʉ̀ŋ chûa-moong", e: "1 hour"},
-            {t: "10 นาที ⏱️🔟", p: "sìp naa-tee", e: "10 minutes"},
-            {t: "2 ชั่วโมง 🕑⏳", p: "sŏng chûa-moong", e: "2 hours"},
-            {t: "3 ทุ่ม 🕘🌙", p: "sǎam-tûm", e: "21:00"},
-            {t: "5 ชั่วโมง 🕔⏳", p: "hâa chûa-moong", e: "5 hours"},
-            {t: "6 โมง 🕕⏰", p: "hòk mohng", e: "6 o'clock"},
-            {t: "9 โมง 🕘⏰", p: "gâao moong", e: "09:00"},
-            {t: "กระป๋อง 🥫🥤", p: "grà bpɔ̌ɔng", e: "Cans"},
-            {t: "กระเป๋าเดินทาง 🧳✈️", p: "grà-bpǎo-dern-taang", e: "suitcase; luggage; travel bag"},
-            {t: "กรุงเทพฯ 🏙️🇹🇭", p: "grung têep", e: "Bangkok"},
-            {t: "กลับบ้าน 🏠🔙", p: "glàp bâan", e: "To go (back home) Takeaway"},
-            {t: "กลับบ้านกี่คน 🏠❓👥", p: "glàp bâan gìi kon", e: "How many people are going home?"},
-            {t: "กลับบ้านหนึ่งคน 🏠☝️🚶", p: "glàp bâan nʉ̀ng kon", e: "1 person goes home."},
-            {t: "กลัวครั้งที่แล้วเมื่อไร 😨📅❓", p: "glua kráng tîi láaew mêuu-rài", e: "When was the last time you were afraid?"},
-            {t: "กล้า 🦁💪", p: "glâa", e: "Brave"},
-            {t: "กว่า ➕⚖️", p: "gwàa", e: "more than; -er (comparative suffix)"},
-            {t: "กับ ➕🤝", p: "gàp", e: "With / and"},
-            {t: "กางเกงขาสั้น 🩳👖", p: "gaang geeng kǎa sân", e: "Shorts (short-legged trousers)"},
-            {t: "กางเกงยีนส์ 👖🤠", p: "gaang geeng yiin", e: "Jeans"},
-            {t: "การบ้าน 📝🏠", p: "gaan bâan", e: "Homework"},
-            {t: "การพูด 🗣️💬", p: "gaan pûut", e: "Speaking"},
-            {t: "การฟัง 👂🎧", p: "gaan fang", e: "Listening"},
-            {t: "การอ่าน 📖👓", p: "gaan àan", e: "Reading"},
-            {t: "การเขียน ✍️📝", p: "gaan kǐan", e: "Writing"},
-            {t: "การเมือง 🏛️🗳️", p: "gaan mʉang", e: "Politics (city)"},
-            {t: "การเรียน 🏫📚", p: "gaan rian", e: "Studying (n)"},
-            {t: "กิน 🍽️😋", p: "gin", e: "Eat"},
-            {t: "กินกาแฟเย็น 🧊☕", p: "gin gaa-faae yen", e: "to drink iced coffee"},
-            {t: "กินข้าวมาเมื่อวาน 🍚📅🔙", p: "gin kâao maa mʉ̂a waan", e: "Ate yesterday"},
-            {t: "กินข้าวอะไร 🍚❓🤷", p: "gin kâao à rai", e: "What do you eat?"},
-            {t: "กินที่ร้านอาหาร 🍽️🏪", p: "gin tîi ráan aa hǎan", e: "Eat at restaurant (food shop)"},
-            {t: "กินนี่ 🍽️👇", p: "gin nîi", e: "Drink here."},
-            {t: "กินน้ำมาสามสิบนาทีก่อน 💧⏱️🔙", p: "gin náam maa sǎam sìp naa tii gɔ̀ɔn", e: "Drank 30 minutes ago"},
-            {t: "กินน้ำอะไร 🥤❓🍹", p: "gin náam à-rai", e: "What do you want to drink?"},
-            {t: "กินยาหรือยัง 💊❓😷", p: "gin yaa rǔue yang", e: "Have you taken medicine?"},
-            {t: "กินอะไร 🍽️❓🤷", p: "gin à-rai", e: "What to eat? / What are you eating?"},
-            {t: "กินอาหารสักครู่ 🍽️⏳✋", p: "gin aa-hăan sàk krôo", e: "Eat for a moment."},
-            {t: "กินอาหารเช้า 🍳🥓🌞", p: "gin aa hǎan cháao", e: "Have breakfast"},
-            {t: "กินอาหารเช้ากี่โมง 🍳⏰❓", p: "gin aa-hǎan cháao gìi mohng", e: "What time do you eat breakfast?"},
-            {t: "กินอาหารเที่ยง 🍱🕛☀️", p: "gin aa hǎan tîang", e: "Have lunch"},
-            {t: "กินอาหารเย็น 🍽️🌙🍷", p: "gin aa hǎan yen", e: "Have dinner"},
-            {t: "กินอาหารเย็นกี่โมง 🍽️🌙⏰", p: "gin aa hǎan yen gìi moong", e: "What time do you have dinner?"},
-            {t: "กินอาหารเย็นห้าโมงเย็น 🍽️🕔🌇", p: "gin aa hǎan yen hâa moong yen", e: "have dinner at 5pm"},
-            {t: "กินอาหารเย็นและอาบน้ำ 🍽️🚿🧼", p: "gin aa hǎan yen lɛ́ àap náam", e: "have dinner and take a shower"},
-            {t: "กินเป็ดย่าง 🦆🔥🥢", p: "gin bpèt yâang", e: "to eat roast duck"},
-            {t: "กินเผ็ดได้ไหม 🌶️❓🥵", p: "gin pèt dâi mái", e: "Can you eat spicy?"},
-            {t: "กินไก่ 🍗🍴😋", p: "gin gài", e: "eat chicken"},
-            {t: "กินไหม 🍽️❓🤷", p: "gin mái", e: "Do you want to eat? (offering)"},
-            {t: "กี่ชั่วโมง ⏳❓🕰️", p: "gèe chua-moong", e: "How many hours?"},
-            {t: "กี่นาทีกว่าจะมาบ้าน ⏱️🏠❓", p: "gì-naa-tee gòr-wâa jà maa bâan", e: "How many minutes until you/they get home?"},
-            {t: "กี่โมงถึงบ้านลูกค้า ⏰🤝🏠", p: "gìi moong tǔng bâan lûuk kâa", e: "What time will you arrive at the client's house?"},
-            {t: "กี่โมงแล้ว ⌚❓👀", p: "gìi moong lɛ́ɛo", e: "What time is it? (how many o’clock already?)"},
-            {t: "ก่อน ⏮️🛑🔙", p: "gɔ̀ɔn", e: "last ../.. ago/before/first (at the end of the sentence)"},
-            {t: "ขยัน 💪🐜📚", p: "kà yǎn", e: "hardworking"},
-            {t: "ของขวัญ 🎁🎀🧸", p: "kɔ̌ɔng kwǎn", e: "Gifts"},
-            {t: "ของหวาน 🍰🍩🍧", p: "kɔ̌ɔng wǎan", e: "Desserts"},
-            {t: "ขอช้อนอีกสอง 🥄🥄🙏", p: "kǎw chɔ́ɔn ìik sǎwng", e: "I'd like two more spoons; two more spoons, please."},
-            {t: "ขอดูทีวีสักครู่นะ 📺👀⏳", p: "kǎw duu tee-wee sàk krûu ná", e: "Let me watch TV for a moment, okay?"},
-            {t: "ขออีกสองช้อน 🥄✌️🙏", p: "kǎw ìik sǎwng chɔ́ɔn", e: "I'd like two more spoons (of something); two more spoons, please."},
-            {t: "ขอเช็คบิล 🧾💸🙏", p: "kɔ̌ɔ chék bin", e: "Please check the bill."},
-            {t: "ขอเมนูภาษาอังกฤษ 📜🇬🇧🙏", p: "kɔ̌ɔ mee-nuu paa-sǎa ang-grìt", e: "May I have the English menu?"},
-            {t: "ขอเมนูหน่อย 📜🤲🙏", p: "kɔ̌ɔ mee nuu nɔ̀ɔi", e: "Can I have the menu, please?"},
-            {t: "ขอโต๊ะอีก 🪑➕🙏", p: "kɔ̌ɔ dtó ìik", e: "I'd like another table / Another table, please."},
-            {t: "ขอใบเสร็จ 🧾✅🙏", p: "kɔ̌ɔ bai-sèt", e: "May I have a receipt?"},
-            {t: "ขับรถ 🚗💨🛣️", p: "kàp rót", e: "To drive"},
-            {t: "ขับรถกลับบ้านกี่ชั่วโมง 🚗🏠⏳", p: "kàp rót glàp bâan gèe chûa-moong", e: "How many hours does it take to drive home?"},
-            {t: "ขับรถเร็วแค่ไหน 🚗💨🏎️", p: "kàp rót reo kɛ̂ɛ nǎi", e: "How fast do you drive?"},
-            {t: "ขับรถได้ 🚗✅🆗", p: "kàp rót dâi", e: "Can drive"},
-            {t: "ขับรถได้ไหม 🚗❓🤷", p: "kàp rót dâi mái", e: "Can you drive?"},
-            {t: "ขับรถไปทำงานกี่โมง 🚗💼⏰", p: "kàp rót bpai tam ngaan gìi moong", e: "What time do you drive to work?"},
-            {t: "ขับรถไปรับอาหารที่สั่ง 🚗🥡🛍️", p: "khàp rót pai ráp aa-hăan tîi sàng", e: "Drive to pick up the food that I ordered."},
-            {t: "ขับรถไปห้างนาน 🚗🛍️⏳", p: "kàp rót pai hâang naan", e: "It takes a long time to drive the mall."},
-            {t: "ขับรถไปโรงแรมกี่นาที 🚗🏨⏱️", p: "kàp rót bpai rohng-raem gì na-tee", e: "How many minutes by car to the hotel?"},
-            {t: "ขับรถไปไหน 🚗❓🗺️", p: "khàp rót bpai nǎi", e: "Where are you driving to?"},
-            {t: "ขับเครื่องบินได้ไหม ✈️👨‍✈️❓", p: "kàp krʉ̂ang bin dâi mǎI", e: "Can you drive a plane?"},
-            {t: "ขาย 💰🏷️🛍️", p: "kǎai", e: "Sell"},
-            {t: "ขายของให้ลูกค้า 🏪🤝💰", p: "kǎai kɔ̌ɔng hâi lûuk-kháa", e: "sell things to customers"},
-            {t: "ขายถังอ็อกซิเจนให้คนไทย 🌬️🇹🇭🏥", p: "kăai tǎng ɔ́k-sì-jen hâi kon Tai", e: "to sell oxygen tanks to Thai people"},
-            {t: "ขาว ⚪🕊️☁️", p: "kǎao", e: "White"},
-            {t: "ขี่จักรยาน 🚲🚴‍♂️💨", p: "kìi jàk grà yaan", e: "Ride a bicycle"},
-            {t: "ขึ้น ⬆️🧗‍♂️🚌", p: "kʉ̂n", e: "go up"},
-            {t: "ข้อความ 💬📱📩", p: "kɔ̂ɔ kwaam", e: "Messages"},
-            {t: "ข้างหน้า ⬆️👀🛣️", p: "kâang nâa", e: "In front (of)"},
-            {t: "ข้าวกระเทียม 🍚🧄👃", p: "kâao grà tiam", e: "garlic rice"},
-            {t: "ข้าวกะเพรา 🍛🍃🌶️", p: "kâao gà prao", e: "rice with stir-fried holy basil"},
-            {t: "ข้าวคะน้า 🍚🥬🥢", p: "kâao ká náa", e: "rice with stir-fried Chinese broccoli"},
-            {t: "ข้าวผักรวม 🍚🥕🥦", p: "kâao pàk ruam", e: "rice with mixed vegetables"},
-            {t: "ข้าวผัด 🍛🍳🦐", p: "kâao pàt", e: "fried rice"},
-            {t: "ข้าวพริกหยวก 🍚🫑🌶️", p: "kâao prík yùak", e: "rice with stir-fried bell peppers"},
-            {t: "ข้าวพริกแกง 🍛🔥🥥", p: "kâao prík gɛɛng", e: "rice with stir-fried curry paste"},
-            {t: "ข้าวไข่เจียว 🍚🍳🥚", p: "kâao kài jiao", e: "rice with omelette"},
-            {t: "คนทำธุรกิจ 👔💼🤝", p: "kon tam tú rá gìt", e: "People who do business"},
-            {t: "คนผิวสี 🧑🏾🌍🌈", p: "kon pǐu sǐi", e: "People of colour"},
-            {t: "คนผิวเข้ม 🧑🏿🕶️☀️", p: "kon pǐu kêm", e: "Dark skin person"},
-            {t: "คนไม่เยอะ 👥📉🚫", p: "kon mâi yə́", e: "Not a lot of people"},
-            {t: "ครอบครัว 👨‍👩‍👧‍👦🏠❤️", p: "krɔ̂ɔp krua", e: "Family"},
-            {t: "ครอบครัวมีกี่คน 👨‍👩‍👧‍👦❓🔢", p: "khrɔ̂ɔp-khrua mii gìi khon", e: "How many people are in your family?"},
-            {t: "ครึ่ง 🌗🍰✂️", p: "krʉ̂ng", e: "Half"},
-            {t: "คล้าย 👯‍♂️🔄👀", p: "kláai", e: "Similar"},
-            {t: "ความอดทน 🧘‍♂️⏳😌", p: "kwaam òt ton", e: "Patience"},
-            {t: "คันธนู 🏹🎯🪵", p: "kan-tá-nuu", e: "bow (weapon)"},
-            {t: "คิดยังไงกับหนังนี้ 🎬💭🤔", p: "kít yang-ngai gàp nǎng níi", e: "What do you think about this movie?"},
-            {t: "คิดว่า อาหารนี้สุขภาพดีไหม 🥗🍎🏥", p: "kít wâa aa-hǎan níi sùk-kà-phâap dii mǎi", e: "Do you think this food is healthy?"},
-            {t: "คิ้ว 🤨👀〰️", p: "kíu", e: "eyebrow"},
-            {t: "คุณต้องพักผ่อน 🛌💤🏥", p: "kun dtông pák-pòn", e: "You need to rest."},
-            {t: "คุณได้รับข้อความใหม่ 📩📲🆕", p: "khun dâi ráp khâw-khwaam mài", e: "You have a new message."},
-            {t: "คุณไปด้วยได้ไหม 🤝🚗❓", p: "kun bpai dâai mái", e: "Can you go with me?"},
-            {t: "คุณไปด้วยไหม 👣🚶‍♂️❓", p: "kun bpuay dûay mái", e: "Are you going too?"},
-            {t: "งานพรุ่งนี้เรียบร้อยไหม 📅💼✅", p: "ngaan prûng-níi rîap-rɔ́ɔi mái", e: "Is tomorrow's work finished?"},
-            {t: "งานเป็นยังไง 💼❓🤷", p: "ngaan bpen yang ngai", e: "How’s work?"},
-            {t: "งานแต่งงาน 👰🤵💍", p: "ngaan dtɛ̀ng ngaan", e: "Weddings"},
-            {t: "ง่วงนอน 😴🥱💤", p: "ngûang-nɔɔn", e: "Sleepy"},
-            {t: "ง่วงนอนครั้งที่แล้วเมื่อไหร่ 😴📅🔙", p: "ngûang nawn kráng têe láaew mêua rài", e: "When was the last time you were sleepy?"},
-            {t: "ง่วงนอนมากๆครั้งที่แล้วเมื่อไหร่ 😴📉🔙", p: "ngûuang-non mâak-mâak kráng tîi láaew mûuea-rài", e: "When was the last time you’re very sleepy?"},
-            {t: "ง่าย 👌👶✅", p: "ngâai", e: "Easy"},
-            {t: "จมูก 👃😤🤧", p: "jà-mùuk", e: "nose"},
-            {t: "จองกี่ห้อง 🏨🔑🔢", p: "jaawng gìi hâawng", e: "How many rooms to book?"},
-            {t: "จองคิวได้ไหม 🚶‍♂️🚶‍♀️📝", p: "jɔɔng kiw dâi mái", e: "Can I book a queue? / Can I make an appointment?"},
-            {t: "จองยัง 🎫❓⏳", p: "jaawng yang", e: "Have you booked yet?"},
-            {t: "จองแล้ว 🎫✅🆗", p: "jaawng lɛ́ɛo", e: "Booked / Reserved"},
-            {t: "จองแล้วใช่ไหม 🎫✅❓", p: "jaawng lɛ́ɛo chây-mǎi", e: "Is it reserved already?"},
-            {t: "จองโรงแรมได้ไหม 🏨🛎️❓", p: "jaawng roong-raem dai mái", e: "Can I book a hotel?"},
-            {t: "จองได้ไหม 📝🎫❓", p: "jong dâi mǎi", e: "Can I book?"},
-            {t: "จะ 🔮🔜🕒", p: "jà", e: "Will"},
-            {t: "จะไปว่ายน้ำอีกครั้ง 🏊‍♂️🔜🔄", p: "jà bpai wâai náam ìik kráng", e: "Going to swim again."},
-            {t: "จังหวัด 🗺️📍🇹🇭", p: "jang wàt", e: "Province"},
-            {t: "จับ 👐👮‍♂️🕸️", p: "jàp", e: "to catch; to hold; to arrest"},
-            {t: "จากไทยไปอังกฤษนาน 🇹🇭✈️🇬🇧", p: "jàak thai bpai ang-grit naan", e: "It takes a long time to travel from Thailand to England."},
-            {t: "จำไม่ได้ 🧠❌🤷", p: "jam mâi dâi", e: "Can’t remember"},
-            {t: "จ่ายยังไง 💳💵❓", p: "jàai yang ngai", e: "How to pay?"},
-            {t: "ฉลาด 🧠💡🎓", p: "chà làat", e: "Smart / Clever"},
-            {t: "ชนบท 🌾🚜🏞️", p: "chon ná bòt", e: "Countryside"},
-            {t: "ชอบกินอะไรบ้าง 😋🍽️❓", p: "chɔ̂ɔp gin à rai bâang", e: "What do you like to eat?"},
-            {t: "ชอบชายหาดอะไรบ้าง 🏖️🌊❤️", p: "chɔ̂ɔp chaai hàat à rai bâang", e: "What beaches do you like?"},
-            {t: "ชอบที่สุด ❤️🥇🔝", p: "chɔ̂ɔp tîi sùt", e: "Like the most"},
-            {t: "ชอบสีฟ้า สีน้ำเงิน 🩵💙🎨", p: "chɔ̂ɔp sǐi fáa sǐi náam ngəən", e: "[dark blue]"},
-            {t: "ชอบหาดกะตะ 🏖️🇹🇭❤️", p: "chɔ̂ɔp hàat gà dtà", e: "I like Kata Beach."},
-            {t: "ชอบเป็ดย่างเอ็มเคมากกว่าไหม 🦆🥢⚖️", p: "châwp bpèt-yâang em-kee mâak-gwàa mǎi", e: "Do you like MK roasted duck more?"},
-            {t: "ชอบเอาโน๊ตบุ๊คใส่กระเป๋า 💻👜📥", p: "chɔ̂ɔp ao nóot búk sài grà bpǎo", e: "Like to bring(get/take/want) laptop and put it in the bag"},
-            {t: "ชอบไก่ใช่ไหม 🍗❤️❓", p: "chɔ̂ɔp gài châi mái", e: "You like chicken, right?"},
-            {t: "ชอบไหม ❤️👍❓", p: "chɔ̂ɔp mái", e: "Do you like it?"},
-            {t: "ชั่วโมง ⏳🕐⏲️", p: "chûa moong", e: "hours"},
-            {t: "ชั้น 🏢🪜⬆️", p: "chán", e: "floor; story; shelf; class; level"},
-            {t: "ชา 🍵🍂☕", p: "chaa", e: "tea"},
-            {t: "ชายหาด 🏖️🌊🌴", p: "chaai hàat", e: "Beach"},
-            {t: "ชื่ออะไร 🏷️❓📛", p: "chʉ̂ʉ à rai", e: "What's your name?"},
-            {t: "ช็อคโกแล็ต 🍫🍬😋", p: "chɔ́k goo lɛ́t", e: "Chocolate"},
-            {t: "ช้า 🐢🐌⏳", p: "cháa", e: "Slow"},
-            {t: "ซน 😈🤪👶", p: "son", e: "Naughty"},
-            {t: "ซื้อ 💸🛒🛍️", p: "sʉ́ʉ", e: "Buy"},
-            {t: "ซื้อของ 🛍️🛒🚶", p: "sʉ́ʉ kɔ̌ɔng", e: "Shopping (buy stuff)"},
-            {t: "ซื้อช็อคโกแล็ตให้ลูกสาวลูกชาย 🍫👧👦", p: "sʉ́ʉ chɔ́k goo lɛ́t hâi lûuk sǎao lûuk chaai", e: "Buy chocolate for daughter and son"},
-            {t: "ซ่อนตัว 🙈🫣🧱", p: "sâwn dtua", e: "to hide oneself; to hide"},
-            {t: "ญี่ปุ่น 🇯🇵🗻🍣", p: "yîi bpùn", e: "Japan(ese)"},
-            {t: "ดอกกุหลาบ 🌹🥀💐", p: "dɔ̀ɔk gù làap", e: "Rose"},
-            {t: "ดี 🌟", p: "dii", e: "good"},
-            {t: "ดีใจ 😁❤️🎉", p: "dee-jai", e: "happy"},
-            {t: "ดึก 🌃🦉🌙", p: "dʉ̀k", e: "Late in the night"},
-            {t: "ดื่ม 🥤🍺🍷", p: "dʉ̀ʉm", e: "drink"},
-            {t: "ดื่มน้ำเปล่า 🚰💧🥤", p: "dʉ̀ʉm náam bplào", e: "drink plain water"},
-            {t: "ดื่มอะไร 🥤❓🤷", p: "dʉ̀ʉm à rai", e: "What do you want to drink (alcohol/non-alcohol)?"},
-            {t: "ดุ 😠🐕💢", p: "dù", e: "Fierce / Strict / scold"},
-            {t: "ดูทีวีสักครู่ได้ไหม 📺⏳❓", p: "duu-tee-wee-sak-krûu-dâi-mǎi", e: "Can I watch TV for a moment?"},
-            {t: "ดูหนัง 🎥🍿👀", p: "duu nǎng", e: "Watch movies"},
-            {t: "ตม. 🛂✈️👮", p: "dtòr mor", e: "Immigration (Bureau/Department)"},
-            {t: "ตรงข้าม 🆚↔️🔄", p: "dtrong kâam", e: "opposite"},
-            {t: "ตรงไป ⬆️🚶‍♂️🛣️", p: "dtrong bpai", e: "Go straight."},
-            {t: "ตลก 🤡🤣😂", p: "dtà lòk", e: "Funny"},
-            {t: "ตลอด ♾️🔄🕒", p: "dtà lɔ̀ɔt", e: "All the time / throughout"},
-            {t: "ตลาดกลางคืน 🌃🏮🍜", p: "dtà làat glaang kʉʉn", e: "Night market"},
-            {t: "ตอนกลางคืนทำอะไร 🌙❓🤷", p: "dtɔɔn glaang kuern tam à rai", e: "[in middle of the night]"},
-            {t: "ตอนนี้ ⏰👇❗️", p: "dtɔɔn níi", e: "now; right now; at this moment"},
-            {t: "ตอนนี้รับโทรศัพท์ได้ไหม 📞✅❓", p: "dtaawn-níi ráp toh-rá-sàp dâai mái", e: "Can you answer the phone now?"},
-            {t: "ตอนนี้รับโทรศัพท์ไม่ได้ 📞❌🙅", p: "dtawn-née ráp-toh-rá-sàp mâi-dâi", e: "I can't answer the phone right now."},
-            {t: "ตอนนี้อยู่บ้านไหม 🏠❓👇", p: "dtaawn-née yòo bâan mǎi", e: "Are you home now?"},
-            {t: "ตอนบ่าย ☀️🕐🥵", p: "dtɔɔn bàai", e: "In the afternoon"},
-            {t: "ตอนบ่ายทำอะไร ☀️❓🤷", p: "dtɔɔn bàai tam à rai", e: "What do you do in the afternoon?"},
-            {t: "ตอนเช้า 🌅🍳🐓", p: "dtɔɔn cháao", e: "Morning"},
-            {t: "ตอนเช้าทำอะไร 🌅❓🤷", p: "dtɔɔn cháao tam à rai", e: "What do you do in the morning?"},
-            {t: "ตอนเช้าอยู่บ้าน 🌅🏠✅", p: "dton cháo yùu bâan", e: "In the morning, I am at home."},
-            {t: "ตอนเด็ก 👶🧸🍼", p: "dtɔɔn dèk", e: "When I was a kid"},
-            {t: "ตอนเที่ยงทำอะไร 🕛❓🤷", p: "dtɔɔn tîang tam à rai", e: "What do you do at noon?"},
-            {t: "ตอนเที่ยว ฝากหมากับใคร ✈️🐶❓", p: "dtawn tîao fàak mǎa gàp krai", e: "When traveling, who do you leave your dog with?"},
-            {t: "ตอนเที่ยว หมาฝากใคร 🐶✈️🤝", p: "dtawn tîeow mǎa fàak krai", e: "When traveling, who takes care of the dog?"},
-            {t: "ตอนเย็นทำอะไร 🌇❓🤷", p: "dtɔɔn yen tam à rai", e: "What do you do in the evening?"},
-            {t: "ตอบอีเมล 📧↩️💻", p: "dtɔ̀ɔrp ii mai(l)w", e: "reply to emails"},
-            {t: "ตัวร้อน 🤒🌡️🔥", p: "dtua rɔ́ɔn", e: "to have a hot body"},
-            {t: "ตา 👁️👴👀", p: "dtaa", e: "eye; maternal grandfather"},
-            {t: "ติดตั้งถังออกซิเจน 🔧🌬️🏥", p: "dtìt dtâng tǎng ɔ̀ɔk sí jeen", e: "I install Oxygen chamber"},
-            {t: "ตื่น และอาบน้ำ 🛌🚿🧼", p: "dtʉ̀ʉn lɛ́ àap náam", e: "Wake up and take a shower"},
-            {t: "ตื่นกี่โมง ⏰🛌❓", p: "dtʉ̀ʉn gìi moong", e: "What time do you wake up?"},
-            {t: "ตื่นเต้นครั้งที่แล้วเมื่อไหร่ 🤩📅❓", p: "dtèun-dtên kráng-têe-láaeo mêua-rài", e: "When was the last time you were excited?"},
-            {t: "ต้องฝากของที่นี่ใช่ไหม 🎒🔒❓", p: "dtâwng fàak kǎawng têe nêe châi mǎi", e: "Do I need to leave my belongings here?"},
-            {t: "ถนน 🛣️🚗🚦", p: "tà nǒn", e: "street/road"},
-            {t: "ถอนเงิน 🏧💸💳", p: "tɔ̌ɔn ngən", e: "Withdraw money"},
-            {t: "ถึง 🏁📍🛑", p: "tʉ̌ng", e: "To / Until / Arrive"},
-            {t: "ถึงกี่โมง 🏁⏰❓", p: "tǔng gìi moong", e: "Until what time? / What time does it arrive?"},
-            {t: "ถือของให้ลูกชาย 🛍️👦🤲", p: "tʉ̌ʉ kɔ̌ɔng hâi lûuk chaai", e: "Carry things for my son."},
-            {t: "ถ่ายรูป 📸🤳🖼️", p: "thàai rûup", e: "To take a photo; to take a picture"},
-            {t: "ทอดในกระทะ 🍳🔥🍗", p: "tâawt nai grà-tá", e: "fry in a pan"},
-            {t: "เกิด 👶🎂💥", p: "gə̀ət", e: "Born"},
-            {t: "ทั้งปี 📅🔄💯", p: "táng bpii", e: "The whole year"},
-            {t: "ทั้งวัน ☀️🔄🌛", p: "táng wan", e: "All day"},
-            {t: "ทั้งเดือน 🗓️🔄💯", p: "táng dʉan", e: "The whole month"},
-            {t: "ทางขวา ➡️👉✋", p: "taang kwǎa", e: "On the right"},
-            {t: "ทายว่า เค้กเป็นอะไร 🎂🤔🍰", p: "taai wâa kéek bpen à-rai", e: "Guess what’s wrong with me!"},
-            {t: "ทำ 🔨🔧✨", p: "tam", e: "Do"},
-            {t: "ทำงาน 💼💻👔", p: "tam ngaan", e: "To work"},
-            {t: "ทำงานกี่ปี 💼📅❓", p: "tam ngaan gìi bpii", e: "How many years have you worked?"},
-            {t: "ทำงานบ้าน 🧹🏠🧼", p: "tam ngaan bâan", e: "Do housework"},
-            {t: "ทำงานหรือเปล่า 💼❓🤷", p: "tam-ngaan rʉ̌ʉ bplào?", e: "Are you working? / Do you work?"},
-            {t: "ทำงานเยอะ 💼📚🤯", p: "tam ngaan yə́", e: "Work a lot"},
-            {t: "ทำงานเรียบร้อยได้ไหม 💼✅❓", p: "tam-ngaan riiap-rɔ̂ɔi dâi mái", e: "Can you do the work properly/neatly?"},
-            {t: "ทำตาม 👣🐑🐕", p: "tam dtaam", e: "to follow; to do as told"},
-            {t: "ทำธุรกิจ 💼📈🤝", p: "rá gìt", e: "Do business"},
-            {t: "ทำยังไง 🤷‍♂️🔧❓", p: "tam yang-ngai", e: "What did you do to resolve it?"},
-            {t: "ทำสมูทตี้ 🥤🍓🍌", p: "tam sà múut dtîi", e: "Make smoothie"},
-            {t: "ทำหลายอย่างพร้อมกัน 🤹‍♂️🤯👐", p: "tam lăai yàang prɔ́ɔm gan", e: "To multitask / to do many things at once/altogether"},
-            {t: "ทำหาย ❌🕵️‍♂️🤷", p: "tam hǎai", e: "To lose sth/make sth gone missing"},
-            {t: "ทำอะไรทุกวัน 📅❓🔁", p: "tam-à-rai túk-wan", e: "What do you do every day?"},
-            {t: "ทำอะไรโง่ๆ 🤪🤡🤦", p: "tam à-rai ngôo-ngôo", e: "to do something stupid"},
-            {t: "ทำอาหาร 🍳👩‍🍳🍲", p: "tam aa hǎan", e: "To cook (make food)"},
-            {t: "ทำอาหารอะไร 🍳❓🤷", p: "tam aa-hǎan à-rai", e: "What food to make? / What are you cooking?"},
-            {t: "ทำเอง 🛠️👤✅", p: "tam-eeng", e: "do it yourself"},
-            {t: "ทำให้ไม่สบาย 🤢😷🦠", p: "tam hâi mâi sà baai", e: "Make me ill"},
-            {t: "ทำไก่ทอดยังไง 🍗🍳❓", p: "tam gài tôr yang-ngai", e: "How do you make fried chicken?"},
-            {t: "ที่ 📍🏠📌", p: "tîi", e: "at; which/that"},
-            {t: "ที่จอดรถ 🅿️🚗🛑", p: "tîi jɔ̀ɔt rót", e: "Parking lot (place to park cars)"},
-            {t: "ที่นั่ง 💺🛋️🎫", p: "tîi nâng", e: "Seats"},
-            {t: "ที่สุด 🔝🥇💯", p: "tîi-sùt", e: "most; -est (superlative suffix)"},
-            {t: "ที่แล้ว 🔙⏮️📅", p: "tîi lɛ́ɛo", e: "Previous…/last…/…ago"},
-            {t: "ทุกที่ 🌎📍🔄", p: "túk tîi", e: "Every place"},
-            {t: "ทุกอย่าง 🪐📦💯", p: "túk yàang", e: "Everything"},
-            {t: "ท้อง 🤰🤰🤱", p: "tɔ́ɔng", e: "abdomen; pregnant"},
-            {t: "ทําสวน 🌻👩‍🌾🌿", p: "tam sǔan", e: "To garden"},
-            {t: "ธนาคาร 🏦💰🏧", p: "tá naa kaan", e: "Bank"},
-            {t: "ธุรกิจ 💼📈🤝", p: "tú rá gìt", e: "Business"},
-            {t: "นวด 💆‍♂️👐🧴", p: "nûuat", e: "to massage"},
-            {t: "นอกบ้าน 🏞️🏠🚪", p: "nɔ̂ɔk bâan", e: "Outside house"},
-            {t: "นอน 🛌💤😴", p: "nɔɔn", e: "To sleep"},
-            {t: "นอนกี่โมง 😴⏰❓", p: "nɔɔn gìi moong", e: "What time do you sleep?"},
-            {t: "นอนน้อย 😴📉🥱", p: "nɔɔn nɔ́ɔi", e: "to get little sleep; to sleep little"},
-            {t: "นอนสี่ทุ่ม 😴🕙🌙", p: "nɔɔn sìi tûm", e: "Sleep at 10pm"},
-            {t: "นอนหลับ 💤🛌🌌", p: "nɔɔn làp", e: "Sleep (well)"},
-            {t: "นอนหลับกี่โมง 💤⏰❓", p: "nɔɔn-làp gìi-moong", e: "What time did you sleep?"},
-            {t: "นอนหลับไหม 💤❓🛌", p: "nɔɔn làp mái", e: "Did you sleep well?"},
-            {t: "นอนไม่หลับ 😳🛌❌", p: "nɔɔn mâi làp", e: "Not sleep well"},
-            {t: "นักธุรกิจ 👔💼🤝", p: "nák tú rá gìt", e: "Businesspeople"},
-            {t: "นักพูด 🗣️🎤👨‍🏫", p: "nák pûut", e: "Speaker"},
-            {t: "นักอ่าน 📖🤓📚", p: "nák àan", e: "Reader"},
-            {t: "นักเรียน 🎒👨‍🎓🏫", p: "nák rian", e: "Students"},
-            {t: "นักเรียนทุกคน 👨‍🎓👩‍🎓💯", p: "nák rian túk kon", e: "Every student"},
-            {t: "นั่งแท็กซี่ 15 นาที 🚕⏱️1️⃣5️⃣", p: "nâng táek-sîi sìp-hâa naa-tii", e: "to take a taxi for 15 minutes"},
-            {t: "นาที ⏱️⏳🕐", p: "naa tii", e: "Minutes"},
-            {t: "นิดหน่อย 🤏🐜🍬", p: "nít-nɔ̀i", e: "a little bit"},
-            {t: "นี้ 👇👉📍", p: "níi", e: "this…"},
-            {t: "น่าสนใจ 🤩✨🔍", p: "nâa sǒn jai", e: "Interesting"},
-            {t: "น่าเบื่อ 🥱🙄💤", p: "nâa-bèua", e: "boring; tedious; dull"},
-            {t: "น้ำตาล 🍚🍬🍭", p: "nám dtaan", e: "Brown / Sugar"},
-            {t: "น้ำร้อน ☕🔥♨️", p: "nám rɔ́ɔn", e: "hot water"},
-            {t: "น้ำเปล่า 🚰💧🥤", p: "náam bplàao", e: "plain water"},
-            {t: "น้ำเย็น 🧊💧🥶", p: "nám yen", e: "cold water"},
-            {t: "น้ำแข็ง 🧊🥶❄️", p: "nám kɛ̌ng", e: "Ice"},
-            {t: "บัญชี 📒💳🏦", p: "ban-chee", e: "account"},
-            {t: "บันได 🪜⬆️⬇️", p: "ban dai", e: "Stairs"},
-            {t: "บางครั้ง 🌓🕒🎲", p: "baang kráng", e: "Sometimes"},
-            {t: "บางส่วน 🍕🧩🍰", p: "baang sùan", e: "Some parts"},
-            {t: "บินนาน ✈️⏳😴", p: "bin naan", e: "Take long time to fly"},
-            {t: "บินไปไทยนาน ✈️🇹🇭⏳", p: "bin bpai thai naan", e: "It takes a long time to fly to Thailand"},
-            {t: "บ่น 🗣️😤🤬", p: "bòn", e: "Complain"},
-            {t: "บ่อน้ำ 💧🐸🏞️", p: "bɔ̀ɔ náam", e: "Pond"},
-            {t: "บ่อยแค่ไหน 🔁❓📅", p: "bòi kâae nǎi", e: "How often?"},
-            {t: "บ่าย ☀️🕑🌤️", p: "bàai", e: "Afternoon"},
-            {t: "บ้าง 🤷‍♂️🤏🐜", p: "bâang", e: "Expecting more than 1 answer"},
-            {t: "บ้านมีกี่คน 🏠👥❓", p: "bâan mii gìi kon", e: "How many people are in your house?"},
-            {t: "บ้านอยู่ที่ไหน 🏠📍❓", p: "bâan yùu tîi nǎI", e: "Where is your house?"},
-            {t: "ปกติ 30 นาที 🔄⏱️3️⃣0️⃣", p: "bpòk-gà-dtì săam-sìp naa-tee", e: "Normally 30 minutes"},
-            {t: "ปกติ 🔄😐✅", p: "bpòk-gà-dtì", e: "normal; regular; usual"},
-            {t: "ประชุม 💼🤝📊", p: "bprà chum", e: "Have a meeting"},
-            {t: "ปลูก 🌱🌳🌻", p: "bplùuk", e: "To grow / to plant"},
-            {t: "ปวดหัว 🤕😫💊", p: "bpùuat hŭua", e: "to have a headache"},
-            {t: "ปั๊ม ⛽🚗💧", p: "bpám", e: "Petrol station"},
-            {t: "ปาก 👄🗣️👅", p: "bpàak", e: "mouth"},
-            {t: "ปากกานี้สำหรับสต๊าฟ 🖊️👔✅", p: "bpàak-gaa née sǎm-ràp sdáap", e: "This pen is for staff."},
-            {t: "ปากกานี้สำหรับใคร 🖊️❓🤷", p: "bpaak-gaa níi săm-ràp krai", e: "Who is this pen for?"},
-            {t: "ปิด 🚪❌🛑", p: "bpit", e: "to close"},
-            {t: "ปี 📅🎂🗓️", p: "bpii", e: "years"},
-            {t: "ปีที่แล้ว 📅🔙⏮️", p: "bpii tîi lɛ́ɛo", e: "Last year"},
-            {t: "ปีหน้า 📅🔜⏭️", p: "bpii nâa", e: "Next year [face]"},
-            {t: "ป่า 🌲🌳🍃", p: "bpàa", e: "Forest"},
-            {t: "ผนัง 🧱🏠🖼️", p: "pà nǎng", e: "Interior walls"},
-            {t: "ผม กับเพื่อนร่วมงาน 3 คน 👨‍💼🤝3️⃣", p: "pǒm gàp pʉ̂an rûam ngaan sǎam kon", e: "Me and 3 colleagues."},
-            {t: "ผม 👨💬💇‍♂️", p: "pǒm", e: "Masc I"},
-            {t: "ผมกำลังเรียนไทย 👨📚🇹🇭", p: "pǒm gam lang rian tai", e: "I am learning Thai."},
-            {t: "ผมปวดหัว 👨🤕💊", p: "pŏm bpùat hŭua", e: "I have a headache."},
-            {t: "ผมพิมพ์ข้อความให้ลูกค้าบ่อย 👨📲🔁", p: "phǒm phim khɔ̂ɔ-khwaam hâi lûuk-kháa bɔ̀i", e: "I often type messages for customers."},
-            {t: "ผมรับของ(เดลิเวอรี่)ทุกวัน 👨📦📅", p: "phom rap khǎawng (dee-lí-wêe-rîi) thúk wan", e: "I receive (delivery) items every day."},
-            {t: "ผมรับข้อความทุกวัน 👨📩📅", p: "phǒm ráp khâw-khwaam thūk wan", e: "I receive messages every day."},
-            {t: "ผมรับลูกวันนี้ 👨👧👇", p: "phǒm ráp lûuk wan-níi", e: "I'm picking up my child today."},
-            {t: "ผมรับลูกสาวจากบ้านเพื่อน 👨👧🏠", p: "phǒm ráp lûuk-sǎao jàak bâan prêuan", e: "I pick up my daughter from a friend's house."},
-            {t: "ผมส่งลูกๆไปโรงเรียนทุกวัน 👨🚌🏫", p: "phǒm sòng lûuk lûuk bpai roong riian thúk wan", e: "I send my children to school every day."},
-            {t: "ผมส่งอีเมล์ทุกวัน 👨📧📅", p: "phom sòng ii-mew took wan", e: "I send emails every day."},
-            {t: "ผมเที่ยวไทยเดือนที่แล้ว 👨✈️🇹🇭", p: "pǒm tîao tai dʉan tîi lɛ́ɛo", e: "I travelled to Thailand last month."},
-            {t: "ผมเป็นนักธุรกิจ 👨💼💰", p: "pǒm bpen nák tú rá gìt", e: "I’m a businessperson."},
-            {t: "ผมแฮปปี้ตอนคนรู้สึกดีขึ้น 👨😊❤️", p: "pǒm happy dton kon rúu sʉ̀k dii kʉ̂n", e: "I’m happy when people feel better (up)."},
-            {t: "ผมไปด้วยได้ไหม 👨🤝❓", p: "phǒm bpai dûay dâi mǎi", e: "Can I go too?"},
-            {t: "ฝรั่งเศส 🇫🇷🥖🍷", p: "fà ràng sèet", e: "France"},
-            {t: "ฝากกระเป๋าที่ไหน 👜🔒❓", p: "fàak grà-bpǎo tîi nǎi", e: "Where do I leave(store) my bags?"},
-            {t: "ฝากกระเป๋าเดินทางได้ที่ไหน 🧳📍❓", p: "fàak grà-bpào deern-taang dâi têe năi", e: "Where can I/you leave/store luggage?"},
-            {t: "ฝากที่นี่ 🔒👇✅", p: "fàak tîi nîi", e: "Leave it here"},
-            {t: "ฝากรถที่นี่ได้ไหม 🚗🅿️❓", p: "fàak rót têe nêe dâai măi", e: "Can I leave my car here (Valet parking)?"},
-            {t: "ฝากเงินที่นี่ได้ไหม 💰🏦❓", p: "faak ngern têe nêe dâi măi", e: "Can I deposit money here?"},
-            {t: "พยายาม 🧗‍♂️💦💪", p: "pá-yaa-yaam", e: "to try; to attempt; to endeavor"},
-            {t: "พยายามช่วยคน 🤝🆘🏥", p: "pá-yaa-yaam chûuay kon", e: "to try to help people"},
-            {t: "พรุ่งนี้คุณทำงานกี่ชั่วโมง 📅💼⏳", p: "prûng-née kun tam-ngaan gèe chûa-moong", e: "How many hours do you work tomorrow?"},
-            {t: "พรุ่งนี้ทำงานเรียบร้อยไหม 📅💼✅", p: "prûng-níi tam-ngaan rîap-rɔ́ɔi mái", e: "Is the work for tomorrow finished?"},
-            {t: "พรุ่งนี้อากาศเป็นยังไง 📅🌤️❓", p: "prûng-níi aa-gàat bpen yang-ngai", e: "How's the weather tomorrow?"},
-            {t: "พรุ่งนี้ไปทะเลไหม 📅🌊🏖️", p: "prûng-née bpai tá-lay mái", e: "Are we going to the beach tomorrow?"},
-            {t: "พัสดุ 📦🚚📬", p: "pát-sà-dù", e: "parcel"},
-            {t: "พายุหนัก 🌪️🌧️‼️", p: "paa-yú nàk", e: "Heavy storm"},
-            {t: "พาลูกชายไปเล่นรักบี้ 👨‍👦🏉🏃", p: "paa lûuk-chaai bpai lên rák-bîi", e: "to take my son to play rugby"},
-            {t: "พิซซ่า ไก่ทอด และสมูทตี้ 🍕🍗🥤", p: "pís sâa gài tɔ̂ɔt lɛ́ sà mûut dtîi", e: "Pizza, fried chicken, and smoothie."},
-            {t: "พิมพ์ข้อความส่งให้ลูกชาย 📲⌨️👦", p: "pim kɔ̂ɔ-kwam sòng hâi lûuk-chaai", e: "Type a message to send to my son."},
-            {t: "พิมพ์หาลูกชาย ⌨️💬👦", p: "pim hǎa lûuk-chaai", e: "Typing to my son."},
-            {t: "พิมพ์หาใคร ⌨️💬❓", p: "pim hǎa krai", e: "Who are you typing to?"},
-            {t: "พิมพ์อีเมล์ทุกวัน 📧⌨️📅", p: "pim ii-meo took wan", e: "to type emails every day"},
-            {t: "พูด 🗣️💬👄", p: "pûut", e: "speak / say"},
-            {t: "พูดภาษาฝรั่งเศสได้ไหม 🇫🇷🗣️❓", p: "pûut paa sǎa fà râng sèet dâi mǎi", e: "Can you speak French?"},
-            {t: "พูดภาษาอะไร 🗣️🏳️❓", p: "pûut paa sǎa à rai", e: "What language do you speak?"},
-            {t: "พูดภาษาอะไรบ้าง 🗣️🏳️🤷", p: "pûut paa sǎa à rai bâang", e: "What languages do you speak?"},
-            {t: "พูดภาษาอังกฤษ และภาษาไทยนิดหน่อย 🇬🇧🤏🇹🇭", p: "pûut paa sǎa ang grìt lɛ́ paa sǎa tai nít nɔ̀ɔi", e: "I speak English and a little Thai."},
-            {t: "พูดว่าอะไร 🗣️💬❓", p: "pûut wâa a-rai", e: "What did you say (that)?"},
-            {t: "พูดอังกฤษ เรียนภาษาไทย 🇬🇧📚🇹🇭", p: "pûut ang grìt rian paa sǎa tai", e: "Speak English, learn Thai."},
-            {t: "ฟังและบอกว่า ได้ยินอะไร 👂🗣️❓", p: "fang lɛ́ bɔ̀ɔk wâa dâi yin à rai", e: "Listen and tell me(That) what you hear"},
-            {t: "ฟัน 🦷😬👄", p: "fan", e: "tooth; to cut; to chop"},
-            {t: "ภาษาไทยพูดยังไง 🇹🇭🗣️❓", p: "...paa-săa Tai pûut yang-ngai", e: "...how do you say it in Thai?"},
-            {t: "ภูเขา ⛰️🏔️🌄", p: "puu kǎo", e: "Mountain"},
-            {t: "มังกร 🐉🐲🔥", p: "mang gɔɔn", e: "Dragon"},
-            {t: "มันฝรั่ง 🥔🍟🥔", p: "man fà ràng", e: "Patatoes"},
-            {t: "มันฝรั่งบด 🥔🥄🥣", p: "man-fa-ràng-bòt", e: "mashed potatoes"},
-            {t: "มั่นใจ 😤💪✨", p: "mân-jai", e: "confident; sure"},
-            {t: "มากกว่า ➕📈🆙", p: "mâak gwàa", e: "More (than)"},
-            {t: "มาจากประเทศอะไร ✈️🏳️❓", p: "maa jàak bprà têet à rai", e: "What country are you from?"},
-            {t: "มาจากประเทศอังกฤษ ✈️🇬🇧👑", p: "maa jàak bprà têet ang grìt", e: "I am from England."},
-            {t: "มาจากประเทศไทยไหม ✈️🇹🇭❓", p: "maa jàak bprà têet tai mái", e: "Are you from Thailand?"},
-            {t: "เช่น 👉🥪🍕", p: "chên", e: "for example; such as; like"},
-            {t: "มีข้อความใหม่ 📩🆕🔔", p: "mee kɔ̂ɔ-kwaam mài", e: "There is a new message."},
-            {t: "มีข้อความให้ลูกค้า 📩👉👔", p: "mii khâaw-khwaam hâi lûuk-kháa", e: "There is a message for the customer."},
-            {t: "มีคอมพิวเตอร์ 2 เครื่อง 💻💻2️⃣", p: "mii khom-phiu-dtêr sŏng krêuang", e: "I have 2 computers."},
-            {t: "มีตอนบ่าย ☀️🕑✅", p: "mii dtaawn-bàai", e: "Have…in the afternoon"},
-            {t: "มีน้ำอะไรบ้าง 🥤❓🍹", p: "mii náam à rai bâang", e: "What drinks do you have? (expect >1 answer)"},
-            {t: "มีบัญชีธนาคาร 2 บัญชี 💳🏦2️⃣", p: "mii banchii thanaakaan sɔ̌ɔng banchii", e: "I have two bank accounts."},
-            {t: "มีประชุมกับลูกค้ากี่โมง 💼🤝⏰", p: "mee-pra-choom-gap-look-kaa-gee-moong", e: "What time is the meeting with the customer?"},
-            {t: "มีปัญหา ⚠️❌🤯", p: "mii bpan hǎa", e: "Have problems"},
-            {t: "มีพี่ชายหนึ่งคน 👱‍♂️☝️1️⃣", p: "mii pîi chaai nʉ̀ng kon", e: "I have one older brother."},
-            {t: "มีพี่น้องกี่คน 👫❓🔢", p: "mii pîi nɔ́ɔng gìi kon", e: "How many siblings do you have?"},
-            {t: "มีลูกกี่คน 👶❓🔢", p: "mii lûuk gìi kon", e: "How many children do you have?"},
-            {t: "มีลูกสองคน 👶👶2️⃣", p: "mii lûuk sɔ̌ɔng kon", e: "I have two children."},
-            {t: "มีสามบริษัท 🏢🏢🏢", p: "mii sǎam bɔ̀ rí sàt", e: "Have 3 companies"},
-            {t: "มีหมาอะไร 🐶🐕❓", p: "mii mǎa à rai", e: "What kind of dog do you have?"},
-            {t: "มีเพื่อนไปด้วยไหม 👫🤝❓", p: "mii pêuan bpai dûay mái", e: "Are friends going with you?"},
-            {t: "มีเมฆ ☁️🌥️🌫️", p: "mii mêek", e: "Have clouds -> Cloudy"},
-            {t: "มีแดด ☀️🕶️🌡️", p: "mii dɛ̀ɛt", e: "Sunny"},
-            {t: "มีแดดเยอะ ☀️🔥🕶️", p: "mii dɛ̀ɛt yə́", e: "Have lots of sun / sunny"},
-            {t: "มีโต๊ะสองคนไหม 🪑🍽️2️⃣", p: "mii dtó sǎawng kon mǎi", e: "Is there a table for two people?"},
-            {t: "มีไข้ 🤒🌡️🤕", p: "mii kâi", e: "to have a fever"},
-            {t: "มืด 🌑🌃🔌", p: "mʉ̂ʉt", e: "Dark"},
-            {t: "มือ ✋👐💅", p: "meuu", e: "hand"},
-            {t: "ยัง ⏳🛑✋", p: "yang", e: "still; yet; to be still; to be yet; still not; not yet; still (doing something)"},
-            {t: "ยังไม่กิน 🍽️🙅‍♂️⏳", p: "yang mâi gin", e: "Not eaten yet."},
-            {t: "ยังไม่อาบ 🚿🙅‍♂️🛁", p: "yang mâi àap", e: "haven't showered yet"},
-            {t: "ยังไม่เอา ✋🛑⏳", p: "yang mâi ao", e: "Don’t want anything yet"},
-            {t: "ยาก 🧗‍♂️🤯📉", p: "yâak", e: "difficult"},
-            {t: "ยานอนหลับ 💊😴💤", p: "yaa nɔɔn làp", e: "Sleeping tablets/pills"},
-            {t: "ยาว 📏🐍🛤️", p: "yaao", e: "long"},
-            {t: "ยุ่ง 🤯🔥📞", p: "yûng", e: "Busy"},
-            {t: "ย่าง 🍢🔥🍖", p: "yâang", e: "to grill; to roast; to step; to stride"},
-            {t: "รถ 🚗🚙🚘", p: "rót", e: "car; vehicle"},
-            {t: "รถติด 1 ชั่วโมง 🚗🚦⏳", p: "rót-dtìt nùeng chûa-moong", e: "Traffic jam 1 hour"},
-            {t: "รถอยู่ที่ไหน 🚗📍❓", p: "rót à yûu tîi nǎi", e: "Where is the car?"},
-            {t: "รถเมล์ 🚌🚍🚏", p: "rót mee", e: "Buses"},
-            {t: "รถไฟ 🚂🚃🛤️", p: "rót fai", e: "Trains"},
-            {t: "รถไม่ติด 🚗💨✅", p: "rót mâi tìt", e: "traffic is not stuck"},
-            {t: "รอนิดนึงนะ ⏳✋🤏", p: "rɔɔ nít nʉng ná", e: "Just a moment, please."},
-            {t: "รอสักครู่ ⏳✋🕒", p: "rɔɔ sàk-krûu", e: "Please wait a moment."},
-            {t: "ระหว่าง ↔️🥪🚧", p: "rá wàang", e: "between"},
-            {t: "รังเกียจ 🤢🤮👎", p: "rang-gìat", e: "to dislike; to detest; to be disgusted with"},
-            {t: "รับ 🤲📥📦", p: "ráp", e: "Pick up"},
-            {t: "รับของเดลิเวอรี่เมื่อไร 📦⏳❓", p: "ráp kɔ̌ɔng dee-lí-wêe-rîi mʉ̂a-rài", e: "When do you receive the delivery?"},
-            {t: "รับข้อความบ่อยแค่ไหน 📩🔁❓", p: "ráp kɔ̂ɔ-kwāam bɔ̀y kâae nǎi", e: "How often do you receive messages?"},
-            {t: "รับลูกสาวจากไหน 👧📍❓", p: "ráp lûuk-sǎao jàak nǎi", e: "Where do you pick up your daughter from?"},
-            {t: "รับลูกเมื่อไร 👶⏳❓", p: "rap lûuk mʉ̂ʉa rai", e: "When will you pick up the child?"},
-            {t: "รัสเซีย 🇷🇺❄️🐻", p: "rát sia", e: "Russia(n)"},
-            {t: "ร้องเพลง 🎤🎶🎵", p: "rɔ́ɔng pleeng", e: "To sing"},
-            {t: "ร้องไห้ 😭💧😢", p: "rɔ́ng-hâi", e: "to cry"},
-            {t: "ร้อน 🥵☀️🔥", p: "rɔ́ɔn", e: "hot"},
-            {t: "ร้อนมากๆครั้งที่แล้วเมื่อไหร่ 🥵📅❓", p: "ráawn mâak mâak kráng têe láaew mêua rài", e: "When was the last time it was very hot?"},
-            {t: "ร้อนไหม 🥵❓☀️", p: "ráwn mái", e: "Is it hot?"},
-            {t: "ร้านกาแฟ ☕🍰🥐", p: "ráan gaa fɛɛ", e: "Coffee shop"},
-            {t: "ร้านเครื่องดื่ม 🥤🍹🍸", p: "ráan krʉ̂ang dʉ̀ʉm", e: "Beverage shop"},
-            {t: "ลง ⬇️📉🚌", p: "long", e: "(go) down"},
-            {t: "ลงรถ 🚗🔚🚶", p: "long rót", e: "to get off (a vehicle), to alight"},
-            {t: "ลงลิฟต์ 🛗⬇️📉", p: "long-líf", e: "Go down the elevator; take the elevator down"},
-            {t: "ลงอีกชั้น ⬇️🏢1️⃣", p: "long-ìik-chán", e: "go down another floor/level; another layer"},
-            {t: "ลงอีกสองชั้น ⬇️🏢2️⃣", p: "long ìik sǒng chán", e: "Go down two more floors / levels."},
-            {t: "ลงเครื่อง ✈️🛬🏁", p: "long-krʉ̂ang", e: "to get off (a plane); to land (a plane)"},
-            {t: "ลบ ❌🗑️➖", p: "lóp", e: "Minus / Negative"},
-            {t: "ลมแรง 🌬️🍃💨", p: "lom rɛɛng", e: "Strong wind"},
-            {t: "ลอง 🤏🤔🔄", p: "lɔɔng", e: "Try / Experiment; attempt"},
-            {t: "ลักยิ้ม 😊👉👶", p: "lák yím", e: "dimples"},
-            {t: "ลานจอดรถ 🅿️🚗🛣️", p: "laan-jòt-rót", e: "parking lot"},
-            {t: "ลาเต้ ☕🥛🤎", p: "laa dtê", e: "Latte"},
-            {t: "ลิสต์ช็อปปิ้ง 📝🛒🧾", p: "lít chɔ́p bpîng", e: "Shopping list"},
-            {t: "ลิ้น 👅👄🔴", p: "líin", e: "tongue"},
-            {t: "ลึก 🕳️🌊⬇️", p: "lʉ́k", e: "Deep"},
-            {t: "ลูกค้า 🛍️👥🛒", p: "lûuk káa", e: "Customer"},
-            {t: "ลูกชาย(ของ)ผมเป็นนักเรียน 👦🎒🏫", p: "lûuk chaai (kɔ̌ɔng) pǒm bpen nák rian", e: "The son of mine is a student."},
-            {t: "ลูกชายเริ่มเล่นรักบี้กี่โมง 👦🏉⏰", p: "lûuk-chaai rə̂əm lên rák-bîi gèe mohng", e: "What time does your son start playing rugby?"},
-            {t: "ลูกทุกคน 👶👦👧", p: "lûuk túk kon", e: "Every children"},
-            {t: "ลูกน้อง 👷‍♂️👔📉", p: "lûuk nɔ́ɔng", e: "Subordinates / people under your supervision"},
-            {t: "ลูกสาวของผมชอบเต้นเพลงเต้นทุกเพลง 👧💃🎶", p: "lûuk sǎao kɔ̌ɔng pǒm chɔ̂ɔp dtên pleeng dtên túk pleeng", e: "The daughter of mine likes to dance every dance song (classifier)."},
-            {t: "ลูกสาวเลิกขี่ม้ากี่โมง 👧🐎⏰", p: "lûuk-sǎao lôek khìi máa kìi moong", e: "What time did your daughter stop riding horses?"},
-            {t: "ลูกเป็นยังไง 👶❓🤷", p: "lûuk bpen yang ngai", e: "How are your children?"},
-            {t: "ลูกๆเรียนหรือเปล่า 👶📚❓", p: "lûuk-lûuk rian rʉ̌ʉ bplào?", e: "Are your children studying?"},
-            {t: "ลูกๆเลิกเรียนสามโมงตรง 👶🏫🕒", p: "lûuk-lûuk lə̂ək-rian sǎam-moong dtrong", e: "The children finish school at 3 o'clock sharp."},
-            {t: "ล้ม 🤸‍♂️🤕⬇️", p: "lóm", e: "to fall down; to collapse; to fail"},
-            {t: "วงเวียน 🔄🚗⭕", p: "wong wian", e: "Roundabout"},
-            {t: "วัด 🏯🙏🕉️", p: "wát", e: "Temples"},
-            {t: "วัน 📅☀️📆", p: "wan", e: "day"},
-            {t: "วันนี้มีประชุมไหม 📅🤝❓", p: "wan-níi mii bprà-chum măi", e: "Is there a meeting today?"},
-            {t: "วันนี้อาบน้ำกี่ครั้ง 🚿🔢❓", p: "wan-níi àap-náam kìi kráng", e: "How many times did you shower today?"},
-            {t: "วันพ่อ 👨‍👧‍👦💛📅", p: "wan pɔ̂ɔ", e: "Father’s day"},
-            {t: "วันอื่น 📅⏭️🔜", p: "wan-ʉ̀ʉn", e: "another day"},
-            {t: "วันเกิด 🎂🎉🎁", p: "wan gə̀ət", e: "Birthday"},
-            {t: "วาดรูป 🎨🖌️🖼️", p: "wâat rûup", e: "Draw"},
-            {t: "วิ่ง 🏃‍♂️💨👟", p: "wîng", e: "To run"},
-            {t: "ว่า 💬👉🔗", p: "wâa", e: "That"},
-            {t: "ว่าง 🈳🕊️✅", p: "wâang", e: "empty; free; available; vacant"},
-            {t: "ว่ายน้ำ 🏊‍♂️🌊💦", p: "wâai náam", e: "To swim"},
-            {t: "ว่ายน้ำเป็นยังไงบ้าง 🏊‍♂️🗣️❓", p: "wâai-nám bpen yang-ngai bâang?", e: "How is swimming (going/what's it like)?"},
-            {t: "ว่ายน้ำได้ไหม 🏊‍♂️❓🤷", p: "wâai náam dâi mái", e: "Can you swim?"},
-            {t: "ว่ายน้ำไหม 🏊‍♂️❓🌊", p: "wâai náam mái", e: "Do you swim?"},
-            {t: "สนุก 🎢🥳🎡", p: "sà-nùk", e: "Fun"},
-            {t: "สนุกครั้งที่แล้วเมื่อไร 🥳📅❓", p: "sà-nùk kráng têe láaew mêu-rài", e: "When was the last time it was fun?"},
-            {t: "สนุกมาก 🤩🎢🔥", p: "sà nùk mâak", e: "Very fun"},
-            {t: "สบายดี 😊✅👍", p: "sà-baai-dii", e: "well; fine; comfortable; healthy"},
-            {t: "สบายดีหรือเปล่า 👋❓😊", p: "sà-baai dii rʉ̌ʉ bplào?", e: "Are you feeling well?"},
-            {t: "สบู่น้ำ 🧼🧴🚿", p: "sà bùu náam", e: "Liquid soap"},
-            {t: "สวน 🌳🌷⛲", p: "sŭuan", e: "garden; park"},
-            {t: "สองชั่วโมงต่อมาสึนามิมา 🌊🕑🚨", p: "sǎawng chûua-moong dtòr maa sù-ná-mí maa", e: "Two hours later, the tsunami came."},
-            {t: "สอน 👨‍🏫📖🗣️", p: "sɔ̌ɔn", e: "Teach"},
-            {t: "สักครู่ ⏳✋🕒", p: "sàk-krûu", e: "just a moment; a moment; a little while; one moment"},
-            {t: "สั่งอาหาร 🗣️📝🍲", p: "sàng aa hǎan", e: "Food ordering"},
-            {t: "สั้น 📏✂️🤏", p: "sân", e: "short"},
-            {t: "สามทุ่ม 🕘🌙💤", p: "sǎam-tûm", e: "nine o'clock at night"},
-            {t: "สาย ⏰🐢🛑", p: "sǎai", e: "8 Bus/Train Line/No./Late (during the day)"},
-            {t: "สำหรับผม มันดี 🙋‍♂️✅👍", p: "sǎm-ràp phǒm man dii", e: "For me, it's good."},
-            {t: "สิบปี 🔟📅⏳", p: "sìp bpii", e: "10 years"},
-            {t: "สิบโมง 🕙🌞⏰", p: "sìp moong", e: "ten o'clock"},
-            {t: "สิบโมงเช้า 🕙🌞🌅", p: "sìp moong cháao", e: "10:00"},
-            {t: "สีเขียวเข้ม 🟢⚫🎨", p: "sǐi kǐao kêm", e: "Dark green"},
-            {t: "สี่คน 👥👥4️⃣", p: "sìi kon", e: "4 people"},
-            {t: "สี่ทุ่ม 🕙🌙💤", p: "sìi tûm", e: "22:00"},
-            {t: "สี่โมงครึ่ง 🕟⏰🌗", p: "sìi-moong-krʉ̂ng", e: "half past four (PM)"},
-            {t: "สุก 🍳🔥✅", p: "sùk", e: "Fully cooked"},
-            {t: "สุขสันต์วันเกิด 🎂🎉🎁", p: "sùk sǎn wan gə̀ət", e: "Happy Birthday!"},
-            {t: "สูง 🦒📏⬆️", p: "sǔung", e: "tall; high"},
-            {t: "สเปน 🇪🇸💃🥘", p: "sà bpeen", e: "Spain"},
-            {t: "สแกน 📲📠🔍", p: "sà gɛɛn", e: "Scan QR code"},
-            {t: "ส่งของให้ลูกค้า 📦🚚👔", p: "sòng kɔ̌ɔng hâi lûuk káa", e: "Send stuff to customers"},
-            {t: "ส่งของให้ลูกค้าบ่อย 📦🚚🔁", p: "sòng kǎwng hâi lûuk-káa bòi", e: "I often deliver goods to customers."},
-            {t: "ส่งของให้เพื่อนบ่อย 📦🚚👫", p: "sòng kɔ̌ɔng hâi pʉ̂an bɔ̀y", e: "I often send things to friends."},
-            {t: "ส่งข้อความให้เพื่อนร่วมงาน 📩📲👔", p: "sòng kɔ̂ɔ-kwam hâi pʉ̂an-rûam-ngaan", e: "Send a message to a colleague"},
-            {t: "ส่งข้อความให้ใคร 📩📲❓", p: "sòng kôr-kwahm hâi krai", e: "To whom should I send a message?"},
-            {t: "ส่งข้อความให้ใครบ่อย 📩📲🔁", p: "sòng kôr-kwaam hâi krai bòi", e: "Who do you text often?"},
-            {t: "ส่งอาหารให้ลูกค้า 🛵🍱👔", p: "sòng a-hǎan hâi lûuk-kháa", e: "Deliver food to the customer."},
-            {t: "หกโมงครึ่งตอนเช้า 🕡🌅⏰", p: "hòk moong krʉ̂ng dtɔɔn cháao", e: "6.30AM"},
-            {t: "หกโมงเช้า 🕕🌅⏰", p: "hòk moong cháao", e: "06:00"},
-            {t: "หนวด 👨🥸🧔", p: "nùat", e: "mustache"},
-            {t: "หนังกี่ชั่วโมง 🎬⏳❓", p: "nǎng gèe chûa-moong", e: "How many hours is the movie?"},
-            {t: "หนังทุกอย่าง 🎬🍿💯", p: "nǎng túk yàang", e: "Every movie"},
-            {t: "หนังสือภูมิศาสตร์ 📚🌍🗺️", p: "nǎng sʉ̌ʉ puu mí sàat", e: "Geography books"},
-            {t: "หนังสือเปียกน้ำ 📖💧💦", p: "nǎng-sǔue bpìiak nám", e: "The book is wet."},
-            {t: "หนา 🧱📚🍔", p: "nǎa", e: "thick; dense"},
-            {t: "หนาว 🥶❄️🧥", p: "nǎao", e: "cold"},
-            {t: "หนาวทำให้เศร้า 🥶➡️😢", p: "năao tam hâi sâo", e: "The cold makes one sad."},
-            {t: "หนาวมากๆครั้งที่แล้วเมื่อไร 🥶📅❓", p: "nǎao mâak mâak kráng tîi láew mêua rài", e: "When was the last time it was very, very cold?"},
-            {t: "หนาวและฝนตก 🥶🌧️☔", p: "nǎao lɛ́ fon dtòk", e: "cold and rainy"},
-            {t: "หนึ่งทุ่ม 🕖🌙🌆", p: "nʉ̀ng tûm", e: "19:00"},
-            {t: "หนึ่งวัน ทำอะไรบ้าง 📅❓🤷", p: "nʉ̀ng wan tam à rai bâang", e: "What are you doing in a day?"},
-            {t: "หน้า 😐👩👱", p: "nâa", e: "Next …"},
-            {t: "หน้าต่าง 🪟🏠🖼️", p: "nâa dtàang", e: "Window"},
-            {t: "หมอผิดบ่อย 👨‍⚕️❌🔁", p: "mɔ̌ɔ pìt bɔ̀i", e: "The doctor makes mistakes often."},
-            {t: "หมาสองตัว 🐶🐶2️⃣", p: "mǎa sɔ̌ɔng dtua", e: "Dogs 2 animals"},
-            {t: "หยุด 🛑✋⛔", p: "yùt", e: "Stop"},
-            {t: "หรือ 🤷‍♂️🔁❓", p: "rʉ̌ʉ", e: "Or"},
-            {t: "หลัง 🔙🏠🍑", p: "lǎng", e: "Behind, after"},
-            {t: "หลายที่ 🗺️📍📚", p: "lǎai tîi", e: "Many places"},
-            {t: "หลายอย่าง 📦📚🎒", p: "lǎai yàang", e: "Many things"},
-            {t: "หวานปกติ 🍬😐👌", p: "wǎan bpòk gà dtì", e: "Normal sweetness"},
-            {t: "หวานมาก 🍬🍬😖", p: "wǎan mâak", e: "Very sweet"},
-            {t: "หันหน้า 🙄🔄👩", p: "hǎn nâa", e: "To face"},
-            {t: "หัวมุม 📐🏙️🚦", p: "hǔa mum", e: "corner"},
-            {t: "หาดกะตะ 🏖️🌊🇹🇭", p: "hàat gà dtà", e: "Kata beach"},
-            {t: "หาดฟรีด้อม 🏖️🆓🌊", p: "hàat frii dɔ̂ɔm", e: "Freedom Beach"},
-            {t: "หายาก 💎🔍📉", p: "hǎa yâak", e: "Difficult to be found"},
-            {t: "หาเงิน 💰👷‍♂️💸", p: "hăa ngern", e: "to earn money; to make money"},
-            {t: "หิมะ ❄️☃️🌨️", p: "hì má", e: "Snow"},
-            {t: "หิวนิดหน่อย 😋🤏🍽️", p: "hǐu nít nɔ̀ɔi", e: "A bit hungry"},
-            {t: "หาดเฉวง 🏖️🌊🌴", p: "hàat chà wěeng", e: "Chaweng Beach"},
-            {t: "หิวใช่ไหม 🍽️🤤❓", p: "hǐu châi mái", e: "You're hungry, right?"},
-            {t: "หิวไหม 🍽️❓🤤", p: "hĭw mái", e: "Are you hungry?"},
-            {t: "หู 👂🔊🙉", p: "hǔu", e: "ear"},
-            {t: "ห้อง 🚪🏠🛏️", p: "hɔ̂ɔng", e: "Room / Chambers"},
-            {t: "ห้องนอนโรงแรม 🏨🛏️💤", p: "hâwng nawn roong raem", e: "hotel room"},
-            {t: "ห้องลอง 👗👖🚪", p: "hɔ̂ɔng lɔɔng", e: "Fitting room"},
-            {t: "ห้าง 🛍️🏬🛒", p: "hâang", e: "Mall"},
-            {t: "ห้าโมง 🕔⏰🌥️", p: "hâa moong", e: "17:00"},
-            {t: "องศา 🌡️📐📏", p: "ong-săa", e: "degree (unit of measurement)"},
-            {t: "องุ่น 🍇🍷🟢", p: "à ngùn", e: "Grapes"},
-            {t: "อบ 🍪🥧🔥", p: "òp", e: "to bake; to roast; to toast; to warm up"},
-            {t: "อยาก 💭🙏❤️", p: "yàak", e: "Want to"},
-            {t: "อยากไปว่ายน้ำอีกครั้ง 🏊‍♂️💭🔄", p: "yàak bpai wâai náam ìik kráng", e: "I want to go swimming again."},
-            {t: "อยู่ 📍🏠✅", p: "yùu", e: "be located/live/stay"},
-            {t: "อยู่ที่ไหน 📍❓🗺️", p: "yùu tîi nǎi", e: "Where are you?"},
-            {t: "อยู่บ้านกี่คน 🏠👥❓", p: "yùu bâan gìi kon", e: "How many people live in your house?"},
-            {t: "อยู่บ้านหนึ่งคน 🏠👤☝️", p: "yùu bâan nʉ̀ng kon", e: "One person lives at home."},
-            {t: "อยู่อังกฤษ 🇬🇧🏠💂", p: "yùu ang grìt", e: "live/be/stay in England"},
-            {t: "อย่างเดียว ☝️📦🔒", p: "yàang diao", e: "On its own"},
-            {t: "อร่อย 😋🤤✨", p: "à-ròi", e: "delicious; tasty"},
-            {t: "อร่อยกว่า 😋📈🏆", p: "à rɔ̀ɔi gwàa", e: "More delicious"},
-            {t: "อร่อยมาก 😋🔥🌟", p: "à rɔ̀ɔi mâak", e: "Very delicious"},
-            {t: "อวัยวะ 🫀🫁🧠", p: "à wai yá wá", e: "Body Parts"},
-            {t: "ออกกำลังกาย 🏋️‍♂️🏃‍♂️💦", p: "òk gam-lang-gaai", e: "to exercise (work out strength body)"},
-            {t: "อะไร ❓🤷‍♂️🤔", p: "à-rai", e: "What?"},
-            {t: "อาการ 🤒🌡️📋", p: "à-gaan", e: "symptom; condition; state; characteristic"},
-            {t: "อากาศ ☁️🌬️🌡️", p: "aa gàat", e: "Weather"},
-            {t: "อากาศเป็นยังไง 🌤️❓👀", p: "aa gàat bpen yang ngai", e: "How is the weather?"},
-            {t: "อากาศเป็นยังไงบ้าง 🌤️🗣️❓", p: "aa-gàat bpen yang-ngai bâang?", e: "How is the weather?"},
-            {t: "อาจจะฝนตก 🌧️🤔☔", p: "àat jà fǒn dtòk", e: "Maybe it will rain"},
-            {t: "อาจจะ 🤔🤷‍♂️🎲", p: "àat jà", e: "Maybe"},
-            {t: "อาทิตย์ ☀️📅🗓️", p: "aa tít", e: "weeks / Sunday"},
-            {t: "อาทิตย์หน้า 📅🔜⏭️", p: "aa tít nâa", e: "Next week"},
-            {t: "อาบน้ำ 🚿🛁🧼", p: "àap náam", e: "Take a shower / Take a bath"},
-            {t: "อาบน้ำกี่โมง 🚿⏰❓", p: "àap náam gìi moong", e: "What time do you shower?"},
-            {t: "อาบน้ำหรือยัง 🚿❓🛀", p: "àap nám rǔue yang", e: "Have you taken a bath yet?"},
-            {t: "อาบน้ำแล้วใช่ไหม 🚿✅❓", p: "àap náam lɛ́ɛo châi mái", e: "You've showered, right?"},
-            {t: "อาบน้ำแล้วไหม 🚿❓🧼", p: "àap náam lɛ́ɛo mái", e: "Have you showered?"},
-            {t: "อาบแดด 🏖️☀️🕶️", p: "àap-dàaet", e: "to sunbathe"},
-            {t: "อาย 😳🙈☺️", p: "aai", e: "shy/ashamed"},
-            {t: "อายครั้งที่แล้วเมื่อไร 😳📅❓", p: "aai kráng tîi láaew mêua rài", e: "When was the last time you were embarrassed?"},
-            {t: "อายุกี่ปี 🎂👴❓", p: "aa yú gìi bpii", e: "How old are you?"},
-            {t: "อาหารจะถึงเมื่อไร 🍱⏳❓", p: "aa-hăan jà tǔng mʉ̂a-rai", e: "When will the food arrive?"},
-            {t: "อาหารทุกอย่าง 🥘🍲💯", p: "aa hǎan túk yàang", e: "Every (kind) of food"},
-            {t: "อาหารนี้สำหรับลูกค้า 🥘➡️👥", p: "aa-hǎan níi sǎm-ráp lûuk-kâa", e: "This food is for the customer."},
-            {t: "อาหารนี้สำหรับใคร 🥘➡️❓", p: "aa-hăan née săm-ràp krai", e: "Who is this food for?"},
-            {t: "อาหารนี้สุขภาพดีสำหรับผม 🥗💪🙋‍♂️", p: "aa-hăan née sùk-kà-phâap dee sǎm-ròp phǒm", e: "This food is healthy for me."},
-            {t: "อาหารหลายอย่าง 🥘🍲🍕", p: "aa hǎan lǎai yàang", e: "Many kinds of food"},
-            {t: "อาหารเช้ากี่โมง 🍳⏰❓", p: "aa-hǎan cháo gìi moong", e: "What time is breakfast?"},
-            {t: "อาหารเช้าอังกฤษ 🍳🇬🇧🥓", p: "aa hǎan cháao ang grìt", e: "English breakfast"},
-            {t: "อาหารเป็นพิษ 🤢🦠🏥", p: "aa hǎan bpen pít", e: "Food poisoning"},
-            {t: "อาหารเป็นยังไง 🥘❓😋", p: "aa-hăan bpen yang-ngai", e: "How's the food?"},
-            {t: "อิตาลี 🇮🇹🍕🍝", p: "ì dtaa lii", e: "Italy/Italian"},
-            {t: "อินเดีย 🇮🇳🍛🕌", p: "in dia", e: "India(n)"},
-            {t: "อิ่มไหม 😋🤰❓", p: "ìm mái", e: "Are you full?"},
-            {t: "อีก 20 นาที ⏱️2️⃣0️⃣", p: "ìik yîi-sìp naa-tee", e: "20 more minutes"},
-            {t: "อีกกี่ชั่วโมงกว่าจะมืด ⏳🌑❓", p: "ìik gìi chûua-moong gwàa jà mʉ̂ʉt", e: "How many more hours until dark?"},
-            {t: "อีกกี่ชั่วโมงกว่าจะเลิกเรียน ⏳🏫🏁", p: "ìik gìi chûua-moong gwàa jà lə̂ək-riiian", e: "How many more hours until school is over?"},
-            {t: "อีกครั้ง 🔄☝️🔁", p: "ìik kráng", e: "More time"},
-            {t: "อีกสองวันวันพ่อ 📅2️⃣👨", p: "ìik sǎaw wan wan pâaw", e: "Father's Day is in two more days."},
-            {t: "อีกสี่อาทิตย์ไปติดตั้งถังอ็อกซิเจนที่ไทย 📅4️⃣🇹🇭", p: "ìik sìi aa-tít bpai dtìt-dtâng tǎng ɔ́k-sí-jen têe tai", e: "In four more weeks, I will go install an oxygen tank in Thailand."},
-            {t: "อเมริกาโน่ ☕🇺🇸🧊", p: "à mee rí gaa nôo", e: "Americano"},
-            {t: "อ่านหนังสืออะไร 📖❓📚", p: "àan nǎng sʉ̌ʉ à rai", e: "What book are you reading?"},
-            {t: "เกาหลี 🇰🇷🥢🥡", p: "gao lǐi", e: "Korea 2.28pm"},
-            {t: "เกิด 👶🎂💥", p: "gə̀ət", e: "Born"},
-            {t: "เกี่ยวกับ ℹ️🔗📖", p: "gìao gàp", e: "About"},
-            {t: "เกือบ 🤏🏁🚧", p: "gʉ̀ap", e: "Almost"},
-            {t: "เขียว 🟢🍏🌿", p: "kǐao", e: "Green"},
-            {t: "เข้าวายฟายไม่ได้ 📶❌🙅", p: "kâo waai-faai mâi dâai", e: "Cannot connect to Wi-Fi."},
-            {t: "เครา 🧔🎅✂️", p: "krao", e: "beard"},
-            {t: "เครียด 😫🤯💢", p: "krîat", e: "Stressed"},
-            {t: "เครื่องดื่ม 🥤🍹🍺", p: "krʉ̂ang dʉ̀ʉm", e: "Drinks / Beverages"},
-            {t: "เครื่องล้างจาน 🧼🍽️🤖", p: "krʉ̂ang láang jaan", e: "Dishwashing machine"},
-            {t: "เครื่องอาบน้ำ 🧴🧼🚿", p: "krʉ̂ang àap náam", e: "Toiletries"},
-            {t: "เครื่องเขียน ✏️📏📎", p: "krʉ̂ang kǐan", e: "Stationery"},
-            {t: "เงินสด 💵💰💸", p: "ngən sòt", e: "Cash"},
-            {t: "เงียบ 🤫🔇😶", p: "ngîap", e: "Quiet"},
-            {t: "เจอ 🤝🔍👀", p: "jəə", e: "Meet"},
-            {t: "เจ็ดโมงเช้า และหกโมงเย็น 🕖🌅🕕", p: "jèt moong cháao lɛ́ hòk moong yen", e: "7am and 6pm"},
-            {t: "เฉยๆ 😐🤷‍♂️😶", p: "chə̌əi chə̌əi", e: "So so / indifferent"},
-            {t: "เช่น 👉🥪🍕", p: "chên", e: "for example; such as; like"},
-            {t: "เช้าบางวัน 🌅🎲📅", p: "cháao baang wan", e: "Morning in some days"},
-            {t: "เดิน 🚶‍♂️👣👟", p: "dəən", e: "Walk"},
-            {t: "เดินป่า 🥾🌲⛰️", p: "dəən bpàa", e: "To hike"},
-            {t: "เดี๋ยวกลับมา 🔙🔜⏳", p: "dǐao glàp maa", e: "I'll be back soon."},
-            {t: "เดี๋ยวกินอาหารไทย 🔜🥘🇹🇭", p: "dǐeaw gin aa-hǎan Tai", e: "Later, I'll eat Thai food."},
-            {t: "เดี๋ยวขับรถไปโรงเรียน 🔜🚗🏫", p: "dǐao kàp rót bpai roong-rian", e: "I'll drive to school later."},
-            {t: "เดี๋ยวโทรหาเพื่อน 🔜📞👫", p: "dǐao too hǎa pêuan", e: "I'll call a friend."},
-            {t: "เดี๋ยวไป 🔜🚶‍♂️💨", p: "dǐao bpai", e: "I'll go (in a moment); I'll be right there"},
-            {t: "เดือน 🗓️📅🌙", p: "dʉan", e: "months"},
-            {t: "เดือนหน้า 📅⏭️🔜", p: "dʉan nâa", e: "Next month"},
-            {t: "เด็ก 👶🧒🧸", p: "dèk", e: "child; young"},
-            {t: "เตรียม 🎒📋✅", p: "dtriam", e: "Prepare"},
-            {t: "เตะ 🦶⚽🥋", p: "dtè", e: "to kick"},
-            {t: "เต็ม 🥛💯🚫", p: "dtem", e: "full, complete"},
-            {t: "เต้น 💃🕺🎶", p: "dtên", e: "To dance"},
-            {t: "เต้นต่อหน้าคน 💃👀👥", p: "dtên dtòr nâa kon", e: "to dance in front of people"},
-            {t: "เต้าหู้ 🍲🥢🤍", p: "dtâo hûu", e: "Tofu"},
-            {t: "เที่ยง(วัน) 🕛☀️🍱", p: "tîang", e: "(wan) Midday"},
-            {t: "เที่ยงคืน 🕛🌑👻", p: "tîang kuern", e: "Midnight"},
-            {t: "เที่ยว ✈️🎒📸", p: "tîao", e: "Travel"},
-            {t: "เนื้อ 🥩🐄🍖", p: "nʉ́a", e: "Beef"},
-            {t: "เนื้อสัตว์ 🍖🍗🥩", p: "nʉ́a sàt", e: "Meat"},
-            {t: "เนื้อแกะ 🐑🥩🍽️", p: "nʉ́a gɛ̀", e: "Lamb"},
-            {t: "เบลเยี่ยม 🇧🇪🍫🧇", p: "been yîam", e: "Belgium"},
-            {t: "เบื่อ 😑🥱💤", p: "bʉ̀ʉa", e: "bored"},
-            {t: "เบื่อครั้งที่แล้วเมื่อไหร่ 😑📅❓", p: "bèua kráng têe láaew mêua rài", e: "When was the last time you were bored?"},
-            {t: "เปรียบเทียบ ⚖️🆚🔄", p: "bpriàp-tîap", e: "to compare"},
-            {t: "เป็นคนตรงไหม 🗣️📏❓", p: "bpen kon dtrong mái", e: "Are you a straightforward person?"},
-            {t: "เป็นนักธุรกิจ 👨‍💼👔✅", p: "bpen nák tú rá gìt", e: "I’m a businessperson"},
-            {t: "เป็นยังไง ❓🤷‍♂️👀", p: "bpen yang ngai", e: "How are you?"},
-            {t: "เป็นยังไงบ้าง 👋❓😊", p: "bpen yang-ngai bâang", e: "How are you? / How's it going?"},
-            {t: "เป็นหวัด 😷🤧🤒", p: "bpen wàt", e: "Have a cold"},
-            {t: "เป็นอะไร ❓🤕🤷", p: "bpen à rai", e: "What's wrong?"},
-            {t: "เพราะทำงานกับคนจีน 🇨🇳👔🤝", p: "prɔ́ tam ngaan gàp kon jiin", e: "Because I work with Chinese people"},
-            {t: "เพื่อนร่วมงาน 👔🤝🏢", p: "pʉ̂an rûam ngaan", e: "Co-workers / Colleagues"},
-            {t: "เพื่อนร่วมงานทุกคน 👔👥💯", p: "pʉ̂an rûam ngaan túk kon", e: "Every colleague"},
-            {t: "เภสัช 👩‍⚕️💊🏥", p: "pee sàt", e: "Pharmacist"},
-            {t: "เมือง 🏙️🏢🏘️", p: "mʉang", e: "City/town"},
-            {t: "เมื่อคืน 🌙🔙🛌", p: "mûe-kuuen", e: "last night"},
-            {t: "เมื่อคืนนอนหลับไหม 🌙💤❓", p: "mʉ̂a kʉʉn nɔɔn làp mǎi", e: "Did you sleep well last night? (lie down and fall asleep)"},
-            {t: "เมื่อเช้า 🌅🔙🍳", p: "mûe cháo", e: "this morning"},
-            {t: "เมื่อไร ⏳❓📅", p: "mʉ̂a rài", e: "When?"},
-            {t: "เมื่อไรกินข้าว 🍚⏳❓", p: "mʉ̂a rài gin kâao", e: "When do you eat (rice/meal)?"},
-            {t: "เมื่อไรกินน้ำ 💧⏳❓", p: "mʉ̂a rài gin náam", e: "When do you drink?"},
-            {t: "กินน้ำมาเมื่อไร 🥤🔙❓", p: "gin náam maa mʉ̂a rài", e: "When did you drink?"},
-            {t: "เมื่อไหร่ ⏳❓📅", p: "mʉ̂a rài", e: "When?"},
-            {t: "เยอะ 📚📈🆙", p: "yə́", e: "A lot"},
-            {t: "เย็น ❄️🌆🧊", p: "yen", e: "Cold"},
-            {t: "เริ่ม ▶️🏁🟢", p: "rôem", e: "to start; to begin"},
-            {t: "เริ่มงาน 💼▶️⏰", p: "rə̂əm ngaan", e: "Start work"},
-            {t: "เริ่มงานแปดโมงตรง 🕗💼✅", p: "rə̂əm ngaan bpɛ̀ɛt moong dtrong", e: "Start work at 8 o'clock sharp."},
-            {t: "เริ่มเรียนโรงเรียนใหม่ 🏫🆕🎒", p: "rə̂əm riian roong-riian mài", e: "to start a new school"},
-            {t: "เรียน ทำการบ้าน 📚📝✍️", p: "rian tam gaan-bâan", e: "Yes, they do homework"},
-            {t: "เรียนภาษากี่ชั่วโมง 🗣️📚⏳", p: "rian paa-sǎa gìi chûa-moong", e: "How many hours do you study a language?"},
-            {t: "กินข้าวมาเมื่อไร 🍚🔙❓", p: "gin kâao maa mʉ̂a rài", e: "When did you eat?"},
-            {t: "เรียนเมื่อไร 📚⏳❓", p: "rian mʉ̂a rài", e: "When do you study?"},
-            {t: "เรียบร้อยยัง ✅❓⏳", p: "rîap-rɔ́ɔi yang", e: "Is it done/finished yet? / Is it ready yet?"},
-            {t: "เรียบร้อยใช่ไหม ✅❓👍", p: "rîap-rɔ́ɔi châi mǎi", e: "Is it done/finished? / Is it all right?"},
-            {t: "เร็ว 🏎️💨⚡", p: "reo", e: "Fast"},
-            {t: "เลิก 🛑💔🔚", p: "lôek", e: "to stop; to quit; to finish (an activity)"},
-            {t: "เลิกงาน 💼🔚🏠", p: "lə̂rk ngaan", e: "Get off work"},
-            {t: "เลิกงานสามโมงตรง 🕒💼🔚", p: "lə̂ək ngaan sǎam moong dtrong", e: "Finish work at 3 o'clock sharp."},
-            {t: "เลี้ยวขวา ↪️➡️👉", p: "líao kwǎa", e: "Turn right"},
-            {t: "เลี้ยวซ้าย ↩️⬅️👈", p: "líao sáai", e: "Turn left"},
-            {t: "เล็ก 🤏🐜👶", p: "lék", e: "Small"},
-            {t: "เล่นดนตรี 🎸🎹🎻", p: "lên don dtrii", e: "Play music(al instrument)"},
-            {t: "เล่นยา 💊💉🚫", p: "lên yaa", e: "Do(play) drugs(medicine)"},
-            {t: "เศร้า 😢🌧️💔", p: "sâo", e: "sad"},
-            {t: "เสร็จ ✅🏁🆗", p: "sèt", e: "Finished"},
-            {t: "เสียงดัง 🔊📢🙉", p: "sǐang dang", e: "Loud (noise)"},
-            {t: "เสียใจ 😞💔😿", p: "sǐa-jai", e: "Sad/Feel sorry"},
-            {t: "เสียใจครั้งที่แล้วเมื่อไหร่ 😿📅❓", p: "sǐa-jai kráng-têe-láaeo mêuua-rài", e: "When was the last time you were sad/sorry?"},
-            {t: "เสื้อกล้าม 🎽💪👕", p: "sʉ̂a-glâam", e: "tank top; sleeveless shirt"},
-            {t: "ทั้งคู่ ✌️👯‍♂️🔗", p: "táng kûu", e: "All pair = Both"},
-            {t: "เสื้อผ้าทุกอย่าง 👗👕💯", p: "sʉ̂a pâa túk yàang", e: "Every type of clothes"},
-            {t: "เสื้อยืด 👕👚🧵", p: "sʉ̂a yʉ̂ʉt", e: "T-shirt"},
-            {t: "เหนือ ⬆️🧭🏔️", p: "nʉ̌a", e: "North"},
-            {t: "เหนื่อย 😫🔋🪫", p: "nʉ̀ai", e: "Tired"},
-            {t: "เหนื่อยมาก 😫💀💤", p: "nʉ̀ʉai mâak", e: "Very tired"},
-            {t: "เหมือนกันกับตื่นเต้น 🤩🟰👯‍♂️", p: "mʉ̌an-gan gàp dtʉ̀ʉn-dtên", e: "the same as being excited"},
-            {t: "เหมือนกับไทย 🇹🇭🟰🌏", p: "mʉ̌an gàp tai", e: "Same as Thailand"},
-            {t: "เหมือนเดิม 🔄🔙👌", p: "mʉ̌an dəəm", e: "Same as usual"},
-            {t: "เห่า ตอนไฟไหม้บ้าน 🐕🔥🏠", p: "hàao dton fai mâi bâan", e: "to bark when the house is on fire (burn)"},
-            {t: "เอสเพรสโซ่ ☕🖤⚡", p: "éet préet sôo", e: "Espresso"},
-            {t: "เอา 🤲✊✅", p: "ao", e: "take / want"},
-            {t: "เอาของใส่ถุง 🛍️📥🎒", p: "ao k̆hɔ̌ng sài t̄hǔng", e: "Put the stuff in the bag."},
-            {t: "เอาชาเย็นอีกหนึ่ง 🥤🧊☝️", p: "ao chaa yen ìik nùeng", e: "I'll have one more iced tea."},
-            {t: "เอาชาไทยเย็นสำหรับลูกชาย 🥤🇹🇭👦", p: "ao chaa Thai yen sam-rap luuk chaai", e: "Get cold Thai tea for my son."},
-            {t: "เอาฝาไหม 🥤🧢❓", p: "ao fǎa mǎi", e: "Do you want a lid?"},
-            {t: "เอาหลอดไหม 🥤📏❓", p: "ao lɔ̀ɔt mǎi", e: "Do you want a straw?"},
-            {t: "เอาอะไร ❓🤲🤷", p: "ao A-rai", e: "What do you want?"},
-            {t: "เอาอีกโต๊ะได้ไหม 🪑➕❓", p: "ao ìk dtó dâi-mǎi", e: "Can I get another table?"},
-            {t: "เอาโต๊ะเล็ก กลาง หรือใหญ่ 🪑📏❓", p: "ao dtó lék glaang rěu yài", e: "Do you want a small, medium, or large table?"},
-            {t: "เอาโต๊ะใหญ่ 🪑🐘✅", p: "ao dtó yai", e: "Take the big table."},
-            {t: "แกง 🍛🌶️🥥", p: "gɛɛng", e: "Curry"},
-            {t: "แกงจืด 🍲🥬☁️", p: "gɛɛng jʉ̀ʉt", e: "Bland curry = soup"},
-            {t: "แขนหัก 💪🦴🤕", p: "kɛ̌ɛn hàk", e: "Broken arms"},
-            {t: "สั่ง 🗣️📝☝️", p: "sàng", e: "order"},
-            {t: "ขอ 🙏🤲🥺", p: "kɔ̌ɔ", e: "ask for / request"},
-            {t: "แค่นี้ก่อน ✋🛑🤏", p: "kɛ̂ɛ níi gɔ̀ɔn", e: "That’s it."},
-            {t: "แต่งตัว 👗👔💄", p: "dtàeng dtuua", e: "to get dressed; to dress up; to put on clothes"},
-            {t: "แถม 🎁🆓➕", p: "tɛ̌ɛm", e: "Give away freebies"},
-            {t: "แปดโมงเช้า 🕗🌅⏰", p: "bpàet-moong cháo", e: "eight o'clock in the morning"},
-            {t: "แปรงฟันหรือยัง 🪥🦷❓", p: "bprang fan rǔe yang", e: "Have you brushed your teeth yet?"},
-            {t: "แปล 🗣️🔄📝", p: "bplae", e: "to translate"},
-            {t: "แปลว่าอะไร 📖❓🤔", p: "bplɛɛ wâa à rai", e: "What does it translate as?"},
-            {t: "แผ่นดินไหว 🌍🏚️📉", p: "pàen din wǎi", e: "earthquake"},
-            {t: "แพง 💸💎📈", p: "pɛɛng", e: "Expensive"},
-            {t: "แพ้ 🤧🏳️👎", p: "pɛ́ɛ", e: "Allergic to"},
-            {t: "แฟน ลูกชาย ลูกสาว และหมา 2 ตัว 👩‍❤️‍👨👨‍👩‍👧‍👦🐶", p: "fɛɛn lûuk chaai lûuk sǎao lɛ́ mǎa sɔ̌ɔng dtua", e: "My spouse/partner, son, daughter, and 2 dogs."},
-            {t: "แฟนผมชอบอ่านหนังสือ 👩📖❤️", p: "fɛɛn pǒm chɔ̂ɔp àan nǎng sʉ̌ʉ", e: "My partner likes to read."},
-            {t: "แฟนให้ไปล้างจาน 👩👉🍽️", p: "faen hâi bpai láang jaan", e: "My partner told me to go wash the dishes."},
-            {t: "แมงมุม 🕷️🕸️🦵", p: "maang-mum", e: "spider"},
-            {t: "แมลงวัน 🪰💩🍴", p: "ma-laeng wan", e: "fly (insect)"},
-            {t: "แมว 🐱🐈🧶", p: "mɛɛo", e: "Cat"},
-            {t: "แล้วคุณล่ะ 👉❓🤷", p: "lɛ́ɛw kun lâ", e: "And you? / How about you?"},
-            {t: "แว่น 👓🕶️🤓", p: "wɛ̂ɛn", e: "glasses"},
-            {t: "แสกน 📲📠🔍", p: "sa gaen", e: "Scan (QR)"},
-            {t: "แห้ง 🏜️🌵☀️", p: "hɛ̂ɛng", e: "Dry"},
-            {t: "โกรธ 😡🤬🔥", p: "gòhroht", e: "angry; to be angry; to be mad at"},
-            {t: "โคลน 🟤🌧️👢", p: "kloon", e: "Mud"},
-            {t: "โต๊ะนี้ว่างไหม 🪑❓🆓", p: "dtó níi wâang mǎi", e: "Is this table free/available?"},
-            {t: "โรงพยาบาลอยู่ตรงข้ามโรงแรม 🏥↔️🏨", p: "roong-pá-yaa-baan yùu dtrong-kâam roong-raem", e: "The hospital is opposite the hotel."},
-            {t: "โรงรถ 🏠🚗🔧", p: "roong rót", e: "Garage"},
-            {t: "โรงแรม 🏨🛎️🛏️", p: "roong rɛɛm", e: "Hotel"},
-            {t: "โรงแรมหมา 🏨🐶🦴", p: "roong-raem hmaa", e: "dog hotel"},
-            {t: "โลภ 🤑💰🧛", p: "lôop", e: "greedy"},
-            {t: "ใกล้ 🤏🏙️🚶", p: "glâi", e: "Near / Close to"},
-            {t: "ใครอยู่บ้าน 👤❓🏠", p: "krai à yûu bâan", e: "Who is at home?"},
-            {t: "ใครเรียนภาษาสเปน 👤🇪🇸📚", p: "krai rian paa sǎa bpeen", e: "Who is learning Spanish?"},
-            {t: "ใครไปลอนดอน 👤✈️🇬🇧", p: "krai bpai lɔɔn dɔɔn", e: "Who went to London?"},
-            {t: "ใจดี ❤️😇✨", p: "jai dii", e: "kind"},
-            {t: "ใจดํา 🖤😈👿", p: "jai dam", e: "Mean / black-hearted"},
-            {t: "ใช่ แต่นอนไม่ได้ ✅🍑😳", p: "châi dtɛ̀ɛ nɔɔn mâi dâi", e: "Yes, but cannot sleep."},
-            {t: "ใช่ ✅🆗👍", p: "châi", e: "Yes"},
-            {t: "ใช้ 🔨🤳🔧", p: "chái", e: "to use; to employ; to spend"},
-            {t: "ใช้เวลา ⏳🕰️🐢", p: "chái wee laa", e: "Spend time"},
-            {t: "ใส่ 📥👕👖", p: "sài", e: "Put on/wear"},
-            {t: "ใส่ถุงไหม 🛍️❓🥡", p: "sài tǔng mǎi", e: "Can I put it in a bag?"},
-            {t: "ใส่น้ำแข็ง 🧊🥤❄️", p: "sài nám kɛ̌ng", e: "Put in ice"},
-            {t: "ใส่เสื้อหรือยัง 👕❓👙", p: "sài sêua rǔue yang", e: "Have you put on your shirt yet? / Have you gotten dressed yet?"},
-            {t: "ใหญ่ 🐘🐋🏔️", p: "yài", e: "big"},
-            {t: "ให้ 🎁🤲💝", p: "hâi", e: "Give"},
-            {t: "ให้ฉันอยู่คนเดียว ✋👤🚪", p: "hâi chăn yùu kon diao", e: "Leave(Let) me (be) alone."},
-            {t: "ให้ยา 💊🤲👨‍⚕️", p: "hâi yaa", e: "Give medicine"},
-            {t: "ไกล 🔭🛫🗺️", p: "glai", e: "far"},
-            {t: "ไก่งวง 🦃🍖🍗", p: "gài nguang", e: "Turkey (chicken)"},
-            {t: "ไก่งวงอบ 🦃🔥🍽️", p: "gai-nguang òp", e: "roasted turkey"},
-            {t: "ไข่ลวก 🥚♨️🥄", p: "kài lûak", e: "Poached egg"},
-            {t: "ได้ กี่คืน ✅🌙❓", p: "dâi gèe keun", e: "Can. How many nights?"},
-            {t: "ได้ ชกมวยเก่งนิดหน่อย ✅🥊🤏", p: "dâi chók muai gèng nít nɔ̀ɔi", e: "Yes, I'm a little good at boxing."},
-            {t: "ได้ ชอบกินต้มยำกุ้ง ✅🍤🌶️", p: "dâi chɔ̂ɔp gin dtôm yam gûng", e: "Yes, I like to eat Tom Yum Goong."},
-            {t: "ได้ ✅🆗🔓", p: "dâi", e: "can; get; obtain; yes"},
-            {t: "ได้นิดหน่อย ✅🤏🐜", p: "dâi nít nɔ̀ɔi", e: "Can a little bit"},
-            {t: "ไถเงิน 🔪💰🤬", p: "tǎi ngən", e: "Rip off money"},
-            {t: "ไทย 🇹🇭🐘🥊", p: "tai", e: "Thai(land)"},
-            {t: "ไป(ดู)ด้วย 🤝👀🚗", p: "bpai duu dûay", e: "to go with; to come along; to join in (to watch)"},
-            {t: "ไปทำงานยังไง 🏢🚗❓", p: "bpai tam ngaan yang ngai", e: "How do you go to work?"},
-            {t: "ไปหาหมอหรือยัง 🏥👨‍⚕️❓", p: "bpai hǎa mɔ̌ɔ rʉ̌ʉ yang", e: "Have you been to the doctor yet?"},
-            {t: "ไปเที่ยว ✈️🎉🏖️", p: "bpai tîao", e: "Go travelling"},
-            {t: "ไปแล้ว 💨👋🔚", p: "bpai láaeo", e: "Gone already"},
-            {t: "ไปโรงพยาบาลยังไง 🏥🚑❓", p: "bpai roong-pá-yaa-baan yang-ngai", e: "How do I get to the hospital?"},
-            {t: "ไปโรงหนังยังไง 🎬🍿❓", p: "bpai roong-nǎng yang-ngai", e: "How do you/I get to the cinema?"},
-            {t: "ไฟตก 🔌💡🌑", p: "fai dtòk", e: "power outage"},
-            {t: "ไมค์ตื่นหกโมงทุกเช้า 👨🕕🌅", p: "mái dtʉ̀ʉn hòk moong túk cháao", e: "Mike wakes up at 6 AM every morning."},
-            {t: "ไมค์เป็นกุ๊กที่ร้านอาหาร 👨‍🍳🍳🏪", p: "mái bpen gúk tîi ráan aa hǎan", e: "Mike is a cook at a restaurant."},
-            {t: "ไมค์แฮปปี้ตอนพูดกับลูกค้า 😊🗣️👥", p: "mái happy dtɔɔn pûut gàp lûuk káa", e: "Mike is happy when talking to customers."},
-            {t: "ไม่ ❌🙅‍♂️🛑", p: "mâi", e: "no; not"},
-            {t: "ไม่คิดอะไรเลย 🧠🌫️😶", p: "mâi kít à rai ləəi", e: "Don’t think about anything at all."},
-            {t: "ไม่ชอบส่งข้อความ 📲👎🙅", p: "mâi chɔ̂ɔp sò̀ng kɔ̂ɔ-kwaam", e: "I don't like sending text messages."},
-            {t: "ไม่ชอบไปโรงเรียน 🏫👎🎒", p: "mâi chɔ̂ɔp bpai roong rian", e: "Don’t like to go to school"},
-            {t: "ไม่ดี 👎❌🚫", p: "mâi dii", e: "Not good"},
-            {t: "ไม่ดู 👀❌🙈", p: "mâi duu", e: "not look; don't watch"},
-            {t: "ไม่ต้องทอน 💵🙅‍♂️🪙", p: "mâi dtɔ̂ɔng tɔɔn", e: "No need to give back the change"},
-            {t: "ไม่มา 🚶‍♂️❌🚫", p: "mâi maa", e: "Not come"},
-            {t: "ไม่มี 🫙❌", p: "mâi mii", e: "No have"},
-            {t: "ไม่มีเวลา ⏰❌🏃‍♂️", p: "mâi mii wee laa", e: "Don’t have time"},
-            {t: "ไม่ร้อน 🌡️❄️✅", p: "mâi rɔ́ɔn", e: "not hot"},
-            {t: "ไม่ว่าย 🏊‍♂️❌🚫", p: "mâi wâai", e: "Not swim"},
-            {t: "ไม่หวาน 🍬❌🧂", p: "mâi wǎan", e: "Not sweet"},
-            {t: "ไม่หิว 🍽️✅👌", p: "mâi hǐu", e: "not hungry"},
-            {t: "ไม่อาบ 🚿❌🧼", p: "mâi àap", e: "Not shower"},
-            {t: "ไม่อิ่ม 🍽️📉🤤", p: "mâi ìm", e: "Not full"},
-            {t: "ไม่เข้าใจ 🤨❓🤷‍♂️", p: "mâi kâo jai", e: "Don’t understand"},
-            {t: "ไม่เย็น 🧊❌🔥", p: "mâi yen", e: "Not cold = room temp"},
-            {t: "ไม่ใช่ ❌🚫🙅‍♀️", p: "mâi châi", e: "No"},
-            {t: "ไม่ใส่น้ำตาล ☕❌🍬", p: "mâi sài náam dtaan", e: "Without sugar"},
-            {t: "ไม่ได้ ❌🚫🛑", p: "mâi dâai", e: "can't; not able to; didn't; haven’t"},
-            {t: "ไม่ได้ เต็มแล้ว 🚫💯🙅", p: "mâi dâi dtem lɛ́ɛo", e: "cannot, full already"},
-            {t: "ไม่ได้ไปไหน 🏠📍🛑", p: "mâi dâi bpai nǎi", e: "Didn’t go anywhere"},
-            {t: "ไล่สตาฟออก 👔🚪💨", p: "lâi sà dtàaf ɔ̀ɔk", e: "Fired staff"},
-            {t: "ไส้กรอก 🌭🍢🌭", p: "sâi-gròk", e: "sausage"},
-            {t: "ง่วง 🥱😴💤", p: "ngûang", e: "sleepy"},
-            {t: "แทน 🔄🔁🆔", p: "taen", e: "instead; in place of; to represent; to substitute"},
-            {t: "วันสุดท้าย 🏁📅🔚", p: "wan-sùt-táai", e: "last day"},
-            {t: "รวย 💰💎🤑", p: "ruay", e: "Rich"},
-            {t: "มัน 🥔✨🔘", p: "man", e: "it"},
-            {t: "ชีวิตง่าย 🧘‍♂️🍀⛱️", p: "chee-wít ngâai", e: "simple/easy life"},
-            {t: "หนัก 🏋️‍♂️🐘🧱", p: "nàk", e: "hard/heavy"},
-            {t: "ตื่น 🛌👀🌅", p: "dtʉ̀ʉn", e: "wake up"},
-            {t: "นี่ 👇📍👉", p: "nêe", e: "this / Here it is."},
-            {t: "แปลก 👽🌀❓", p: "bplàek", e: "strange"},
-            {t: "คืนละพันห้า 🌙💵1️⃣5️⃣", p: "keun lá pan hâa", e: "1,500 baht per night."},
-            {t: "วันที่เท่าไหร่ 📅❓🔢", p: "wan-têe tâo-rài", e: "What date is it? / What date?"},
-            {t: "ถาม ❓🗣️🙋‍♂️", p: "tǎam", e: "To ask questions /inquire/enquire"},
-            {t: "ราคา 🏷️💵💰", p: "raa-kaa", e: "Price"},
-            {t: "วันที่ 🗓️📅📍", p: "wan-tîi", e: "Date (time)"},
-            {t: "เข้า ➡️🚪📥", p: "kâo", e: "Enter"},
-            {t: "แนะนำ 🗣️👍🌟", p: "nɛ́-nam", e: "Recommend/Suggest"},
-            {t: "คืน 🌙🌌🔙", p: "keun", e: "nights"},
-            {t: "ละ 1️⃣➡️🔢", p: "lá", e: "per; each; every"},
-            {t: "ต่อ ➕🔗⏩", p: "dtɔ̀ɔ", e: "to connect; to continue; to bargain; to extend; per"},
-            {t: "วันพฤหัส 📅🟠🏫", p: "wan-pá-réú-hàt", e: "Thursday"},
-            {t: "วันอังคาร 📅💓🌸", p: "wan-ang-kaan", e: "Tuesday"},
-            {t: "ปอนด์ 💷⚖️🍞", p: "bpon", e: "pounds"},
-            {t: "รีบ 🏃💨⚡", p: "rîip", e: "Hurry"},
-            {t: "ต้อง ❗⚠️✅", p: "dtâawng", e: "Must/Have to"},
-            {t: "เลย ⏩🎯🏎️", p: "loie", e: "at all (if come with not)"},
-            {t: "ทาง 🛣️🛣️🛤️", p: "taang", e: "Way"},
-            {t: "เปิด 🔓💡🚪", p: "bpèrt", e: "to open; to turn on"},
-            {t: "สัตว์ 🦁🐶🐘", p: "sàt", e: "animal"},
-            {t: "สวนสัตว์ 🦁🦒🏟️", p: "suan-sàt", e: "zoo"},
-            {t: "สัก 💉📉⏲️", p: "sàk", e: "to tattoo"},
-            {t: "ตะเกียบ 🥢🍜🍱", p: "dtà-gìap", e: "chopsticks"},
-            {t: "จักรยาน 🚲🚴‍♂️💨", p: "jàk-gra-yaan", e: "bicycle"},
-            {t: "น่ากลัว 👻😱💀", p: "nâa-glua", e: "scary"},
-            {t: "อากาศสะอาด 🌬️🍃✨", p: "aa-gàat sà-àat", e: "clean air"},
-            {t: "เหงา 🙍‍♂️🌑🍂", p: "ngăo", e: "lonely"},
-            {t: "สงบ 🧘‍♂️☮️🌊", p: "sa-ngòp", e: "calm; peaceful; quiet; tranquil"},
-            {t: "ข้างนอก 🌳🏡🚪", p: "kâang nɔ̂ɔk", e: "outside"},
-            {t: "ติดตั้ง 🔧⚙️📦", p: "dtìt-dtâng", e: "to install; to set up"},
-            {t: "ร้านเสื้อผ้า 👗👔🛍️", p: "ráan sʉ̂a-pâa", e: "clothing store"},
-            {t: "คืนโค้ทลูกชาย 🧥🔙👦", p: "kʉʉn khóot lûuk-chaai", e: "return my son's coat"},
-            {t: "ยกเลิก ❌🚫🛑", p: "yók-lôek", e: "cancel"},
-            {t: "ผมเป็นคนเงียบๆ 👨🤫😶", p: "phǒm bpen kon ngîap-ngîap", e: "I am a quiet person."},
-            {t: "ดึง ⬅️✊🪢", p: "dueng", e: "to pull; to draw"},
-            {t: "แลก 🔄💸💱", p: "lâek", e: "Exchange"},
-            {t: "ดูก่อน 👀⏳⏮️", p: "duu gòn", e: "Let me see first; look first; wait; well, now"},
-            {t: "แลกปอนด์เป็นบาท 💷🔄฿", p: "lâek bpon pen bàat", e: "Exchange pounds for baht."},
-            {t: "หนังสือเดินทาง 📖✈️🛂", p: "nǎng-sǔe-doen-thaang", e: "Passport"},
-            {t: "บัญชีออมทรัพย์ 💰🏦📉", p: "Ban-chii-awm-sáp", e: "Savings account"},
-            {t: "บัญชีกระแสรายวัน 💸🏦💳", p: "Ban chii krà-sǎe-raay-wan", e: "Current accounts"},
-            {t: "บางคน 👥🎲👤", p: "baang kon", e: "some people"},
-            {t: "เด็กบางคน 🧒🎲🎈", p: "dèk baang kon", e: "some children"},
-            {t: "บางวัน 📅🎲🌤️", p: "baang wan", e: "some days"},
-            {t: "ใบอนุญาต 📄📑✅", p: "bai-à-nú-yâat", e: "permit"},
-            {t: "สวัสดีปีใหม่ 🎆🎇🥂", p: "sà-wàt-dee bpee-mài", e: "Happy New Year"},
-            {t: "หมดอายุ 🛑💀⌛", p: "mòt-aa-yú", e: "To expire"},
-            {t: "ใบขับขี่ 🪪🚗🪪", p: "bai-kàp-kèe", e: "driver's license"},
-            {t: "ใบ 🍃📄📄", p: "bai", e: "Classifier for paper/certificate/card/document (sth flat/card-like)"},
-            {t: "นามบัตร 🪪👔🤝", p: "naam-bàt", e: "business cards"},
-            {t: "อนุญาต ✅🔓🙋‍♂️", p: "à-nú-yâat", e: "To permit / allow"},
-            {t: "(หนึ่ง)หมื่นห้า(พัน) 1️⃣5️⃣0️⃣0️⃣0️⃣", p: "(nùeng)-mèun hâa-(pan)", e: "fifteen thousand"}
-        ];
-
-        let jumbledCurrentSentence = [];
-        let jumbledTargetSentence = [];
-
-        function pickRandomVocab() {
-            document.getElementById('review').scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            const index = Math.floor(Math.random() * vocabList.length);
-            const currentVocab = vocabList[index];
-            
-            document.getElementById('current-thai').innerText = currentVocab.t;
-            document.getElementById('current-ipa').innerText = currentVocab.p;
-            document.getElementById('current-en').innerText = currentVocab.e;
-            
-            document.getElementById('current-ipa').classList.remove('show');
-            document.getElementById('current-en').classList.remove('show');
-            document.getElementById('current-controls').classList.remove('hidden');
-            
-            speak(currentVocab.t);
+            );
         }
 
-        function toggle(btn, className) {
-            const parent = btn.closest('.content-group') || btn.closest('div').parentElement;
-            const target = parent.querySelector('.' + className);
-            if(target) target.classList.toggle('show');
-        }
-
-        function toggleElement(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle('show');
-        }
-
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const msg = new SpeechSynthesisUtterance(text);
-                msg.lang = 'th-TH';
-                msg.rate = 0.85; 
-                window.speechSynthesis.speak(msg);
-            }
-        }
-
-        function speakCurrent() {
-            const currentThaiText = document.getElementById('current-thai').innerText;
-            speak(currentThaiText);
-        }
-
-        // Jumbled Sentences Logic
-        function moveWord(element, targetId) {
-            const targetContainer = document.getElementById(targetId);
-            targetContainer.appendChild(element);
-            // Change click handler to return the word
-            element.onclick = function(event) { returnWord(event, 'jumble-source-1'); };
-        }
-
-        function returnWord(event, sourceId) {
-            // Check if clicking directly on a word, not the container
-            if (event.target !== event.currentTarget) {
-                const sourceContainer = document.getElementById(sourceId);
-                sourceContainer.appendChild(event.target);
-                // Change click handler back to move
-                event.target.onclick = function() { moveWord(this, 'jumble-target-1'); };
-            }
-        }
-
-        function resetJumble(sourceId, targetId) {
-            const sourceContainer = document.getElementById(sourceId);
-            const targetContainer = document.getElementById(targetId);
-            const words = Array.from(targetContainer.children);
-            
-            words.forEach(word => {
-                sourceContainer.appendChild(word);
-                word.onclick = function() { moveWord(this, targetId); };
-            });
-            
-            const feedback = document.getElementById('jumble-feedback-1');
-            feedback.classList.add('hidden');
-            feedback.classList.remove('text-green-600', 'text-red-600');
-        }
-
-        function checkJumble(targetId, correctOrderArray, feedbackId) {
-            const targetContainer = document.getElementById(targetId);
-            const currentWords = Array.from(targetContainer.children).map(el => el.innerText.trim());
-            const feedback = document.getElementById(feedbackId);
-            
-            feedback.classList.remove('hidden', 'text-green-600', 'text-red-600');
-            
-            // Allow multiple correct answers for "เมื่อวาน ผม ขับรถ ไป ทะเล กับ แฟน"
-            // Let's accept:
-            // 1. เมื่อวาน ผม ขับรถ ไป ทะเล กับ แฟน
-            // 2. ผม ขับรถ ไป ทะเล กับ แฟน เมื่อวาน
-            // 3. ผม ขับรถ ไป ทะเล เมื่อวาน กับ แฟน
-            
-            const joinedCurrent = currentWords.join(' ');
-            
-            const correct1 = "เมื่อวาน 📅 ผม 👨 ขับรถ 🚗 ไป ทะเล 🏖️ กับ แฟน 👩‍❤️‍👨";
-            const correct2 = "ผม 👨 ขับรถ 🚗 ไป ทะเล 🏖️ กับ แฟน 👩‍❤️‍👨 เมื่อวาน 📅";
-            const correct3 = "เมื่อวาน 📅 ผม 👨 ขับรถ 🚗 กับ แฟน 👩‍❤️‍👨 ไป ทะเล 🏖️";
-            const correct4 = "ผม 👨 ขับรถ 🚗 กับ แฟน 👩‍❤️‍👨 ไป ทะเล 🏖️ เมื่อวาน 📅";
-
-            if (currentWords.length !== 5) {
-                 feedback.innerText = "ยังไม่ครบ (Not complete yet)";
-                 feedback.classList.add('text-red-600');
-                 return;
-            }
-
-            if (joinedCurrent === correct1 || joinedCurrent === correct2 || joinedCurrent === correct3 || joinedCurrent === correct4) {
-                feedback.innerText = "เก่งมาก! (Correct!) 🎉";
-                feedback.classList.add('text-green-600');
-                speak(currentWords.join(' ')); // Read the formed sentence
-            } else {
-                feedback.innerText = "ลองอีกครั้ง (Try again) 😅";
-                feedback.classList.add('text-red-600');
-            }
-        }
-
-        // Multiple Choice Logic
-        function handleMC(button, isCorrect) {
-            // Reset siblings
-            const parent = button.parentElement;
-            const options = parent.querySelectorAll('.mc-option');
-            options.forEach(opt => {
-                opt.classList.remove('mc-correct', 'mc-wrong');
-            });
-
-            if (isCorrect) {
-                button.classList.add('mc-correct');
-                speak("เก่งมาก");
-            } else {
-                button.classList.add('mc-wrong');
-                speak("ลองอีกครั้ง");
-            }
-        }
-
-        document.body.addEventListener('touchstart', function() {
-            if (window.speechSynthesis.speaking) return;
-            const msg = new SpeechSynthesisUtterance('');
-            msg.volume = 0;
-            window.speechSynthesis.speak(msg);
-        }, {once: true});
-
+        // Render the App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
