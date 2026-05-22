@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ความรู้สึก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                    colors: {
+                        amber: { 50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 800: '#92400e' },
+                        sky: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 500: '#0ea5e9', 600: '#0284c7', 800: '#075985' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #fafaf9; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+
+        .btn-tts {
+            @apply px-2 py-1 text-[11px] rounded bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors cursor-pointer inline-flex items-center justify-center shadow-sm active:scale-95;
+        }
+        .btn-ipa {
+            @apply px-2 py-1 text-[11px] font-bold uppercase rounded bg-sky-100 text-sky-700 hover:bg-sky-200 transition-colors cursor-pointer inline-block tracking-wider shadow-sm active:scale-95;
+        }
+        .btn-en {
+            @apply px-2 py-1 text-[11px] font-bold uppercase rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors cursor-pointer inline-block tracking-wider shadow-sm active:scale-95;
+        }
+        
+        /* Smooth transitions for tabs */
+        .tab-section {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <nav class="bg-white border-r border-slate-200 w-full md:w-80 flex-shrink-0 md:h-full flex flex-col z-20 shadow-md">
+        <div class="p-5 border-b border-slate-100" id="nav-header">
+            <!-- Rendered via JS -->
+        </div>
+        <div class="flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto p-3 gap-2 flex-grow no-scrollbar" id="nav-menu">
+            <!-- Rendered via JS -->
+        </div>
+    </nav>
+
+    <main class="flex-grow h-full overflow-y-auto bg-stone-50 p-4 md:p-8">
+        <div class="max-w-4xl mx-auto pb-24" id="main-content">
+            <!-- Rendered via JS -->
+        </div>
+    </main>
+
+    <script>
+        // Data structure containing ALL Thai text, IPA, and English translations
+        const appData = {
+            title: { th: "💖 ความรู้สึก", ipa: "kwaam rúu-sʉ̀k", en: "Feelings" },
+            nav: [
+                { id: "intro", icon: "fa-door-open", th: "บทนำ", ipa: "bòt-nam", en: "Introduction" },
+                { id: "dialogue", icon: "fa-comments", th: "บทสนทนา", ipa: "bòt-sǒn-tá-naa", en: "Dialogue" },
+                { id: "vocab", icon: "fa-book", th: "คำศัพท์เป้าหมาย", ipa: "kam-sàp bpâo-mǎi", en: "Target Vocabulary" },
+                { id: "main_tasks", icon: "fa-star", th: "กิจกรรมหลัก", ipa: "gìt-jà-gam làk", en: "Main Activities" },
+                { id: "ext_tasks", icon: "fa-plus-circle", th: "กิจกรรมเพิ่มเติม", ipa: "gìt-jà-gam pə̂əm-dtəəm", en: "Extension Activities" }
+            ],
+            sections: {
+                intro: {
+                    header: { th: "🤔 คำถามก่อนเรียน", ipa: "kam-tǎam gɔ̀ɔn rian", en: "Lead-in Questions" },
+                    instruction: { th: "ตอบคำถามต่อไปนี้", ipa: "dtɔ̀ɔp kam-tǎam dtɔ̀ɔ-bpai-níi", en: "Answer the following questions." },
+                    content: [
+                        { th: "1. วันนี้นอนพอไหม หรือรู้สึกง่วงนอน? 🥱", ipa: "wan-níi nɔɔn pɔɔ mǎi, rʉ̌ʉ rúu-sʉ̀k ngûang-nɔɔn?", en: "Did you sleep enough today, or do you feel sleepy?" },
+                        { th: "2. เวลาทำงาน คุณรู้สึกเครียดบ่อยไหม? 😰", ipa: "wee-laa tam-ngaan, kun rúu-sʉ̀k krîat bɔ̀ɔi mǎi?", en: "When working, do you feel stressed often?" },
+                        { th: "3. มีอะไรที่ทำให้คุณรู้สึกตื่นเต้นในสัปดาห์นี้ไหม? 🤩", ipa: "mii à-rai tîi tam hâi kun rúu-sʉ̀k dtʉ̀ʉn-dtên nai sàp-daa níi mǎi?", en: "Is there anything that makes you feel excited this week?" }
+                    ]
+                },
+                dialogue: {
+                    header: { th: "💬 บทสนทนา", ipa: "bòt-sǒn-tá-naa", en: "Dialogue" },
+                    instruction: { th: "อ่านและฟังบทสนทนา", ipa: "àan lɛ́ fang bòt-sǒn-tá-naa", en: "Read and listen to the dialogue." },
+                    content: [
+                        { role: "ครู 👩‍🏫", th: "คุณจิม วันนี้ ดู ง่วงนอน นะคะ", ipa: "kun jim wan-níi duu ngûang-nɔɔn ná ká", en: "Jim, you look sleepy today." },
+                        { role: "จิม 👨", th: "ครับ เมื่อคืน ผม ทำงาน เยอะ เลย เครียด นิดหน่อย ครับ", ipa: "kráp, mʉ̂a-kʉʉn pǒm tam-ngaan yə́, ləəi krîat nít-nɔ̀ɔi kráp", en: "Yes, I worked a lot last night, so I'm a bit stressed." },
+                        { role: "ครู 👩‍🏫", th: "วันหยุด นี้ มี แผน ไป เที่ยว ไหม คะ จะได้ ไม่ เบื่อ", ipa: "wan-yùt níi mii pɛ̌ɛn bpai tîao mǎi ká, jà dâi mâi bʉ̀a", en: "Do you have plans to travel this holiday? So you won't be bored." },
+                        { role: "จิม 👨", th: "มี ครับ ผม จะ ไป ทะเล ผม รู้สึก ตื่นเต้น มาก ครับ", ipa: "mii kráp, pǒm jà bpai tá-lee, pǒm rúu-sʉ̀k dtʉ̀ʉn-dtên mâak kráp", en: "Yes, I will go to the beach. I feel very excited." },
+                        { role: "ครู 👩‍🏫", th: "ดี เลย ค่ะ ครู ดีใจ ด้วย นะคะ", ipa: "dii ləəi kâ, kruu dii-jai dûai ná ká", en: "That's great. I am happy for you." }
+                    ],
+                    subHeader: { th: "🧠 คำถามเพื่อความเข้าใจ", ipa: "kam-tǎam pʉ̂a kwaam-kâo-jai", en: "Comprehension Questions" },
+                    subContent: [
+                        { th: "1. ทำไมคุณจิมถึงรู้สึกง่วงนอนและเครียด? 🥱", ipa: "tam-mai kun jim tʉ̌ng rúu-sʉ̀k ngûang-nɔɔn lɛ́ krîat?", en: "Why does Jim feel sleepy and stressed?" },
+                        { th: "2. วันหยุดนี้คุณจิมมีแผนจะทำอะไร? 🏖️", ipa: "wan-yùt níi kun jim mii pɛ̌ɛn jà tam à-rai?", en: "What does Jim plan to do this holiday?" },
+                        { th: "3. คุณจิมรู้สึกยังไงที่จะได้ไปทะเล? 🤩", ipa: "kun jim rúu-sʉ̀k yang-ngai tîi jà dâi bpai tá-lee?", en: "How does Jim feel about getting to go to the beach?" }
+                    ]
+                },
+                vocab: {
+                    header: { th: "🎯 คำศัพท์เป้าหมาย", ipa: "kam-sàp bpâo-mǎi", en: "Target Vocabulary" },
+                    instruction: { th: "คำศัพท์สำคัญจากบทสนทนา", ipa: "kam-sàp sǎm-kan jàak bòt-sǒn-tá-naa", en: "Important vocabulary from the dialogue." },
+                    content: [
+                        { emoji: "🥱", th: "ง่วงนอน", ipa: "ngûang-nɔɔn", en: "Sleepy" },
+                        { emoji: "😰", th: "เครียด", ipa: "krîat", en: "Stressed" },
+                        { emoji: "😒", th: "เบื่อ", ipa: "bʉ̀a", en: "Bored" },
+                        { emoji: "🤩", th: "ตื่นเต้น", ipa: "dtʉ̀ʉn-dtên", en: "Excited" },
+                        { emoji: "😁", th: "ดีใจ", ipa: "dii-jai", en: "Glad / Happy" }
+                    ]
+                },
+                main_tasks: {
+                    header: { th: "🌟 กิจกรรมหลัก", ipa: "gìt-jà-gam làk", en: "Main Activities" },
+                    instruction: { th: "ใช้คำศัพท์ที่เรียนมาทำกิจกรรมต่อไปนี้", ipa: "chái kam-sàp tîi rian maa tam gìt-jà-gam dtɔ̀ɔ-bpai-níi", en: "Use the vocabulary you learned to do the following activities." },
+                    content: [
+                        {
+                            type: "🎤 สัมภาษณ์ชีวิตจริง", typeIpa: "sǎm-pâat chii-wít jing", typeEn: "Real-life Interview",
+                            title: { th: "สัมภาษณ์: ความรู้สึกวันนี้", ipa: "sǎm-pâat: kwaam-rúu-sʉ̀k wan-níi", en: "Interview: Today's feelings" },
+                            desc: { th: "สัมภาษณ์ครูเกี่ยวกับวันนี้ ถามว่าครูทำงานเครียดไหม ถ้ารู้สึกเบื่อ ครูชอบทำอะไร", ipa: "sǎm-pâat kruu gìao-gàp wan-níi. tǎam wâa kruu tam-ngaan krîat mǎi. tâa rúu-sʉ̀k bʉ̀a kruu chɔ̂ɔp tam à-rai.", en: "Interview the teacher about today. Ask if they are stressed from work. If they feel bored, what do they like to do?" }
+                        },
+                        {
+                            type: "🎭 บทบาทสมมติ", typeIpa: "bòt-bàat sǒm-mút", typeEn: "Role-play",
+                            title: { th: "บทบาทสมมติ: วางแผนหนีความเบื่อ", ipa: "bòt-bàat sǒm-mút: waang-pɛ̌ɛn nǐi kwaam-bʉ̀a", en: "Role-play: Planning to escape boredom" },
+                            desc: { th: "คุณเบื่อและเครียดกับงานมาก ชวนเพื่อน (ครู) ไปเที่ยว บอกเพื่อนว่าคุณตื่นเต้นมากที่จะได้ไปพักผ่อน", ipa: "kun bʉ̀a lɛ́ krîat gàp ngaan mâak. chuan pʉ̂an (kruu) bpai tîao. bɔ̀ɔk pʉ̂an wâa kun dtʉ̀ʉn-dtên mâak tîi jà dâi bpai pák-pɔ̀n.", en: "You are very bored and stressed with work. Invite a friend (teacher) to travel. Tell them you are very excited to rest." }
+                        },
+                        {
+                            type: "🎲 เกมการพูด", typeIpa: "geem gaan pûut", typeEn: "Speaking Game",
+                            title: { th: "เกมการพูด: ฉันรู้สึกยังไง?", ipa: "geem gaan pûut: chǎn rúu-sʉ̀k yang-ngai?", en: "Speaking Game: How do I feel?" },
+                            desc: { th: "ครูแสดงท่าทาง นักเรียนทายความรู้สึก (เช่น ง่วงนอน, เครียด, ตื่นเต้น) จากนั้นสลับกัน!", ipa: "kruu sà-dɛɛng tâa-taang. nák-rian taai kwaam-rúu-sʉ̀k (chên ngûang-nɔɔn, krîat, dtʉ̀ʉn-dtên). jàak nán sà-làp gan!", en: "Teacher acts out an emotion. Student guesses the feeling (e.g., sleepy, stressed, excited). Then take turns!" }
+                        },
+                        {
+                            type: "💬 คำถามอภิปราย", typeIpa: "kam-tǎam à-pí-bpraai", typeEn: "Discussion Question",
+                            title: { th: "คำถามอภิปราย: วิธีแก้ความเครียด", ipa: "kam-tǎam à-pí-bpraai: wí-tii gɛ̂ɛ kwaam-krîat", en: "Discussion Question: Ways to relieve stress" },
+                            desc: { th: "เวลาคุณรู้สึกเครียดหรือง่วงนอนตอนทำงาน คุณทำอะไรให้ตัวเองรู้สึกดีขึ้นหรือตื่นเต้น?", ipa: "wee-laa kun rúu-sʉ̀k krîat rʉ̌ʉ ngûang-nɔɔn dtɔɔn tam-ngaan, kun tam à-rai hâi dtua-eeng rúu-sʉ̀k dii kʉ̂n rʉ̌ʉ dtʉ̀ʉn-dtên?", en: "When you feel stressed or sleepy at work, what do you do to make yourself feel better or excited?" }
+                        }
+                    ]
+                },
+                ext_tasks: {
+                    header: { th: "🚀 กิจกรรมเพิ่มเติม", ipa: "gìt-jà-gam pə̂əm-dtəəm", en: "Extension Activities" },
+                    instruction: { th: "กิจกรรมสำรองสำหรับฝึกพูดเพิ่มเติม", ipa: "gìt-jà-gam sǎm-rɔɔng sǎm-ràp fʉ̀k pûut pə̂əm-dtəəm", en: "Backup activities for extra speaking practice." },
+                    content: [
+                        {
+                            type: "⚖️ โต้วาทีชีวิตจริง", typeIpa: "dtôo-waa-tii chii-wít jing", typeEn: "Real-life Debate",
+                            title: { th: "โต้วาที: ทำงานที่บ้าน หรือ ออฟฟิศ?", ipa: "dtôo-waa-tii: tam-ngaan tîi bâan rʉ̌ʉ ɔ́ɔp-fít?", en: "Debate: Work at home or office?" },
+                            desc: { th: "ทำงานที่บ้านทำให้คนรู้สึกเหงาและเบื่อมากกว่าทำงานที่ออฟฟิศ คุณเห็นด้วยหรือไม่?", ipa: "tam-ngaan tîi bâan tam hâi kon rúu-sʉ̀k ngǎo lɛ́ bʉ̀a mâak gwàa tam-ngaan tîi ɔ́ɔp-fít. kun hěn-dûai rʉ̌ʉ mâi?", en: "Working at home makes people feel lonely and bored more than working at the office. Do you agree or not?" }
+                        },
+                        {
+                            type: "🗺️ เล่าเรื่องชีวิตจริง", typeIpa: "lâo rʉ̂ang chii-wít jing", typeEn: "Real-life Story-telling",
+                            title: { th: "เล่าเรื่อง: วันที่น่าตื่นเต้นที่สุด", ipa: "lâo rʉ̂ang: wan tîi nâa dtʉ̀ʉn-dtên tîi-sùt", en: "Story-telling: The most exciting day" },
+                            desc: { th: "เล่าเรื่องเกี่ยวกับวันที่คุณทำกิจกรรมบางอย่าง แล้วคุณรู้สึกดีใจและตื่นเต้นมาก", ipa: "lâo rʉ̂ang gìao-gàp wan tîi kun tam gìt-jà-gam baang-yàang, lɛ́ɛo kun rúu-sʉ̀k dii-jai lɛ́ dtʉ̀ʉn-dtên mâak.", en: "Tell a story about a day you did a certain activity, and you felt very glad and excited." }
+                        },
+                        {
+                            type: "🌟 การนำเสนอ", typeIpa: "gaan nam-sà-nə̌ə", typeEn: "Real-life Presentation",
+                            title: { th: "การนำเสนอ: 3 วิธีแก้ง่วง", ipa: "gaan nam-sà-nə̌ə: sǎam wí-tii gɛ̂ɛ ngûang", en: "Presentation: 3 ways to cure sleepiness" },
+                            desc: { th: "แนะนำ 3 วิธีที่คุณใช้เวลาคุณรู้สึกง่วงนอนหรือเบื่อ เพื่อให้กลับมารู้สึกดีอีกครั้ง", ipa: "nɛ́-nam sǎam wí-tii tîi kun chái wee-laa kun rúu-sʉ̀k ngûang-nɔɔn rʉ̌ʉ bʉ̀a, pʉ̂a hâi glàp maa rúu-sʉ̀k dii ìik-kráng.", en: "Recommend 3 methods you use when you feel sleepy or bored, in order to feel good again." }
+                        }
+                    ]
+                }
+            }
+        };
+
+        let currentIdCounter = 0;
+        function getUniqueId() {
+            return `el-${currentIdCounter++}`;
+        }
+
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; // Slightly slower for clear pronunciation
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn('Text-to-speech is not supported.');
+            }
+        }
+
+        function toggleVisibility(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        // Core UI Builder function. Generates the Thai text with TTS, IPA, and EN toggles.
+        function buildThaiBlock(th, ipa, en, sizeClass = "text-lg", wrapperClass = "mb-4", fontClass="font-medium") {
+            const id = getUniqueId();
+            const safeSpeak = th.replace(/['"]/g, "").replace(/[\uD83C-\uDBFF\uDC00-\uDFFF]+/g, '').trim(); // Strip emoji for TTS
+            
+            return `
+                <div class="${wrapperClass}">
+                    <div class="flex items-start flex-wrap gap-2">
+                        <span class="${sizeClass} ${fontClass} text-slate-800 leading-snug">${th}</span>
+                        <div class="flex gap-1 mt-0.5">
+                            <button onclick="speakThai('${safeSpeak}')" class="btn-tts" title="Listen"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="toggleVisibility('${id}-ipa')" class="btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('${id}-en')" class="btn-en">EN</button>
+                        </div>
+                    </div>
+                    <div id="${id}-ipa" class="hidden text-sky-600 font-medium text-[13px] mt-1.5 ml-1">${ipa}</div>
+                    <div id="${id}-en" class="hidden text-slate-500 italic text-[13px] mt-1 ml-1">${en}</div>
+                </div>
+            `;
+        }
+
+        function switchTab(tabId) {
+            // Update nav styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-50', 'border-amber-400');
+                btn.classList.add('border-transparent', 'hover:bg-slate-50');
+            });
+            const activeBtn = document.getElementById(`nav-btn-${tabId}`);
+            activeBtn.classList.remove('border-transparent', 'hover:bg-slate-50');
+            activeBtn.classList.add('bg-amber-50', 'border-amber-400');
+
+            // Update content visibility
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+        }
+
+        function renderApp() {
+            // 1. Render Header
+            const headerHtml = buildThaiBlock(appData.title.th, appData.title.ipa, appData.title.en, "text-2xl", "", "font-bold");
+            document.getElementById('nav-header').innerHTML = headerHtml;
+
+            // 2. Render Navigation Menu
+            let navHtml = '';
+            appData.nav.forEach(item => {
+                const textBlock = buildThaiBlock(item.th, item.ipa, item.en, "text-base", "", "font-medium");
+                navHtml += `
+                    <button id="nav-btn-${item.id}" onclick="switchTab('${item.id}')" class="nav-btn flex items-start text-left px-4 py-3 rounded-xl border-l-4 border-transparent transition-all w-full min-w-[240px]">
+                        <i class="fa-solid ${item.icon} text-amber-500 mt-1 mr-3 w-4 text-center"></i>
+                        <div class="flex-grow">${textBlock}</div>
+                    </button>
+                `;
+            });
+            document.getElementById('nav-menu').innerHTML = navHtml;
+
+            // 3. Render Main Content Sections
+            let mainHtml = '';
+            
+            // Section: Intro
+            mainHtml += `
+                <section id="sec-intro" class="tab-section hidden">
+                    <div class="mb-8 border-b border-slate-200 pb-4">
+                        ${buildThaiBlock(appData.sections.intro.header.th, appData.sections.intro.header.ipa, appData.sections.intro.header.en, "text-3xl", "mb-2", "font-bold")}
+                        ${buildThaiBlock(appData.sections.intro.instruction.th, appData.sections.intro.instruction.ipa, appData.sections.intro.instruction.en, "text-base", "", "text-slate-600")}
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6">
+                        ${appData.sections.intro.content.map(q => buildThaiBlock(q.th, q.ipa, q.en, "text-xl")).join('')}
+                    </div>
+                </section>
+            `;
+
+            const diag = appData.sections.dialogue;
+            let diagLines = diag.content.map(line => `
+                <div class="flex gap-4 p-4 rounded-xl ${line.role.includes('ครู') ? 'bg-sky-50' : 'bg-amber-50'}">
+                    <div class="font-bold whitespace-nowrap pt-1">${line.role}</div>
+                    <div class="flex-grow">
+                        ${buildThaiBlock(line.th, line.ipa, line.en, "text-xl", "mb-0")}
+                    </div>
+                </div>
+            `).join('');
+
+            mainHtml += `
+                <section id="sec-dialogue" class="tab-section hidden">
+                    <div class="mb-8 border-b border-slate-200 pb-4">
+                        ${buildThaiBlock(diag.header.th, diag.header.ipa, diag.header.en, "text-3xl", "mb-2", "font-bold")}
+                        ${buildThaiBlock(diag.instruction.th, diag.instruction.ipa, diag.instruction.en, "text-base", "", "text-slate-600")}
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-8">
+                        <div class="p-6 md:p-8 space-y-4">
+                            ${diagLines}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
+                        <div class="mb-6 pb-2 border-b border-slate-100">
+                            ${buildThaiBlock(diag.subHeader.th, diag.subHeader.ipa, diag.subHeader.en, "text-2xl", "mb-0", "font-bold")}
+                        </div>
+                        <div class="space-y-6">
+                            ${diag.subContent.map(q => buildThaiBlock(q.th, q.ipa, q.en, "text-xl")).join('')}
+                        </div>
+                    </div>
+                </section>
+            `;
+
+            const vocab = appData.sections.vocab;
+            let vocabItems = vocab.content.map(v => `
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 flex items-center gap-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-4xl flex-shrink-0 bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center">${v.emoji}</div>
+                    <div class="flex-grow">
+                        ${buildThaiBlock(v.th, v.ipa, v.en, "text-2xl", "mb-0", "font-bold text-slate-800")}
+                    </div>
+                </div>
+            `).join('');
+
+            mainHtml += `
+                <section id="sec-vocab" class="tab-section hidden">
+                    <div class="mb-8 border-b border-slate-200 pb-4">
+                        ${buildThaiBlock(vocab.header.th, vocab.header.ipa, vocab.header.en, "text-3xl", "mb-2", "font-bold")}
+                        ${buildThaiBlock(vocab.instruction.th, vocab.instruction.ipa, vocab.instruction.en, "text-base", "", "text-slate-600")}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${vocabItems}
+                    </div>
+                </section>
+            `;
+
+            const tasks = appData.sections.main_tasks;
+            let taskItems = tasks.content.map(t => `
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-amber-400"></div>
+                    <div class="mb-4">
+                        ${buildThaiBlock(t.type, t.typeIpa, t.typeEn, "text-sm", "mb-2", "font-bold text-amber-600")}
+                        ${buildThaiBlock(t.title.th, t.title.ipa, t.title.en, "text-2xl", "mb-0", "font-bold")}
+                    </div>
+                    <div class="bg-amber-50 rounded-xl p-5 border border-amber-100">
+                        ${buildThaiBlock(t.desc.th, t.desc.ipa, t.desc.en, "text-lg", "mb-0", "text-amber-900")}
+                    </div>
+                </div>
+            `).join('');
+
+            mainHtml += `
+                <section id="sec-main_tasks" class="tab-section hidden">
+                    <div class="mb-8 border-b border-slate-200 pb-4">
+                        ${buildThaiBlock(tasks.header.th, tasks.header.ipa, tasks.header.en, "text-3xl", "mb-2", "font-bold")}
+                        ${buildThaiBlock(tasks.instruction.th, tasks.instruction.ipa, tasks.instruction.en, "text-base", "", "text-slate-600")}
+                    </div>
+                    <div class="grid gap-6">
+                        ${taskItems}
+                    </div>
+                </section>
+            `;
+
+            const ext = appData.sections.ext_tasks;
+            let extItems = ext.content.map(t => `
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-sky-400"></div>
+                    <div class="mb-4">
+                        ${buildThaiBlock(t.type, t.typeIpa, t.typeEn, "text-sm", "mb-2", "font-bold text-sky-600")}
+                        ${buildThaiBlock(t.title.th, t.title.ipa, t.title.en, "text-2xl", "mb-0", "font-bold")}
+                    </div>
+                    <div class="bg-sky-50 rounded-xl p-5 border border-sky-100">
+                        ${buildThaiBlock(t.desc.th, t.desc.ipa, t.desc.en, "text-lg", "mb-0", "text-sky-900")}
+                    </div>
+                </div>
+            `).join('');
+
+            mainHtml += `
+                <section id="sec-ext_tasks" class="tab-section hidden">
+                    <div class="mb-8 border-b border-slate-200 pb-4">
+                        ${buildThaiBlock(ext.header.th, ext.header.ipa, ext.header.en, "text-3xl", "mb-2", "font-bold")}
+                        ${buildThaiBlock(ext.instruction.th, ext.instruction.ipa, ext.instruction.en, "text-base", "", "text-slate-600")}
+                    </div>
+                    <div class="grid gap-6">
+                        ${extItems}
+                    </div>
+                </section>
+            `;
+
+            document.getElementById('main-content').innerHTML = mainHtml;
+
+            // Start on intro tab
+            switchTab('intro');
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', renderApp);
+
+    </script>
+</body>
+</html>
