@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ลัลล์ไม่ชอบไวน์ Enemies With Benefits</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Fonts: Kanit -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICONS ---
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const icons = {
+                refresh: <><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></>,
+                book: <><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></>,
+                message: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>,
+                zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>,
+                play: <polygon points="5 3 19 12 5 21 5 3"/>
+            };
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                    {icons[name]}
+                </svg>
+            );
+        };
+
+        // --- MASSIVE VOCABULARY DATA ---
+        const reviewVocabList = [
+            { t: "น้ำเปล่า", i: "náam-bplàao", e: "plain water", em: "💧" }, { t: "สั่ง", i: "sàng", e: "order", em: "📝" },
+            { t: "ตาม", i: "dtaam", e: "follow", em: "➡️" }, { t: "อาหารตามสั่ง", i: "aa-hăan-dtaam-sàng", e: "cooked-to-order food", em: "🍛" },
+            { t: "แนะนำ", i: "náe-nam", e: "recommend", em: "💡" }, { t: "รมควัน", i: "rom-kwan", e: "smoked", em: "🥓" },
+            { t: "หมัก", i: "màk", e: "marinate", em: "🥩" }, { t: "กะเพรา", i: "gà-prao", e: "basil", em: "🌿" },
+            { t: "รสชาติ", i: "rót-châat", e: "Flavours", em: "😋" }, { t: "ยำ", i: "yam", e: "spicy salad", em: "🥗" },
+            { t: "รวม", i: "ruam", e: "mixed", em: "🔀" }, { t: "ทะเล", i: "tá-lay", e: "sea", em: "🌊" },
+            { t: "เดือด", i: "deùat", e: "boiling", em: "🔥" }, { t: "น้ำแข็ง", i: "náam-kăeng", e: "ice", em: "🧊" },
+            { t: "มี", i: "mii", e: "have", em: "✅" }, { t: "ไม่เย็น", i: "mâi-yen", e: "room temp", em: "🥤" },
+            { t: "หมูกรอบ", i: "mǔu-grɔ̀ɔp", e: "crispy pork", em: "🐷" }, { t: "ร้อย", i: "rɔ́ɔi", e: "hundred", em: "💯" },
+            { t: "พิเศษ", i: "phí-sèet", e: "special", em: "✨" }, { t: "ไข่ดาว", i: "khài-daao", e: "fried eggs", em: "🍳" },
+            { t: "ไข่กวน", i: "khài-guan", e: "scrambled eggs", em: "🍳" }, { t: "ปลาหมึก", i: "bplaa-mʉ̀k", e: "squid", em: "🦑" },
+            { t: "หนังสือ", i: "nǎng-sʉ̌ʉ", e: "books", em: "📚" }, { t: "ปลา", i: "bplaa", e: "fish", em: "🐟" },
+            { t: "แก้ว", i: "gɛ̂ɛo", e: "glass", em: "🥛" }, { t: "ใหญ่", i: "yài", e: "large", em: "📏" },
+            { t: "หวาน", i: "wǎan", e: "sweet", em: "🍬" }, { t: "นี่", i: "nîi", e: "Here", em: "📍" },
+            { t: "บางครั้ง", i: "baang-khráng", e: "sometimes", em: "⏳" }, { t: "ปั่น", i: "bpàn", e: "frappe", em: "🌀" },
+            { t: "กลับบ้าน", i: "glàp-bâan", e: "Takeaway", em: "🏠" }, { t: "เครื่องดื่ม", i: "khrʉ̂ang-dʉ̀ʉm", e: "beverages", em: "🥤" },
+            { t: "โบราณ", i: "boo-raan", e: "ancient", em: "🏺" }, { t: "ไข่มุก", i: "khài-múk", e: "pearls", em: "🧋" },
+            { t: "เพิ่ม", i: "phɛ̂ɛm", e: "extra", em: "➕" }, { t: "นม", i: "nom", e: "milk", em: "🥛" },
+            { t: "ดูอร่อย", i: "duu à-rɔ̀i", e: "looks delicious", em: "😋" }, { t: "วันนี้", i: "wan-níi", e: "today", em: "📅" },
+            { t: "พรุ่งนี้", i: "prûng níi", e: "tomorrow", em: "📅" }, { t: "ลืม", i: "lʉ̄m", e: "to forget", em: "🤦" },
+            { t: "ครอบครัว", i: "krôp-krua", e: "family", em: "👨‍👩‍👧‍👦" }, { t: "ของ", i: "kŏng", e: "of", em: "🔗" },
+            { t: "คน", i: "kon", e: "people", em: "👥" }, { t: "ใคร", i: "krai", e: "who", em: "❓" },
+            { t: "พี่น้อง", i: "pêe-nóng", e: "siblings", em: "👫" }, { t: "อายุ", i: "aa-yú", e: "age", em: "🎂" },
+            { t: "ทำงาน", i: "tam-ngaan", e: "To work", em: "💼" }, { t: "เป็น", i: "bpen", e: "To be", em: "🔗" },
+            { t: "นักศึกษา", i: "nák-sùk-săa", e: "uni student", em: "🎓" }, { t: "สี", i: "sĕe", e: "colour", em: "🎨" },
+            { t: "น่าตื่นเต้น", i: "nâa-dtùuen-dtên", e: "exciting", em: "🤩" }, { t: "เรียน", i: "rian", e: "learn", em: "📚" },
+            { t: "พูดอีกครั้งได้ไหม", i: "pôot ìik kráng dâi măi", e: "Say again?", em: "🔁" }, { t: "ตลก", i: "dtà-lòk", e: "funny", em: "🤣" },
+            { t: "อยู่", i: "yùu", e: "live / stay", em: "📍" }, { t: "แม่", i: "mɛ̂ɛ", e: "mother", em: "👩‍👧" },
+            { t: "เพื่อน", i: "pêuan", e: "friends", em: "🧑‍🤝‍🧑" }, { t: "หมา", i: "mǎa", e: "dogs", em: "🐶" },
+            { t: "แมว", i: "maeo", e: "cats", em: "😺" }, { t: "ใหม่", i: "mài", e: "new", em: "🆕" },
+            { t: "ที่ไหน", i: "tîi nǎi", e: "where", em: "🪧" }, { t: "บ้าน", i: "bâan", e: "house", em: "🏠" },
+            { t: "ไป", i: "bpai", e: "Go", em: "🚶" }, { t: "รวย", i: "ruai", e: "rich", em: "🤑" },
+            { t: "เที่ยว", i: "tîao", e: "travel", em: "🚗" }, { t: "ขับรถ", i: "khàp rót", e: "Drive", em: "🚘" },
+            { t: "สอน", i: "sɔ̌ɔn", e: "teach", em: "👨‍🏫" }, { t: "ซื้อ", i: "sʉ́ʉ", e: "buy", em: "🛍️" },
+            { t: "มากกว่า", i: "mâak gwàa", e: "more than", em: "🧭" }, { t: "แพง", i: "paaeng", e: "expensive", em: "💸" },
+            { t: "นานแล้ว", i: "naan lɛ́ɛo", e: "long time ago", em: "⏳" }, { t: "เขา", i: "kǎo", e: "He/She", em: "👤" },
+            { t: "เมื่อไร", i: "mʉ̂ʉa-rài", e: "When", em: "❓" }, { t: "เมื่อวาน", i: "mʉ̂ʉ waan", e: "yesterday", em: "⏪" },
+            { t: "เข้าใจ", i: "kâo-jai", e: "understand", em: "💡" }, { t: "รู้", i: "rúu", e: "know", em: "🧠" },
+            { t: "เห็น", i: "hěn", e: "see", em: "👁️" }, { t: "เล่น", i: "lên", e: "play", em: "⚽️" },
+            { t: "รู้สึก", i: "rúu-sùek", e: "feel", em: "😊" }, { t: "เยอะ", i: "yér", e: "a lot", em: "🔢" },
+            { t: "ร้องไห้", i: "róng-hâi", e: "cry", em: "😭" }, { t: "เงินสด", i: "ngoen-sòt", e: "cash", em: "💵" },
+            { t: "บัตร", i: "bàt", e: "card", em: "💳" }, { t: "ข้าว", i: "kâao", e: "rice", em: "🍚" },
+            { t: "เวลา", i: "way-laa", e: "time", em: "⏰" }, { t: "ดื่ม", i: "dùuem", e: "drink", em: "🥤" },
+            { t: "เหนื่อย", i: "nèuuay", e: "tired", em: "😩" }, { t: "ทำไม", i: "tam-mai", e: "why", em: "❓" },
+            { t: "ติดงาน", i: "dtìt-ngaan", e: "stuck at work", em: "💼" }, { t: "ตำรวจ", i: "tam-lùuat", e: "police", em: "👮‍♂️" },
+            { t: "แตกต่าง", i: "dtàek-dtàang", e: "different", em: "🆚" }, { t: "กับ", i: "gàp", e: "with / and", em: "🤝" },
+            { t: "ดาว", i: "daao", e: "star", em: "⭐️" }, { t: "สาขา", i: "săa-kăa", e: "major", em: "🌿" },
+            { t: "หมด", i: "mòt", e: "out of stock", em: "🚫" }, { t: "วิวาห์", i: "wí-waa", e: "wedding", em: "💍" },
+            { t: "น่ากิน", i: "nâa-gin", e: "looks delicious", em: "🤤" }, { t: "ส้มตำ", i: "sôm-dtam", e: "papaya salad", em: "🥗" },
+            { t: "ตื่น", i: "dteùn", e: "wake up", em: "⏰" }, { t: "เช้า", i: "cháo", e: "morning", em: "🌅" },
+            { t: "เหรอ", i: "rǒr", e: "really?", em: "🤔" }, { t: "บอก", i: "bòk", e: "tell", em: "🗣️" },
+            { t: "ให้", i: "hâi", e: "give", em: "🎁" }, { t: "ข่าว", i: "khàao", e: "news", em: "📰" },
+            { t: "ใจดี", i: "jai-dee", e: "kind", em: "😊" }, { t: "ร้านอาหาร", i: "ráan-aa-hăan", e: "restaurant", em: "🍽️" },
+            { t: "ประหม่า", i: "bprà-màa", e: "nervous", em: "😳" }, { t: "เริ่ม", i: "rêrm", e: "start", em: "🚀" },
+            { t: "เลย", i: "loei", e: "immediately", em: "⚡️" }, { t: "ความรับผิดชอบ", i: "khwaam-ráp-phìt-châawp", e: "responsibility", em: "✅" },
+            { t: "อีก", i: "èek", e: "more", em: "➕" }, { t: "ยัง", i: "yang", e: "still / not yet", em: "⏳" },
+            { t: "ครู", i: "kroo", e: "teacher", em: "🧑‍🏫" }, { t: "นอน", i: "nawn", e: "sleep", em: "😴" },
+            { t: "เร็ว", i: "rew", e: "fast", em: "⚡" }, { t: "ความรัก", i: "khwaam-rák", e: "love", em: "❤️" },
+            { t: "โอกาส", i: "òo-gàat", e: "opportunity", em: "🍀" }, { t: "หาย", i: "hăai", e: "recover / lost", em: "🤒" },
+            { t: "หรือ", i: "rĕu", e: "or", em: "🔀" }, { t: "รับ", i: "ráp", e: "receive", em: "📥" },
+            { t: "ขอ", i: "kŏr", e: "request", em: "🙏" }, { t: "คุย", i: "kúi", e: "talk", em: "🗣️" },
+            { t: "มาม่า", i: "maa-mâa", e: "instant noodles", em: "🍜" }, { t: "ถ้า", i: "tâa", e: "if", em: "❓" },
+            { t: "ชุดว่ายน้ำ", i: "chút-wâai-náam", e: "swimsuit", em: "👙" }, { t: "ทา", i: "taa", e: "apply (cream)", em: "🧴" },
+            { t: "ได้", i: "dâai", e: "get/receive", em: "📥" }, { t: "ผู้ช่วย", i: "pôo-chûay", e: "assistant", em: "🧑‍💼" },
+            { t: "ปีนี้", i: "bpii-nii", e: "this year", em: "📅" }, { t: "ช้อน", i: "chón", e: "spoon", em: "🥄" }
+        ];
+
+        // --- LESSON DATA ---
+        // Target Vocab & Structure
+        const targetVocab = [
+            { t: "ไวน์", i: "waai", e: "wine", em: "🍷" },
+            { t: "กิน", i: "gin", e: "eat / drink", em: "😋" },
+            { t: "ชอบ", i: "chɔ̂ɔp", e: "like", em: "❤️" }
+        ];
+
+        const targetStructures = [
+            { t: "ทำไม ไม่ [Verb] ที่ [Subject] [Verb] ให้", i: "tam-mai mâi [Verb] tîi [Subject] [Verb] hâi", e: "Why don't you [Verb] what [Subject] [Verb] for you?", em: "❓" },
+            { t: "ฉัน ไม่ชอบ [Noun/Verb]", i: "chǎn mâi chɔ̂ɔp [Noun/Verb]", e: "I don't like [Noun/Verb]", em: "🙅‍♀️" }
+        ];
+
+        // Video Script
+        const scriptData = [
+            { speaker: "เพื่อน", t: "ทำไมมึงไม่กินไวน์ที่กูซื้อให้มึงวะ", i: "tam-mai mʉng mâi gin waai tîi guu sʉ́ʉ hâi mʉng wá", e: "Why don't you drink the wine that I bought for you?", em: "🧑" },
+            { speaker: "ลัลล์", t: "ลัลล์ไม่ชอบไวน์ค่ะ", i: "Lan mâi chɔ̂ɔp waai kâ", e: "Lan doesn't like wine.", em: "👩" }
+        ];
+
+        // --- CORE COMPONENT: Interactive Thai Text ---
+        const ThaiText = ({ text, ipa, en, emoji = "", speaker = "", isHeader = false, isTitle = false, isBox = false, isQuestion = false }) => {
+            const [showIpa, setShowIpa] = useState(false);
+            const [showEn, setShowEn] = useState(false);
+
+            const handleSpeak = (e) => {
+                e.stopPropagation();
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'th-TH';
+                    utterance.rate = 0.85;
+                    window.speechSynthesis.speak(utterance);
+                }
+            };
+
+            let containerClass = "w-full rounded-2xl p-4 mb-3 transition-all relative ";
+            let textClass = "font-medium cursor-pointer group flex-1 flex flex-wrap items-center gap-2 ";
+
+            if (isTitle) {
+                containerClass += "bg-red-700 shadow-lg border border-red-500";
+                textClass += "text-2xl md:text-3xl font-bold text-white text-center justify-center";
+            } else if (isHeader) {
+                containerClass += "bg-red-50 border-2 border-red-200 shadow-sm";
+                textClass += "text-xl md:text-2xl font-bold text-red-800";
+            } else if (isBox) {
+                containerClass += "bg-white border-2 border-dashed border-slate-300 shadow-sm";
+                textClass += "text-lg text-slate-700 italic justify-center text-center";
+            } else if (isQuestion) {
+                containerClass += "bg-transparent p-0 mb-0 border-none shadow-none";
+                textClass += "text-lg font-bold text-red-700";
+            } else {
+                containerClass += "bg-white border border-slate-200 shadow-sm hover:border-red-300 hover:shadow-md";
+                textClass += "text-lg text-slate-800";
+            }
+
+            return (
+                <div className={containerClass}>
+                    {speaker && <div className="text-xs font-bold text-red-500 uppercase mb-1">{speaker}</div>}
+                    
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div onClick={handleSpeak} className={textClass}>
+                            {emoji && <span>{emoji}</span>}
+                            <span className="hover:text-red-500 transition-colors">
+                                {text} <span className="text-xl opacity-30 group-hover:opacity-100 transition-opacity">🔊</span>
+                            </span>
+                        </div>
+                        
+                        <div className="flex gap-2 shrink-0 self-end sm:self-auto">
+                            <button onClick={() => setShowIpa(!showIpa)} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${showIpa ? 'bg-amber-400 text-amber-900 shadow-inner' : (isTitle ? 'bg-red-900 text-red-100' : 'bg-slate-100 text-slate-500 hover:bg-slate-200')}`}>
+                                IPA
+                            </button>
+                            <button onClick={() => setShowEn(!showEn)} className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${showEn ? 'bg-indigo-500 text-white shadow-inner' : (isTitle ? 'bg-red-900 text-red-100' : 'bg-slate-100 text-slate-500 hover:bg-slate-200')}`}>
+                                EN
+                            </button>
+                        </div>
+                    </div>
+
+                    {(showIpa || showEn) && (
+                        <div className={`mt-3 pt-3 flex flex-col gap-2 fade-in border-t border-dashed ${isTitle ? 'border-red-500/50' : 'border-slate-200'}`}>
+                            {showIpa && (
+                                <div className={`flex items-start gap-2 font-mono ${isTitle ? 'text-amber-200' : 'text-amber-600'}`}>
+                                    <span className="text-[10px] font-bold uppercase mt-1 opacity-60">IPA</span>
+                                    <span>{ipa}</span>
+                                </div>
+                            )}
+                            {showEn && (
+                                <div className={`flex items-start gap-2 ${isTitle ? 'text-indigo-100' : 'text-indigo-600'}`}>
+                                    <span className="text-[10px] font-bold uppercase mt-1 opacity-60">EN</span>
+                                    <span className="italic">{en}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- SECTIONS ---
+
+        const ReviewSection = () => {
+            const [currentIndex, setCurrentIndex] = useState(0);
+
+            useEffect(() => { pickRandom(); }, []);
+
+            const pickRandom = () => {
+                setCurrentIndex(Math.floor(Math.random() * reviewVocabList.length));
+            };
+
+            const word = reviewVocabList[currentIndex];
+            if (!word) return null;
+
+            return (
+                <div className="space-y-4 pb-8 fade-in">
+                    <ThaiText text="เกมทบทวนคำศัพท์" ipa="geem tób-tuan kam-sàp" en="Vocabulary Review Game" emoji="🎲" isHeader={true} />
+                    <ThaiText text="สร้างประโยคจากคำนี้!" ipa="sâang bprà-yòok jàak kam níi!" en="Make a sentence from this word!" emoji="🎯" />
+                    
+                    <div className="bg-gradient-to-br from-red-600 to-rose-700 p-8 rounded-[2rem] shadow-xl text-center relative overflow-hidden mt-6">
+                        <div className="text-8xl mb-6 drop-shadow-xl">{word.em}</div>
+                        <ThaiText text={word.t} ipa={word.i} en={word.e} isTitle={true} />
+                        
+                        <button onClick={pickRandom} className="mt-6 bg-white text-red-700 font-bold text-lg px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto w-full sm:w-auto">
+                            <Icon name="refresh" size={20} /> <span>สุ่มคำใหม่</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const LessonSection = () => {
+            const [answers, setAnswers] = useState({});
+            const checkAnswer = (qNum, isCorrect) => setAnswers(prev => ({...prev, [qNum]: isCorrect}));
+
+            const Question = ({ qNum, qText, qIpa, qEn, choices }) => (
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mt-4">
+                    <div className="mb-3">
+                        <ThaiText text={qText} ipa={qIpa} en={qEn} isQuestion={true} />
+                    </div>
+                    <div className="space-y-2">
+                        {choices.map((c, i) => {
+                            const isCorrect = answers[qNum] === true && c.correct;
+                            const isWrong = answers[qNum] === false && !c.correct;
+                            let btnClass = "w-full text-left p-3 rounded-xl border-2 transition-all font-medium ";
+                            if (isCorrect) btnClass += "bg-green-100 border-green-500 text-green-800";
+                            else if (isWrong) btnClass += "bg-red-50 border-red-300 text-red-700 opacity-50";
+                            else btnClass += "bg-slate-50 border-slate-200 text-slate-700 hover:border-red-400";
+                            return (
+                                <button key={i} onClick={() => checkAnswer(qNum, c.correct)} className={btnClass}>
+                                    <ThaiText text={c.text} ipa="" en="" />
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                        {isCorrect && "✅"} {isWrong && "❌"}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="space-y-6 pb-8 fade-in">
+                    {/* Lead-in */}
+                    <div className="bg-amber-50 p-5 rounded-[2rem] border-2 border-amber-200 shadow-sm">
+                        <ThaiText text="ชวนคุยก่อนดูวิดีโอ" ipa="chuan kui gɔ̀ɔn duu wí-dii-oo" en="Lead-in Questions" emoji="🗣️" isHeader={true}/>
+                        <div className="mt-4 space-y-2">
+                            <ThaiText text="คุณชอบ ดื่ม ไวน์ ไหม?" ipa="kun chɔ̂ɔp dʉ̀ʉm waai mǎi?" en="Do you like drinking wine?" emoji="🍷" />
+                            <ThaiText text="ถ้าเพื่อน ซื้อ ของให้คุณ แต่คุณ ไม่ชอบ คุณจะ ทำยังไง?" ipa="tâa pʉ̂an sʉ́ʉ kɔ̌ɔng hâi kun dtɛ̀ɛ kun mâi chɔ̂ɔp, kun jà tam yang-ngai?" en="If a friend buys you something but you don't like it, what will you do?" emoji="🎁" />
+                            <ThaiText text="เครื่องดื่ม อะไรที่คุณ ไม่ชอบ เลย?" ipa="khrʉ̂ang-dʉ̀ʉm à-rai tîi kun mâi chɔ̂ɔp ləəi?" en="What beverage do you not like at all?" emoji="🥤" />
+                        </div>
+                    </div>
+
+                    {/* Video */}
+                    <ThaiText text="ดูวิดีโอคลิป" ipa="duu wí-dii-oo klíp" en="Watch the video clip" emoji="🎬" isHeader={true} />
+                    <div className="bg-slate-100 p-4 rounded-[2rem] text-center border-2 border-red-100 italic text-slate-500 text-sm mb-4">
+                        <a href="https://x.com/EWB_Series/status/1831268718496985335" target="_blank" className="text-blue-500 underline font-bold">คลิกที่นี่เพื่อดูวิดีโอบน X (Twitter)</a>
+                        <br/>(ดูช่วง 0:00 - 0:07)
+                    </div>
+
+                    {/* Script & Breakdown */}
+                    <div className="mt-6 space-y-4">
+                        <ThaiText text="บทสนทนาและโครงสร้าง" ipa="bòt sǒn-tá-naa lɛ́ kroong-sâang" en="Dialogue & Structure" emoji="💬" isHeader={true}/>
+                        
+                        {/* Target Vocab Box */}
+                        <div className="bg-white p-4 rounded-2xl border-2 border-dashed border-red-200">
+                            {targetVocab.map((v, i) => <ThaiText key={i} text={v.t} ipa={v.i} en={v.e} emoji={v.em} />)}
+                            <div className="my-2 border-b border-slate-100"></div>
+                            {targetStructures.map((v, i) => <ThaiText key={i} text={v.t} ipa={v.i} en={v.e} emoji={v.em} />)}
+                        </div>
+
+                        {scriptData.map((line, i) => (
+                            <ThaiText key={i} text={line.t} ipa={line.i} en={line.e} emoji={line.em} speaker={line.speaker} />
+                        ))}
+                    </div>
+
+                    {/* Structure Practice */}
+                    <div className="bg-red-50 p-5 rounded-[2rem] border-2 border-red-200 shadow-sm mt-6">
+                        <ThaiText text="แต่งประโยคของคุณเอง" ipa="dtɛ̀ng bprà-yòok kɔ̌ɔng kun eeng" en="Make your own sentence" emoji="🎯" isHeader={true}/>
+                        <div className="space-y-2 mt-4">
+                            <ThaiText text="ตัวอย่าง: ทำไม ไม่ กิน หมูกรอบ ที่ ฉัน สั่ง ให้" ipa="dtua-yàang: tam-mai mâi gin mǔu-grɔ̀ɔp tîi chǎn sàng hâi" en="Example: Why don't you eat the crispy pork that I ordered for you?" emoji="🐷" />
+                            <ThaiText text="ตานักเรียน:" ipa="dtaa nák-rian:" en="Student's turn:" emoji="🗣️" isBox={true} />
+                        </div>
+                    </div>
+
+                    {/* Comprehension & Discussion */}
+                    <div className="mt-6">
+                        <ThaiText text="คำถามทดสอบและพูดคุย" ipa="kǎm-tǎam tót-sɔ̀ɔp lɛ́ pûut-kui" en="Comprehension & Discussion" emoji="📝" isHeader={true}/>
+                        
+                        <Question 
+                            qNum={1} 
+                            qText="เพื่อนถามลัลล์เรื่องอะไร?" 
+                            qIpa="pʉ̂an tǎam Lan rʉ̂ang à-rai?"
+                            qEn="What did the friend ask Lan about?"
+                            choices={[
+                                { text: "ก. เรื่องอาหาร", correct: false },
+                                { text: "ข. เรื่องไวน์", correct: true },
+                                { text: "ค. เรื่องงาน", correct: false }
+                            ]} 
+                        />
+                        <Question 
+                            qNum={2} 
+                            qText="ใครเป็นคนซื้อไวน์?" 
+                            qIpa="krai bpen kon sʉ́ʉ waai?"
+                            qEn="Who bought the wine?"
+                            choices={[
+                                { text: "ก. ลัลล์", correct: false },
+                                { text: "ข. เพื่อน", correct: true },
+                                { text: "ค. แม่", correct: false }
+                            ]} 
+                        />
+                        <Question 
+                            qNum={3} 
+                            qText="ทำไมลัลล์ไม่กินไวน์?" 
+                            qIpa="tam-mai Lan mâi gin waai?"
+                            qEn="Why didn't Lan drink the wine?"
+                            choices={[
+                                { text: "ก. ลัลล์ไม่ชอบไวน์", correct: true },
+                                { text: "ข. ไวน์แพง", correct: false },
+                                { text: "ค. ลัลล์อิ่มแล้ว", correct: false }
+                            ]} 
+                        />
+
+                        {/* Discussion Questions */}
+                        <div className="mt-6 space-y-2">
+                            <ThaiText text="คำถามชวนคุย" ipa="kǎm-tǎam chuan kui" en="Discussion Questions" emoji="💬" isHeader={true}/>
+                            <ThaiText text="มีอาหารหรือเครื่องดื่มอะไร ที่คุณ ไม่ชอบ เลย?" ipa="mii aa-hǎan rʉ̌ʉ khrʉ̂ang-dʉ̀ʉm à-rai tîi kun mâi chɔ̂ɔp ləəi?" en="Is there any food or beverage that you don't like at all?" emoji="🍕" />
+                            <ThaiText text="ถ้าแม่ ซื้อเสื้อผ้าที่คุณ ไม่ชอบ ให้ คุณจะใส่ไหม?" ipa="tâa mɛ̂ɛ sʉ́ʉ sʉ̂a-pâa tîi kun mâi chɔ̂ɔp hâi, kun jà sài mǎi?" en="If your mother buys you clothes you don't like, will you wear them?" emoji="👕" />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const SpeakingSection = () => (
+            <div className="space-y-6 pb-8 fade-in">
+                <ThaiText text="กิจกรรมพูดในชีวิตจริง" ipa="gìt-jà-gam pûut nai chii-wít jing" en="Real-life Speaking Activities" emoji="🗣️" isHeader={true} />
+
+                {/* Roleplay */}
+                <div className="bg-rose-50 p-5 rounded-[2rem] border-2 border-rose-200 shadow-sm">
+                    <ThaiText text="บทบาทสมมติ: ซื้อของกินมาฝาก" ipa="bòt-bàat sǒm-mút: sʉ́ʉ kɔ̌ɔng gin maa fàak" en="Roleplay: Buying food for someone" emoji="🎭" isHeader={true}/>
+                    <ThaiText text="ใช้คำศัพท์: ทำไมไม่กิน, ที่ฉันซื้อให้, ไม่ชอบ" ipa="chái kam-sàp: tam-mai mâi gin, tîi chǎn sʉ́ʉ hâi, mâi chɔ̂ɔp" en="Use vocab: Why don't you eat, That I bought for you, Don't like" emoji="🎯" isBox={true} />
+                    
+                    <div className="mt-4 space-y-2">
+                        <ThaiText text="คุณ: ซื้อ ชาไข่มุก มาให้ กินสิ" ipa="kun: sʉ́ʉ chaa khài-múk maa hâi, gin sì" en="You: I bought bubble tea for you, drink it." emoji="🧋" speaker="A"/>
+                        <ThaiText text="เพื่อน: ขอบใจนะ แต่ แปปนึง นะ" ipa="pʉ̂an: kɔ̀ɔp-jai ná, dtɛ̀ɛ bpáeb-neung ná" en="Friend: Thanks, but wait a moment." emoji="⏳" speaker="B"/>
+                        <ThaiText text="คุณ: ทำไม ไม่ กิน ชาไข่มุก ที่ฉัน ซื้อให้ วะ?" ipa="kun: tam-mai mâi gin chaa khài-múk tîi chǎn sʉ́ʉ hâi wá?" en="You: Why don't you drink the bubble tea that I bought for you?" emoji="🤔" speaker="A"/>
+                        <ThaiText text="เพื่อน: ฉัน ไม่ชอบ หวาน!" ipa="pʉ̂an: chǎn mâi chɔ̂ɔp wǎan!" en="Friend: I don't like sweet things!" emoji="🙅‍♂️" speaker="B"/>
+                    </div>
+                </div>
+
+                {/* Real-life Interview */}
+                <div className="bg-sky-50 p-5 rounded-[2rem] border-2 border-sky-200 shadow-sm">
+                    <ThaiText text="สัมภาษณ์: ของที่ไม่ชอบ" ipa="sǎm-pâat: kɔ̌ɔng tîi mâi chɔ̂ɔp" en="Interview: Things you don't like" emoji="🎤" isHeader={true}/>
+                    <ThaiText text="ตอบคำถามเหล่านี้" ipa="dtɔ̀ɔp kǎm-tǎam lǎo-níi" en="Answer these questions" emoji="💡" isBox={true} />
+                    <div className="mt-4 space-y-2">
+                        <ThaiText text="คุณ ไม่ชอบ อากาศ แบบไหน ที่สุด?" ipa="kun mâi chɔ̂ɔp aa-gàat bɛ̀ɛp nǎi tîi-sùt?" en="What kind of weather do you dislike the most?" emoji="🌦️" />
+                        <ThaiText text="มี นิสัย แบบไหน ของเพื่อน ที่คุณ ไม่ชอบ?" ipa="mii ní-sǎi bɛ̀ɛp nǎi kɔ̌ɔng pʉ̂an tîi kun mâi chɔ̂ɔp?" en="What kind of personality in a friend do you dislike?" emoji="🧠" />
+                    </div>
+                </div>
+
+                {/* Speaking Game */}
+                <div className="bg-emerald-50 p-5 rounded-[2rem] border-2 border-emerald-200 shadow-sm">
+                    <ThaiText text="เกม: ฉันไม่ชอบ..." ipa="geem: chǎn mâi chɔ̂ɔp..." en="Game: I don't like..." emoji="🙅‍♀️" isHeader={true}/>
+                    <ThaiText text="นักเรียนเลือก 1 อย่างที่ ไม่ชอบ แล้วครูต้องถามว่า ทำไม" ipa="nák-rian lʉ̂ak nʉ̀ng yàang tîi mâi chɔ̂ɔp lɛ́ɛo kruu dtɔ̂ng tǎam wâa tam-mai" en="Student picks 1 thing they don't like, and teacher asks why." emoji="🎯" isBox={true} />
+                    <ThaiText text="ตัวอย่าง: นักเรียน: ฉันไม่ชอบตื่นเช้า / ครู: ทำไมไม่ชอบตื่นเช้า?" ipa="dtua-yàang: nák-rian: chǎn mâi chɔ̂ɔp dtʉ̀ʉn cháo / kruu: tam-mai mâi chɔ̂ɔp dtʉ̀ʉn cháo?" en="Example: Student: I don't like waking up early / Teacher: Why don't you like waking up early?" emoji="🌅" />
+                </div>
+            </div>
+        );
+
+        const ExtensionSection = () => (
+            <div className="space-y-6 pb-8 fade-in">
+                <ThaiText text="กิจกรรมเสริม" ipa="gìt-jà-gam sə̌əm" en="Extension Activities" emoji="🚀" isHeader={true} />
+
+                {/* Real-life Debate */}
+                <div className="bg-orange-50 p-5 rounded-[2rem] border-2 border-orange-200 shadow-sm">
+                    <ThaiText text="โต้วาที: บอกความจริง" ipa="dtôo-waa-tii: bɔ̀ɔk kwaam-jing" en="Debate: Telling the truth" emoji="⚖️" isHeader={true}/>
+                    <ThaiText text="บอก ว่า ไม่ชอบ VS เก็บไว้ ไม่ บอก" ipa="bɔ̀ɔk wâa mâi chɔ̂ɔp VS gèp wái mâi bɔ̀ɔk" en="Say you don't like it VS Keep it and not tell" emoji="🥊" isTitle={true}/>
+                    <ThaiText text="ถ้าแม่ทำอาหารไม่อร่อย คุณจะทำแบบไหน? ทำไม?" ipa="tâa mɛ̂ɛ tam aa-hǎan mâi à-rɔ̀i, kun jà tam bɛ̀ɛp nǎi? tam-mai?" en="If your mother cooks badly, which will you do? Why?" emoji="🤔" isBox={true} />
+                </div>
+
+                {/* Real-life Story-telling */}
+                <div className="bg-purple-50 p-5 rounded-[2rem] border-2 border-purple-200 shadow-sm">
+                    <ThaiText text="เล่าเรื่อง: ของขวัญที่ไม่ชอบ" ipa="lâo rʉ̂ang: kɔ̌ɔng-kwǎn tîi mâi chɔ̂ɔp" en="Storytelling: The gift I don't like" emoji="🎁" isHeader={true}/>
+                    <ThaiText text="ใช้คำศัพท์: ซื้อ, ให้, ไม่ชอบ, แต่" ipa="chái kam-sàp: sʉ́ʉ, hâi, mâi chɔ̂ɔp, dtɛ̀ɛ" en="Use vocab: Buy, Give, Don't like, But" emoji="🎯" isBox={true} />
+                    <ThaiText text="เล่าเรื่องตอนที่มีคน ซื้อ ของ ให้ คุณ แต่คุณ ไม่ชอบ เลย" ipa="lâo rʉ̂ang dtɔɔn tîi mii kon sʉ́ʉ kɔ̌ɔng hâi kun dtɛ̀ɛ kun mâi chɔ̂ɔp ləəi" en="Tell a story about when someone bought you something but you didn't like it at all." emoji="📖" />
+                </div>
+
+                {/* Real-life Presentation */}
+                <div className="bg-teal-50 p-5 rounded-[2rem] border-2 border-teal-200 shadow-sm">
+                    <ThaiText text="นำเสนอ: 3 สิ่งที่ฉันไม่ชอบ" ipa="nam-sà-nə̌ə: sǎam sìng tîi chǎn mâi chɔ̂ɔp" en="Presentation: 3 things I don't like" emoji="📊" isHeader={true}/>
+                    <ThaiText text="บอก 3 สิ่งที่คุณ ไม่ชอบ และ บอกเหตุผล" ipa="bɔ̀ɔk sǎam sìng tîi kun mâi chɔ̂ɔp lɛ́ bɔ̀ɔk hèet-pǒn" en="Tell 3 things you don't like and give reasons." emoji="🗣️" isBox={true} />
+                </div>
+            </div>
+        );
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [currentTab, setCurrentTab] = useState('review');
+
+            const tabs = [
+                { id: 'review', icon: 'refresh', label: 'ทบทวน' },
+                { id: 'lesson', icon: 'book', label: 'บทเรียน' },
+                { id: 'speak', icon: 'message', label: 'พูด' },
+                { id: 'ext', icon: 'zap', label: 'เสริม' }
+            ];
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen relative shadow-2xl bg-[#f8fafc] overflow-x-hidden">
+                    
+                    {/* Sticky Header */}
+                    <div className="bg-white p-5 shadow-sm sticky top-0 z-40 border-b border-slate-200 flex items-center justify-center">
+                        <ThaiText 
+                            text="ลัลล์ไม่ชอบไวน์" 
+                            ipa="Lan mâi chɔ̂ɔp waai" 
+                            en="Enemies With Benefits" 
+                            emoji="🍷" 
+                            isTitle={true} 
+                        />
+                    </div>
+
+                    {/* Content Area */}
+                    <div className="px-5 pt-6 pb-28">
+                        {currentTab === 'review' && <ReviewSection />}
+                        {currentTab === 'lesson' && <LessonSection />}
+                        {currentTab === 'speak' && <SpeakingSection />}
+                        {currentTab === 'ext' && <ExtensionSection />}
+                    </div>
+
+                    {/* Bottom Navigation */}
+                    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] rounded-t-3xl z-50 pb-safe">
+                        <div className="flex justify-around px-2 py-3">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setCurrentTab(tab.id)}
+                                    className={`flex flex-col items-center justify-center w-[22%] py-2 rounded-2xl transition-all ${currentTab === tab.id ? 'text-red-600 scale-110' : 'text-slate-400 hover:text-red-400'}`}
+                                >
+                                    <Icon name={tab.icon} size={24} className={currentTab === tab.id ? 'drop-shadow-md' : ''} />
+                                    <span className={`text-[11px] mt-1 font-semibold ${currentTab === tab.id ? 'font-bold' : ''}`}>{tab.label}</span>
+                                    {currentTab === tab.id && <div className="w-1 h-1 bg-red-600 rounded-full mt-1"></div>}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
