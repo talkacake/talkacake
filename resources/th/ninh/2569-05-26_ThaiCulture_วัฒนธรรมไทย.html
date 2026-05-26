@@ -203,6 +203,27 @@
         </div>
     </section>
 
+    <!-- SECTION 2.5: Additional Vocab -->
+    <section class="mb-12">
+        <div class="header-row mb-4">
+            <div class="header-title" onclick="speak('คำศัพท์เพิ่มเติม', 'th-TH')">
+                <span class="text-2xl">📝</span>
+                <h2 class="text-2xl font-bold text-gray-800">คำศัพท์เพิ่มเติม</h2>
+                <button class="text-pink-500">🔊</button>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleVisibility('sec-add-vocab-ipa')" class="toggle-btn btn-ipa">IPA</button>
+                <button onclick="toggleVisibility('sec-add-vocab-en')" class="toggle-btn btn-en">EN</button>
+            </div>
+        </div>
+        <div id="sec-add-vocab-ipa" class="hidden-content text-orange-600 italic mb-2 ml-10">kam-sàp pêrm-dtəəm</div>
+        <div id="sec-add-vocab-en" class="hidden-content text-gray-500 mb-4 ml-10 cursor-pointer hover:text-pink-600" onclick="speak('Additional Vocabulary', 'en-US')">Additional Vocabulary 🔊</div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="add-vocab-list">
+            <!-- Additional Vocab injected via JS -->
+        </div>
+    </section>
+
     <!-- SECTION 3: Main Activities -->
     <section class="mb-12">
         <div class="header-row mb-4">
@@ -489,6 +510,26 @@
             { t: "ถ้าต้องสอนคนไทยเกี่ยวกับวัฒนธรรมของคุณ คุณจะสอนเรื่องอะไร?", i: "tâa dtɔ̂ng sɔ̌ɔn kon tai gìiao-gàp wát-tá-ná-tam kɔ̌ɔng kun, kun jà sɔ̌ɔn rʉ̂ʉang à-rai?", e: "If you had to teach Thai people about your culture, what would you teach?" }
         ];
 
+        // --- DATA: Additional Vocabulary ---
+        const additionalVocabData = [
+            { emoji: "🗣️💢", t: "เถียง", i: "tĭiang", e: "argue" },
+            { emoji: "👍", t: "ง่าย", i: "ngâai", e: "easy" },
+            { emoji: "🆔", t: "เอกลักษณ์", i: "èek-lák", e: "identity" },
+            { emoji: "😱", t: "กลัว", i: "glua", e: "scared / afraid" },
+            { emoji: "❤️", t: "ใจ", i: "jai", e: "heart" },
+            { emoji: "🙏", t: "เกรงใจ", i: "grayng-jai", e: "considerate" },
+            { emoji: "🙇‍♂️🙏", t: "ความเคารพ", i: "kwaam-kerâwp", e: "respect" },
+            { emoji: "🙇‍♂️", t: "โค้ง", i: "kóhng", e: "to take a bow" },
+            { emoji: "🕒❓", t: "บ่อยแค่ไหน", i: "bòi-kâe-năi", e: "How often?" },
+            { emoji: "👍✨", t: "ข้อดี", i: "kô-dii", e: "advantages; good things" },
+            { emoji: "🐢⏳", t: "ไม่รีบ", i: "mâi-rêep", e: "not in a rush" },
+            { emoji: "⚠️👎", t: "ข้อเสีย", i: "kâaw-sĭa", e: "disadvantages; flaws" },
+            { emoji: "😠🔥", t: "หัวรุนแรง", i: "hŭa-roon-raeng", e: "aggressive" },
+            { emoji: "🏆🏃", t: "แข่งขัน", i: "khàeng-khăn", e: "to compete" },
+            { emoji: "🏗️", t: "พัฒนา", i: "pát-tá-naa", e: "to develop" },
+            { emoji: "💪🧠", t: "แข็งแกร่ง", i: "kăeng-gràeng", e: "strong (mind)" }
+        ];
+
         // --- Functions ---
 
         function createInteractiveBlock(item, idPrefix, withEmoji = false) {
@@ -655,6 +696,14 @@
             discData.forEach((item, i) => {
                 discCont.innerHTML += createQuestionBlock(item.t, item.i, item.e, `disc-${i}`);
             });
+
+            // Additional Vocabulary
+            const addVocabCont = document.getElementById('add-vocab-list');
+            if (addVocabCont) {
+                additionalVocabData.forEach((item, i) => {
+                    addVocabCont.innerHTML += createInteractiveBlock(item, `add-vocab-${i}`, true);
+                });
+            }
 
             // Init first random word
             randomWord();
