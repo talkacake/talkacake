@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เซเว่น</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        thai: ['"Sarabun"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
+        .toggle-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .toggle-content.active { display: block; }
+        .btn-active { background-color: #14b8a6 !important; color: white !important; border-color: #14b8a6 !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .playing { animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; color: #0d9488; }
+        @keyframes pulse-ring { 0% { transform: scale(0.95); } 50% { transform: scale(1.15); } 100% { transform: scale(0.95); } }
+    </style>
+</head>
+<body class="font-sans text-slate-800 antialiased pb-20">
+
+    <header id="main-header" class="bg-white shadow-sm sticky top-0 z-50">
+        <!-- Content injected by JS -->
+    </header>
+
+    <main id="app-container" class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+        <!-- Content will be injected here -->
+    </main>
+
+    <script>
+        let phraseIdCounter = 0;
+        
+        const lessonData = {
+            header: {
+                title: "เซเว่น 🏪",
+                tts: "เซเว่น",
+                ipa: "se-wên",
+                en: "7-Eleven",
+                icon: "" 
+            },
+            leadIn: {
+                title: "คำถามนำ",
+                tts: "คำถามนำ",
+                ipa: "kham-thǎam nam",
+                en: "Lead-in Questions",
+                icon: "💬",
+                phrases: [
+                    { thai: "คุณ ชอบ ไป เซเว่น ไหม 🏪❓", tts: "คุณ ชอบ ไป เซเว่น ไหม", ipa: "kun chôop bpai se-wên mǎi", en: "Do you like going to 7-Eleven?" },
+                    { thai: "ปกติ คุณ ซื้อ อะไร ที่ เซเว่น 🥤🥪", tts: "ปกติ คุณ ซื้อ อะไร ที่ เซเว่น", ipa: "bpòk-gà-dtì kun sûea a-rai tîi se-wên", en: "What do you usually buy at 7-Eleven?" },
+                    { thai: "พนักงาน เซเว่น ชอบ ถาม อะไร 🗣️🤔", tts: "พนักงาน เซเว่น ชอบ ถาม อะไร", ipa: "pá-nák-ngaan se-wên chôop tǎam a-rai", en: "What do 7-Eleven staff usually ask?" }
+                ]
+            },
+            scenario: {
+                title: "สถานการณ์: ซื้อ ของ ที่ เซเว่น",
+                tts: "สถานการณ์ ซื้อ ของ ที่ เซเว่น",
+                ipa: "sa-tǎa-na-gaan: sûea kɔ̌ɔng tîi se-wên",
+                en: "Scenario: Shopping at 7-Eleven",
+                icon: "🛒",
+                dialogues: [
+                    { speaker: "A", thai: "ขอโทษ ค่ะ มี น้ำ แพ็ก เซเว่น เหลือ ใน สต็อค ไหม 📦💧❓", tts: "ขอโทษ ค่ะ มี น้ำ แพ็ก เซเว่น เหลือ ใน สต็อค ไหม", ipa: "kŏr-tôot kâ, mii náam páek se-wên lǔea nai sà-dtók mǎi", en: "Excuse me, do you have any 7-Eleven water packs left in stock?" },
+                    { speaker: "B", thai: "มี ค่ะ วาง อยู่ ด้าน ใน สุด ค่ะ 👈", tts: "มี ค่ะ วาง อยู่ ด้าน ใน สุด ค่ะ", ipa: "mii kâ. waang yùu dâan nai sùt kâ", en: "Yes, they are placed at the very back." },
+                    { speaker: "A", thai: "ขอบคุณ ค่ะ... แล้ว มี นม อีก ไหม 🥛❓", tts: "ขอบคุณ ค่ะ แล้ว มี นม อีก ไหม", ipa: "kɔ̀ɔp-kun kâ... laéw mii nom ìik mǎi", en: "Thank you... and do you have any more milk in stock?" },
+                    { speaker: "B", thai: "มี ค่ะ เอา นมจืด หรือ นมช็อกโกแลต คะ 👈", tts: "มี ค่ะ เอา นมจืด หรือ นมช็อกโกแลต คะ", ipa: "mii kâ. ao nom-jùet rǔe nom-chók-goo-láet ká", en: "Yes. Would you like plain milk or chocolate milk?" },
+                    { speaker: "A", thai: "เอา นมจืด ค่ะ... แล้วก็ ขอ เติม เงิน ทรูมันนี่ หน่อย ค่ะ 📱💸", tts: "เอา นมจืด ค่ะ แล้วก็ ขอ เติม เงิน ทรูมันนี่ หน่อย ค่ะ", ipa: "ao nom-jùet kâ... laéw-gɔ̂ kŏr dterm ngern true-money nòi kâ", en: "I'll take plain milk... and can I please top up my True Money account?" },
+                    { speaker: "B", thai: "ได้ ค่ะ ทั้งหมด 150 บาท ค่ะ รับ หลอด ไหม คะ 🥤❓", tts: "ได้ ค่ะ ทั้งหมด 150 บาท ค่ะ รับ หลอด ไหม คะ", ipa: "dâai kâ. táng-mòt nùeng-rɔ́ɔi-hâa-sìp bàat kâ. ráp lɔ̀ɔt mǎi ká", en: "Yes. The total is 150 baht. Would you like a straw?" },
+                    { speaker: "A", thai: "ขอ หลอด หน่อย ค่ะ... เอ๊ะ ไม่ รับ หลอด ดีกว่า ค่ะ 🥤🚫", tts: "ขอ หลอด หน่อย ค่ะ เอ๊ะ ไม่ รับ หลอด ดีกว่า ค่ะ", ipa: "kŏr lɔ̀ɔt nòi kâ... é! mâi ráp lɔ̀ɔt dii gwàa kâ", en: "Can I please have straws... ah, actually I don't want any straws." },
+                    { speaker: "B", thai: "โอเค ค่ะ จ่าย เงิน สด หรือ สแกน คะ 💵📲", tts: "โอเค ค่ะ จ่าย เงิน สด หรือ สแกน คะ", ipa: "oo-kee kâ. jàai ngern-sòt rǔe sà-gaen ká", en: "Okay. Paying with cash or scan?" },
+                    { speaker: "A", thai: "จ่าย คิวอาร์ ได้ ไหม 📲", tts: "จ่าย คิวอาร์ ได้ ไหม", ipa: "jàai kiu-aa dâai mǎi", en: "Can I pay with QR?" },
+                    { speaker: "B", thai: "ได้ ค่ะ สแกน ตรงนี้ เลย ค่ะ รับ ถุง ไหม คะ 📱✅", tts: "ได้ ค่ะ สแกน ตรงนี้ เลย ค่ะ รับ ถุง ไหม คะ", ipa: "dâai kâ. sà-gaen dtrong-níi loei kâ. ráp tŭng mǎi ká", en: "Yes, you can scan right here. Do you need a bag?" },
+                    { speaker: "A", thai: "ขอ ถุง พลาสติก หน่อย ค่ะ ขอบคุณ ค่ะ 🛍️🙏", tts: "ขอ ถุง พลาสติก หน่อย ค่ะ ขอบคุณ ค่ะ", ipa: "kŏr tŭng pláat-dtìk nòi kâ. kɔ̀ɔp-kun kâ", en: "Can I please have a plastic bag? Thank you." }
+            ]
+        },
+        comprehension: {
+            title: "คำถามความเข้าใจ",
+            tts: "คำถามความเข้าใจ",
+            ipa: "kham-thǎam khwaam-kâo-jai",
+                en: "Comprehension Questions",
+                icon: "🧠",
+                phrases: [
+                    { thai: "ลูกค้า ถาม หา อะไร 🛒❓", tts: "ลูกค้า ถาม หา อะไร", ipa: "lûuk-káa tǎam hǎa a-rai", en: "What did the customer ask for?" },
+                    { thai: "ลูกค้า รับ หลอด ไหม 🥤🚫", tts: "ลูกค้า รับ หลอด ไหม", ipa: "lûuk-káa ráp lɔ̀ɔt mǎi", en: "Did the customer take a straw?" },
+                    { thai: "ลูกค้า จ่าย เงิน ยังไง 📲💸", tts: "ลูกค้า จ่าย เงิน ยังไง", ipa: "lûuk-káa jàai ngern yang-ngai", en: "How did the customer pay?" }
+                ]
+            },
+            discussion: {
+                title: "คำถามอภิปราย",
+                tts: "คำถามอภิปราย",
+                ipa: "kham-thǎam a-pí-bpraai",
+                en: "Discussion Questions",
+                icon: "🗣️",
+                phrases: [
+                    { thai: "คุณ ชอบ ซื้อ อะไร ที่ เซเว่น มาก ที่สุด 🛒❓", tts: "คุณ ชอบ ซื้อ อะไร ที่ เซเว่น มาก ที่สุด", ipa: "kun chôop sûea a-rai tîi se-wên mâak tîi-sùt", en: "What do you like buying at 7-Eleven the most?" },
+                    { thai: "เซเว่น ที่ ไทย กับ ประเทศ ของ คุณ ต่าง กัน ไหม 🇹🇭🌍", tts: "เซเว่น ที่ ไทย กับ ประเทศ ของ คุณ ต่าง กัน ไหม", ipa: "se-wên tîi tai gàp bpra-têet kɔ̌ɔng kun dtàang gan mǎi", en: "Is 7-Eleven in Thailand different from the one in your country?" },
+                    { thai: "คุณ จ่าย เงิน ด้วย คิวอาร์ บ่อย ไหม 📱💸", tts: "คุณ จ่าย เงิน ด้วย คิวอาร์ บ่อย ไหม", ipa: "kun jàai ngern dûay kiu-aa bòi mǎi", en: "Do you pay with QR code often?" }
+                ]
+            }
+        };
+
+        function speakThai(text, buttonElement) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; // Slightly slower for A1 student
+            buttonElement.classList.add('playing');
+            utterance.onend = () => buttonElement.classList.remove('playing');
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleSection(button, targetId) {
+            const target = document.getElementById(targetId);
+            target.classList.toggle('active');
+            button.classList.toggle('btn-active');
+        }
+
+        function createHeadingHTML(icon, title, tts, ipa, en, idPrefix, isMain = false) {
+            const ipaId = `${idPrefix}-ipa`;
+            const enId = `${idPrefix}-en`;
+            return `
+                <div class="${isMain ? 'max-w-3xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3' : 'mb-8'}">
+                    <div class="flex items-center gap-3 ${isMain ? '' : 'mb-3'}">
+                        ${icon ? `<span class="text-3xl">${icon}</span>` : ''}
+                        <h${isMain ? '1' : '2'} class="text-3xl font-bold font-thai text-slate-900">${title}</h${isMain ? '1' : '2'}>
+                        <button onclick="speakThai('${tts}', this)" class="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-brand-50 text-brand-600 hover:bg-brand-100"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="toggleSection(this, '${ipaId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">IPA</button>
+                        <button onclick="toggleSection(this, '${enId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">EN</button>
+                    </div>
+                    <div id="${ipaId}" class="toggle-content mt-2 p-3 bg-blue-50 rounded-lg w-full max-w-sm"><p class="text-blue-800 font-mono text-sm text-center">${ipa}</p></div>
+                    <div id="${enId}" class="toggle-content mt-2 p-3 bg-emerald-50 rounded-lg w-full max-w-sm"><p class="text-emerald-800 text-sm font-medium text-center">${en}</p></div>
+                </div>
+            `;
+        }
+
+        function createPhraseHTML(phrase, speaker = null) {
+            phraseIdCounter++;
+            const ipaId = `ipa-${phraseIdCounter}`;
+            const enId = `en-${phraseIdCounter}`;
+            const speakerBadge = speaker ? `<div class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-sm shadow-sm">${speaker}</div>` : '';
+
+            return `
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md mb-4 transition-all">
+                    <div class="flex items-start gap-4">
+                        ${speakerBadge}
+                        <div class="flex-1 space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-xl sm:text-2xl font-thai font-medium text-slate-800 leading-loose">${phrase.thai}</p>
+                                <button onclick="speakThai('${phrase.tts}', this)" class="shrink-0 mt-1 flex items-center justify-center w-10 h-10 rounded-full bg-brand-50 text-brand-600 hover:bg-brand-100"><i class="fas fa-volume-up"></i></button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="toggleSection(this, '${ipaId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">IPA</button>
+                                <button onclick="toggleSection(this, '${enId}')" class="px-3 py-1 text-xs font-semibold rounded-full border border-slate-300 text-slate-600">EN</button>
+                            </div>
+                            <div id="${ipaId}" class="toggle-content mt-2 p-3 bg-blue-50 rounded-lg"><p class="text-blue-800 font-mono text-sm">${phrase.ipa}</p></div>
+                            <div id="${enId}" class="toggle-content mt-2 p-3 bg-emerald-50 rounded-lg"><p class="text-emerald-800 text-sm font-medium">${phrase.en}</p></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderApp() {
+            document.getElementById('main-header').innerHTML = createHeadingHTML(lessonData.header.icon, lessonData.header.title, lessonData.header.tts, lessonData.header.ipa, lessonData.header.en, 'main', true);
+            
+            const container = document.getElementById('app-container');
+            container.innerHTML = `
+                <section>
+                    ${createHeadingHTML(lessonData.leadIn.icon, lessonData.leadIn.title, lessonData.leadIn.tts, lessonData.leadIn.ipa, lessonData.leadIn.en, 'leadIn')}
+                    ${lessonData.leadIn.phrases.map(p => createPhraseHTML(p)).join('')}
+                </section>
+                <hr class="my-10 border-slate-200">
+                <section>
+                    ${createHeadingHTML(lessonData.scenario.icon, lessonData.scenario.title, lessonData.scenario.tts, lessonData.scenario.ipa, lessonData.scenario.en, 'scenario')}
+                    ${lessonData.scenario.dialogues.map(d => createPhraseHTML(d, d.speaker)).join('')}
+                </section>
+                <hr class="my-10 border-slate-200">
+                <section>
+                    ${createHeadingHTML(lessonData.comprehension.icon, lessonData.comprehension.title, lessonData.comprehension.tts, lessonData.comprehension.ipa, lessonData.comprehension.en, 'comp')}
+                    ${lessonData.comprehension.phrases.map(p => createPhraseHTML(p)).join('')}
+                </section>
+                <hr class="my-10 border-slate-200">
+                <section>
+                    ${createHeadingHTML(lessonData.discussion.icon, lessonData.discussion.title, lessonData.discussion.tts, lessonData.discussion.ipa, lessonData.discussion.en, 'disc')}
+                    ${lessonData.discussion.phrases.map(p => createPhraseHTML(p)).join('')}
+                </section>
+            `;
+        }
+
+        window.addEventListener('DOMContentLoaded', renderApp);
+    </script>
+</body>
+</html>
