@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทบทวน (Review)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        .reveal {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hidden { display: none; }
+        
+        /* Custom Details Marker */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased pb-20">
+
+    <div id="app" class="max-w-3xl mx-auto px-4 pt-8">
+        <!-- Content injected here by JS -->
+    </div>
+
+    <script>
+        let synth = window.speechSynthesis;
+
+        function speakText(text) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'th-TH';
+            utterance.rate = 0.85; // Slower for A1 slow learner
+            synth.speak(utterance);
+        }
+
+        function toggleVisibility(button, type) {
+            const container = button.closest('.thai-block');
+            const content = container.querySelector(`.${type}-content`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                content.classList.add('reveal');
+                button.classList.replace('bg-opacity-20', 'bg-opacity-100');
+                if(type === 'ipa') button.classList.add('ring-2', 'ring-green-400');
+                if(type === 'en') button.classList.add('ring-2', 'ring-blue-400');
+            } else {
+                content.classList.add('hidden');
+                content.classList.remove('reveal');
+                if(type === 'ipa') button.classList.remove('ring-2', 'ring-green-400');
+                if(type === 'en') button.classList.remove('ring-2', 'ring-blue-400');
+            }
+        }
+
+        // All text elements use this block to guarantee TTS, IPA, and EN toggles.
+        function createBlock(emoji, thaiText, ipaText, enText, isTitle = false, isSmall = false) {
+            const textSize = isTitle ? 'text-3xl md:text-4xl' : (isSmall ? 'text-xl md:text-2xl' : 'text-2xl md:text-3xl');
+            const bgColor = isTitle ? 'bg-indigo-100 border-indigo-300' : 'bg-white border-gray-200';
+            const safeThai = thaiText.replace(/'/g, "\\'").replace(/"/g, '\\"');
+
+            let html = `
+            <div class="thai-block ${bgColor} rounded-2xl p-5 shadow-sm border mb-4 transition-all hover:shadow-md w-full">
+                <div class="flex items-start gap-3 mb-4">
+                    ${emoji ? `<span class="${textSize}">${emoji}</span>` : ''}
+                    <span class="font-bold text-gray-800 ${textSize} leading-snug" lang="th">${thaiText}</span>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <button onclick="speakText('${safeThai}')" class="flex items-center gap-1 bg-red-100 text-red-700 px-4 py-2 rounded-xl font-semibold text-sm hover:bg-red-200 transition shadow-sm active:scale-95">
+                        🔊 ฟัง (Listen)
+                    </button>
+                    <button onclick="toggleVisibility(this, 'ipa')" class="flex items-center gap-1 bg-green-100 text-green-700 px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-200 transition shadow-sm active:scale-95">
+                        🗣️ IPA
+                    </button>
+                    <button onclick="toggleVisibility(this, 'en')" class="flex items-center gap-1 bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-semibold text-sm hover:bg-blue-200 transition shadow-sm active:scale-95">
+                        🇬🇧 EN
+                    </button>
+                </div>
+
+                <div class="ipa-content hidden text-green-800 text-lg md:text-xl font-medium italic mt-3 bg-green-50 p-3 rounded-xl border border-green-100 w-full">
+                    ${ipaText}
+                </div>
+                <div class="en-content hidden text-blue-800 text-lg md:text-xl font-medium mt-2 bg-blue-50 p-3 rounded-xl border border-blue-100 w-full">
+                    ${enText}
+                </div>
+            </div>`;
+            return html;
+        }
+
+        function renderPage() {
+            const app = document.getElementById('app');
+            let html = '';
+
+            // --- PAGE TITLE ---
+            html += createBlock('🧠🎯', 'ทบทวน', 'thóp-thuan', 'Review', true);
+
+            // --- SECTION 1: EXERCISES ---
+            html += `<div class="mt-12 mb-4 flex items-center gap-2 border-b-2 border-indigo-200 pb-2">`;
+            html += createBlock('💪', 'ส่วนที่ 1: แบบฝึกหัด', 'sùan thîi nʉ̀ng: bɛ̀ɛp-fʉ̀k-hàt', 'Part 1: Exercises');
+            html += `</div>`;
+
+            // 1. Sentence Order (Jumbled Sentences)
+            html += `<div class="mt-6 border-l-4 border-blue-400 pl-4">`;
+            html += createBlock('🧩', '1. เรียงประโยค', 'riang bprà-yòok', '1. Sentence Order (Jumbled sentences)');
+            html += createBlock('📝', 'เรียงคำให้เป็นประโยคที่ถูกต้อง', 'riang kham hây pen bprà-yòok thîi thùuk-dtɔ̂ɔng', 'Put the words in the correct order', false, true);
+            
+            const jumbled = [
+                { q: "รองเท้า / ไหม / สีดำ / มี / ครับ", a: "มีรองเท้าสีดำไหมครับ", ipa: "mii rawng-tháaw sǐi dam mǎi kráp", en: "Do you have black shoes?" },
+                { q: "เดี๋ยวกลับมา / คิดดูก่อน / ขอ / ค่ะ", a: "ขอคิดดูก่อน เดี๋ยวกลับมาค่ะ", ipa: "khɔ̌ɔ khít-duu-gàawn dǐaw glàp maa kâ", en: "I'll think about it first. I'll come back." },
+                { q: "เดินป่า / ไม่อยาก / อากาศร้อน / ไป", a: "อากาศร้อน ไม่อยากไปเดินป่า", ipa: "aa-gàat rɔ́ɔn mâi yàak bpai dəən bpàa", en: "The weather is hot. I don't want to go hiking." },
+                { q: "ข้าวเปล่า / ข้าวเหนียว / เปลี่ยน / เป็น", a: "เปลี่ยนข้าวเปล่าเป็นข้าวเหนียว", ipa: "bplìian khâao plàao pen khâao nǐaw", en: "Change plain rice to sticky rice." },
+                { q: "จ้างแม่บ้าน / ไม่พอ / เงินสด / มี", a: "มีเงินสดไม่พอจ้างแม่บ้าน", ipa: "mii ngoen sòt mâi paw jâang mâe-bâan", en: "I don't have enough cash to hire a maid." }
+            ];
+
+            jumbled.forEach(item => {
+                html += `<div class="p-4 bg-gray-50 rounded-xl mb-4 border border-gray-200 shadow-sm">
+                            <p class="text-xl md:text-2xl font-bold text-gray-800 mb-3 tracking-wide">${item.q}</p>
+                            <details class="group">
+                                <summary class="cursor-pointer bg-indigo-100 text-indigo-700 font-bold py-2 px-4 rounded-xl inline-block mb-2 hover:bg-indigo-200 transition">👀 ดูเฉลย (Show Answer)</summary>
+                                <div class="mt-3">
+                                    ${createBlock('✅', item.a, item.ipa, item.en, false, true)}
+                                </div>
+                            </details>
+                         </div>`;
+            });
+            html += `</div>`;
+
+            // Speaking Task 1: Q&A
+            html += `<div class="mt-8 p-5 bg-blue-50 rounded-2xl border border-blue-200">`;
+            html += createBlock('🗣️', 'กิจกรรมพูด: ถามและตอบ', 'gìt-jà-gam phûut: thǎam lɛ́ dtɔ̀ɔp', 'Speaking Task: Q&A');
+            html += createBlock('1️⃣', 'คุณมีรองเท้าสีดำไหม?', 'khun mii rawng-tháaw sǐi dam mǎi?', 'Do you have black shoes?', false, true);
+            html += createBlock('2️⃣', 'วันอาทิตย์ คุณตื่นกี่โมง?', 'wan aa-thít khun dtʉ̀ʉn gìi moong?', 'What time do you wake up on Sunday?', false, true);
+            html += createBlock('3️⃣', 'เวลาไปร้านอาหาร คุณสั่งของหวานบ่อยไหม?', 'wee-laa bpai ráan aa-hǎan khun sàng khɔ̌ɔng wǎan bɔ̀y mǎi?', 'When going to a restaurant, do you order dessert often?', false, true);
+            html += createBlock('4️⃣', 'คุณชอบไปทะเล หรือเดินป่า? อธิบายสิ', 'khun chɔ̂ɔp bpai thá-lee rʉ̌ʉ dəən bpàa? à-thí-baai sì', 'Do you like going to the sea or hiking? Explain.', false, true);
+            html += createBlock('5️⃣', 'เมื่อวานคุณทำอาหารอะไร?', 'mʉ̂a-waan khun tham aa-hǎan a-rai?', 'What food did you cook yesterday?', false, true);
+            html += `</div>`;
+
+            // 2. Gap Fill
+            html += `<div class="mt-10 border-l-4 border-green-400 pl-4">`;
+            html += createBlock('🕳️', '2. เติมคำ', 'dtəəm kham', '2. Gap Fill');
+            html += createBlock('📝', 'เติมคำในช่องว่างให้ถูกต้อง', 'dtəəm kham nai chɔ̂ng wâang hây thùuk-dtɔ̂ɔng', 'Fill in the blank correctly', false, true);
+
+            const gapFill = [
+                { q: "หมดสัญญา ___ นี้", a: "หมดสัญญาอาทิตย์นี้", ipa: "mòt sǎn-yaa aa-tít-née", en: "The contract expires this week." },
+                { q: "พรุ่งนี้บ่าย ___ ให้เราไหม", a: "พรุ่งนี้บ่ายว่างให้เราไหม", ipa: "phrûng-níi bàai wâang hâi rao mǎi", en: "Are you free for us tomorrow afternoon?" },
+                { q: "ชอบไปทะเล ___ เงียบ", a: "ชอบไปทะเลเพราะเงียบ", ipa: "chɔ̂ɔp bpai thá-lee phró ngîap", en: "I like going to the sea because it's quiet." },
+                { q: "พูดภาษาไทย ___", a: "พูดภาษาไทยไม่ง่าย", ipa: "pôot-phaa-săa-thai-mâi-ngâai", en: "Speaking Thai is not easy." },
+                { q: "ผม ___ เกสร", a: "ผมแพ้เกสร", ipa: "phǒm pɛ́ɛ gee-sǎawn", en: "I am allergic to pollen." }
+            ];
+
+            gapFill.forEach(item => {
+                html += `<div class="p-4 bg-gray-50 rounded-xl mb-4 border border-gray-200 shadow-sm">
+                            <p class="text-xl md:text-2xl font-bold text-gray-800 mb-3 tracking-wide">${item.q}</p>
+                            <details class="group">
+                                <summary class="cursor-pointer bg-green-100 text-green-700 font-bold py-2 px-4 rounded-xl inline-block mb-2 hover:bg-green-200 transition">👀 ดูเฉลย (Show Answer)</summary>
+                                <div class="mt-3">
+                                    ${createBlock('✅', item.a, item.ipa, item.en, false, true)}
+                                </div>
+                            </details>
+                         </div>`;
+            });
+            html += `</div>`;
+
+            // Speaking Task 2: Role-play
+            html += `<div class="mt-8 p-5 bg-green-50 rounded-2xl border border-green-200">`;
+            html += createBlock('🎭', 'กิจกรรมพูด: บทบาทสมมติ', 'gìt-jà-gam phûut: bòt-bàat sǒm-mút', 'Speaking Task: Role-play');
+            html += createBlock('🏨', 'สถานการณ์ 1: จองห้องพักโรงแรมและขอต่อราคา', 'jɔɔng hɔ̂ng phák roong-rɛɛm lɛ́ khɔ̌ɔ dtàaw raa-kaa', 'Scenario 1: Booking a hotel room and negotiating the price', false, true);
+            html += createBlock('🍚', 'สถานการณ์ 2: สั่งข้าวเปล่า แต่อยากเปลี่ยนเป็นข้าวเหนียว', 'sàng khâao-plàao dtɛ̀ɛ yàak bplìian bpen khâao nǐaw', 'Scenario 2: Ordering plain rice but want to change to sticky rice', false, true);
+            html += createBlock('🏢', 'สถานการณ์ 3: ถามเบอร์เจ้านาย เพราะขี้เกียจทำงาน', 'thǎam bəə jâao-naai phró khîi-gìat tham-ngaan', 'Scenario 3: Asking for the boss\'s number because you are lazy to work', false, true);
+            html += createBlock('📱', 'สถานการณ์ 4: คุยกับช่างซ่อมมือถือ', 'khui gàp châang sɔ̂m mʉʉ-thʉ̌ʉ', 'Scenario 4: Talking with a mobile phone mechanic', false, true);
+            html += createBlock('👩‍👧‍👦', 'สถานการณ์ 5: เจอเพื่อนแม่ ถามว่า "กินข้าวยัง" และอยากไปกินข้าวต้มด้วยกันไหม', 'jəə phʉ̂an mɛ̂ɛ thǎam wâa "gin khâao yang" lɛ́ yàak bpai gin khâao dtôm dǔay gan mǎi', 'Scenario 5: Meeting mom\'s friend, asking "Have you eaten yet?" and do you want to eat porridge together', false, true);
+            html += `</div>`;
+
+            // 3. Multiple Choice (Listening)
+            html += `<div class="mt-10 border-l-4 border-yellow-400 pl-4">`;
+            html += createBlock('🎧', '3. ฟังแล้วเลือก', 'fang lɛ́ɛw lʉ̂ak', '3. Listen & Choose');
+            html += createBlock('📝', 'กดฟังเสียงแล้วเลือกข้อที่ถูกต้อง', 'gòt fang sǐang lɛ́ɛw lʉ̂ak khɔ̂ɔ thîi thùuk-dtɔ̂ɔng', 'Click to listen to the audio and choose the correct option', false, true);
+
+            const listening = [
+                { 
+                    audio: "ไม่อยากโทษใคร", 
+                    choices: ["A. ฉันไม่อยากโทษใคร", "B. ฉันไม่อยากทำอะไร", "C. ไม่มีใครรู้"], 
+                    ansThai: "A. ไม่อยากโทษใคร", ansIpa: "A. mâi yàak thôot khrai", ansEn: "A. I don't want to blame anyone." 
+                },
+                { 
+                    audio: "กินข้าวยัง", 
+                    choices: ["A. หิวข้าวไหม", "B. กินข้าวยัง", "C. ข้าวอร่อยไหม"], 
+                    ansThai: "B. กินข้าวยัง", ansIpa: "B. gin khâao yang", ansEn: "B. Have you eaten yet?" 
+                },
+                { 
+                    audio: "ไม่มีใครได้ทำ", 
+                    choices: ["A. ไม่มีใครทำได้", "B. ไม่มีใครอยากทำ", "C. ไม่มีใครได้ทำ"], 
+                    ansThai: "C. ไม่มีใครได้ทำ", ansIpa: "C. mâi mii khrai dâai tham", ansEn: "C. Nobody gets a chance to do it." 
+                },
+                { 
+                    audio: "ขอเบอร์หน่อยค่ะ", 
+                    choices: ["A. ขอเมนูหน่อยค่ะ", "B. ขอเบอร์หน่อยค่ะ", "C. ขอเวลาหน่อยค่ะ"], 
+                    ansThai: "B. ขอเบอร์หน่อยค่ะ", ansIpa: "B. khɔ̌ɔ bəə nɔ̀ɔi kâ", ansEn: "B. Can I have your number, please?" 
+                },
+                { 
+                    audio: "แพ็กได้ไหม", 
+                    choices: ["A. แพ็กได้ไหม", "B. ลดราคาได้ไหม", "C. เอาอีกไหม"], 
+                    ansThai: "A. แพ็กได้ไหม", ansIpa: "A. páek dâai mǎi", ansEn: "A. Can it be packed?" 
+                }
+            ];
+
+            listening.forEach((item, index) => {
+                const safeAudio = item.audio.replace(/'/g, "\\'");
+                html += `<div class="p-4 bg-gray-50 rounded-xl mb-4 border border-gray-200 shadow-sm">
+                            <button onclick="speakText('${safeAudio}')" class="flex items-center gap-2 bg-red-100 text-red-700 px-6 py-3 rounded-2xl font-bold text-lg hover:bg-red-200 transition shadow-sm active:scale-95 mb-4">
+                                🔊 ข้อ ${index + 1} (Listen to Q${index + 1})
+                            </button>
+                            <div class="bg-white border border-gray-200 p-4 rounded-xl mb-4">
+                                ${item.choices.map(c => `<p class="text-xl font-bold text-gray-700 mb-2">${c}</p>`).join('')}
+                            </div>
+                            <details class="group">
+                                <summary class="cursor-pointer bg-yellow-100 text-yellow-800 font-bold py-2 px-4 rounded-xl inline-block mb-2 hover:bg-yellow-200 transition">👀 ดูเฉลย (Show Answer)</summary>
+                                <div class="mt-3">
+                                    ${createBlock('✅', item.ansThai, item.ansIpa, item.ansEn, false, true)}
+                                </div>
+                            </details>
+                         </div>`;
+            });
+            html += `</div>`;
+
+            // Speaking Task 3: Interview
+            html += `<div class="mt-8 p-5 bg-yellow-50 rounded-2xl border border-yellow-200">`;
+            html += createBlock('🎤', 'กิจกรรมพูด: สัมภาษณ์', 'gìt-jà-gam phûut: sǎm-pâat', 'Speaking Task: Interview');
+            html += createBlock('1️⃣', 'ช่วงนี้คุณเครียดเรื่องอะไร?', 'chûang-níi khun krîat rʉ̂ang a-rai?', 'Recently, what are you stressed about?', false, true);
+            html += createBlock('2️⃣', 'คุณคิดว่าภาษาไทยยากไหม?', 'khun khít wâa phaa-sǎa thai yâak mǎi?', 'Do you think Thai language is difficult?', false, true);
+            html += createBlock('3️⃣', 'เวลาว่างคุณชอบดูหนังผี หรือฟังเพลงรัก?', 'wee-laa wâang khun chɔ̂ɔp duu nǎng phǐi rʉ̌ʉ fang pleeng rák?', 'In your free time, do you like watching ghost movies or listening to love songs?', false, true);
+            html += createBlock('4️⃣', 'ถ้าคุณมีเงินหนึ่งล้าน คุณอยากทำอะไร?', 'thâa khun mii ngən nʉ̀ng láan khun yàak tham a-rai?', 'If you had one million money, what would you want to do?', false, true);
+            html += createBlock('5️⃣', 'อธิบายรูปเพื่อนแม่ของคุณสิ!', 'à-thí-baai rôop phʉ̂an mɛ̂ɛ khǒng khun sì!', 'Explain the picture of your mom\'s friend!', false, true);
+            html += `</div>`;
+
+            // 4. Error Correction
+            html += `<div class="mt-10 border-l-4 border-red-400 pl-4">`;
+            html += createBlock('❌', '4. แก้ประโยค', 'gɛ̂ɛ bprà-yòok', '4. Error Correction');
+            html += createBlock('📝', 'หาคำผิดและแก้ประโยคให้ถูกต้อง', 'hǎa kham phìt lɛ́ gɛ̂ɛ bprà-yòok hây thùuk-dtɔ̂ɔng', 'Find the wrong word and fix the sentence', false, true);
+
+            const errors = [
+                { q: "สั่งข้าวเปล่าเป็นข้าวเหนียว", a: "เปลี่ยนข้าวเปล่าเป็นข้าวเหนียว", ipa: "bplìian khâao plàao pen khâao nǐaw", en: "Change plain rice to sticky rice." },
+                { q: "ว่าจะทำเดินป่า", a: "ว่าจะไปเดินป่า", ipa: "wâa jà bpai dəən bpàa", en: "I think I will go hiking." },
+                { q: "ที่แฮมเบิร์ก ไม่มีคนแพ้ในแง่ร้าย", a: "ที่แฮมเบิร์ก ไม่มีคนมองโลกในแง่ร้าย", ipa: "têe-haem-bêrk mâi-mee-kon-mɔɔng-lôhk-nai-ngâe-ráai", en: "In Hamburg, there are no pessimistic people." },
+                { q: "ขับรถง่ายชั่วโมง", a: "ขับรถหลายชั่วโมง", ipa: "khàp rót lǎai chûa-moong", en: "Drive for many hours." },
+                { q: "วันอาทิตย์ขี้เกียจ ตื่นยาว", a: "วันอาทิตย์ขี้เกียจ ตื่นสาย", ipa: "wan-aa-tít khîi-gìat dtèun-săai", en: "Sunday is lazy, wake up late." }
+            ];
+
+            errors.forEach(item => {
+                html += `<div class="p-4 bg-gray-50 rounded-xl mb-4 border border-gray-200 shadow-sm">
+                            <p class="text-xl md:text-2xl font-bold text-red-600 mb-3 tracking-wide line-through decoration-red-400 decoration-2">${item.q}</p>
+                            <details class="group">
+                                <summary class="cursor-pointer bg-red-100 text-red-700 font-bold py-2 px-4 rounded-xl inline-block mb-2 hover:bg-red-200 transition">👀 ดูเฉลย (Show Answer)</summary>
+                                <div class="mt-3">
+                                    ${createBlock('✅', item.a, item.ipa, item.en, false, true)}
+                                </div>
+                            </details>
+                         </div>`;
+            });
+            html += `</div>`;
+
+            // Speaking Task 4: Debate
+            html += `<div class="mt-8 p-5 bg-red-50 rounded-2xl border border-red-200">`;
+            html += createBlock('⚖️', 'กิจกรรมพูด: โต้วาที', 'gìt-jà-gam phûut: dtôo-waa-thii', 'Speaking Task: Debate');
+            html += createBlock('1️⃣', 'คนอ้วน สุขภาพดี จริงไหม?', 'khon ûan sùk-kà-phâap-dii jing mǎi?', 'Fat people are healthy, is it true?', false, true);
+            html += createBlock('2️⃣', 'ไปเที่ยวทะเล ดีกว่า เดินป่า', 'bpai thîaw thá-lee dii gwàa dəən bpàa', 'Going to the sea is better than hiking.', false, true);
+            html += createBlock('3️⃣', 'ฟังดนตรีสด ดีกว่า ดูหนังผี', 'fang don-dtree sòt dii gwàa duu nǎng phǐi', 'Listening to live music is better than watching ghost movies.', false, true);
+            html += createBlock('4️⃣', 'คนรวยไม่เครียด จริงไหม?', 'khon ruai mâi krîat jing mǎi?', 'Rich people are not stressed, is it true?', false, true);
+            html += createBlock('5️⃣', 'คนชอบคนสวยหลายคน จริงไหม?', 'khon chɔ̂ɔp khon sǔuai lǎai khon jing mǎi?', 'People like many beautiful people, is it true?', false, true);
+            html += `</div>`;
+
+            // --- SECTION 2: EXTENSION ACTIVITIES ---
+            html += `<div class="mt-14 mb-4 flex items-center gap-2 border-b-2 border-indigo-200 pb-2">`;
+            html += createBlock('🌟', 'ส่วนเสริม', 'sùan sə̌əm', 'Extension');
+            html += `</div>`;
+
+            // Ext 1: Story-telling
+            html += `<div class="mt-6 border-l-4 border-purple-400 pl-4">`;
+            html += createBlock('📖', 'กิจกรรมเสริม: เล่าเรื่อง', 'gìt-jà-gam sə̌əm: lâo rʉ̂ang', 'Extension Activity: Story-Telling');
+            html += createBlock('1️⃣', 'เล่าเรื่องเมื่อวานของคุณ', 'lâo rʉ̂ang mʉ̂a-waan khǒng khun', 'Tell the story of your yesterday.', false, true);
+            html += createBlock('2️⃣', 'เล่าเรื่องเวลาไปเที่ยวทะเล', 'lâo rʉ̂ang wee-laa bpai thîaw thá-lee', 'Tell the story of when you went to the sea.', false, true);
+            html += createBlock('3️⃣', 'เล่าเรื่องคนที่คุณเจอที่โรงแรม', 'lâo rʉ̂ang khon thîi khun jəə thîi roong-rɛɛm', 'Tell the story of the person you met at the hotel.', false, true);
+            html += createBlock('4️⃣', 'เล่าเรื่องเวลาคุณกลัวผี', 'lâo rʉ̂ang wee-laa khun glua phǐi', 'Tell the story of when you were scared of ghosts.', false, true);
+            html += createBlock('5️⃣', 'เล่าเรื่องเวลาทำอาหาร', 'lâo rʉ̂ang wee-laa tham aa-hǎan', 'Tell the story of when you cook.', false, true);
+            html += `</div>`;
+
+            // Ext 2: Presentation
+            html += `<div class="mt-8 border-l-4 border-teal-400 pl-4">`;
+            html += createBlock('📊', 'กิจกรรมเสริม: นำเสนอ', 'gìt-jà-gam sə̌əm: nam-sǎ-nə̌ə', 'Extension Activity: Presentation');
+            html += createBlock('1️⃣', 'อธิบายเมืองของคุณ', 'à-thí-baai mʉʉang khǒng khun', 'Explain your city.', false, true);
+            html += createBlock('2️⃣', 'อธิบายกีฬาที่คุณชอบเล่น', 'à-thí-baai gee-laa thîi khun chɔ̂ɔp lên', 'Explain the sport you like to play.', false, true);
+            html += createBlock('3️⃣', 'อธิบายรสชาติอาหารไทยที่คุณชอบ', 'à-thí-baai rót-châat aa-hǎan thai thîi khun chɔ̂ɔp', 'Explain the taste of Thai food you like.', false, true);
+            html += createBlock('4️⃣', 'อธิบายว่าทำไมอยากพูดภาษาไทย', 'à-thí-baai wâa tham-mai yàak phûut phaa-sǎa thai', 'Explain why you want to speak Thai.', false, true);
+            html += createBlock('5️⃣', 'อธิบายบริษัทของคุณ', 'à-thí-baai bɔɔ-rí-sàt khǒng khun', 'Explain your company.', false, true);
+            html += `</div>`;
+
+            // Outro
+            html += `<div class="mt-16 text-center">`;
+            html += createBlock('🎉👏', 'เก่งมากครับ!', 'gèng mâak kráp', 'Very good!', true);
+            html += `</div>`;
+
+            app.innerHTML = html;
+        }
+
+        // Initialize page
+        window.onload = renderPage;
+
+    </script>
+</body>
+</html>
