@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้า 70 - 71</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #334155; /* Slate 700 */
+        }
+        .hidden-content {
+            display: none;
+        }
+        .show-content {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .interactive-block {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid #3b82f6; /* Blue 500 */
+        }
+        .btn-toggle {
+            transition: all 0.2s;
+        }
+        .btn-toggle.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 pb-24 max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-2">หน้า 70 - 71 📖</h1>
+    </header>
+
+    <!-- Section 1: Lead-in Questions -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-green-700 mb-4">🤔 ก่อนเริ่มอ่าน (ชวนคุย)</h2>
+        <div id="leadin-container"></div>
+    </section>
+
+    <!-- Section 2: Reading Text -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-purple-700 mb-4">📖 เนื้อเรื่อง: หน้า 70 - 71</h2>
+        <div id="reading-container" class="space-y-4"></div>
+    </section>
+
+    <!-- Section 3: Comprehension & Discussion -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-red-600 mb-4">❓ คำถามความเข้าใจ และ คำถามอภิปราย</h2>
+        
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 mt-4">คำถามเกี่ยวกับเนื้อเรื่อง</h3>
+        <div id="comprehension-container"></div>
+        
+        <h3 class="text-xl font-semibold text-gray-700 mb-2 mt-8">คำถามชวนคิด (Discussion)</h3>
+        <div id="discussion-container"></div>
+    </section>
+
+    <!-- Section 4: Target Vocabulary -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-yellow-600 mb-4">🔑 คำศัพท์หลักจากเรื่อง (5 คำ)</h2>
+        <div id="target-vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- Section 5: Real-life Production Tasks -->
+    <section class="mb-12">
+        <h2 class="text-2xl font-bold text-indigo-600 mb-4">🎭 กิจกรรมฝึกพูดและการนำไปใช้จริง</h2>
+        <div id="production-container"></div>
+    </section>
+
+    <!-- Section 6: Extension Activities -->
+    <section class="mb-12 border-t-2 border-dashed border-gray-300 pt-8 mt-8">
+        <h2 class="text-2xl font-bold text-teal-600 mb-4">✨ กิจกรรมเพิ่มเติม (หากมีเวลาเหลือ)</h2>
+        <div id="extension-container"></div>
+    </section>
+
+    <footer class="text-center text-gray-500 mt-12 mb-8">
+        <p>🎉 จบบทเรียน ขอให้สนุกกับการเรียนภาษาไทยครับ 🎉</p>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // --- 1. TTS Setup ---
+        function speakThai(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียง (TTS)");
+            }
+        }
+
+        // --- 2. Toggle Functionality ---
+        function toggleContent(buttonElement, targetClass) {
+            const container = buttonElement.closest('.interactive-block');
+            const targetElement = container.querySelector(`.${targetClass}`);
+            
+            if (targetElement.classList.contains('hidden-content')) {
+                targetElement.classList.remove('hidden-content');
+                targetElement.classList.add('show-content');
+                buttonElement.classList.add('active');
+            } else {
+                targetElement.classList.remove('show-content');
+                targetElement.classList.add('hidden-content');
+                buttonElement.classList.remove('active');
+            }
+        }
+
+        // --- 3. Component Generator ---
+        function generateBlockHTML(emoji, thaiText, ipaText, enText, isVocabCard = false) {
+            const extraClass = isVocabCard ? 'bg-yellow-50 border-yellow-400' : 'bg-white border-blue-400';
+            return `
+                <div class="interactive-block ${extraClass}">
+                    <div class="flex items-start justify-between mb-3">
+                        <p class="text-lg text-gray-800 font-medium leading-relaxed flex-1">
+                            <span class="mr-2 text-xl">${emoji}</span> ${thaiText}
+                        </p>
+                        <button onclick="speakThai('${thaiText.replace(/'/g, "\\'")}')" class="ml-4 p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition shrink-0">
+                            🔊
+                        </button>
+                    </div>
+                    <div class="flex gap-3 mb-2">
+                        <button onclick="toggleContent(this, 'ipa-content')" class="btn-toggle text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 px-4 py-1.5 rounded-full border border-gray-300">IPA</button>
+                        <button onclick="toggleContent(this, 'en-content')" class="btn-toggle text-xs font-bold text-gray-600 bg-gray-200 hover:bg-gray-300 px-4 py-1.5 rounded-full border border-gray-300">EN</button>
+                    </div>
+                    <div class="ipa-content hidden-content mt-3 p-2 bg-gray-50 rounded text-blue-800 font-mono text-sm">
+                        🗣️ ${ipaText}
+                    </div>
+                    <div class="en-content hidden-content mt-2 p-2 bg-gray-50 rounded text-green-800 text-sm italic">
+                        🇬🇧 ${enText}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 4. Render Functions ---
+        function renderSection(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = dataArray.map(item => 
+                generateBlockHTML(item.emoji, item.th, item.ipa, item.en)
+            ).join('');
+        }
+        
+        function renderVocabCards(containerId, dataArray) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = dataArray.map(item => 
+                generateBlockHTML(item.emoji, item.th, item.ipa, item.en, true)
+            ).join('');
+        }
+
+        // --- 5. Lesson Data ---
+        const leadInQuestions = [
+            { emoji: '🤥', th: 'เมื่อเพื่อนพูดโกหก คุณรู้ได้ยังไงว่าเขาพูดโกหก?', ipa: 'mʉ̂ʉa pʉ̂ʉan pûut goo-hòk kun rúu dâai yang-ngai wâa kǎo pûut goo-hòk?', en: 'When a friend tells a lie, how do you know they are lying?' },
+            { emoji: '🤔', th: 'คุณเคยเจอคนคุยเก่ง ที่พูดความจริงนิดนึงเรื่องโกหกนิดนึงไหม? คุณทำยังไง?', ipa: 'kun kəəi jəə kon kui gèng, tîi pûut kwaam-jing nít-nʉng rʉ̂ʉang goo-hòk nít-nʉng mǎi? kun tam yang-ngai?', en: 'Have you ever met a talkative person who speaks a little bit of truth and a little bit of lies? What do you do?' },
+            { emoji: '🙉', th: 'ถ้าคุณรู้ว่าคนนั้นพูดโกหก คุณจะอยากฟังเขาต่อไหม? เพราะอะไร?', ipa: 'tâa kun rúu wâa kon nán pûut goo-hòk, kun jà yàak fang kǎo dtɔ̀ɔ mǎi? prɔ́ à-rai?', en: 'If you know that person is lying, would you want to keep listening to them? Why?' }
+        ];
+
+        const readingData = [
+            { emoji: '👀', th: 'จ้อยสังเกตดูหน้ามนัส แต่เขาไม่ได้แสดงความรู้สึกอะไรออกมา', ipa: 'jɔ̂ɔi sǎng-gèet duu nâa má-nát, dtɛ̀ɛ kǎo mâi dâai sà-dɛɛng kwaam-rúu-sʉ̀k à-rai ɔ̀ɔk maa', en: 'Joy observed Manus\'s face, but he didn\'t show any emotion.' },
+            { emoji: '🐽', th: 'จ้อยเริ่มคิดได้ว่ามนัสอาจจะคิดจูงจมูกจ้อยได้ง่ายๆตามใจชอบ จะอย่างไรก็ตาม เธอจะไม่ยอมเด็ดขาด จึงบอกว่า:', ipa: 'jɔ̂ɔi rə̂əm kít dâai wâa má-nát àat jà kít juung jà-mùuk jɔ̂ɔi dâai ngâai ngâai dtaam-jai-chɔ̂ɔp. jà yàang-rai gɔ̂ɔ dtaam, təə jà mâi yɔɔm dèt-kàat. jʉng bɔ̀ɔk wâa:', en: 'Joy began to realize that Manus might think he could easily lead her by the nose as he pleased. However, she would absolutely not let him. So she said:' },
+            { emoji: '🙄', th: '"เอาละ เอาละ ใครเขาจะเชื่อ พี่พูดโอเว่อร์มากเลย ผู้หญิงที่ไหนจะชื่อ \'ลิงดำ\' ได้โถ่โว้ย..."', ipa: '"ao lá, ao lá, krai kǎo jà chʉ̂ʉa. pîi pûut oo-wə̂ə mâak ləəi. pûu-yǐng tîi nǎi jà chʉ̂ʉ \'ling dam\' dâai... tôo-wóoi..."', en: '"Alright, alright, who would believe that? You are exaggerating so much. What kind of woman would be named \'Black Monkey\'... oh my god..."' },
+            { emoji: '😤', th: '"พี่พูดจริงๆดีกว่า อย่าคิดว่าจ้อยโง่น่ะ พี่น่าจะเล่าเรื่องจริงๆให้จ้อยฟังจะดีกว่า"', ipa: '"pîi pûut jing jing dii gwàa. yàa kít wâa jɔ̂ɔi ngôo nà. pîi nâa jà lâo rʉ̂ʉang jing jing hâi jɔ̂ɔi fang jà dii gwàa"', en: '"You better tell the truth. Don\'t think Joy is stupid. You should tell Joy the real story, that would be better."' },
+            { emoji: '🚫', th: '"พี่ทำอะไรบ้าง ในเมื่อพี่ไม่มีเงิน ไม่มีปืน แล้วยังไม่มีเสื้อผ้าอีกมั้ง เอ้า... เล่ามาตามตรงหน่อยน่ะ ไม่ต้องพูดถึงเรื่องอื่นๆอีก... ตกลงตามนี้น่ะพี่"', ipa: '"pîi tam à-rai bâang, nai mʉ̂ʉa pîi mâi mii ngən, mâi mii bpʉʉn, lɛ́ɛo yang mâi mii sʉ̂ʉa-pâa ìik máng. âo... lâo maa dtaam dtrong nɔ̀oi nà. mâi dtɔ̂ng pûut tʉ̌ng rʉ̂ʉang ʉ̀ʉn ʉ̀ʉn ìik... dtòk-long dtaam níi nà pîi"', en: '"What did you do, since you had no money, no gun, and probably no clothes either? Come on... tell me straight. You don\'t need to talk about other things anymore... agreed?"' },
+            { emoji: '😠', th: '"แล้วมึงรู้ได้ไงว่ากูพูดโกหก คนส่วนมากเขาเชื่อทุกสิ่งทุกอย่างที่กูบอก..." มนัสหันกลับมามองดูหน้าจ้อย เขาพูดออกมาอย่างเคืองใจ:', ipa: '"lɛ́ɛo mʉng rúu dâai ngai wâa guu pûut goo-hòk. kon sùan mâak kǎo chʉ̂ʉa túk-sìng-túk-yàang tîi guu bɔ̀ɔk..." má-nát hǎn glàp maa mɔɔng duu nâa jɔ̂ɔi. kǎo pûut ɔ̀ɔk maa yàang kʉʉang jai:', en: '"And how did you know I was lying? Most people believe everything I say..." Manus turned back to look at Joy\'s face. He spoke resentfully:' },
+            { emoji: '🤷‍♀️', th: '"จะโกหกหรือไม่โกหก... จ้อยจะเชื่อหรือไม่เชื่อ มันก็ไม่สำคัญอะไรอีกแล้ว" จ้อยสวนตอบอย่างทันควัน:', ipa: '"jà goo-hòk rʉ̌ʉ mâi goo-hòk... jɔ̂ɔi jà chʉ̂ʉa rʉ̌ʉ mâi chʉ̂ʉa, man gɔ̂ɔ mâi sǎm-kan à-rai ìik lɛ́ɛo" jɔ̂ɔi sǔan dtɔ̀ɔp yàang tan-kwan:', en: '"Whether you lie or not... whether Joy believes it or not, it doesn\'t matter anymore," Joy retorted instantly:' },
+            { emoji: '👂', th: '"แต่...ช่วยเล่าต่อน่ะ ฉันอยากฟัง"', ipa: '"dtɛ̀ɛ... chûuai lâo dtɔ̀ɔ nà. chǎn yàak fang"', en: '"But... please continue the story. I want to listen."' }
+        ];
+
+        const targetVocab = [
+            { emoji: '🐽', th: 'จูงจมูก', ipa: 'juung jà-mùuk', en: 'To lead by the nose / to manipulate easily' },
+            { emoji: '🙄', th: 'พูดโอเว่อร์', ipa: 'pûut oo-wə̂ə', en: 'To exaggerate' },
+            { emoji: '😠', th: 'เคืองใจ', ipa: 'kʉʉang jai', en: 'Resentful / offended / annoyed' },
+            { emoji: '🗣️', th: 'สวนตอบ', ipa: 'sǔan dtɔ̀ɔp', en: 'To retort / answer back quickly' },
+            { emoji: '⚡', th: 'อย่างทันควัน', ipa: 'yàang tan-kwan', en: 'Instantly / immediately' }
+        ];
+
+        const comprehensionQuestions = [
+            { emoji: '❓', th: 'ทำไมจ้อยถึงไม่เชื่อเรื่องที่มนัสเล่า?', ipa: 'tam-mai jɔ̂ɔi tʉ̌ng mâi chʉ̂ʉa rʉ̂ʉang tîi má-nát lâo?', en: 'Why didn\'t Joy believe the story Manus told?' },
+            { emoji: '❓', th: 'จ้อยบอกให้มนัสทำอะไรต่อไป?', ipa: 'jɔ̂ɔi bɔ̀ɔk hâi má-nát tam à-rai dtɔ̀ɔ-bpai?', en: 'What did Joy tell Manus to do next?' },
+            { emoji: '❓', th: 'มนัสบอกว่าคนส่วนมากทำอย่างไรเวลาเขาเล่าเรื่อง?', ipa: 'má-nát bɔ̀ɔk wâa kon sùan mâak tam yàang-rai wee-laa kǎo lâo rʉ̂ʉang?', en: 'What did Manus say most people do when he tells a story?' }
+        ];
+
+        const discussionQuestions = [
+            { emoji: '💭', th: 'คุณคิดว่ามนัสพยายามจะ "จูงจมูก" จ้อยด้วยการเล่าเรื่องแปลกๆ ใช่ไหม?', ipa: 'kun kít wâa má-nát pá-yaa-yaam jà "juung jà-mùuk" jɔ̂ɔi dûuai gaan lâo rʉ̂ʉang bplɛ̀ɛk bplɛ̀ɛk châi mǎi?', en: 'Do you think Manus is trying to "lead Joy by the nose" by telling weird stories?' },
+            { emoji: '🤨', th: 'ถ้ามีคน "พูดโอเว่อร์" บ่อยๆ คุณจะรู้ได้อย่างไรว่าเรื่องไหนจริง เรื่องไหนโกหก?', ipa: 'tâa mii kon "pûut oo-wə̂ə" bɔ̀oi bɔ̀oi, kun jà rúu dâai yàang-rai wâa rʉ̂ʉang nǎi jing, rʉ̂ʉang nǎi goo-hòk?', en: 'If someone "exaggerates" often, how do you know which story is real and which is a lie?' },
+            { emoji: '🎭', th: 'จ้อยทำเป็นไม่สนใจและ "สวนตอบอย่างทันควัน" คุณคิดว่าจ้อยกลัวมนัสน้อยลงแล้วใช่ไหม?', ipa: 'jɔ̂ɔi tam bpen mâi sǒn-jai lɛ́ "sǔan dtɔ̀ɔp yàang tan-kwan" kun kít wâa jɔ̂ɔi glua má-nát nɔ́ɔi long lɛ́ɛo châi mǎi?', en: 'Joy acted like she didn\'t care and "retorted instantly." Do you think Joy is less afraid of Manus now?' }
+        ];
+
+        const productionTasks = [
+            { emoji: '🗣️', th: 'เล่นเกม (Speaking Game): "ความจริง 2 โกหก 1" - ให้คุณเล่าเรื่องเกี่ยวกับตัวเอง 3 เรื่อง (ความจริง 2 เรื่อง โกหก 1 เรื่อง) และให้ครูทายว่าเรื่องไหนคุณ "พูดโอเว่อร์"!', ipa: 'lên geem: "kwaam-jing sɔ̌ɔng, goo-hòk nʉ̀ng" - hâi kun lâo rʉ̂ʉang gìiao-gàp dtua-eeng sǎam rʉ̂ʉang, lɛ́ hâi kruu taai wâa rʉ̂ʉang nǎi kun "pûut oo-wə̂ə"!', en: 'Speaking Game: "2 Truths and a Lie" - Tell 3 stories about yourself (2 true, 1 lie) and have the teacher guess which one you are "exaggerating"!' },
+            { emoji: '🎭', th: 'บทบาทสมมติ (Role-play): เพื่อนของคุณ (ครู) ชอบ "จูงจมูก" และพูดเรื่องโกหก ให้คุณ "สวนตอบอย่างทันควัน" เพื่อบอกให้เขาพูดความจริง', ipa: 'bòt-bàat sǒm-mút: pʉ̂ʉan kɔ̌ɔng kun (kruu) chɔ̂ɔp "juung jà-mùuk" lɛ́ pûut rʉ̂ʉang goo-hòk, hâi kun "sǔan dtɔ̀ɔp yàang tan-kwan" pʉ̂ʉa bɔ̀ɔk hâi kǎo pûut kwaam-jing', en: 'Role-play: Your friend (teacher) likes to "lead you by the nose" and tell lies. "Retort instantly" to tell them to speak the truth.' }
+        ];
+
+        const extensionTasks = [
+            { emoji: '⚖️', th: 'โต้วาที (Debate): การพูดโกหกเพื่อให้คนอื่นสนุก (เหมือนการเล่าเรื่องของมนัส) เป็นเรื่องที่ยอมรับได้ไหม?', ipa: 'dtôo-waa-tii: gaan pûut goo-hòk pʉ̂ʉa hâi kon ʉ̀ʉn sà-nùk (mʉ̌ʉan gaan lâo rʉ̂ʉang kɔ̌ɔng má-nát) bpen rʉ̂ʉang tîi yɔɔm ráp dâai mǎi?', en: 'Debate: Is lying to entertain others (like Manus\'s storytelling) acceptable?' },
+            { emoji: '🎤', th: 'สัมภาษณ์ (Interview): สมมติว่าคุณเป็นจ้อย คุณจะถามอะไรมนัสต่อ เพื่อให้เขายอมพูดความจริงว่าเขาหนีตำรวจได้อย่างไรโดยไม่มีเงิน?', ipa: 'sǎm-pâat: sǒm-mút wâa kun bpen jɔ̂ɔi, kun jà tǎam à-rai má-nát dtɔ̀ɔ, pʉ̂ʉa hâi kǎo yɔɔm pûut kwaam-jing wâa kǎo nǐi dtam-rùat dâai yàang-rai dooi mâi mii ngən?', en: 'Interview: Imagine you are Joy. What would you ask Manus next to make him tell the truth about how he escaped the police without money?' }
+        ];
+
+        // Render all sections on load
+        renderSection('leadin-container', leadInQuestions);
+        renderSection('reading-container', readingData);
+        renderSection('comprehension-container', comprehensionQuestions);
+        renderSection('discussion-container', discussionQuestions);
+        renderVocabCards('target-vocab-container', targetVocab);
+        renderSection('production-container', productionTasks);
+        renderSection('extension-container', extensionTasks);
+
+    </script>
+</body>
+</html>
