@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สุขภาพ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4;
+            color: #1f2937;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .tab-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-btn.active {
+            background-color: #22c55e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .word-card {
+            transition: transform 0.2s;
+        }
+        .word-card:hover {
+            transform: scale(1.02);
+        }
+        .thai-block {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+            margin: 0.25rem 0;
+            padding: 0.25rem 0.5rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            line-height: 1.8;
+        }
+        .thai-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+        }
+        .btn-tts {
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .btn-tts:hover { transform: scale(1.2); }
+        .btn-toggle {
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        .btn-ipa { background-color: #dbeafe; color: #1e40af; }
+        .btn-ipa:hover { background-color: #bfdbfe; }
+        .btn-en { background-color: #dcfce3; color: #166534; }
+        .btn-en:hover { background-color: #bbf7d0; }
+        .text-ipa { color: #2563eb; font-family: monospace; font-size: 1.1rem; background: #eff6ff; padding: 0 0.25rem; border-radius: 0.25rem;}
+        .text-en { color: #16a34a; font-size: 1.1rem; background: #f0fdf4; padding: 0 0.25rem; border-radius: 0.25rem;}
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <header class="text-center space-y-4 pt-4 pb-8">
+            <h1 class="text-5xl md:text-6xl font-bold text-green-600 drop-shadow-sm flex items-center justify-center gap-4">
+                🩺 <span id="main-title"></span> 🌿
+            </h1>
+            <div id="sub-title" class="flex justify-center mt-4"></div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex flex-wrap justify-center gap-3 mb-8" id="nav-container">
+            <!-- Tabs injected via JS -->
+        </nav>
+
+        <!-- Content Area -->
+        <main class="glass-panel rounded-2xl p-6 md:p-10" id="content-area">
+            <!-- Content injected via JS -->
+        </main>
+
+    </div>
+
+<script>
+// --- CORE UTILITIES ---
+let idCounter = 0;
+
+// Text-to-Speech Function
+function speakThai(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'th-TH';
+        utterance.rate = 0.85; // Slightly slower for A1+
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+    } else {
+        alert("ขออภัย เบราว์เซอร์ของคุณไม่รองรับระบบอ่านออกเสียง");
+    }
+}
+
+// Generate the Thai Block HTML with inline toggles
+function T(th, ipa, en) {
+    idCounter++;
+    const safeTh = th.replace(/'/g, "\\'");
+    return `
+        <div class="thai-block">
+            <span class="thai-text">${th}</span>
+            <button onclick="speakThai('${safeTh}')" class="btn-tts" title="Listen">🔊</button>
+            <button onclick="document.getElementById('ipa-${idCounter}').classList.toggle('hidden')" class="btn-toggle btn-ipa">IPA</button>
+            <button onclick="document.getElementById('en-${idCounter}').classList.toggle('hidden')" class="btn-toggle btn-en">EN</button>
+            <span id="ipa-${idCounter}" class="hidden text-ipa">${ipa}</span>
+            <span id="en-${idCounter}" class="hidden text-en">${en}</span>
+        </div>
+    `;
+}
+
+// --- LESSON DATA ---
+const lessonData = {
+    title: { th: "สุขภาพ", ipa: "sùk-kà-pâap", en: "Health" },
+    subtitle: { th: "บทเรียน นี้ ดัดแปลง มาจาก Easy Thai บท ที่ 9", ipa: "bòt-rian níi dàt-bplɛɛng maa-jàak Easy Thai bòt tîi gâo", en: "This lesson is adapted from Easy Thai Lesson 9" },
+    tabs: [
+        { id: "leadin", th: "บทนำ", ipa: "bòt-nam", en: "Lead-in" },
+        { id: "dialogue", th: "บทสนทนา", ipa: "bòt-sǒn-tá-naa", en: "Dialogue" },
+        { id: "vocab", th: "คำศัพท์เป้าหมาย", ipa: "kam-sàp bpâo-mǎai", en: "Target Vocab" },
+        { id: "tasks", th: "กิจกรรม", ipa: "gìt-jà-gam", en: "Tasks" },
+        { id: "extension", th: "กิจกรรมเสริม", ipa: "gìt-jà-gam sə̌əm", en: "Extension" }
+    ],
+    leadin: [
+        { th: "ช่วงนี้ คุณ สบายดี ไหม", ipa: "chûang-níi kun sà-baai dii mǎi", en: "How are you doing lately?" },
+        { th: "เวลา เป็นไข้ คุณ ทำ อะไร", ipa: "wee-laa bpen kâi kun tam à-rai", en: "When you have a fever, what do you do?" },
+        { th: "คุณ เคย ปวดหัว บ่อย ไหม", ipa: "kun kəəi bpùat hǔa bɔ̀ɔi mǎi", en: "Do you often have headaches?" }
+    ],
+    targetVocab: [
+        { emoji: "🤒", th: "เป็นไข้", ipa: "bpen kâi", en: "to have a fever" },
+        { emoji: "🩺", th: "ไปหาหมอ", ipa: "bpai hǎa mɔ̌ɔ", en: "to go see a doctor" },
+        { emoji: "🤕", th: "ปวดหัว", ipa: "bpùat hǔa", en: "headache" },
+        { emoji: "💊", th: "กินยา", ipa: "gin yaa", en: "take medicine" },
+        { emoji: "😴", th: "พักผ่อน", ipa: "pák-pɔ̀ɔn", en: "to rest" }
+    ],
+    dialogue: {
+        intro: { th: "อ่าน บทสนทนา นี้", ipa: "àan bòt-sǒn-tá-naa níi", en: "Read this dialogue" },
+        lines: [
+            { speaker: "มาลี", th: "คุณจิม เป็นยังไง บ้าง คะ", ipa: "kun jim bpen yang-ngai bâang ká", en: "Khun Jim, how are you?" },
+            { speaker: "จิม", th: "ผม ไม่สบาย ครับ", ipa: "pǒm mâi sà-baai kráp", en: "I am not well." },
+            { speaker: "มาลี", th: "คุณ เป็นอะไร คะ", ipa: "kun bpen à-rai ká", en: "What's wrong with you?" },
+            { speaker: "จิม", th: "ผม ปวดหัว และ เป็นไข้ ครับ", ipa: "pǒm bpùat hǔa lɛ́ bpen kâi kráp", en: "I have a headache and a fever." },
+            { speaker: "มาลี", th: "คุณจิม กินยา หรือยัง คะ", ipa: "kun jim gin yaa rʉ̌ʉ-yang ká", en: "Khun Jim, have you taken medicine yet?" },
+            { speaker: "จิม", th: "กิน แล้ว ครับ แต่ ยัง ไม่ ดีขึ้น", ipa: "gin lɛ́ɛo kráp dtɛ̀ɛ yang mâi dii kʉ̂n", en: "Taken already, but still not better." },
+            { speaker: "มาลี", th: "ถ้าอย่างนั้น ต้อง ไปหาหมอ และ พักผ่อน ค่ะ", ipa: "tâa yàang-nán dtɔ̂ɔng bpai hǎa mɔ̌ɔ lɛ́ pák-pɔ̀ɔn kâ", en: "If so, you must go see a doctor and rest." }
+        ],
+        comprehensionTitle: { th: "ตอบ คำถาม", ipa: "dtɔ̀ɔp kam-tǎam", en: "Answer the questions" },
+        questions: [
+            { th: "จิม ปวดหัว และ เป็นไข้ ใช่ไหม", ipa: "jim bpùat hǔa lɛ́ bpen kâi châi mǎi", en: "Jim has a headache and a fever, right?" },
+            { th: "จิม กิน ยา หรือยัง", ipa: "jim gin yaa rʉ̌ʉ-yang", en: "Has Jim taken medicine yet?" },
+            { th: "มาลี บอก ให้ จิม ทำ อะไร", ipa: "maa-lii bɔ̀ɔk hâi jim tam à-rai", en: "What did Malee tell Jim to do?" }
+        ]
+    },
+    tasks: [
+        {
+            type: "🎭", typeTh: "บทบาทสมมติ", typeIpa: "bòt-bàat sǒm-mút", typeEn: "Role-play",
+            title: { th: "ไปหาหมอ", ipa: "bpai hǎa mɔ̌ɔ", en: "Going to the doctor" },
+            desc: { th: "คุณ เป็นไข้ และ ปวดหัว คุย กับ หมอ ที่ โรงพยาบาล", ipa: "kun bpen kâi lɛ́ bpùat hǔa, kui gàp mɔ̌ɔ tîi roong-pá-yaa-baan", en: "You have a fever and headache. Talk to the doctor at the hospital." }
+        },
+        {
+            type: "🗣️", typeTh: "อภิปราย", typeIpa: "à-pí-bpraai", typeEn: "Discussion",
+            title: { th: "วิธี ดูแล ตัวเอง", ipa: "wí-tii duu-lɛɛ dtua-eeng", en: "How to take care of yourself" },
+            desc: [
+                { th: "1. เวลา คุณ เป็นไข้ คุณ ทำ อะไร กินยา หรือ ไปหาหมอ", ipa: "1. wee-laa kun bpen kâi kun tam à-rai, gin yaa rʉ̌ʉ bpai hǎa mɔ̌ɔ", en: "1. When you have a fever, what do you do? Take medicine or go to the doctor?" },
+                { th: "2. คุณ คิดว่า การ พักผ่อน สำคัญ ไหม เวลา ป่วย", ipa: "2. kun kít wâa gaan pák-pɔ̀ɔn sǎm-kan mǎi wee-laa bpùai", en: "2. Do you think resting is important when you are sick?" },
+                { th: "3. ยา อะไร ที่ คุณ กิน บ่อย ที่สุด", ipa: "3. yaa à-rai tîi kun gin bɔ̀ɔi tîi-sùt", en: "3. What medicine do you take the most often?" },
+                { th: "4. โรงพยาบาล ใน ประเทศ ของ คุณ เป็นยังไง บ้าง", ipa: "4. roong-pá-yaa-baan nai bprà-têet kɔ̌ɔng kun bpen yang-ngai bâang", en: "4. How are the hospitals in your country?" },
+                { th: "5. คุณ ชอบ ไปหาหมอ ไหม ทำไม", ipa: "5. kun chɔ̂ɔp bpai hǎa mɔ̌ɔ mǎi, tam-mai", en: "5. Do you like going to the doctor? Why?" }
+            ]
+        },
+        {
+            type: "🎤", typeTh: "สัมภาษณ์", typeIpa: "sǎm-pâat", typeEn: "Interview",
+            title: { th: "การ พักผ่อน", ipa: "gaan pák-pɔ̀ɔn", en: "Resting" },
+            desc: [
+                { th: "1. ถาม เค้ก ว่า ถ้า ปวดหัว เค้ก พักผ่อน ยังไง", ipa: "1. tǎam kêek wâa tâa bpùat hǔa kêek pák-pɔ̀ɔn yang-ngai", en: "1. Ask Cake how they rest if they have a headache." },
+                { th: "2. ถาม เค้ก ว่า เค้ก เป็นไข้ บ่อย ไหม", ipa: "2. tǎam kêek wâa kêek bpen kâi bɔ̀ɔi mǎi", en: "2. Ask Cake if they have a fever often." },
+                { th: "3. ถาม เค้ก ว่า ตอน ป่วย เค้ก ชอบ กิน อะไร", ipa: "3. tǎam kêek wâa dtɔɔn bpùai kêek chɔ̂ɔp gin à-rai", en: "3. Ask Cake what they like to eat when sick." },
+                { th: "4. ถาม เค้ก ว่า เค้ก กลัว การ ไปหาหมอ ไหม", ipa: "4. tǎam kêek wâa kêek glua gaan bpai hǎa mɔ̌ɔ mǎi", en: "4. Ask Cake if they are afraid of going to the doctor." },
+                { th: "5. ถาม เค้ก ว่า เค้ก ชอบ กินยา ไหม", ipa: "5. tǎam kêek wâa kêek chɔ̂ɔp gin yaa mǎi", en: "5. Ask Cake if they like taking medicine." }
+            ]
+        },
+        {
+            type: "🎲", typeTh: "เกมพูดคุย", typeIpa: "geem pûut-kui", typeEn: "Speaking Game",
+            title: { th: "ฉัน ป่วย", ipa: "chǎn bpùai", en: "I am sick" },
+            desc: { th: "แสดง ท่าทาง ป่วย (ปวดหัว, เป็นไข้) และ ให้ เค้ก เดา อาการ", ipa: "sà-dɛɛng tâa-taang bpùai (bpùat hǔa, bpen kâi) lɛ́ hâi kêek dao aa-gaan", en: "Act out being sick (headache, fever) and let Cake guess the symptoms." }
+        }
+    ],
+    extension: [
+        {
+            type: "📖", typeTh: "เล่าเรื่อง", typeIpa: "lâo-rʉ̂ʉang", typeEn: "Story-telling",
+            title: { th: "ตอน เป็นไข้ สูง", ipa: "dtɔɔn bpen kâi sǔung", en: "When having a high fever" },
+            desc: { th: "เล่า ประสบการณ์ เมื่อ คุณ เป็นไข้ และ ต้อง ไปหาหมอ", ipa: "lâo bprà-sòp-gaan mʉ̂a kun bpen kâi lɛ́ dtɔ̂ɔng bpai hǎa mɔ̌ɔ", en: "Tell an experience when you had a fever and had to go to the doctor." }
+        },
+        {
+            type: "💡", typeTh: "แนะนำ", typeIpa: "nɛ́-nam", typeEn: "Giving Advice",
+            title: { th: "เค้ก ปวดหัว บ่อย", ipa: "kêek bpùat hǔa bɔ̀ɔi", en: "Cake has headaches often" },
+            desc: { th: "ให้ คำแนะนำ กับ เค้ก ว่า ควร กินยา พักผ่อน หรือ ไปหาหมอ", ipa: "hâi kam-nɛ́-nam gàp kêek wâa kuan gin yaa pák-pɔ̀ɔn rʉ̌ʉ bpai hǎa mɔ̌ɔ", en: "Give advice to Cake whether they should take medicine, rest, or go to the doctor." }
+        }
+    ]
+};
+
+// --- RENDERING ENGINE ---
+const contentArea = document.getElementById('content-area');
+
+function switchTab(tabId) {
+    // Update nav styling
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+            btn.classList.add('active');
+            btn.classList.remove('bg-white', 'text-gray-700', 'hover:bg-green-50');
+        } else {
+            btn.classList.remove('active');
+            btn.classList.add('bg-white', 'text-gray-700', 'hover:bg-green-50');
+        }
+    });
+
+    // Render content
+    let html = '';
+    
+    if (tabId === 'leadin') {
+        html += `<h2 class="text-3xl font-bold text-green-700 mb-6 flex items-center gap-2">✨ ${T("คำถาม นำเข้า สู่ บทเรียน", "kam-tǎam nam kâo sùu bòt-rian", "Lead-in Questions")}</h2>`;
+        html += `<ul class="space-y-6 text-xl">`;
+        lessonData.leadin.forEach((q, index) => {
+            html += `<li class="flex items-start gap-3 bg-green-50 p-4 rounded-xl border border-green-100"><span class="text-green-600 font-bold">${index + 1}.</span> ${T(q.th, q.ipa, q.en)}</li>`;
+        });
+        html += `</ul>`;
+    } 
+    
+    else if (tabId === 'dialogue') {
+        html += `<h2 class="text-3xl font-bold text-blue-700 mb-4 flex items-center gap-2">💬 ${T(lessonData.dialogue.intro.th, lessonData.dialogue.intro.ipa, lessonData.dialogue.intro.en)}</h2>`;
+        
+        // Dialogue lines
+        html += `<div class="bg-blue-50/50 p-4 md:p-6 rounded-2xl border border-blue-100 space-y-4 mb-8">`;
+        lessonData.dialogue.lines.forEach(line => {
+            const avatarColor = line.speaker === 'A' ? 'bg-blue-500' : 'bg-purple-500';
+            html += `
+                <div class="flex gap-4 items-start">
+                    <div class="w-10 h-10 shrink-0 ${avatarColor} text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">${line.speaker}</div>
+                    <div class="flex-1 bg-white p-3 rounded-xl rounded-tl-none shadow-sm border border-gray-100">
+                        ${T(line.th, line.ipa, line.en)}
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+
+        // Comprehension Questions
+        html += `<h3 class="text-2xl font-bold text-orange-600 mb-4 flex items-center gap-2">🧐 ${T(lessonData.dialogue.comprehensionTitle.th, lessonData.dialogue.comprehensionTitle.ipa, lessonData.dialogue.comprehensionTitle.en)}</h3>`;
+        html += `<div class="space-y-3">`;
+        lessonData.dialogue.questions.forEach((q, i) => {
+            html += `<div class="p-3 bg-orange-50 border border-orange-100 rounded-lg flex items-center gap-3">
+                        <span class="font-bold text-orange-400 text-xl">Q${i+1}</span>
+                        ${T(q.th, q.ipa, q.en)}
+                    </div>`;
+        });
+        html += `</div>`;
+    }
+
+    else if (tabId === 'vocab') {
+        html += `<h2 class="text-3xl font-bold text-purple-700 mb-6 flex items-center gap-2">🎯 ${T("คำศัพท์ เป้าหมาย", "kam-sàp bpâo-mǎai", "Target Vocabulary")}</h2>`;
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+        lessonData.targetVocab.forEach(v => {
+            html += `
+                <div class="word-card bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+                    <div class="text-5xl">${v.emoji}</div>
+                    <div class="flex-1">${T(v.th, v.ipa, v.en)}</div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+    }
+
+    else if (tabId === 'tasks') {
+        html += `<h2 class="text-3xl font-bold text-indigo-700 mb-6 flex items-center gap-2">🎬 ${T("กิจกรรม การพูด", "gìt-jà-gam gaan-pûut", "Speaking Tasks")}</h2>`;
+        html += `<div class="space-y-6">`;
+        lessonData.tasks.forEach(task => {
+            let descHtml = Array.isArray(task.desc) 
+                ? task.desc.map(d => `<div class="mb-2">${T(d.th, d.ipa, d.en)}</div>`).join('')
+                : T(task.desc.th, task.desc.ipa, task.desc.en);
+
+            html += `
+                <div class="bg-white p-5 rounded-2xl border-l-4 border-indigo-500 shadow-sm">
+                    <div class="mb-3">
+                        <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-bold mb-2">
+                            ${task.type} ${T(task.typeTh, task.typeIpa, task.typeEn)}
+                        </span>
+                        <div class="text-2xl">${T(task.title.th, task.title.ipa, task.title.en)}</div>
+                    </div>
+                    <div class="pl-4 border-l-2 border-gray-100 bg-gray-50/50 p-3 rounded-r-lg">
+                        ${descHtml}
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+    }
+
+    else if (tabId === 'extension') {
+        html += `<h2 class="text-3xl font-bold text-rose-700 mb-6 flex items-center gap-2">🌟 ${T("กิจกรรม เสริม", "gìt-jà-gam sə̌əm", "Extension Activities")}</h2>`;
+        html += `<div class="space-y-6">`;
+        lessonData.extension.forEach(task => {
+            let descHtml = Array.isArray(task.desc) 
+                ? task.desc.map(d => `<div class="mb-2">${T(d.th, d.ipa, d.en)}</div>`).join('')
+                : T(task.desc.th, task.desc.ipa, task.desc.en);
+
+            html += `
+                <div class="bg-white p-5 rounded-2xl border-l-4 border-rose-500 shadow-sm">
+                    <div class="mb-3">
+                        <span class="inline-block px-3 py-1 bg-rose-100 text-rose-800 rounded-full text-sm font-bold mb-2">
+                            ${task.type} ${T(task.typeTh, task.typeIpa, task.typeEn)}
+                        </span>
+                        <div class="text-2xl">${T(task.title.th, task.title.ipa, task.title.en)}</div>
+                    </div>
+                    <div class="pl-4 border-l-2 border-gray-100 bg-gray-50/50 p-3 rounded-r-lg">
+                        ${descHtml}
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+    }
+
+    contentArea.innerHTML = html;
+}
+
+// --- INITIALIZATION ---
+function init() {
+    document.getElementById('main-title').innerHTML = T(lessonData.title.th, lessonData.title.ipa, lessonData.title.en);
+    
+    // Add subtitle
+    if (document.getElementById('sub-title') && lessonData.subtitle) {
+        document.getElementById('sub-title').innerHTML = T(lessonData.subtitle.th, lessonData.subtitle.ipa, lessonData.subtitle.en);
+    }
+
+    const navContainer = document.getElementById('nav-container');
+    lessonData.tabs.forEach((tab, index) => {
+        const btn = document.createElement('button');
+        btn.dataset.tab = tab.id;
+        btn.className = `tab-btn px-4 py-2 rounded-xl font-bold text-lg shadow-sm border border-gray-200`;
+        // Make the inner content of the button use our Thai formatter
+        btn.innerHTML = T(tab.th, tab.ipa, tab.en);
+        
+        // Custom click handler to avoid triggering TTS/Toggle when clicking the main button area
+        btn.onclick = (e) => {
+            // Only switch tab if they didn't click inside the thai-block buttons
+            if(e.target.tagName !== 'BUTTON' || e.target === btn) {
+                switchTab(tab.id);
+            }
+        };
+        navContainer.appendChild(btn);
+    });
+
+    // Start on first tab
+    switchTab(lessonData.tabs[0].id);
+}
+
+// Run on load
+window.onload = init;
+
+</script>
+</body>
+</html>
