@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กรรมพันธุ์ (เจ๊ทแหลก ซีซั่น 2)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0fdf4; /* Teal-50 */
+            color: #0f172a;
+        }
+        h1, h2, h3, h4, button, div, p {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .hidden-content { display: none; }
+        .show-content { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .thai-text { font-size: 1.2rem; line-height: 1.6; }
+        
+        /* Interactive Button Styles */
+        .ctrl-btn {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 4px;
+        }
+        .btn-ipa { background-color: #fef08a; color: #854d0e; border: 1px solid #fde047; } 
+        .btn-ipa:hover { background-color: #fde047; }
+        .btn-en { background-color: #bae6fd; color: #0369a1; border: 1px solid #7dd3fc; } 
+        .btn-en:hover { background-color: #7dd3fc; }
+        
+        .tts-btn {
+            width: 24px; height: 24px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            background-color: #ccfbf1; color: #0f766e;
+            cursor: pointer; margin-left: 4px;
+        }
+        .tts-btn:hover { background-color: #99f6e4; transform: scale(1.1); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-900 text-white p-4 shadow-lg sticky top-0 z-50 border-b-4 border-green-500">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div id="nav-title-container"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-8">
+
+        <!-- Section 1: Review Game -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-yellow-400">
+            <div id="sec1-title-container" class="mb-4 text-2xl font-bold text-gray-800"></div>
+            <div id="sec1-desc-container" class="mb-6 text-gray-600"></div>
+            
+            <div id="review-card" class="bg-yellow-50 border-2 border-dashed border-yellow-400 rounded-xl p-10 text-center min-h-[250px] flex flex-col justify-center items-center relative overflow-hidden transition hover:shadow-md">
+                <div class="text-6xl mb-4 animate-bounce" id="card-emoji">🧬</div>
+                <div id="card-word-container" class="text-3xl font-bold text-gray-800"></div>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <div id="btn-random-container"></div>
+            </div>
+        </section>
+
+        <!-- Section 2: Lead-in, Video & Comprehension -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-green-600">
+            <div id="sec2-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <!-- Lead-in Questions -->
+            <div class="mb-6 bg-green-50 rounded-xl p-5 border border-green-200">
+                <h3 class="font-bold text-green-800 mb-3 flex items-center"><i class="fas fa-comments mr-2"></i> ชวนคุยก่อนดู (Lead-in)</h3>
+                <div id="sec2-leadin-container" class="space-y-3 pl-2"></div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="bg-gray-800 rounded-xl overflow-hidden shadow-2xl text-center relative group p-8 max-w-lg mx-auto border border-gray-700">
+                <div class="mb-4 drop-shadow-md">
+                    <i class="fab fa-facebook fa-4x text-green-500 bg-white rounded-full"></i>
+                </div>
+                <h3 class="text-white text-xl font-bold mb-4 drop-shadow-md">กรรมพันธุ์ (เจ๊ทแหลก ซีซั่น 2)</h3>
+                <a href="https://www.facebook.com/watch/?v=1298268185844072" target="_blank" class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-full transition transform hover:scale-105 shadow-lg border-2 border-white cursor-pointer">
+                    <i class="fas fa-play mr-2"></i> ดูบน Facebook
+                </a>
+            </div>
+
+            <!-- Comprehension Questions -->
+            <div class="mt-8 bg-emerald-50 rounded-xl p-5 border border-emerald-200">
+                <h3 class="font-bold text-emerald-800 mb-4 flex items-center"><i class="fas fa-question-circle mr-2"></i> คำถามท้ายคลิป (Comprehension)</h3>
+                <div id="sec2-questions-container" class="space-y-3 pl-2"></div>
+            </div>
+        </section>
+
+        <!-- Section 3: Script & Breakdown (Swapped) -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-sky-600">
+            <div id="sec3-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            <div id="sec3-desc-container" class="mb-6 text-gray-600 bg-sky-50 p-4 rounded-lg border border-sky-200 shadow-sm"></div>
+            
+            <div id="script-container" class="space-y-6"></div>
+        </section>
+
+        <!-- Section 4: Target Vocab (Max 5) (Swapped) -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-teal-500">
+            <div id="sec4-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            <div id="vocab-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- Section 5: Real-Life Activities (Core Lesson) -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-purple-600">
+            <div id="sec5-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <div class="space-y-6">
+                <!-- Role Play -->
+                <div class="bg-white rounded-xl p-6 border border-purple-200 shadow-sm hover:shadow-md transition">
+                    <div id="act1-header" class="mb-3"></div>
+                    <div id="act1-desc" class="mb-4"></div>
+                    <div class="text-4xl text-center p-4 bg-purple-50 rounded-lg">🕵️‍♂️🗣️😏</div>
+                </div>
+
+                <!-- Debate -->
+                <div class="bg-white rounded-xl p-6 border border-indigo-200 shadow-sm hover:shadow-md transition">
+                    <div id="act2-header" class="mb-3"></div>
+                    <div id="act2-desc" class="mb-4"></div>
+                    <div class="text-4xl text-center p-4 bg-indigo-50 rounded-lg">🧬👶 vs 📚💦</div>
+                </div>
+
+                <!-- Discussion -->
+                <div class="bg-white rounded-xl p-6 border border-fuchsia-200 shadow-sm hover:shadow-md transition">
+                    <div id="act3-header" class="mb-3"></div>
+                    <div id="act3-desc" class="mb-4"></div>
+                    <div class="text-4xl text-center p-4 bg-fuchsia-50 rounded-lg">🤔🤪👨‍👩‍👧</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Extension Activities -->
+        <section class="bg-white rounded-2xl shadow-lg p-6 border-l-8 border-orange-500">
+            <div id="sec6-title-container" class="mb-6 text-2xl font-bold text-gray-800"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Interview -->
+                <div class="bg-white rounded-xl p-5 border border-orange-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext1-header" class="mb-2"></div>
+                    <div id="ext1-desc"></div>
+                </div>
+
+                <!-- Story Telling -->
+                <div class="bg-white rounded-xl p-5 border border-yellow-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext2-header" class="mb-2"></div>
+                    <div id="ext2-desc"></div>
+                </div>
+
+                <!-- Speaking Game -->
+                <div class="bg-white rounded-xl p-5 border border-amber-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext3-header" class="mb-2"></div>
+                    <div id="ext3-desc"></div>
+                </div>
+
+                <!-- Presentation -->
+                <div class="bg-white rounded-xl p-5 border border-red-200 shadow-sm hover:shadow-md transition">
+                    <div id="ext4-header" class="mb-2"></div>
+                    <div id="ext4-desc"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-500 py-6 text-sm">
+        <div id="footer-container" class="flex justify-center"></div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // --- DATA: UI STRINGS ---
+        const uiData = {
+            "nav-title": { th: "กรรมพันธุ์ (เจ๊ทแหลก ซีซั่น 2)", ipa: "gam-má-pan (Jét-làek Season 2)", en: "Genetics (Jet-Laek Season 2)" },
+            "sec1-title": { th: "1. ทบทวนคำศัพท์ 🎲", ipa: "tóp-tuan kam-sàp", en: "Vocabulary Review" },
+            "sec1-desc": { th: "สุ่มคำศัพท์แล้วแต่งประโยค", ipa: "sùm kam-sàp láew dtàeng bprà-yòhk", en: "Randomize a word and make a sentence." },
+            "btn-random": { th: "สุ่มคำศัพท์", ipa: "sùm kam-sàp", en: "Randomize" },
+            "card-init": { th: "กดปุ่มเพื่อเริ่ม", ipa: "gòt bpùm pêua rêrm", en: "Press button to start" },
+            
+            "sec2-title": { th: "2. วิดีโอ และ ความเข้าใจ 📺", ipa: "wí-dee-oh láe kwaam kâo jai", en: "Video & Comprehension" },
+            "li1": { th: "คุณคิดว่าความสามารถเกิดจากการฝึกฝนหรือกรรมพันธุ์?", ipa: "kun kít wâa kwaam săa-mâat gèrt jàak gaan fèuk-fŏn rĕu gam-má-pan", en: "Do you think talent/skills come from practice or genetics?" },
+            "li2": { th: "คุณเคยเก่งเรื่องอะไรบางอย่างโดยไม่ต้องพยายามไหม?", ipa: "kun koie gèng rêuuang à-rai baang yàang doie mâi dtâwng pá-yaa-yaam măi", en: "Have you ever been good at something without trying?" },
+            "li3": { th: "คุณปลูกต้นไม้เก่งไหม?", ipa: "kun bplùuk dtôn mái gèng măi", en: "Are you good at growing plants? (Do you have a green thumb?)" },
+            "cq1": { th: "กรีฑาบอกว่ามีคนได้เกรดสี่วิชาอะไร?", ipa: "gree-taa bàawk wâa mee kon dâai gràyt sèe wí-chaa à-rai", en: "What subject did Kritha say someone got a grade 4 in?" },
+            "cq2": { th: "พี่ชายคิดว่าความสามารถในการปลูกต้นไม้มาจากอะไร?", ipa: "pêe chaai kít wâa kwaam săa-mâat nai gaan bplùuk dtôn mái maa jàak à-rai", en: "What does Pee Chai think the plant-growing skill comes from?" },
+            "cq3": { th: "ตอนจบ ออนิวสับสนเรื่องอะไร?", ipa: "dtawn jòp · aw-new săp-sŏn rêuuang à-rai", en: "At the end, what is All-new confused about?" },
+
+            "sec3-title": { th: "3. เจาะลึกบทสนทนา 💬", ipa: "jòk lêuk bòt sŏn-tá-naa", en: "Deep Dive: Conversation" },
+            "sec3-desc": { th: "กดปุ่ม 'วิเคราะห์ประโยค' เพื่อดูโครงสร้าง ตัวอย่าง และแต่งประโยคของคุณเอง", ipa: "gòt bpùm 'wí-kráw bprà-yòhk' pêua duu krohng sâang, dtua yàang, láew dtàeng bprà-yòhk kăawng kun eng", en: "Click 'Breakdown' to see the structure, examples, and make your own sentence." },
+            "btn-breakdown": { th: "💡 วิเคราะห์ประโยค", ipa: "wí-kráw bprà-yòhk", en: "Breakdown" },
+            "prompt-student": { th: "📝 ลองแต่งประโยคของคุณเอง (Your turn):", ipa: "lawng dtàeng bprà-yòhk kăawng kun eng", en: "Try making your own sentence:" },
+
+            "sec4-title": { th: "4. คำศัพท์เป้าหมาย (5 คำ) 🔑", ipa: "kam-sàp bpâo-măai", en: "Target Vocabulary" },
+
+            "sec5-title": { th: "5. กิจกรรมชีวิตจริง (Real-Life Tasks) 🗣️", ipa: "gìt-jà-gam chee-wít jing", en: "Real-Life Activities" },
+            "act1-head": { th: "บทบาทสมมติ: จับผิดเพื่อนร่วมงาน", ipa: "bòt-bàat sŏm-mút: jàp pìt pêuuan rûuam ngaan", en: "Role-Play: Suspicious Colleague" },
+            "act1-desc": { th: "คุณกับเพื่อนร่วมงานกำลังคุยกันเรื่องพนักงานใหม่ที่มีความสามารถแปลกๆ ลองใช้คำว่า 'มีซัมติง' ในบทสนทนา", ipa: "kun gàp pêuuan rûuam ngaan gam-lang kui gan rêuuang pá-nák-ngaan mài têe mee kwaam săa-mâat plàek plàek... lawng chái kam wâa 'mee sum-thing'...", en: "You and a colleague are gossiping about a new employee with weird talents. Use 'have something going on' (ซัมติง)." },
+            "act2-head": { th: "โต้วาที: พรสวรรค์ vs พรแสวง", ipa: "dtôh-waa-tee: paawn-sà-wăn vs paawn-să-wăeng", en: "Debate: Talent vs Hard Work" },
+            "act2-desc": { th: "ความสำเร็จในชีวิตมาจาก 'กรรมพันธุ์ (DNA)' หรือ 'การทำงานหนัก' มากกว่ากัน?", ipa: "kwaam săm-rèt nai chee-wít maa jàak 'gam-má-pan' rĕu 'gaan tam ngaan nàk' mâak gwàa gan", en: "Does success in life come more from 'Genetics/DNA' or 'Hard work'?" },
+            "act3-head": { th: "ชวนคุย: นิสัยแปลกๆจากครอบครัว", ipa: "chuan kui: ní-săi plàek plàek jàak krâawp-kruua", en: "Discussion: Weird Inherited Traits" },
+            "act3-desc": { th: "คุณคิดว่าคุณได้รับ 'นิสัยแปลกๆ' อะไรมาจากพ่อแม่ผ่านทางกรรมพันธุ์บ้างไหม?", ipa: "kun kít wâa kun dâai ráp 'ní-săi plàek plàek' à-rai maa jàak pâaw mâe pàan taang gam-má-pan bâang măi", en: "Do you think you inherited any 'weird habits' from your parents through genetics?" },
+
+            "sec6-title": { th: "6. กิจกรรมเสริม (Extension) 🚀", ipa: "gìt-jà-gam sĕrm", en: "Extension Activities" },
+            "ext1-head": { th: "สัมภาษณ์: คนคุยกับต้นไม้", ipa: "săm-pâat: kon kui gàp dtôn mái", en: "Interview: The Plant Whisperer" },
+            "ext1-desc": { th: "สัมภาษณ์เพื่อนที่รับบทเป็นคนที่คิดว่าตัวเองมี DNA ของพืช ถามถึงชีวิตประจำวันของเขา", ipa: "săm-pâat pêuuan têe ráp bòt bpen kon têe kít wâa dtua eng mee DNA kăawng pêut... tăam tĕung chee-wít bprà-jam wan kăawng kăo", en: "Interview a friend playing someone who thinks they have Plant DNA. Ask about their daily life." },
+            "ext2-head": { th: "เล่าเรื่อง: พลังวิเศษไร้ประโยชน์", ipa: "lâo rêuuang: pa-lang wí-sèht rái bprà-yòht", en: "Story-Telling: The Useless Superpower" },
+            "ext2-desc": { th: "แต่งเรื่องเล่าเกี่ยวกับวันที่คุณค้นพบว่าคุณมีพรสวรรค์ (แต่เป็นเรื่องตลกและไม่มีประโยชน์เลย)", ipa: "dtàeng rêuuang lâo gìiao gàp wan têe kun kón póp wâa kun mee paawn-sà-wăn...", en: "Tell a story about the day you discovered you had a talent/gift (but it's funny and completely useless)." },
+            "ext3-head": { th: "เกม: ตรวจ DNA นิสัย", ipa: "game: dtrùuat DNA ní-săi", en: "Game: DNA Personality Test" },
+            "ext3-desc": { th: "บอกนิสัยหรือทักษะแปลกๆมา 1 ข้อ ให้เพื่อนเดาว่าได้มาจาก 'พ่อ' หรือ 'แม่'", ipa: "bàawk ní-săi rĕu ták-sà plàek plàek maa 1 kâaw... hâi pêuuan dao wâa dâai maa jàak 'pâaw' rĕu 'mâe'", en: "State 1 weird habit or skill, and have your friend guess if you got it from your 'Dad' or 'Mom'." },
+            "ext4-head": { th: "นำเสนอ: ครอบครัวสายพันธุ์ใหม่", ipa: "nam sà-nĕr: krâawp-kruua săai pan mài", en: "Presentation: The New Genetics Family" },
+            "ext4-desc": { th: "พรีเซนต์เรื่อง '3 สิ่งแปลกๆที่สืบทอดกันมาในครอบครัวของฉัน'", ipa: "present rêuuang '3 sìng plàek plàek têe sèup tâawt gan maa nai krâawp-kruua kăawng chăn'", en: "Present '3 weird things that are passed down in my family'." },
+            
+            "footer-text": { th: "สร้างเพื่อการเรียนการสอนภาษาไทย", ipa: "sâang pêua gaan riian gaan sŏn paa-săa tai", en: "Created for Thai learning" }
+        };
+
+        // --- DATA: Target Vocab (Max 5) ---
+        const targetVocab = [
+            { th: "แปลกๆ", ipa: "plàek plàek", en: "Weird / Suspicious", emoji: "🤨" },
+            { th: "ซัมติง", ipa: "sum-thing", en: "Something (Slang for hidden agenda/secret relationship)", emoji: "🤫" },
+            { th: "เกษตร", ipa: "gà-sèht", en: "Agriculture", emoji: "🧑‍🌾" },
+            { th: "พรสวรรค์", ipa: "paawn-sà-wăn", en: "Talent / Gift", emoji: "🌟" },
+            { th: "กรรมพันธุ์", ipa: "gam-má-pan", en: "Genetics / Heredity", emoji: "🧬" }
+        ];
+
+        // --- DATA: Review Vocab List (Merged 12 New + Selected Past Items) ---
+        const reviewVocab = [
+            // NEW 12 Items
+            {th: "ตกเครื่อง", ipa: "dtòk krêuuang", en: "Miss the flight", emoji: "✈️⏰"},
+            {th: "รอบๆ", ipa: "râawp râawp", en: "Around", emoji: "🔄"},
+            {th: "เปิดโปง", ipa: "bpèrt bpohng", en: "Reveal (the secret)", emoji: "🕵️‍♂️🔍"},
+            {th: "ประมวลผล", ipa: "bprà-muuan pŏn", en: "To process", emoji: "⚙️💻"},
+            {th: "หัก", ipa: "hàk", en: "To break / To reduce marks", emoji: "💔🪓"},
+            {th: "อ่อย", ipa: "àuy", en: "To seduce / Flirt", emoji: "😏💘"},
+            {th: "ระยะทาง", ipa: "rá-yá taang", en: "Distance", emoji: "📏🛣️"},
+            {th: "หน่วยกู้ภัย", ipa: "nùuay gûu pai", en: "Rescue team", emoji: "🚑🛟"},
+            {th: "วิกฤต", ipa: "wí-grìt", en: "Crisis", emoji: "🚨⚠️"},
+            {th: "เสียอาการ", ipa: "sĭia aa-gaan", en: "Lose our cool", emoji: "😤😵‍💫"},
+            {th: "ท้องผูก", ipa: "táawng pùuk", en: "Constipation", emoji: "🚽😣"},
+            {th: "เก็บอาการ", ipa: "gèp aa-gaan", en: "Keep our cool", emoji: "😌🧊"},
+
+            // Previous List (Sampled)
+            {th: "ปรัชญา", ipa: "bpràt-yaa", en: "Philosophy", emoji: "🧠📜🏺"},
+            {th: "รบกวน", ipa: "róp-guuan", en: "Disturb", emoji: "🙏"},
+            {th: "ทรัพย์สิน", ipa: "sáp-sĭn", en: "Assets", emoji: "💰"},
+            {th: "ลึกลับ", ipa: "léuk-láp", en: "Mysterious", emoji: "🕵️‍♂️"},
+            {th: "ไขคดี", ipa: "kăi ká-dee", en: "Solve case", emoji: "🔍"},
+            {th: "ผู้ว่าฯ", ipa: "pûu wâa", en: "Governor", emoji: "🏛️"},
+            {th: "เอาเหล็กตี", ipa: "ao lèk dtee", en: "Hit with metal", emoji: "🔨"},
+            {th: "ผู้ใหญ่บ้าน", ipa: "pûu yài bâan", en: "Village Chief", emoji: "👨‍🌾"},
+            {th: "เม้ามอย", ipa: "máo maauy", en: "Gossip", emoji: "👄"},
+            {th: "การสังหาร", ipa: "gaan săng-hăan", en: "Assassination", emoji: "🔫"},
+            {th: "ล้อเลียน", ipa: "láw liian", en: "Mock", emoji: "🤡"},
+            {th: "พลังวิเศษ", ipa: "pa-lang wí-sèht", en: "Superpower", emoji: "🦸"}
+        ];
+
+        // --- DATA: Script & Breakdown ---
+        const scriptData = [
+            { 
+                role: "พี่ชาย", th: "กูว่าแปลกๆว่ะ", ipa: "goo wâa plàek plàek wà", en: "I think it's weird.",
+                breakdown: {
+                    structTh: "[ประธาน] + ว่า + [คำคุณศัพท์] + ว่ะ", structIpa: "[Subj] + wâa + [Adj] + wà", structEn: "I think it's [Adjective] (Informal/Slang)",
+                    exTh: "ฉันว่ามันแพงไปว่ะ", exIpa: "chăn wâa man paeng bpai wà", exEn: "I think it's too expensive, man."
+                }
+            },
+            { 
+                role: "พี่ชาย", th: "กูว่ามันคงแบบ มีซัมตงซัมติงกับผักพวกนี้แหละมั้ง", ipa: "goo wâa man kong bàep · mee sum-tong sum-thing gàp pàk pûuak née làe máng", en: "I think they probably have some 'something' (secret connection) with these vegetables.",
+                breakdown: {
+                    structTh: "มีซัมติง (Something)", structIpa: "mee sum-thing", structEn: "To have a secret relationship / hidden agenda (Slang)",
+                    exTh: "สองคนนี้ต้องมีซัมติงกันแน่ๆ", exIpa: "săawng kon née dtâwng mee sum-thing gan nâe nâe", exEn: "These two definitely have something going on."
+                }
+            },
+            { 
+                role: "ออนิว", th: "ก็แค่ปลูกป่ะวะ", ipa: "gôr kâe bplùuk bpà wá", en: "It's just planting, isn't it?",
+                breakdown: {
+                    structTh: "ก็แค่ + [การกระทำ] + ป่ะวะ", structIpa: "gôr kâe + [Action] + bpà wá", structEn: "It's just [Action], isn't it? (Why make a big deal out of it?)",
+                    exTh: "ก็แค่ลืมป่ะวะ ทำไมต้องโกรธขนาดนี้", exIpa: "gôr kâe leum bpà wá · tam-mai dtâwng gròht kà-nàat née", exEn: "I just forgot, didn't I? Why so angry?"
+                }
+            },
+            { role: "กรีฑา", th: "มันเคยบอกว่า มันได้เกรดสี่วิชาเกษตร", ipa: "man koie bàawk wâa · man dâai gràyt sèe wí-chaa gà-sèht", en: "He used to say that he got a grade 4 in Agriculture class." },
+            { role: "ออนิว", th: "เกรดสี่ทุกวิชาเว้ย", ipa: "gràyt sèe túk wí-chaa wôei", en: "Grade 4 in ALL subjects, hey." },
+            { role: "พี่ชาย", th: "มีพรสวรรค์ด้านเดียวเนี่ยนะ", ipa: "mee paawn-sà-wăn dâan diiao nîia ná", en: "Having talent in only one area?" },
+            { role: "ออนิว", th: "มีพรสวรรค์ด้านอื่นด้วย", ipa: "mee paawn-sà-wăn dâan èun dûuay", en: "He has talent in other areas too." },
+            { 
+                role: "กรีฑา", th: "เขาเกิดมาเพื่อสิ่งนี้ป่ะฮะ", ipa: "kăo gèrt maa pêua sìng née bpà há", en: "Was he born for this?",
+                breakdown: {
+                    structTh: "เกิดมาเพื่อ + [สิ่งของ/เป้าหมาย]", structIpa: "gèrt maa pêua + [Goal/Thing]", structEn: "Born for [Goal/Thing]",
+                    exTh: "นักร้องคนนี้เกิดมาเพื่อร้องเพลงจริงๆ", exIpa: "nák ráawng kon née gèrt maa pêua ráawng pleng jing jing", exEn: "This singer was truly born to sing."
+                }
+            },
+            { role: "ออนิว", th: "คืออย่างงี้", ipa: "keu yàang ngée", en: "It's like this..." },
+            { 
+                role: "พี่ชาย", th: "ไม่หรอก กูว่าจริงๆอ่ะ เพราะกรรมพันธุ์มันนั่นแหละ", ipa: "mâi ràawk · goo wâa jing jing à · práw gam-má-pan man nân làe", en: "No. Actually, I think it's because of his genetics.",
+                breakdown: {
+                    structTh: "ไม่หรอก กูว่าจริงๆอ่ะ เพราะ...", structIpa: "mâi ràawk · goo wâa jing jing à · práw...", structEn: "No, actually I think it's because...",
+                    exTh: "ไม่หรอก กูว่าจริงๆอ่ะ เพราะเขาขี้เกียจ", exIpa: "mâi ràawk · goo wâa jing jing à · práw kăo kêe gìiat", exEn: "No, actually I think it's because he's lazy."
+                }
+            },
+            { role: "พี่ชาย", th: "ไป ไปทำงาน", ipa: "bpai · bpai tam ngaan", en: "Go, go to work." },
+            { role: "ออนิว", th: "กรรมพันธุ์ไรวะ", ipa: "gam-má-pan rai wá", en: "What genetics?" },
+            { role: "ออนิว", th: "กรรมพันธุ์ กรรมพันธุ์", ipa: "gam-má-pan · gam-má-pan", en: "Genetics. Genetics." },
+            { role: "ออนิว", th: "กรรมพืช กรรมพันธุ์ พืชมีกรรมพันธุ์กรรมพืช DNA", ipa: "gam-má-pêut · gam-má-pan · pêut mee gam-má-pan gam-má-pêut DNA", en: "Plant-genetics? Genetics. Plants have genetics, plant-genetics, DNA." },
+            { role: "ออนิว", th: "หรือว่า We share the same DNA. Am I a plant?", ipa: "rĕu wâa We share the same DNA. Am I a plant?", en: "Or... We share the same DNA. Am I a plant?" }
+        ];
+
+        // --- FUNCTIONS ---
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("TTS not supported");
+            }
+        }
+
+        function toggleVisibility(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            if (el.classList.contains('hidden-content')) {
+                el.classList.remove('hidden-content');
+                el.classList.add('show-content');
+            } else {
+                el.classList.add('hidden-content');
+                el.classList.remove('show-content');
+            }
+        }
+
+        // Render Universal Text Unit
+        function renderInteractive(id, thai, ipa, en, options = {}) {
+            const type = options.type || 'inline';
+            const textSize = options.textSize || '';
+            const emoji = options.emoji || '';
+
+            // Layout 1: BUTTON (Special)
+            if (type === 'button') {
+                return `
+                    <div class="inline-flex flex-col items-center">
+                        <button onclick="randomReviewWord()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 flex items-center mb-1">
+                            <i class="fas fa-dice mr-2"></i> ${thai}
+                        </button>
+                        <div class="flex items-center mt-2">
+                             <button onclick="speak('${thai}')" class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs hover:bg-teal-200 border border-teal-200 shadow-sm">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <button onclick="toggleVisibility('ipa-${id}')" class="ctrl-btn btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}')" class="ctrl-btn btn-en">EN</button>
+                        </div>
+                        <div id="ipa-${id}" class="hidden-content mt-1 text-xs text-gray-500 font-mono text-center bg-white p-1 rounded shadow-sm border border-yellow-200">${ipa}</div>
+                        <div id="en-${id}" class="hidden-content mt-1 text-xs text-blue-700 font-medium text-center bg-white p-1 rounded shadow-sm border border-blue-200">${en}</div>
+                    </div>
+                `;
+            }
+
+            // Layout 2: BLOCK
+            if (type === 'block') {
+                return `
+                <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition shadow-sm">
+                    <div class="flex items-start space-x-3">
+                        ${emoji ? `<span class="text-3xl pt-1">${emoji}</span>` : ''}
+                        <div class="flex-1">
+                            <p class="thai-text font-bold text-slate-800 mb-2">${thai}</p>
+                            
+                            <div class="flex flex-wrap items-center">
+                                <button onclick="speak('${thai.replace(/'/g, "\\'")}')" class="w-8 h-8 bg-teal-500 text-white rounded-full hover:bg-teal-600 flex items-center justify-center shadow-sm mr-2">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                                <button onclick="toggleVisibility('ipa-${id}')" class="px-2 py-1 bg-yellow-50 text-yellow-800 rounded text-xs font-bold mr-2 hover:bg-yellow-200 border border-yellow-200">IPA</button>
+                                <button onclick="toggleVisibility('en-${id}')" class="px-2 py-1 bg-blue-50 text-blue-800 rounded text-xs font-bold hover:bg-blue-200 border border-blue-200">EN</button>
+                            </div>
+
+                            <div id="ipa-${id}" class="hidden-content mt-3 text-sm text-gray-500 font-mono bg-slate-50 p-2 rounded border border-gray-100">${ipa}</div>
+                            <div id="en-${id}" class="hidden-content mt-2 text-sm text-blue-700 font-medium bg-slate-50 p-2 rounded border border-gray-100">${en}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // Layout 3: INLINE / HEADER
+            return `
+                <div class="inline-block w-full">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="${textSize}">${thai}</span>
+                        <div class="inline-flex items-center space-x-1 ml-1">
+                            <button onclick="speak('${thai.replace(/'/g, "\\'")}')" class="tts-btn" title="Listen">
+                                <i class="fas fa-volume-up" style="font-size: 0.8rem;"></i>
+                            </button>
+                            <button onclick="toggleVisibility('ipa-${id}')" class="ctrl-btn btn-ipa">IPA</button>
+                            <button onclick="toggleVisibility('en-${id}')" class="ctrl-btn btn-en">EN</button>
+                        </div>
+                    </div>
+                    <div id="ipa-${id}" class="hidden-content mt-2 text-sm text-gray-500 font-mono ml-1 border-l-2 border-yellow-400 pl-2 bg-yellow-50 p-1 rounded shadow-sm">${ipa}</div>
+                    <div id="en-${id}" class="hidden-content mt-1 text-sm text-blue-700 font-medium ml-1 border-l-2 border-blue-400 pl-2 bg-blue-50 p-1 rounded shadow-sm">${en}</div>
+                </div>
+            `;
+        }
+
+        // Random Review Generator
+        function randomReviewWord() {
+            const container = document.getElementById('card-word-container');
+            const random = reviewVocab[Math.floor(Math.random() * reviewVocab.length)];
+            const id = 'rev-dynamic';
+            
+            const displayEmoji = random.emoji || "🔄";
+            document.getElementById('card-emoji').innerText = displayEmoji;
+            
+            container.innerHTML = `
+                <div class="animate-fadeIn">
+                    <h3 class="text-4xl font-bold text-slate-800 mb-4">${random.th}</h3>
+                    <div class="flex justify-center space-x-3">
+                         <button onclick="speak('${random.th}')" class="w-12 h-12 bg-teal-500 text-white rounded-full flex items-center justify-center hover:bg-teal-600 shadow-lg transition transform hover:scale-110">
+                            <i class="fas fa-volume-up fa-lg"></i>
+                        </button>
+                        <button onclick="toggleVisibility('ipa-${id}')" class="px-4 py-2 bg-yellow-200 text-yellow-900 rounded-lg font-bold shadow-sm hover:bg-yellow-300">IPA</button>
+                        <button onclick="toggleVisibility('en-${id}')" class="px-4 py-2 bg-blue-200 text-blue-900 rounded-lg font-bold shadow-sm hover:bg-blue-300">EN</button>
+                    </div>
+                    <div id="ipa-${id}" class="hidden-content mt-4 text-xl text-gray-500 font-mono bg-white p-3 rounded-lg shadow-inner border border-gray-200">${random.ipa}</div>
+                    <div id="en-${id}" class="hidden-content mt-2 text-xl text-blue-600 font-semibold bg-white p-3 rounded-lg shadow-inner border border-gray-200">${random.en}</div>
+                </div>
+            `;
+        }
+
+        // Generate Script Breakdown HTML
+        function generateScriptHTML(line, index) {
+            let roleColor = "bg-gray-200 text-gray-800";
+            if (line.role === "พี่ชาย") roleColor = "bg-blue-600 text-white";
+            if (line.role === "ออนิว") roleColor = "bg-red-500 text-white";
+            if (line.role === "กรีฑา") roleColor = "bg-green-600 text-white";
+
+            const basicLineHTML = renderInteractive(`script-${index}`, line.th, line.ipa, line.en, { type: 'inline', textSize: 'text-lg font-bold text-slate-800' });
+            
+            let breakdownHTML = "";
+            if (line.breakdown) {
+                const bd = line.breakdown;
+                const bdTitle = renderInteractive(`bd-title-${index}`, "โครงสร้าง/คำศัพท์:", "krohng sâang / kam-sàp:", "Structure/Vocab:");
+                const bdStruct = renderInteractive(`bd-str-${index}`, bd.structTh, bd.structIpa, bd.structEn, { textSize: 'font-semibold text-teal-800' });
+                const exTitle = renderInteractive(`ex-title-${index}`, "ตัวอย่าง:", "dtua yàang:", "Example:");
+                const exBody = renderInteractive(`ex-body-${index}`, bd.exTh, bd.exIpa, bd.exEn, { textSize: 'text-gray-800' });
+                const promptStudent = renderInteractive(`pr-std-${index}`, uiData['prompt-student'].th, uiData['prompt-student'].ipa, uiData['prompt-student'].en, { textSize: 'font-bold text-teal-700' });
+                const btnBreakdown = renderInteractive(`btn-bd-${index}`, uiData['btn-breakdown'].th, uiData['btn-breakdown'].ipa, uiData['btn-breakdown'].en, { textSize: 'text-xs text-white' });
+
+                breakdownHTML = `
+                    <div class="mt-2">
+                        <button onclick="toggleVisibility('bd-panel-${index}')" class="bg-teal-500 hover:bg-teal-600 text-white px-3 py-1 rounded-md text-sm transition shadow-sm">
+                            <i class="fas fa-lightbulb mr-1 text-yellow-300"></i> ${btnBreakdown}
+                        </button>
+                        
+                        <div id="bd-panel-${index}" class="hidden-content mt-3 bg-teal-50 p-4 rounded-lg border border-teal-200 shadow-inner">
+                            <div class="mb-3">
+                                <span class="text-sm text-teal-600 font-bold">${bdTitle}</span><br>
+                                ${bdStruct}
+                            </div>
+                            <div class="mb-4 bg-white p-3 rounded border border-gray-200 shadow-sm">
+                                <span class="text-sm text-gray-500 font-bold">${exTitle}</span><br>
+                                ${exBody}
+                            </div>
+                            <div class="bg-white p-3 rounded border-2 border-dashed border-teal-300">
+                                ${promptStudent}
+                                <input type="text" placeholder="..." class="mt-2 w-full p-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex-shrink-0 w-16 h-16 ${roleColor} rounded-full flex items-center justify-center font-bold shadow-md text-sm overflow-hidden text-center leading-tight">
+                        ${line.role}
+                    </div>
+                    <div class="flex-grow pt-1">
+                        ${basicLineHTML}
+                        ${breakdownHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            
+            // Nav
+            document.getElementById('nav-title-container').innerHTML = 
+                renderInteractive('nav', uiData['nav-title'].th, uiData['nav-title'].ipa, uiData['nav-title'].en, { textSize: 'text-xl font-bold' });
+
+            // Section 1 (Review)
+            document.getElementById('sec1-title-container').innerHTML = 
+                renderInteractive('sec1t', uiData['sec1-title'].th, uiData['sec1-title'].ipa, uiData['sec1-title'].en);
+            document.getElementById('sec1-desc-container').innerHTML = 
+                renderInteractive('sec1d', uiData['sec1-desc'].th, uiData['sec1-desc'].ipa, uiData['sec1-desc'].en);
+            document.getElementById('card-word-container').innerHTML = 
+                renderInteractive('card', uiData['card-init'].th, uiData['card-init'].ipa, uiData['card-init'].en, { textSize: 'text-xl text-gray-400' });
+            document.getElementById('btn-random-container').innerHTML = 
+                renderInteractive('btn-rnd', uiData['btn-random'].th, uiData['btn-random'].ipa, uiData['btn-random'].en, { type: 'button' });
+
+            // Section 2 (Lead-in, Video, Comprehension)
+            document.getElementById('sec2-title-container').innerHTML = 
+                renderInteractive('sec2t', uiData['sec2-title'].th, uiData['sec2-title'].ipa, uiData['sec2-title'].en);
+            
+            const leadinCont = document.getElementById('sec2-leadin-container');
+            leadinCont.innerHTML += renderInteractive('li1', uiData['li1'].th, uiData['li1'].ipa, uiData['li1'].en, { type: 'block', emoji: '🧬' });
+            leadinCont.innerHTML += renderInteractive('li2', uiData['li2'].th, uiData['li2'].ipa, uiData['li2'].en, { type: 'block', emoji: '🌟' });
+            leadinCont.innerHTML += renderInteractive('li3', uiData['li3'].th, uiData['li3'].ipa, uiData['li3'].en, { type: 'block', emoji: '🌱' });
+
+            const compCont = document.getElementById('sec2-questions-container');
+            compCont.innerHTML += renderInteractive('cq1', uiData['cq1'].th, uiData['cq1'].ipa, uiData['cq1'].en, { type: 'block', emoji: '1️⃣' });
+            compCont.innerHTML += renderInteractive('cq2', uiData['cq2'].th, uiData['cq2'].ipa, uiData['cq2'].en, { type: 'block', emoji: '2️⃣' });
+            compCont.innerHTML += renderInteractive('cq3', uiData['cq3'].th, uiData['cq3'].ipa, uiData['cq3'].en, { type: 'block', emoji: '3️⃣' });
+
+            // Section 3 (Script & Breakdown - Swapped)
+            document.getElementById('sec3-title-container').innerHTML = 
+                renderInteractive('sec3t', uiData['sec3-title'].th, uiData['sec3-title'].ipa, uiData['sec3-title'].en);
+            document.getElementById('sec3-desc-container').innerHTML = 
+                renderInteractive('sec3d', uiData['sec3-desc'].th, uiData['sec3-desc'].ipa, uiData['sec3-desc'].en);
+            
+            const scriptContainer = document.getElementById('script-container');
+            scriptData.forEach((line, index) => {
+                scriptContainer.innerHTML += generateScriptHTML(line, index);
+            });
+
+            // Section 4 (Vocab - Swapped)
+            document.getElementById('sec4-title-container').innerHTML = 
+                renderInteractive('sec4t', uiData['sec4-title'].th, uiData['sec4-title'].ipa, uiData['sec4-title'].en);
+            const vocabContainer = document.getElementById('vocab-container');
+            targetVocab.forEach((item, index) => {
+                vocabContainer.innerHTML += renderInteractive(`vocab-${index}`, item.th, item.ipa, item.en, { type: 'block', emoji: item.emoji });
+            });
+
+            // Section 5 (Core Activities)
+            document.getElementById('sec5-title-container').innerHTML = 
+                renderInteractive('sec5t', uiData['sec5-title'].th, uiData['sec5-title'].ipa, uiData['sec5-title'].en);
+            
+            document.getElementById('act1-header').innerHTML = 
+                renderInteractive('act1-h', uiData['act1-head'].th, uiData['act1-head'].ipa, uiData['act1-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('act1-desc').innerHTML = 
+                renderInteractive('act1-d', uiData['act1-desc'].th, uiData['act1-desc'].ipa, uiData['act1-desc'].en, { textSize: 'text-gray-600' });
+
+            document.getElementById('act2-header').innerHTML = 
+                renderInteractive('act2-h', uiData['act2-head'].th, uiData['act2-head'].ipa, uiData['act2-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('act2-desc').innerHTML = 
+                renderInteractive('act2-d', uiData['act2-desc'].th, uiData['act2-desc'].ipa, uiData['act2-desc'].en, { textSize: 'text-gray-600' });
+
+            document.getElementById('act3-header').innerHTML = 
+                renderInteractive('act3-h', uiData['act3-head'].th, uiData['act3-head'].ipa, uiData['act3-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('act3-desc').innerHTML = 
+                renderInteractive('act3-d', uiData['act3-desc'].th, uiData['act3-desc'].ipa, uiData['act3-desc'].en, { textSize: 'text-gray-600' });
+
+            // Section 6 (Extensions)
+            document.getElementById('sec6-title-container').innerHTML = 
+                renderInteractive('sec6t', uiData['sec6-title'].th, uiData['sec6-title'].ipa, uiData['sec6-title'].en);
+
+            document.getElementById('ext1-header').innerHTML = 
+                renderInteractive('ext1-h', uiData['ext1-head'].th, uiData['ext1-head'].ipa, uiData['ext1-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext1-desc').innerHTML = 
+                renderInteractive('ext1-d', uiData['ext1-desc'].th, uiData['ext1-desc'].ipa, uiData['ext1-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            document.getElementById('ext2-header').innerHTML = 
+                renderInteractive('ext2-h', uiData['ext2-head'].th, uiData['ext2-head'].ipa, uiData['ext2-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext2-desc').innerHTML = 
+                renderInteractive('ext2-d', uiData['ext2-desc'].th, uiData['ext2-desc'].ipa, uiData['ext2-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            document.getElementById('ext3-header').innerHTML = 
+                renderInteractive('ext3-h', uiData['ext3-head'].th, uiData['ext3-head'].ipa, uiData['ext3-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext3-desc').innerHTML = 
+                renderInteractive('ext3-d', uiData['ext3-desc'].th, uiData['ext3-desc'].ipa, uiData['ext3-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            document.getElementById('ext4-header').innerHTML = 
+                renderInteractive('ext4-h', uiData['ext4-head'].th, uiData['ext4-head'].ipa, uiData['ext4-head'].en, { textSize: 'font-bold text-lg' });
+            document.getElementById('ext4-desc').innerHTML = 
+                renderInteractive('ext4-d', uiData['ext4-desc'].th, uiData['ext4-desc'].ipa, uiData['ext4-desc'].en, { textSize: 'text-sm text-gray-600' });
+
+            // Footer
+            document.getElementById('footer-container').innerHTML = 
+                renderInteractive('foot', uiData['footer-text'].th, uiData['footer-text'].ipa, uiData['footer-text'].en);
+        };
+    </script>
+</body>
+</html>
