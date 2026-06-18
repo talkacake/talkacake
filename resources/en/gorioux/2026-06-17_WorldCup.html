@@ -1290,6 +1290,22 @@
             </div>
         </section>
 
+        <!-- PART 8: ADDITIONAL VOCABULARY -->
+        <section id="additional-vocab" class="card p-6 md:p-8 bg-teal-50 border-teal-200">
+            <div class="eng-block mb-6">
+                <h2 class="text-2xl font-bold text-teal-900 flex items-center gap-2">➕ 8. Additional Vocabulary</h2>
+                <div class="btn-group">
+                    <button onclick="speak('8. Additional Vocabulary')" class="btn-icon bg-teal-100">🔊</button>
+                    <button onclick="toggleThai('s8-th')" class="btn-icon bg-teal-100">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s8-th" class="th-text !text-teal-700 !border-teal-300">8. คำศัพท์เพิ่มเติม</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="additional-vocab-grid">
+                <!-- Javascript will populate this -->
+            </div>
+        </section>
+
     </main>
 
     <script>
@@ -2346,17 +2362,70 @@
             { emoji: "🏃‍♀️", en: "I am going for a run.", th: "จะไปวิ่ง" }
         ];
 
+        const additionalVocabList = [
+            { emoji: "💧🏞️", en: "reservoir", th: "อ่างเก็บน้ำ" },
+            { emoji: "😊🙏", en: "polite", th: "สุภาพ" },
+            { emoji: "🎙️🎬", en: "Thai dub", th: "พากย์ไทย" },
+            { emoji: "⚔️🛡️", en: "warrior", th: "นักรบ" },
+            { emoji: "🙏📜✨", en: "Ceremony", th: "พิธี" },
+            { emoji: "🎶👂", en: "catchy", th: "ติดหู" },
+            { emoji: "🌟📣", en: "famous", th: "มีชื่อเสียง" },
+            { emoji: "😞💔", en: "disappointed", th: "ผิดหวัง (ดิส-ซับ-พ้อยน์-เท็ด)" },
+            { emoji: "😩", en: "tiring", th: "น่าเหนื่อย (ทาย-เอ่อ-ริ่ง)" },
+            { emoji: "😠", en: "aggressive", th: "ก้าวร้าว (แอ็ค-เกรส-ซิฟ)" },
+            { emoji: "👯‍♂️🤝", en: "close friends", th: "เพื่อนสนิท" },
+            { emoji: "😍🤫", en: "She has a crush on her close friend.", th: "เธอแอบชอบเพื่อนสนิท" },
+            { emoji: "😞🎶", en: "I'm disappointed in this concert.", th: "ฉันผิดหวังกับคอนเสิร์ตนี้" },
+            { emoji: "😣", en: "uncomfortable", th: "อึดอัด (อัน-คอมฟ์-เท-เบิ่ว)" },
+            { emoji: "⚠️🔓", en: "insecure", th: "ไม่ปลอดภัย (อิน-เซะ-โคว)" },
+            { emoji: "😰😱", en: "Panicky", th: "เลิกลั่ก" },
+            { emoji: "⚠️‼️✨", en: "important", th: "สำคัญ" },
+            { emoji: "📊🎭", en: "overall performance", th: "การแสดงภาพรวม" },
+            { emoji: "🎤🎶", en: "guest singer", th: "นักร้องรับเชิญ" },
+            { emoji: "💰🤝", en: "fund", th: "สนับสนุนทางการเงิน / ให้ทุน" },
+            { emoji: "👶👨‍👩‍👧‍👦", en: "grandchild", th: "หลาน (แกรนด์-ชาย-เอ่อวด์)" }
+        ];
+
+        function renderAdditionalVocab() {
+            const container = document.getElementById('additional-vocab-grid');
+            if (!container) return;
+            
+            additionalVocabList.forEach((item, index) => {
+                const thId = `add-vocab-${index}`;
+                const card = document.createElement('div');
+                card.className = "bg-white border-2 border-teal-100 p-4 rounded-xl hover:shadow-md transition-shadow flex items-start justify-between gap-2";
+                
+                const emoji = item.emoji || '✨';
+
+                card.innerHTML = `
+                    <div class="flex-1">
+                        <div class="text-2xl mb-1">${emoji.split('\t')[0]}</div>
+                        <div class="eng-block">
+                            <span class="eng-text font-bold text-gray-800 text-lg leading-tight mb-1">${item.en}</span>
+                        </div>
+                        <div id="${thId}" class="th-text !border-teal-300 !text-teal-600 font-bold text-sm mt-1">${item.th}</div>
+                    </div>
+                    <div class="flex flex-col gap-1 shrink-0">
+                         <button onclick="speak('${item.en.replace(/'/g, "\\'")}')" class="btn-icon text-sm h-8 w-8 bg-teal-50 text-teal-700">🔊</button>
+                         <button onclick="toggleThai('${thId}')" class="btn-icon text-sm h-8 w-8 bg-teal-50 text-teal-700">🇹🇭</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function pickRandomWord() {
             const display = document.getElementById('wordDisplay');
+            const combinedVocab = typeof additionalVocabList !== 'undefined' ? [...vocabData, ...additionalVocabList] : vocabData;
             
             // Animation start
             display.style.opacity = '0';
             
             setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * vocabData.length);
-                const item = vocabData[randomIndex];
+                const randomIndex = Math.floor(Math.random() * combinedVocab.length);
+                const item = combinedVocab[randomIndex];
                 const uniqueId = 'rand-' + Math.random().toString(36).substr(2, 9);
-                const randomEmoji = item.emoji ? item.emoji : '✨';
+                const randomEmoji = item.emoji ? item.emoji.split('\t')[0] : '✨';
                 
                 display.innerHTML = `
                     <div class="flex flex-col items-center gap-2">
@@ -2376,6 +2445,9 @@
                 display.style.opacity = '1';
             }, 200);
         }
+
+        // Render additional vocabulary on load
+        renderAdditionalVocab();
     </script>
 </body>
 </html>
