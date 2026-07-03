@@ -55,18 +55,65 @@
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         );
 
-        // --- Global Voice Pre-loader (Fixes silent TTS issue) ---
+        // --- Global Voice Pre-loader + Robust TTS helpers ---
         let availableVoices = [];
+
+        const noveltyVoiceNames = new Set([
+            'Albert', 'Bad News', 'Bahh', 'Bells', 'Boing', 'Bubbles', 'Cellos',
+            'Good News', 'Jester', 'Junior', 'Organ', 'Ralph', 'Superstar',
+            'Trinoids', 'Whisper', 'Wobble', 'Zarvox'
+        ]);
+
         const loadVoices = () => {
-            if ('speechSynthesis' in window) {
-                availableVoices = window.speechSynthesis.getVoices();
-            }
+            if (!('speechSynthesis' in window)) return [];
+            availableVoices = window.speechSynthesis.getVoices() || [];
+            return availableVoices;
         };
+
+        const getVoicesReady = () => {
+            return new Promise((resolve) => {
+                const voices = loadVoices();
+                if (voices.length) {
+                    resolve(voices);
+                    return;
+                }
+
+                let settled = false;
+                const finish = () => {
+                    if (settled) return;
+                    settled = true;
+                    resolve(loadVoices());
+                };
+
+                window.speechSynthesis.addEventListener('voiceschanged', finish, { once: true });
+                setTimeout(finish, 700);
+            });
+        };
+
+        const pickEnglishVoice = (preferredLang = 'en-US') => {
+            const voices = availableVoices.length ? availableVoices : loadVoices();
+            const cleanVoices = voices.filter(v => v && v.lang && v.lang.startsWith('en') && !noveltyVoiceNames.has(v.name));
+
+            return (
+                cleanVoices.find(v => v.name === 'Google US English') ||
+                cleanVoices.find(v => v.name === 'Google UK English Female') ||
+                cleanVoices.find(v => v.name === 'Google UK English Male') ||
+                cleanVoices.find(v => v.name === 'Samantha') ||
+                cleanVoices.find(v => v.name === 'Daniel') ||
+                cleanVoices.find(v => v.lang === preferredLang && v.localService === false) ||
+                cleanVoices.find(v => v.lang === 'en-US' && v.localService === false) ||
+                cleanVoices.find(v => v.lang === 'en-GB' && v.localService === false) ||
+                cleanVoices.find(v => v.lang === preferredLang) ||
+                cleanVoices.find(v => v.lang === 'en-US') ||
+                cleanVoices.find(v => v.lang === 'en-GB') ||
+                cleanVoices[0] ||
+                null
+            );
+        };
+
         if ('speechSynthesis' in window) {
             loadVoices();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = loadVoices;
-            }
+            window.speechSynthesis.onvoiceschanged = loadVoices;
         }
 
         // --- Main App Component ---
@@ -74,31 +121,50 @@
             const [activeTab, setActiveTab] = useState('draw');
 
             // Robust Text-to-Speech Helper Function
-            const speak = (text, rate = 0.85) => {
+            const speak = async (text, rate = 0.85) => {
                 if (!('speechSynthesis' in window)) {
                     console.warn("Text-to-Speech is not supported in this browser.");
                     return;
                 }
 
-                window.speechSynthesis.cancel(); // Stop any currently playing audio
-                const utterance = new SpeechSynthesisUtterance(text);
-                
-                // Attempt to explicitly set an English voice if available
-                if (availableVoices.length > 0) {
-                    const englishVoice = availableVoices.find(v => v.name.includes('Google US English')) || 
-                                         availableVoices.find(v => v.lang === 'en-US') || 
-                                         availableVoices.find(v => v.lang.startsWith('en'));
-                    if (englishVoice) {
-                        utterance.voice = englishVoice;
+                const textToSpeak = String(text || '').trim();
+                if (!textToSpeak) return;
+
+                try {
+                    await getVoicesReady();
+
+                    // Stop any queued speech, then resume in case Chrome has paused the engine.
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.resume();
+
+                    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                    const selectedVoice = pickEnglishVoice('en-US');
+
+                    if (selectedVoice) {
+                        utterance.voice = selectedVoice;
+                        utterance.lang = selectedVoice.lang || 'en-US';
+                    } else {
+                        utterance.lang = 'en-US';
                     }
+
+                    utterance.rate = Math.max(0.6, Math.min(rate, 1.1));
+                    utterance.pitch = 1;
+                    utterance.volume = 1;
+
+                    utterance.onerror = (event) => {
+                        console.warn('TTS error:', event.error, event);
+                    };
+
+                    // Save reference globally to prevent Chrome's garbage collection bug from cutting off audio.
+                    window._ttsUtterance = utterance;
+
+                    // Chrome can fail silently if speak() happens immediately after cancel().
+                    setTimeout(() => {
+                        window.speechSynthesis.speak(utterance);
+                    }, 80);
+                } catch (error) {
+                    console.warn('TTS failed:', error);
                 }
-                
-                utterance.lang = 'en-US';
-                utterance.rate = rate;
-                
-                // Save reference globally to prevent Chrome's garbage collection bug from cutting off audio
-                window._ttsUtterance = utterance; 
-                window.speechSynthesis.speak(utterance);
             };
 
             return (
