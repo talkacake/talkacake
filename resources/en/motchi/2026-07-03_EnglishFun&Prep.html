@@ -55,19 +55,50 @@
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         );
 
+        // --- Global Voice Pre-loader (Fixes silent TTS issue) ---
+        let availableVoices = [];
+        const loadVoices = () => {
+            if ('speechSynthesis' in window) {
+                availableVoices = window.speechSynthesis.getVoices();
+            }
+        };
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+        }
+
         // --- Main App Component ---
         function App() {
             const [activeTab, setActiveTab] = useState('draw');
 
-            // Text-to-Speech Helper Function
+            // Robust Text-to-Speech Helper Function
             const speak = (text, rate = 0.85) => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'en-US';
-                    utterance.rate = rate;
-                    window.speechSynthesis.speak(utterance);
+                if (!('speechSynthesis' in window)) {
+                    console.warn("Text-to-Speech is not supported in this browser.");
+                    return;
                 }
+
+                window.speechSynthesis.cancel(); // Stop any currently playing audio
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Attempt to explicitly set an English voice if available
+                if (availableVoices.length > 0) {
+                    const englishVoice = availableVoices.find(v => v.name.includes('Google US English')) || 
+                                         availableVoices.find(v => v.lang === 'en-US') || 
+                                         availableVoices.find(v => v.lang.startsWith('en'));
+                    if (englishVoice) {
+                        utterance.voice = englishVoice;
+                    }
+                }
+                
+                utterance.lang = 'en-US';
+                utterance.rate = rate;
+                
+                // Save reference globally to prevent Chrome's garbage collection bug from cutting off audio
+                window._ttsUtterance = utterance; 
+                window.speechSynthesis.speak(utterance);
             };
 
             return (
@@ -84,6 +115,7 @@
                                 <TabButton active={activeTab === 'match'} onClick={() => setActiveTab('match')} icon="🎮" label="Vocab Match" />
                                 <TabButton active={activeTab === 'interview'} onClick={() => setActiveTab('interview')} icon="💬" label="Interview Prep" />
                                 <TabButton active={activeTab === 'treasure'} onClick={() => setActiveTab('treasure')} icon="🗺️" label="Treasure Hunt" />
+                                <TabButton active={activeTab === 'vocab'} onClick={() => setActiveTab('vocab')} icon="📚" label="Extra Vocab" />
                             </div>
                         </header>
 
@@ -93,6 +125,7 @@
                             {activeTab === 'match' && <MatchGameTab speak={speak} />}
                             {activeTab === 'interview' && <InterviewTab speak={speak} />}
                             {activeTab === 'treasure' && <TreasureHuntTab speak={speak} />}
+                            {activeTab === 'vocab' && <VocabTab speak={speak} />}
                         </div>
                     </div>
                 </div>
@@ -636,6 +669,64 @@
                             </button>
                         </div>
                     )}
+                </div>
+            );
+        }
+
+        // --- 5. Additional Vocabulary Tab ---
+        function VocabTab({ speak }) {
+            const vocabSections = [
+                {
+                    title: '3/7/26',
+                    words: [
+                        { emoji: "👕👖", en: "wear", th: "ใส่เสื้อผ้า", pron: "แวร์" },
+                        { emoji: "🕒📅", en: "lately", th: "ช่วงนี้", pron: "เลท ลี่" },
+                        { emoji: "⌚️", en: "watch", th: "ดู", pron: "วอทช์" },
+                        { emoji: "❓💬", en: "What is it about?", th: "มันเกี่ยวกับอะไร", pron: "" },
+                        { emoji: "🐕🔍", en: "a lost dog", th: "หมาหลงทางตัวหนึ่ง", pron: "อะ ลอสท์ ด๊อก" },
+                        { emoji: "😢🐶", en: "I feel sorry for the dog.", th: "สงสารหมา", pron: "" },
+                        { emoji: "⚽️🏃‍♀️", en: "She's playing football.", th: "เธอกำลังเล่นฟุตบอล", pron: "" },
+                        { emoji: "🏫🤝", en: "The school takes good care of students.", th: "โรงเรียนดูแลนักเรียนดี", pron: "เดอะ สะกู เทค กู้ด แคร์ อ๊อฟ สตูเด่น" },
+                        { emoji: "👩‍🏫📚", en: "teach", th: "สอน", pron: "ทีช" }
+                    ]
+                }
+            ];
+
+            return (
+                <div className="space-y-8">
+                    <div className="text-center mb-6">
+                        <h2 className="text-2xl font-bold text-indigo-700">📚 Additional Vocabulary</h2>
+                        <p className="text-indigo-500">รวมคำศัพท์และประโยคเพิ่มเติม (กดที่รูปลำโพงเพื่อฟังเสียง)</p>
+                    </div>
+
+                    {vocabSections.map((section, idx) => (
+                        <div key={idx} className="bg-indigo-50 rounded-2xl p-6 border-2 border-indigo-200">
+                            <h3 className="text-xl font-bold text-indigo-800 mb-4 border-b-2 border-indigo-200 pb-2">📅 {section.title}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {section.words.map((w, wIdx) => (
+                                    <div key={wIdx} className="bg-white p-4 rounded-xl shadow-sm border border-indigo-100 flex items-center justify-between hover:shadow-md transition-shadow">
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-3xl">{w.emoji}</span>
+                                            <div>
+                                                <p className="font-bold text-slate-800 text-lg">{w.en}</p>
+                                                <div className="flex gap-2 items-center text-sm flex-wrap mt-1">
+                                                    <span className="text-slate-600 font-medium">{w.th}</span>
+                                                    {w.pron && <span className="text-indigo-400 text-xs bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">{w.pron}</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => speak(w.en)}
+                                            className="p-2 text-indigo-500 hover:text-white hover:bg-indigo-500 rounded-full transition-colors shrink-0 shadow-sm border border-indigo-100"
+                                            title="ฟังเสียง"
+                                        >
+                                            <Volume2 size={24} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             );
         }
