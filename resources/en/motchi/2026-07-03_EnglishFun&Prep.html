@@ -1,0 +1,608 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Volume2, RefreshCcw, Check, PenTool, Eraser, Play, Clock } from 'lucide-react';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('draw');
+
+  // ฟังก์ชันช่วยอ่านออกเสียง (Text-to-Speech)
+  const speak = (text, rate = 0.85) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // หยุดเสียงเก่าก่อน
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = rate; // พูดช้าลงนิดหน่อยให้น้องฟังทัน
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-pink-50 p-4 md:p-8 font-sans text-slate-800">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-pink-200">
+        
+        {/* Header & Navigation */}
+        <header className="bg-pink-100 p-6 text-center border-b-4 border-pink-200">
+          <h1 className="text-3xl font-bold text-pink-600 mb-2">✨ English Fun & Prep ✨</h1>
+          <p className="text-slate-600 mb-6">Let's practice for your interview in Bulgaria! 🇧🇬</p>
+          
+          <div className="flex flex-wrap justify-center gap-2">
+            <TabButton active={activeTab === 'draw'} onClick={() => setActiveTab('draw')} icon="🎨" label="Phonics & Draw" />
+            <TabButton active={activeTab === 'match'} onClick={() => setActiveTab('match')} icon="🎮" label="Vocab Match" />
+            <TabButton active={activeTab === 'interview'} onClick={() => setActiveTab('interview')} icon="💬" label="Interview Prep" />
+            <TabButton active={activeTab === 'treasure'} onClick={() => setActiveTab('treasure')} icon="🗺️" label="Treasure Hunt" />
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="p-6">
+          {activeTab === 'draw' && <PhonicsDrawTab speak={speak} />}
+          {activeTab === 'match' && <MatchGameTab speak={speak} />}
+          {activeTab === 'interview' && <InterviewTab speak={speak} />}
+          {activeTab === 'treasure' && <TreasureHuntTab speak={speak} />}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// Component: ปุ่มเมนู Tab
+// -------------------------------------------------------------
+function TabButton({ active, onClick, icon, label }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-full font-semibold transition-all flex items-center gap-2
+        ${active ? 'bg-pink-500 text-white shadow-md scale-105' : 'bg-white text-pink-600 hover:bg-pink-50'}`}
+    >
+      <span className="text-xl">{icon}</span> {label}
+    </button>
+  );
+}
+
+// -------------------------------------------------------------
+// 1. โหมดฝึกสัมภาษณ์ (Interview Tab)
+// -------------------------------------------------------------
+function InterviewTab({ speak }) {
+  const questions = [
+    { 
+      en: "Can you tell me a little bit about yourself?", 
+      th: "แนะนำตัวได้ไหม", 
+      hints: ["What is your name?", "How old are you?", "Where are you from?"] 
+    },
+    { 
+      en: "What's your favorite subject?", 
+      th: "วิชาโปรดคืออะไร", 
+      hints: ["My favourite subjects are... (Science, Art)"] 
+    },
+    { 
+      en: "What do you like to do in your free time?", 
+      th: "เวลาว่างชอบทำอะไร / งานอดิเรก", 
+      hints: ["I like to draw.", "I like to cook."] 
+    },
+    { 
+      en: "Why do you want to come to our school in Bulgaria?", 
+      th: "ทำไมอยากมาโรงเรียนของเราที่บัลเกเรีย", 
+      hints: ["I like it here because Bulgaria is a beautiful country."] 
+    },
+    { 
+      en: "Tell us about your school in Thailand. How do you think it will be different from our school?", 
+      th: "บอกเกี่ยวกับโรงเรียนในประเทศไทย คิดว่าแตกต่างจากโรงเรียนเรายังไง", 
+      hints: ["My school in Thailand is [big/small].", "I think your school has different subjects/friends/weather."] 
+    },
+    { 
+      en: "How can you share your Thai culture with your new classmates here?", 
+      th: "จะแชร์วัฒนธรรมไทยกับเพื่อนๆที่นี่ยังไง", 
+      hints: ["I can cook Thai food like Pad Thai.", "I can teach them some Thai words.", "I can show them how to 'Wai'."] 
+    },
+    { 
+      en: "Do you have any questions?", 
+      th: "มีคำถามไหม", 
+      hints: ["Have you seen our swimming pool?", "What time do you have lunch?"] 
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-bold text-slate-700">💬 Interview Practice</h2>
+        <p className="text-slate-500">กดรูปลำโพงเพื่อฟังคำถาม และกดที่การ์ดเพื่อดูคำแปล/คำใบ้</p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {questions.map((q, idx) => (
+          <Flashcard key={idx} q={q} speak={speak} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Flashcard({ q, speak }) {
+  const [flipped, setFlipped] = useState(false);
+
+  return (
+    <div className="relative h-48 w-full perspective-1000">
+      <div 
+        className={`w-full h-full duration-500 preserve-3d cursor-pointer ${flipped ? 'rotate-y-180' : ''}`}
+        onClick={() => setFlipped(!flipped)}
+      >
+        {/* Front */}
+        <div className="absolute backface-hidden w-full h-full bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 flex flex-col justify-center items-center text-center shadow-sm hover:shadow-md transition-shadow">
+          <button 
+            onClick={(e) => { e.stopPropagation(); speak(q.en); }}
+            className="absolute top-4 right-4 text-blue-500 hover:text-blue-700 bg-blue-100 p-2 rounded-full"
+          >
+            <Volume2 size={20} />
+          </button>
+          <h3 className="text-xl font-bold text-blue-800">{q.en}</h3>
+          <p className="text-sm text-blue-400 mt-4">(คลิกเพื่อดูคำแปลภาษาไทย)</p>
+        </div>
+
+        {/* Back */}
+        <div className="absolute backface-hidden rotate-y-180 w-full h-full bg-green-50 border-2 border-green-200 rounded-2xl p-6 flex flex-col justify-center items-center text-center shadow-sm">
+          <h3 className="text-lg font-bold text-green-800 mb-2">{q.th}</h3>
+          <div className="w-full h-px bg-green-200 my-2"></div>
+          <p className="text-sm text-green-700 font-semibold mb-1">แนวทางการตอบ (Hints):</p>
+          <ul className="text-sm text-green-600 text-left list-disc pl-4">
+            {q.hints.map((hint, i) => <li key={i}>{hint}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// 2. โหมด Phonics & Draw
+// -------------------------------------------------------------
+function PhonicsDrawTab({ speak }) {
+  const [currentWord, setCurrentWord] = useState(null);
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  // คำศัพท์ Phonics (นำ phonemes ออกเพื่อให้เด็กฝึกอ่านเอง)
+  const drawWords = [
+    // --- Review Sounds ---
+    { word: "cake", th: "เค้ก 🍰", sound: "a_e", letters: ["c", "a", "k", "e"] },
+    { word: "rain", th: "ฝน 🌧️", sound: "ai", letters: ["r", "a", "i", "n"] },
+    { word: "play", th: "เล่น ⚽", sound: "ay", letters: ["p", "l", "a", "y"] },
+    { word: "tree", th: "ต้นไม้ 🌳", sound: "ee", letters: ["t", "r", "e", "e"] },
+    { word: "leaf", th: "ใบไม้ 🍂", sound: "ea", letters: ["l", "e", "a", "f"] },
+    { word: "key", th: "กุญแจ 🗝️", sound: "ey", letters: ["k", "e", "y"] },
+    { word: "cats", th: "แมว (หลายตัว) 🐱🐱", sound: "s", letters: ["c", "a", "t", "s"] },
+    { word: "candies", th: "ลูกอม 🍬🍬", sound: "ies", letters: ["c", "a", "n", "d", "i", "e", "s"] },
+    // --- New Sounds (อาย) ---
+    { word: "kite", th: "ว่าว 🪁", sound: "i_e", letters: ["k", "i", "t", "e"] },
+    { word: "light", th: "หลอดไฟ 💡", sound: "igh", letters: ["l", "i", "g", "h", "t"] },
+    { word: "pie", th: "ขนมพาย 🥧", sound: "ie", letters: ["p", "i", "e"] },
+    { word: "sky", th: "ท้องฟ้า ☁️", sound: "y (อาย)", letters: ["s", "k", "y"] },
+  ];
+
+  // ฟังก์ชันการวาดรูปลง Canvas
+  const startDrawing = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = '#ec4899'; // สีชมพู
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const handleSelectWord = (wordObj) => {
+    setCurrentWord(wordObj);
+    clearCanvas();
+    // No automatic sound here anymore. Let the student read it!
+  };
+
+  return (
+    <div className="flex flex-col md:flex-row gap-6">
+      {/* ซ้าย: เลือกคำศัพท์ */}
+      <div className="md:w-1/3 bg-orange-50 rounded-2xl p-4 border-2 border-orange-200">
+        <h2 className="text-xl font-bold text-orange-700 mb-4 flex items-center gap-2">
+          <Play size={20} /> 1. เลือกคำ & ฝึกอ่าน
+        </h2>
+        <div className="flex flex-col gap-2 h-96 overflow-y-auto pr-2">
+          {drawWords.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSelectWord(item)}
+              className={`p-3 text-left rounded-xl font-bold text-lg transition-all flex justify-between items-center
+                ${currentWord?.word === item.word 
+                  ? 'bg-orange-500 text-white shadow-md' 
+                  : 'bg-white text-orange-600 hover:bg-orange-100 border border-orange-200'}`}
+            >
+              <span>{item.word.toUpperCase()}</span>
+              <span className={`text-xs px-2 py-1 rounded-full ${currentWord?.word === item.word ? 'bg-orange-400 text-white' : 'bg-orange-100 text-orange-500'}`}>
+                เสียง: {item.sound}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ขวา: กระดานวาดรูป */}
+      <div className="md:w-2/3 flex flex-col items-center">
+        <div className="w-full bg-purple-50 rounded-2xl p-4 border-2 border-purple-200 flex flex-col items-center">
+           <h2 className="text-xl font-bold text-purple-700 mb-2 flex items-center gap-2">
+            <PenTool size={20} /> 2. วาดรูปสิ่งนั้นเลย!
+          </h2>
+          
+          {currentWord ? (
+            <div className="text-center mb-4">
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-3xl font-black text-purple-600 tracking-widest">{currentWord.word.toUpperCase()}</span>
+                
+                {/* ปุ่มกดฟังเสียงแบบ Manual เพื่อให้เด็กเช็คการออกเสียงด้วยตัวเอง */}
+                <button 
+                  onClick={() => speak(currentWord.word)}
+                  className="p-2 bg-purple-200 text-purple-700 hover:bg-purple-300 rounded-full transition-colors"
+                  title="ฟังเสียงคำศัพท์"
+                >
+                  <Volume2 size={20} />
+                </button>
+
+                <span className="bg-pink-200 text-pink-700 text-sm font-bold px-3 py-1 rounded-full shadow-sm">
+                  Phonics: {currentWord.sound}
+                </span>
+              </div>
+              <p className="text-purple-500 font-medium mt-1">{currentWord.th}</p>
+            </div>
+          ) : (
+            <p className="text-purple-400 mb-4 text-center">เลือกคำศัพท์ทางซ้ายมือก่อนนะ 👈</p>
+          )}
+
+          <div className="relative bg-white border-2 border-dashed border-purple-300 rounded-xl overflow-hidden shadow-inner touch-none">
+             <canvas
+                ref={canvasRef}
+                width={400}
+                height={300}
+                className="cursor-crosshair w-full max-w-full"
+                onMouseDown={startDrawing}
+                onMouseMove={draw}
+                onMouseUp={stopDrawing}
+                onMouseLeave={stopDrawing}
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
+             />
+          </div>
+          
+          <button 
+            onClick={clearCanvas}
+            className="mt-4 flex items-center gap-2 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold transition-colors"
+          >
+            <Eraser size={18} /> ลบกระดาน (Clear)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// 3. โหมดเกมจับคู่คำศัพท์ (Match Game)
+// -------------------------------------------------------------
+function MatchGameTab({ speak }) {
+  // ดึงคำศัพท์จาก list ของน้อง
+  const vocabList = [
+    { id: 1, emoji: "🔬", en: "Science" },
+    { id: 2, emoji: "📜", en: "History" },
+    { id: 3, emoji: "🎨", en: "Art" },
+    { id: 4, emoji: "🗣️", en: "Languages" },
+    { id: 5, emoji: "🧪", en: "Experiments" },
+    { id: 6, emoji: "🎸", en: "Hobbies" },
+    { id: 7, emoji: "✏️", en: "Draw" },
+    { id: 8, emoji: "⭐", en: "Favourite" },
+  ];
+
+  // สุ่มตำแหน่งเพื่อความสนุก
+  const [emojis, setEmojis] = useState([]);
+  const [words, setWords] = useState([]);
+  
+  const [selectedEmoji, setSelectedEmoji] = useState(null);
+  const [selectedWord, setSelectedWord] = useState(null);
+  const [matchedIds, setMatchedIds] = useState([]);
+
+  useEffect(() => {
+    initGame();
+  }, []);
+
+  const initGame = () => {
+    setMatchedIds([]);
+    setSelectedEmoji(null);
+    setSelectedWord(null);
+    // Shuffle
+    setEmojis([...vocabList].sort(() => Math.random() - 0.5));
+    setWords([...vocabList].sort(() => Math.random() - 0.5));
+  };
+
+  // ตรวจสอบเมื่อมีการเลือกครบ 2 ฝั่ง
+  useEffect(() => {
+    if (selectedEmoji && selectedWord) {
+      if (selectedEmoji.id === selectedWord.id) {
+        // จับคู่สำเร็จ
+        speak("Correct! " + selectedWord.en);
+        setMatchedIds(prev => [...prev, selectedEmoji.id]);
+        setSelectedEmoji(null);
+        setSelectedWord(null);
+      } else {
+        // จับคู่ผิด
+        setTimeout(() => {
+          setSelectedEmoji(null);
+          setSelectedWord(null);
+        }, 800);
+      }
+    }
+  }, [selectedEmoji, selectedWord]);
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-teal-700">🎮 Match the Words</h2>
+          <p className="text-teal-600">จับคู่รูปภาพ/คำไทย กับ คำศัพท์ภาษาอังกฤษ</p>
+        </div>
+        <button 
+          onClick={initGame}
+          className="flex items-center gap-2 bg-teal-100 hover:bg-teal-200 text-teal-700 px-4 py-2 rounded-lg font-bold"
+        >
+          <RefreshCcw size={18} /> เริ่มใหม่
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
+        {/* คอลัมน์ซ้าย: Emojis/Thai */}
+        <div className="flex flex-col gap-3">
+          {emojis.map((item) => {
+            const isMatched = matchedIds.includes(item.id);
+            const isSelected = selectedEmoji?.id === item.id;
+            return (
+              <button
+                key={`e-${item.id}`}
+                disabled={isMatched}
+                onClick={() => setSelectedEmoji(item)}
+                className={`p-4 text-3xl font-medium rounded-xl border-2 transition-all duration-300
+                  ${isMatched ? 'bg-slate-100 border-slate-200 text-slate-300 opacity-50 scale-95' 
+                  : isSelected ? 'bg-teal-400 border-teal-500 text-white shadow-inner scale-95' 
+                  : 'bg-white border-teal-200 text-teal-800 hover:bg-teal-50 shadow-sm hover:shadow-md'}`}
+              >
+                {item.emoji}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* คอลัมน์ขวา: English Words */}
+        <div className="flex flex-col gap-3">
+          {words.map((item) => {
+            const isMatched = matchedIds.includes(item.id);
+            const isSelected = selectedWord?.id === item.id;
+            return (
+              <button
+                key={`w-${item.id}`}
+                disabled={isMatched}
+                onClick={() => {
+                  speak(item.en);
+                  setSelectedWord(item);
+                }}
+                className={`p-4 text-xl font-bold rounded-xl border-2 transition-all duration-300
+                  ${isMatched ? 'bg-slate-100 border-slate-200 text-slate-300 opacity-50 scale-95' 
+                  : isSelected ? 'bg-teal-400 border-teal-500 text-white shadow-inner scale-95' 
+                  : 'bg-white border-teal-200 text-teal-800 hover:bg-teal-50 shadow-sm hover:shadow-md'}`}
+              >
+                {item.en}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {matchedIds.length === vocabList.length && (
+        <div className="mt-8 p-4 bg-yellow-100 border-2 border-yellow-400 rounded-xl text-center animate-bounce">
+          <h3 className="text-2xl font-black text-yellow-600 flex items-center justify-center gap-2">
+            <Check size={28} /> เก่งมาก! You did it! 🎉
+          </h3>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// 4. โหมดเกมล่าขุมทรัพย์ (Treasure Hunt Challenge)
+// -------------------------------------------------------------
+function TreasureHuntTab({ speak }) {
+  const [currentStage, setCurrentStage] = useState(0); 
+  const [chests, setChests] = useState(0);
+  const [timer, setTimer] = useState(0);
+
+  // ระบบจับเวลา
+  useEffect(() => {
+    let interval;
+    if (timer > 0) {
+      interval = setInterval(() => setTimer(t => t - 1), 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const stages = [
+    {
+      id: 1,
+      title: "Chest 1: The 10-Second Brainstorm ⚡",
+      rule: "บอกชื่ออาหารที่หนูชอบมา 3 อย่างให้เร็วที่สุด!",
+      en: "Name 3 foods you like to eat!",
+      th: "(เช่น Chocolate, Sausage, Snack!)",
+      color: "bg-cyan-100 border-cyan-300 text-cyan-800",
+      btnColor: "bg-cyan-500 hover:bg-cyan-600",
+    },
+    {
+      id: 2,
+      title: "Chest 2: The Magic Artifact 🔍",
+      rule: "มีเวลา 1 นาที! วิ่งไปหยิบของสีชมพูหรือสีฟ้ามา 1 ชิ้น แล้วอธิบายมัน 3 ประโยค",
+      en: "Find a PINK or BLUE object. Tell me 3 sentences about it.",
+      th: "เช่น 'This is my pen. It is pink. It is cute.'",
+      color: "bg-emerald-100 border-emerald-300 text-emerald-800",
+      btnColor: "bg-emerald-500 hover:bg-emerald-600",
+      hasTimer: true
+    },
+    {
+      id: 3,
+      title: "Chest 3: The Joker's Answer 🤡",
+      rule: "ครูจะถามคำถามสัมภาษณ์ แต่หนูต้องตอบให้มั่วและตลกที่สุด!",
+      en: "What is your favourite subject?",
+      th: "(ตัวอย่าง: My favourite subject is sleeping with aliens!)",
+      color: "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800",
+      btnColor: "bg-fuchsia-500 hover:bg-fuchsia-600",
+    },
+    {
+      id: 4,
+      title: "Chest 4: The Boss Fight 👑",
+      rule: "เจอการ์ดบอสแล้ว! คราวนี้ตอบแบบจริงจังและมั่นใจที่สุด",
+      en: "Why do you want to come to our school in Bulgaria?",
+      th: "(ใช้แพทเทิร์นเหตุผลที่เตรียมมาได้เลย)",
+      color: "bg-amber-100 border-amber-300 text-amber-800",
+      btnColor: "bg-amber-500 hover:bg-amber-600",
+    },
+    {
+      id: 5,
+      title: "Chest 5: Interrogate the Boss 🔄",
+      rule: "ถึงตานักสืบตัวน้อย! ให้หนูเป็นคนสัมภาษณ์ครูบ้าง ถามมาเลย 2 คำถาม!",
+      en: "Now YOU ask me 2 questions in English!",
+      th: "(เช่น What is your favorite food? Do you like swimming?)",
+      color: "bg-indigo-100 border-indigo-300 text-indigo-800",
+      btnColor: "bg-indigo-500 hover:bg-indigo-600",
+    }
+  ];
+
+  const handleOpenChest = () => {
+    setChests(prev => prev + 1);
+    if (currentStage < 4) {
+      setCurrentStage(prev => prev + 1);
+      setTimer(0);
+    }
+  };
+
+  const resetGame = () => {
+    setChests(0);
+    setCurrentStage(0);
+    setTimer(0);
+  };
+
+  const stage = stages[currentStage];
+
+  return (
+    <div className="flex flex-col gap-6 items-center">
+      {/* 🗺️ Treasure Map Header Graphic */}
+      <div className="w-full bg-amber-800 rounded-2xl p-6 shadow-xl border-4 border-amber-900 relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]">
+        <h2 className="text-3xl font-bold text-amber-100 mb-4 text-center tracking-widest uppercase" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+          🗺️ Treasure Hunt
+        </h2>
+        
+        {/* ช่องหีบสมบัติ */}
+        <div className="flex justify-between items-center bg-amber-900/40 p-4 rounded-xl gap-2 backdrop-blur-sm">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <div key={num} className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl border-4 flex items-center justify-center text-3xl md:text-4xl transition-all duration-500 shrink-0
+              ${chests >= num ? 'border-yellow-300 bg-yellow-100/90 scale-110 shadow-[0_0_15px_rgba(253,224,71,0.8)]' : 'border-amber-950 bg-amber-900 opacity-70'}`}>
+              {chests >= num ? '💎' : '🧰'}
+            </div>
+          ))}
+        </div>
+        
+        {/* หน้าจอเมื่อสะสมครบ */}
+        {chests === 5 && (
+          <div className="absolute inset-0 bg-yellow-400/95 flex flex-col items-center justify-center animate-in zoom-in duration-500 z-10">
+            <h3 className="text-4xl md:text-5xl font-black text-amber-900 mb-4 drop-shadow-md text-center leading-tight">🏆 YOU WIN! 🏆</h3>
+            <p className="text-amber-800 text-xl md:text-2xl mb-8 font-bold text-center">You found all the Bulgarian Treasures!</p>
+            <button onClick={resetGame} className="px-8 py-3 bg-amber-900 text-yellow-400 font-bold text-xl rounded-full hover:bg-amber-800 transition-colors shadow-lg">
+              Play Again
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 🎯 Current Stage Card */}
+      {chests < 5 && (
+        <div className={`w-full max-w-2xl border-4 rounded-3xl p-6 md:p-8 text-center transition-colors duration-300 shadow-md ${stage.color}`}>
+          <h3 className="text-2xl md:text-3xl font-black mb-4">{stage.title}</h3>
+          <p className="text-lg md:text-xl font-bold mb-6 opacity-90">{stage.rule}</p>
+          
+          <div className="bg-white/80 p-6 rounded-2xl mb-6 shadow-sm inline-block w-full">
+             <button 
+              onClick={() => speak(stage.en)}
+              className="mb-4 text-slate-600 hover:text-white bg-white hover:bg-amber-500 p-4 rounded-full shadow-md transition-all"
+             >
+               <Volume2 size={32} className="mx-auto" />
+             </button>
+             <p className="text-xl md:text-2xl font-bold text-slate-800 mb-3">{stage.en}</p>
+             <p className="text-lg font-semibold text-slate-600">{stage.th}</p>
+          </div>
+
+          {/* นาฬิกาจับเวลา */}
+          {stage.hasTimer && (
+            <div className="mb-8">
+              {timer > 0 ? (
+                <div className="text-5xl font-black text-rose-500 animate-pulse flex justify-center items-center gap-3">
+                  <Clock size={40} /> 00:{timer < 10 ? `0${timer}` : timer}
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setTimer(60)}
+                  className="px-6 py-3 bg-rose-500 text-white font-bold rounded-full hover:bg-rose-600 flex items-center justify-center gap-2 mx-auto text-lg shadow-md"
+                >
+                  <Clock size={24} /> เริ่มจับเวลา 1 นาที!
+                </button>
+              )}
+            </div>
+          )}
+
+          <button 
+            onClick={handleOpenChest}
+            className={`px-8 py-4 text-white text-2xl font-black rounded-full shadow-lg transform hover:scale-105 transition-all w-full md:w-auto ${stage.btnColor}`}
+          >
+            เปิดหีบสมบัติ! (Open Chest) 🗝️
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Add some custom styles for the 3D flip card effect
+const style = document.createElement('style');
+style.textContent = `
+  .perspective-1000 { perspective: 1000px; }
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
+  .rotate-y-180 { transform: rotateY(180deg); }
+`;
+document.head.appendChild(style);
