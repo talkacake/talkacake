@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Fun & Prep - Level 2</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .bg-space { background-image: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%); }
+    </style>
+</head>
+<body class="bg-indigo-50 text-slate-800 font-sans">
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // --- Custom SVG Icons ---
+        const Volume2 = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>;
+        const RefreshCcw = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>;
+        const Check = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>;
+        const PenTool = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>;
+        const Eraser = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path><path d="m5 11 9 9"></path></svg>;
+        const Play = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
+        const Clock = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+        const Plus = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
+
+        // --- Robust TTS Fix ---
+        let availableVoices = [];
+        const loadVoices = () => { if ('speechSynthesis' in window) availableVoices = window.speechSynthesis.getVoices(); };
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // --- Main App Component ---
+        function App() {
+            const [activeTab, setActiveTab] = useState('draw');
+
+            const speak = (text, rate = 0.85) => {
+                if (!('speechSynthesis' in window)) return;
+                window.speechSynthesis.cancel(); 
+                
+                setTimeout(() => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        const englishVoice = voices.find(v => v.name.includes('Google US English')) || 
+                                             voices.find(v => v.name.includes('English')) ||
+                                             voices.find(v => v.lang.startsWith('en'));
+                        if (englishVoice) utterance.voice = englishVoice;
+                    }
+                    utterance.lang = 'en-US';
+                    utterance.rate = rate;
+                    window._ttsUtterance = utterance; 
+                    window.speechSynthesis.speak(utterance);
+                }, 50);
+            };
+
+            return (
+                <div className="min-h-screen p-4 md:p-8 font-sans">
+                    <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-indigo-200">
+                        
+                        {/* Header */}
+                        <header className="bg-indigo-100 p-6 text-center border-b-4 border-indigo-200">
+                            <h1 className="text-3xl font-black text-indigo-700 mb-2">🚀 Interview Level 2: Expand Your Answers!</h1>
+                            <p className="text-indigo-600 mb-6 font-medium">Let's build bigger and better sentences for Bulgaria! 🇧🇬</p>
+                            
+                            <div className="flex flex-wrap justify-center gap-2">
+                                <TabButton active={activeTab === 'draw'} onClick={() => setActiveTab('draw')} icon="🎨" label="Phonics & Draw" />
+                                <TabButton active={activeTab === 'match'} onClick={() => setActiveTab('match')} icon="🎮" label="Link Words" />
+                                <TabButton active={activeTab === 'builder'} onClick={() => setActiveTab('builder')} icon="🍔" label="Answer Builder" />
+                                <TabButton active={activeTab === 'mission'} onClick={() => setActiveTab('mission')} icon="🚀" label="Space Mission" />
+                            </div>
+                        </header>
+
+                        {/* Content Area */}
+                        <div className="p-6">
+                            {activeTab === 'draw' && <PhonicsDrawTab speak={speak} />}
+                            {activeTab === 'match' && <MatchGameTab speak={speak} />}
+                            {activeTab === 'builder' && <BuilderTab speak={speak} />}
+                            {activeTab === 'mission' && <MissionTab speak={speak} />}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function TabButton({ active, onClick, icon, label }) {
+            return (
+                <button
+                    onClick={onClick}
+                    className={`px-4 py-2 rounded-full font-bold transition-all flex items-center gap-2
+                        ${active ? 'bg-indigo-600 text-white shadow-lg scale-105' : 'bg-white text-indigo-700 hover:bg-indigo-50 shadow-sm border border-indigo-100'}`}
+                >
+                    <span className="text-xl">{icon}</span> {label}
+                </button>
+            );
+        }
+
+        // --- 1. Phonics & Draw Tab (Updated with Expansion Theme) ---
+        function PhonicsDrawTab({ speak }) {
+            const [currentWord, setCurrentWord] = useState(null);
+            const canvasRef = useRef(null);
+            const [isDrawing, setIsDrawing] = useState(false);
+
+            // Words related to building answers and time
+            const drawWords = [
+                { word: "burger", th: "แฮมเบอร์เกอร์ 🍔", sound: "ur", letters: ["b", "u", "r", "g", "e", "r"] },
+                { word: "time", th: "เวลา ⏳", sound: "i_e", letters: ["t", "i", "m", "e"] },
+                { word: "past", th: "อดีต ⏪", sound: "a", letters: ["p", "a", "s", "t"] },
+                { word: "now", th: "ตอนนี้ ⏯️", sound: "ow", letters: ["n", "o", "w"] },
+                { word: "grow", th: "เติบโต 🌱", sound: "ow", letters: ["g", "r", "o", "w"] },
+                { word: "space", th: "อวกาศ 🚀", sound: "a_e", letters: ["s", "p", "a", "c", "e"] },
+                { word: "speak", th: "พูด 🗣️", sound: "ea", letters: ["s", "p", "e", "a", "k"] },
+                { word: "think", th: "คิด 🤔", sound: "th", letters: ["t", "h", "i", "n", "k"] },
+            ];
+
+            const startDrawing = (e) => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                ctx.beginPath();
+                ctx.moveTo(clientX - rect.left, clientY - rect.top);
+                setIsDrawing(true);
+            };
+
+            const draw = (e) => {
+                if (!isDrawing) return;
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                ctx.lineTo(clientX - rect.left, clientY - rect.top);
+                ctx.strokeStyle = '#4f46e5'; 
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            };
+
+            const stopDrawing = () => setIsDrawing(false);
+            const clearCanvas = () => {
+                const canvas = canvasRef.current;
+                if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            };
+
+            return (
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-1/3 bg-blue-50 rounded-2xl p-4 border-2 border-blue-200">
+                        <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2"><Play size={20} /> 1. เลือกคำ & ฝึกอ่าน</h2>
+                        <div className="flex flex-col gap-2 h-[450px] overflow-y-auto pr-2">
+                            {drawWords.map((item, idx) => (
+                                <button key={idx} onClick={() => { setCurrentWord(item); clearCanvas(); }}
+                                    className={`p-3 text-left rounded-xl font-bold text-lg transition-all flex justify-between items-center
+                                        ${currentWord?.word === item.word ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-blue-600 hover:bg-blue-100 border border-blue-200'}`}>
+                                    <span>{item.word.toUpperCase()}</span>
+                                    <span className={`text-xs px-2 py-1 rounded-full ${currentWord?.word === item.word ? 'bg-blue-400' : 'bg-blue-100 text-blue-500'}`}>
+                                        {item.sound}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="md:w-2/3 flex flex-col items-center">
+                        <div className="w-full bg-slate-50 rounded-2xl p-4 border-2 border-slate-200 flex flex-col items-center">
+                            <h2 className="text-xl font-bold text-slate-700 mb-2 flex items-center gap-2"><PenTool size={20} /> 2. วาดรูปสิ่งนั้นเลย!</h2>
+                            {currentWord ? (
+                                <div className="text-center mb-4">
+                                    <div className="flex items-center justify-center gap-3">
+                                        <span className="text-3xl font-black text-indigo-600 tracking-widest">{currentWord.word.toUpperCase()}</span>
+                                        <button onClick={() => speak(currentWord.word)} className="p-2 bg-indigo-200 text-indigo-700 hover:bg-indigo-300 rounded-full transition-colors"><Volume2 size={20} /></button>
+                                    </div>
+                                    <p className="text-slate-500 font-medium mt-1">{currentWord.th}</p>
+                                </div>
+                            ) : <p className="text-slate-400 mb-4">เลือกคำศัพท์ทางซ้ายมือก่อนนะ 👈</p>}
+                            <div className="relative bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden shadow-inner touch-none">
+                                <canvas ref={canvasRef} width={400} height={300} className="cursor-crosshair w-full max-w-full block"
+                                    onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing}
+                                    onTouchStart={(e) => { e.preventDefault(); startDrawing(e); }} onTouchMove={(e) => { e.preventDefault(); draw(e); }} onTouchEnd={stopDrawing} />
+                            </div>
+                            <button onClick={clearCanvas} className="mt-4 flex items-center gap-2 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-bold transition-colors">
+                                <Eraser size={18} /> ลบกระดาน (Clear)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 2. Link Words Match Tab ---
+        function MatchGameTab({ speak }) {
+            // Words for extending sentences
+            const vocabList = [
+                { id: 1, emoji: "🤔", en: "Because", th: "เพราะว่า" },
+                { id: 2, emoji: "👉", en: "For example", th: "ยกตัวอย่างเช่น" },
+                { id: 3, emoji: "⏪", en: "Before", th: "เมื่อก่อน" },
+                { id: 4, emoji: "⏯️", en: "Now", th: "ตอนนี้" },
+                { id: 5, emoji: "⏩", en: "Future", th: "อนาคต" },
+                { id: 6, emoji: "➕", en: "Also", th: "และก็ / ด้วย" },
+                { id: 7, emoji: "🛑", en: "But", th: "แต่" },
+                { id: 8, emoji: "💭", en: "I think", th: "หนูคิดว่า" },
+            ];
+
+            const [emojis, setEmojis] = useState([]);
+            const [words, setWords] = useState([]);
+            const [selectedEmoji, setSelectedEmoji] = useState(null);
+            const [selectedWord, setSelectedWord] = useState(null);
+            const [matchedIds, setMatchedIds] = useState([]);
+
+            useEffect(() => { initGame(); }, []);
+
+            const initGame = () => {
+                setMatchedIds([]); setSelectedEmoji(null); setSelectedWord(null);
+                setEmojis([...vocabList].sort(() => Math.random() - 0.5));
+                setWords([...vocabList].sort(() => Math.random() - 0.5));
+            };
+
+            useEffect(() => {
+                if (selectedEmoji && selectedWord) {
+                    if (selectedEmoji.id === selectedWord.id) {
+                        speak("Yes! " + selectedWord.en);
+                        setMatchedIds(prev => [...prev, selectedEmoji.id]);
+                        setSelectedEmoji(null); setSelectedWord(null);
+                    } else {
+                        setTimeout(() => { setSelectedEmoji(null); setSelectedWord(null); }, 800);
+                    }
+                }
+            }, [selectedEmoji, selectedWord]);
+
+            return (
+                <div>
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 className="text-2xl font-bold text-teal-700">🎮 Link Words Match</h2>
+                            <p className="text-teal-600">คำเชื่อมประโยค (Transition words) สำหรับอธิบายเหตุผลและเวลา</p>
+                        </div>
+                        <button onClick={initGame} className="flex items-center gap-2 bg-teal-100 hover:bg-teal-200 text-teal-700 px-4 py-2 rounded-lg font-bold">
+                            <RefreshCcw size={18} /> เริ่มใหม่
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 md:gap-8 max-w-2xl mx-auto">
+                        <div className="flex flex-col gap-3">
+                            {emojis.map((item) => {
+                                const isMatched = matchedIds.includes(item.id);
+                                const isSelected = selectedEmoji?.id === item.id;
+                                return (
+                                    <button key={`e-${item.id}`} disabled={isMatched} onClick={() => setSelectedEmoji(item)}
+                                        className={`p-3 md:p-4 text-2xl md:text-3xl font-medium rounded-xl border-2 transition-all duration-300 flex justify-center items-center gap-2
+                                            ${isMatched ? 'bg-slate-100 border-slate-200 text-slate-300 opacity-50 scale-95' 
+                                            : isSelected ? 'bg-teal-400 border-teal-500 text-white shadow-inner scale-95' 
+                                            : 'bg-white border-teal-200 text-teal-800 hover:bg-teal-50 shadow-sm hover:shadow-md'}`}>
+                                        <span>{item.emoji}</span> <span className="text-sm font-bold opacity-60">({item.th})</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            {words.map((item) => {
+                                const isMatched = matchedIds.includes(item.id);
+                                const isSelected = selectedWord?.id === item.id;
+                                return (
+                                    <button key={`w-${item.id}`} disabled={isMatched} onClick={() => { speak(item.en); setSelectedWord(item); }}
+                                        className={`p-3 md:p-4 text-lg md:text-xl font-bold rounded-xl border-2 transition-all duration-300
+                                            ${isMatched ? 'bg-slate-100 border-slate-200 text-slate-300 opacity-50 scale-95' 
+                                            : isSelected ? 'bg-teal-400 border-teal-500 text-white shadow-inner scale-95' 
+                                            : 'bg-white border-teal-200 text-teal-800 hover:bg-teal-50 shadow-sm hover:shadow-md'}`}>
+                                        {item.en}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 3. Answer Builder Tab (NEW CORE FEATURE) ---
+        function BuilderTab({ speak }) {
+            const [mode, setMode] = useState('burger'); // 'burger' or 'time'
+            
+            const burgerQuestions = [
+                {
+                    q: "What is your favorite subject?",
+                    th: "วิชาโปรดคืออะไร?",
+                    a: "My favorite subject is Art.",
+                    r: "Because I love to draw and be creative.",
+                    e: "For example, I like drawing animals and nature."
+                },
+                {
+                    q: "Why do you want to study in Bulgaria?",
+                    th: "ทำไมถึงอยากมาเรียนที่บัลเกเรีย?",
+                    a: "I want to study here because it's a beautiful country.",
+                    r: "Also, I want to meet new friends and learn new things.",
+                    e: "For example, I want to try Bulgarian food and see snow!"
+                }
+            ];
+
+            const timeQuestions = [
+                {
+                    q: "Tell me about your English skills.",
+                    th: "เล่าเรื่องทักษะภาษาอังกฤษของหนูให้ฟังหน่อย",
+                    p: "Before, I didn't speak English much.",
+                    pr: "Now, I practice speaking with my teacher every day.",
+                    f: "In the future, I want to speak English very fluently!"
+                },
+                {
+                    q: "Tell me about your hobbies.",
+                    th: "งานอดิเรกของหนูคืออะไร?",
+                    p: "In the past, I loved playing games.",
+                    pr: "Now, I like cooking and drawing.",
+                    f: "In the future, I want to try swimming in the school pool."
+                }
+            ];
+
+            return (
+                <div className="space-y-8">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-black text-rose-600 mb-2">🛠️ Answer Builder</h2>
+                        <p className="text-slate-600 font-medium">สูตรลับตอบคำถามให้ยาวขึ้น! เลือกทฤษฎีที่จะฝึกเลย</p>
+                    </div>
+
+                    <div className="flex justify-center gap-4">
+                        <button onClick={() => setMode('burger')} className={`px-6 py-3 rounded-2xl font-bold text-lg flex items-center gap-2 transition-all ${mode === 'burger' ? 'bg-orange-500 text-white shadow-lg scale-105' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'}`}>
+                            🍔 Burger (A-R-E)
+                        </button>
+                        <button onClick={() => setMode('time')} className={`px-6 py-3 rounded-2xl font-bold text-lg flex items-center gap-2 transition-all ${mode === 'time' ? 'bg-purple-500 text-white shadow-lg scale-105' : 'bg-purple-100 text-purple-600 hover:bg-purple-200'}`}>
+                            ⏳ Time Machine (P-P-F)
+                        </button>
+                    </div>
+
+                    {mode === 'burger' && (
+                        <div className="bg-orange-50 p-6 rounded-3xl border-4 border-orange-200">
+                            <div className="text-center mb-6">
+                                <h3 className="text-xl font-bold text-orange-800">ทฤษฎีแฮมเบอร์เกอร์: ตอบคำถาม + ให้เหตุผล + ยกตัวอย่าง</h3>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {burgerQuestions.map((item, idx) => (
+                                    <div key={idx} className="bg-white rounded-2xl p-5 shadow-md border-2 border-orange-100">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <h4 className="font-bold text-lg text-slate-800">{item.q}</h4>
+                                            <button onClick={() => speak(item.q)} className="text-orange-500 hover:bg-orange-100 p-2 rounded-full"><Volume2 size={18}/></button>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {/* Answer */}
+                                            <div className="bg-yellow-100 p-3 rounded-xl border-l-4 border-yellow-400 cursor-pointer hover:bg-yellow-200" onClick={() => speak(item.a)}>
+                                                <div className="font-bold text-yellow-800 flex items-center gap-2"><span className="text-2xl">🍞</span> 1. Answer (ตอบตรงๆ)</div>
+                                                <p className="text-yellow-900 font-medium mt-1">{item.a}</p>
+                                            </div>
+                                            {/* Reason */}
+                                            <div className="bg-red-100 p-3 rounded-xl border-l-4 border-red-400 cursor-pointer hover:bg-red-200" onClick={() => speak(item.r)}>
+                                                <div className="font-bold text-red-800 flex items-center gap-2"><span className="text-2xl">🥩</span> 2. Reason (ให้เหตุผล)</div>
+                                                <p className="text-red-900 font-medium mt-1"><span className="bg-red-200 px-1 rounded">Because...</span> {item.r.replace('Because', '')}</p>
+                                            </div>
+                                            {/* Example */}
+                                            <div className="bg-green-100 p-3 rounded-xl border-l-4 border-green-400 cursor-pointer hover:bg-green-200" onClick={() => speak(item.e)}>
+                                                <div className="font-bold text-green-800 flex items-center gap-2"><span className="text-2xl">🥬</span> 3. Example (ยกตัวอย่าง)</div>
+                                                <p className="text-green-900 font-medium mt-1"><span className="bg-green-200 px-1 rounded">For example...</span> {item.e.replace('For example,', '')}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {mode === 'time' && (
+                        <div className="bg-purple-50 p-6 rounded-3xl border-4 border-purple-200">
+                            <div className="text-center mb-6">
+                                <h3 className="text-xl font-bold text-purple-800">ทฤษฎีไทม์แมชชีน: เล่าอดีต + บอกปัจจุบัน + มองอนาคต</h3>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {timeQuestions.map((item, idx) => (
+                                    <div key={idx} className="bg-white rounded-2xl p-5 shadow-md border-2 border-purple-100">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <h4 className="font-bold text-lg text-slate-800">{item.q}</h4>
+                                            <button onClick={() => speak(item.q)} className="text-purple-500 hover:bg-purple-100 p-2 rounded-full"><Volume2 size={18}/></button>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {/* Past */}
+                                            <div className="bg-slate-100 p-3 rounded-xl border-l-4 border-slate-400 cursor-pointer hover:bg-slate-200" onClick={() => speak(item.p)}>
+                                                <div className="font-bold text-slate-700 flex items-center gap-2"><span className="text-2xl">⏪</span> 1. Past (เมื่อก่อน...)</div>
+                                                <p className="text-slate-800 font-medium mt-1"><span className="bg-slate-300 px-1 rounded">Before...</span> {item.p.replace('Before,', '').replace('In the past,', '')}</p>
+                                            </div>
+                                            {/* Present */}
+                                            <div className="bg-indigo-100 p-3 rounded-xl border-l-4 border-indigo-400 cursor-pointer hover:bg-indigo-200" onClick={() => speak(item.pr)}>
+                                                <div className="font-bold text-indigo-800 flex items-center gap-2"><span className="text-2xl">⏯️</span> 2. Present (แต่ตอนนี้...)</div>
+                                                <p className="text-indigo-900 font-medium mt-1"><span className="bg-indigo-200 px-1 rounded">Now...</span> {item.pr.replace('Now,', '')}</p>
+                                            </div>
+                                            {/* Future */}
+                                            <div className="bg-pink-100 p-3 rounded-xl border-l-4 border-pink-400 cursor-pointer hover:bg-pink-200" onClick={() => speak(item.f)}>
+                                                <div className="font-bold text-pink-800 flex items-center gap-2"><span className="text-2xl">⏩</span> 3. Future (ในอนาคต...)</div>
+                                                <p className="text-pink-900 font-medium mt-1"><span className="bg-pink-200 px-1 rounded">In the future...</span> {item.f.replace('In the future,', '')}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- 4. Space Mission Tab (Replaces Treasure Hunt) ---
+        function MissionTab({ speak }) {
+            const [currentStage, setCurrentStage] = useState(0); 
+            const [planets, setPlanets] = useState(0);
+
+            const stages = [
+                {
+                    id: 1,
+                    title: "Planet 1: The Warm-up 🌍",
+                    rule: "พูดประโยคสั้นๆ 3 ประโยคเกี่ยวกับตัวเอง (ชื่อ, อายุ, มาจากไหน)",
+                    en: "Tell me your Name, Age, and Country!",
+                    color: "bg-blue-900 text-blue-100 border-blue-400",
+                    btnColor: "bg-blue-500 hover:bg-blue-400",
+                },
+                {
+                    id: 2,
+                    title: "Planet 2: Build a Burger! 🍔🪐",
+                    rule: "ตอบคำถามนี้ โดยใช้สูตร ตอบ(A) + เหตุผล(R) + ยกตัวอย่าง(E)",
+                    en: "What is your favourite subject?",
+                    color: "bg-orange-900 text-orange-100 border-orange-400",
+                    btnColor: "bg-orange-500 hover:bg-orange-400",
+                },
+                {
+                    id: 3,
+                    title: "Planet 3: The Time Machine ⏳🌌",
+                    rule: "เล่าเรื่องโดยใช้สูตร อดีต(P) + ปัจจุบัน(P) + อนาคต(F)",
+                    en: "Tell me about your English learning.",
+                    color: "bg-purple-900 text-purple-100 border-purple-400",
+                    btnColor: "bg-purple-500 hover:bg-purple-400",
+                },
+                {
+                    id: 4,
+                    title: "Planet 4: The Boss Alien 👽",
+                    rule: "บอสถามคำถามจริงจัง! ตอบให้ยาวที่สุดเท่าที่ทำได้ (ใช้สูตรไหนก็ได้)",
+                    en: "Why do you want to study at our school in Bulgaria?",
+                    color: "bg-rose-900 text-rose-100 border-rose-400",
+                    btnColor: "bg-rose-500 hover:bg-rose-400",
+                },
+                {
+                    id: 5,
+                    title: "Planet 5: Interrogate the Boss 🛸",
+                    rule: "ตาหนูเป็นเอเลี่ยนบอสบ้าง! ถามครูมาเลย 2 คำถาม",
+                    en: "Now YOU ask me 2 questions in English!",
+                    color: "bg-emerald-900 text-emerald-100 border-emerald-400",
+                    btnColor: "bg-emerald-500 hover:bg-emerald-400",
+                }
+            ];
+
+            const handleWinPlanet = () => {
+                setPlanets(prev => prev + 1);
+                if (currentStage < 4) setCurrentStage(prev => prev + 1);
+            };
+
+            const resetGame = () => { setPlanets(0); setCurrentStage(0); };
+            const stage = stages[currentStage];
+            const planetEmojis = ['🌍', '🪐', '🌌', '👽', '🛸'];
+
+            return (
+                <div className="flex flex-col gap-6 items-center">
+                    {/* Mission Header Graphic */}
+                    <div className="w-full bg-space rounded-3xl p-6 shadow-2xl border-4 border-indigo-500 relative overflow-hidden">
+                        <h2 className="text-3xl md:text-4xl font-black text-white mb-4 text-center tracking-widest uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+                            🚀 Space Mission
+                        </h2>
+                        
+                        {/* Progress */}
+                        <div className="flex justify-between items-center bg-black/40 p-4 rounded-xl gap-2 backdrop-blur-md border border-indigo-400/30">
+                            {[1, 2, 3, 4, 5].map((num, i) => (
+                                <div key={num} className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full border-4 flex items-center justify-center text-3xl md:text-4xl transition-all duration-700 shrink-0
+                                    ${planets >= num ? 'border-cyan-400 bg-cyan-900/80 scale-110 shadow-[0_0_20px_rgba(34,211,238,0.8)]' : 'border-slate-700 bg-slate-800 opacity-50'}`}>
+                                    {planets >= num ? planetEmojis[i] : '⭐'}
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {/* Win Screen */}
+                        {planets === 5 && (
+                            <div className="absolute inset-0 bg-indigo-900/95 flex flex-col items-center justify-center z-10 animate-pulse">
+                                <h3 className="text-4xl md:text-6xl font-black text-cyan-300 mb-4 drop-shadow-[0_0_15px_rgba(34,211,238,1)] text-center">MISSION COMPLETE!</h3>
+                                <p className="text-white text-xl md:text-2xl mb-8 font-bold text-center">You are an Interview Astronaut!</p>
+                                <button onClick={resetGame} className="px-8 py-3 bg-cyan-500 text-indigo-900 font-black text-xl rounded-full hover:bg-cyan-400 transition-colors shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                                    Play Again
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Current Stage Card */}
+                    {planets < 5 && (
+                        <div className={`w-full max-w-2xl border-4 rounded-3xl p-6 md:p-8 text-center transition-colors duration-500 shadow-xl ${stage.color}`}>
+                            <h3 className="text-2xl md:text-3xl font-black mb-4 tracking-wide">{stage.title}</h3>
+                            <p className="text-lg md:text-xl font-bold mb-6 opacity-90">{stage.rule}</p>
+                            
+                            <div className="bg-white/10 p-6 rounded-2xl mb-8 shadow-inner inline-block w-full backdrop-blur-sm border border-white/20">
+                                <button onClick={() => speak(stage.en)} className="mb-4 text-white hover:text-indigo-900 bg-white/20 hover:bg-white p-4 rounded-full shadow-md transition-all flex items-center justify-center mx-auto">
+                                    <Volume2 size={32} />
+                                </button>
+                                <p className="text-2xl md:text-3xl font-bold text-white mb-2">{stage.en}</p>
+                            </div>
+
+                            <button onClick={handleWinPlanet} className={`px-8 py-4 text-white text-2xl font-black rounded-full shadow-lg transform hover:scale-105 transition-all w-full md:w-auto flex items-center justify-center mx-auto gap-2 ${stage.btnColor}`}>
+                                พิชิตด่านนี้! (Conquer!) 🚀
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
