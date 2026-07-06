@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Fun & Prep - Level 4</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-blue-50 text-slate-800 font-sans">
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // --- Custom SVG Icons ---
+        const Volume2 = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>;
+        const Check = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>;
+        const PenTool = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>;
+        const Eraser = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path><path d="m5 11 9 9"></path></svg>;
+        const Play = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
+        const RefreshCcw = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>;
+        const Puzzle = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 0-.288.877l.131.86a3.45 3.45 0 0 1-3.376 3.96h-1.05a.98.98 0 0 0-.877.288l-1.611 1.611a2.408 2.408 0 0 1-3.408 0l-1.611-1.611a.98.98 0 0 0-.877-.288h-1.05a3.45 3.45 0 0 1-3.376-3.96l.131-.86a.98.98 0 0 0-.288-.877L.823 13.7A2.408 2.408 0 0 1 .823 10.3l1.568-1.568c.23-.23.338-.556.289-.878l-.131-.86A3.45 3.45 0 0 1 5.925 3.03h1.05c.322-.049.648.059.878.289l1.568 1.568c.47.47 1.087.706 1.704.706s1.233-.235 1.704-.706l1.568-1.568c.23-.23.556-.338.878-.289h1.05a3.45 3.45 0 0 1 3.376 3.96l-.131.86z"></path></svg>;
+        const LinkIcon = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>;
+        const LifeBuoy = ({ size = 24, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line><line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line></svg>;
+
+        // --- Robust TTS Fix ---
+        let availableVoices = [];
+        const loadVoices = () => { if ('speechSynthesis' in window) availableVoices = window.speechSynthesis.getVoices(); };
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // --- Main App Component ---
+        function App() {
+            const [activeTab, setActiveTab] = useState('draw');
+
+            const speak = (text, rate = 0.85) => {
+                if (!('speechSynthesis' in window)) return;
+                window.speechSynthesis.cancel(); 
+                
+                setTimeout(() => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voices = window.speechSynthesis.getVoices();
+                    if (voices.length > 0) {
+                        const englishVoice = voices.find(v => v.name.includes('Google US English')) || 
+                                             voices.find(v => v.name.includes('English')) ||
+                                             voices.find(v => v.lang.startsWith('en'));
+                        if (englishVoice) utterance.voice = englishVoice;
+                    }
+                    utterance.lang = 'en-US';
+                    utterance.rate = rate;
+                    window._ttsUtterance = utterance; 
+                    window.speechSynthesis.speak(utterance);
+                }, 50);
+            };
+
+            return (
+                <div className="min-h-screen p-4 md:p-8 font-sans">
+                    <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-200">
+                        
+                        {/* Header */}
+                        <header className="bg-blue-100 p-6 text-center border-b-4 border-blue-200">
+                            <h1 className="text-3xl md:text-4xl font-black text-blue-700 mb-2">🚀 Level 4: The Master Speaker</h1>
+                            <p className="text-blue-600 mb-6 font-medium text-lg">Let's give LONG answers and survive the interview! 🇧🇬</p>
+                            
+                            <div className="flex flex-wrap justify-center gap-2 md:gap-4">
+                                <TabButton active={activeTab === 'draw'} onClick={() => setActiveTab('draw')} icon="🎨" label="Short Phonics Draw" />
+                                <TabButton active={activeTab === 'match'} onClick={() => setActiveTab('match')} icon="🧩" label="Match Long Answers" />
+                                <TabButton active={activeTab === 'linker'} onClick={() => setActiveTab('linker')} icon="🔗" label="Sentence Linkers" />
+                                <TabButton active={activeTab === 'survival'} onClick={() => setActiveTab('survival')} icon="🆘" label="Survival Phrases" />
+                            </div>
+                        </header>
+
+                        {/* Content Area */}
+                        <div className="p-4 md:p-8 bg-slate-50">
+                            {activeTab === 'draw' && <ShortDrawTab speak={speak} />}
+                            {activeTab === 'match' && <LongAnswerMatchTab speak={speak} />}
+                            {activeTab === 'linker' && <SentenceLinkerTab speak={speak} />}
+                            {activeTab === 'survival' && <SurvivalTab speak={speak} />}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function TabButton({ active, onClick, icon, label }) {
+            return (
+                <button
+                    onClick={onClick}
+                    className={`px-4 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 text-sm md:text-base
+                        ${active ? 'bg-blue-600 text-white shadow-lg scale-105' : 'bg-white text-blue-700 hover:bg-blue-50 shadow-sm border-2 border-blue-100'}`}
+                >
+                    <span className="text-xl">{icon}</span> {label}
+                </button>
+            );
+        }
+
+        // --- 1. Short Draw Tab (Easy Phonics/Phrases) ---
+        function ShortDrawTab({ speak }) {
+            const [currentPrompt, setCurrentPrompt] = useState(null);
+            const canvasRef = useRef(null);
+            const [isDrawing, setIsDrawing] = useState(false);
+
+            // Shorter phrases to prevent reading fatigue, focusing on key sounds/vocab
+            const drawPrompts = [
+                { emoji: "🐈📦", text: "A cat in a box", th: "แมวในกล่อง", sound: "a / o" },
+                { emoji: "👨🇧🇬", text: "My dad in Bulgaria", th: "พ่อของฉันที่บัลเกเรีย", sound: "a / ia" },
+                { emoji: "🍔😋", text: "A big burger", th: "เบอร์เกอร์ชิ้นใหญ่", sound: "i / ur" },
+                { emoji: "❄️⛄", text: "Cold snow", th: "หิมะที่หนาวเย็น", sound: "o / ow" },
+                { emoji: "🎨🌳", text: "Draw a green tree", th: "วาดต้นไม้สีเขียว", sound: "aw / ee" },
+            ];
+
+            const startDrawing = (e) => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                ctx.beginPath();
+                ctx.moveTo(clientX - rect.left, clientY - rect.top);
+                setIsDrawing(true);
+            };
+
+            const draw = (e) => {
+                if (!isDrawing) return;
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                ctx.lineTo(clientX - rect.left, clientY - rect.top);
+                ctx.strokeStyle = '#2563eb'; 
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            };
+
+            const stopDrawing = () => setIsDrawing(false);
+            const clearCanvas = () => {
+                const canvas = canvasRef.current;
+                if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            };
+
+            return (
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="md:w-1/3 bg-blue-100 rounded-3xl p-5 border-2 border-blue-200">
+                        <h2 className="text-xl font-bold text-blue-800 mb-2 flex items-center gap-2"><Play size={20} /> 1. Easy Read & Draw</h2>
+                        <p className="text-sm text-blue-600 mb-4">ฝึกอ่านวลีสั้นๆ (Phrases) แล้ววาดรูปตาม</p>
+                        <div className="flex flex-col gap-3">
+                            {drawPrompts.map((item, idx) => (
+                                <button key={idx} onClick={() => { setCurrentPrompt(item); clearCanvas(); }}
+                                    className={`p-4 text-left rounded-2xl font-bold text-lg transition-all flex flex-col gap-1
+                                        ${currentPrompt?.text === item.text ? 'bg-blue-600 text-white shadow-md scale-105' : 'bg-white text-blue-700 hover:bg-blue-50 border border-blue-200'}`}>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-2xl">{item.emoji}</span>
+                                        <span className="leading-tight">{item.text}</span>
+                                    </div>
+                                    <span className={`text-xs px-2 py-1 rounded-full w-max ${currentPrompt?.text === item.text ? 'bg-blue-400 text-white' : 'bg-blue-100 text-blue-600'}`}>
+                                        Sound: {item.sound}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="md:w-2/3 flex flex-col items-center">
+                        <div className="w-full bg-white rounded-3xl p-6 border-4 border-slate-200 flex flex-col items-center shadow-sm">
+                            <h2 className="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2"><PenTool size={20} /> 2. Draw It!</h2>
+                            {currentPrompt ? (
+                                <div className="text-center mb-6 w-full bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200">
+                                    <div className="flex items-center justify-center gap-3">
+                                        <span className="text-2xl md:text-3xl font-black text-blue-600">{currentPrompt.text}</span>
+                                        <button onClick={() => speak(currentPrompt.text)} className="p-2 bg-blue-200 text-blue-700 hover:bg-blue-300 rounded-full transition-colors shrink-0"><Volume2 size={24} /></button>
+                                    </div>
+                                    <p className="text-slate-500 font-medium mt-2">({currentPrompt.th})</p>
+                                </div>
+                            ) : <p className="text-slate-400 mb-6 bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200 w-full text-center">👈 เลือกวลีทางซ้ายมือก่อนนะ!</p>}
+                            
+                            <div className="relative bg-white border-4 border-slate-200 rounded-2xl overflow-hidden shadow-inner touch-none w-full max-w-lg mx-auto">
+                                <canvas ref={canvasRef} width={400} height={300} className="cursor-crosshair w-full max-w-full block"
+                                    onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing}
+                                    onTouchStart={(e) => { e.preventDefault(); startDrawing(e); }} onTouchMove={(e) => { e.preventDefault(); draw(e); }} onTouchEnd={stopDrawing} />
+                            </div>
+                            
+                            <button onClick={clearCanvas} className="mt-6 flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold transition-colors">
+                                <Eraser size={20} /> Clear Board
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 2. Match Long Answers Tab ---
+        function LongAnswerMatchTab({ speak }) {
+            const qaPairs = [
+                {
+                    id: 1,
+                    q: "Can you tell me a little bit about yourself?",
+                    a: "My name is [Name]. Before, I lived in Thailand, but now I live in Bulgaria with my mom and dad.",
+                    th: "แนะนำตัว (อยู่บัลเกเรียกับพ่อแม่)"
+                },
+                {
+                    id: 2,
+                    q: "What's your favourite subject?",
+                    a: "I like Art because I like to draw things like trees, skies, and pets.",
+                    th: "วิชาที่ชอบ (ใช้ because และ like ในการยกตัวอย่าง)"
+                },
+                {
+                    id: 3,
+                    q: "Why do you want to come to our school in Bulgaria?",
+                    a: "I want to come here because I want to learn English and make new friends.",
+                    th: "เหตุผลที่อยากเรียนที่นี่ (ใช้ because และ and)"
+                },
+                {
+                    id: 4,
+                    q: "Tell us about your school in Thailand.",
+                    a: "In Thailand, my school was very hot. But I think this school will be cold and have snow!",
+                    th: "โรงเรียนที่ไทยเทียบกับที่นี่ (ใช้ But เทียบอากาศ)"
+                },
+                {
+                    id: 5,
+                    q: "How can you share your Thai culture here?",
+                    a: "I can cook Thai food for my friends to try, like Pad Thai or Tom Yum.",
+                    th: "แชร์วัฒนธรรมไทย (ใช้ like ยกตัวอย่างอาหาร)"
+                },
+                {
+                    id: 6,
+                    q: "Do you have any questions?",
+                    a: "Yes! Do you have a swimming pool, and what time do you have lunch?",
+                    th: "มีคำถามไหม (ถาม 2 เรื่องเชื่อมด้วย and)"
+                }
+            ];
+
+            const [selectedQ, setSelectedQ] = useState(null);
+            const [selectedA, setSelectedA] = useState(null);
+            const [matchedIds, setMatchedIds] = useState([]);
+
+            const handleSelectQ = (q) => {
+                speak(q.q);
+                setSelectedQ(q);
+            };
+
+            const handleSelectA = (a) => {
+                speak(a.a);
+                setSelectedA(a);
+            };
+
+            useEffect(() => {
+                if (selectedQ && selectedA) {
+                    if (selectedQ.id === selectedA.id) {
+                        setMatchedIds(prev => [...prev, selectedQ.id]);
+                        setTimeout(() => { setSelectedQ(null); setSelectedA(null); }, 500);
+                    } else {
+                        setTimeout(() => { setSelectedQ(null); setSelectedA(null); }, 1000);
+                    }
+                }
+            }, [selectedQ, selectedA]);
+
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl font-black text-indigo-700 mb-2 flex items-center justify-center gap-2"><Puzzle size={32}/> Match the Long Answers!</h2>
+                        <p className="text-indigo-600 font-medium">จับคู่คำถามสัมภาษณ์ฝั่งซ้าย กับ "คำตอบแบบยาว" ฝั่งขวา เพื่อดูตัวอย่างการใช้ And, But, Because, Like</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Questions Column */}
+                        <div className="flex flex-col gap-4">
+                            <h3 className="text-xl font-bold text-slate-500 text-center uppercase tracking-widest">Questions</h3>
+                            {qaPairs.map(item => {
+                                const isMatched = matchedIds.includes(item.id);
+                                const isSelected = selectedQ?.id === item.id;
+                                return (
+                                    <button key={`q-${item.id}`} disabled={isMatched} onClick={() => handleSelectQ(item)}
+                                        className={`p-5 text-left rounded-2xl border-2 transition-all duration-300 relative overflow-hidden
+                                            ${isMatched ? 'bg-green-50 border-green-200 text-green-700 opacity-50 scale-95' 
+                                            : isSelected ? 'bg-indigo-600 border-indigo-700 text-white shadow-lg scale-105 z-10' 
+                                            : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:shadow-md'}`}>
+                                        <div className="font-bold text-lg">{item.q}</div>
+                                        {isMatched && <div className="absolute top-2 right-2 text-green-500"><Check size={24}/></div>}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Answers Column (Shuffled visually using CSS order for simplicity, or just rendered normally if we assume teacher guides) */}
+                        <div className="flex flex-col gap-4">
+                            <h3 className="text-xl font-bold text-slate-500 text-center uppercase tracking-widest">Long Answers</h3>
+                            {/* We manually map them in a slightly different visual order by just rendering them based on a static scrambled array or just as is for a simple match */}
+                            {[qaPairs[2], qaPairs[5], qaPairs[0], qaPairs[4], qaPairs[1], qaPairs[3]].map(item => {
+                                const isMatched = matchedIds.includes(item.id);
+                                const isSelected = selectedA?.id === item.id;
+                                
+                                // Highlight target conjunctions in the text visually
+                                const highlightText = (text) => {
+                                    const wordsToHighlight = ['before,', 'but', 'because', 'and', 'like'];
+                                    let parts = text.split(new RegExp(`(${wordsToHighlight.join('|')})`, 'gi'));
+                                    return parts.map((part, i) => 
+                                        wordsToHighlight.includes(part.toLowerCase()) 
+                                        ? <span key={i} className="bg-yellow-200 text-yellow-900 px-1 rounded font-black">{part}</span> 
+                                        : part
+                                    );
+                                };
+
+                                return (
+                                    <button key={`a-${item.id}`} disabled={isMatched} onClick={() => handleSelectA(item)}
+                                        className={`p-5 text-left rounded-2xl border-2 transition-all duration-300 relative overflow-hidden
+                                            ${isMatched ? 'bg-green-50 border-green-200 text-green-700 opacity-50 scale-95' 
+                                            : isSelected ? 'bg-orange-500 border-orange-600 text-white shadow-lg scale-105 z-10' 
+                                            : 'bg-white border-slate-200 text-slate-700 hover:border-orange-300 hover:shadow-md'}`}>
+                                        <div className="font-bold text-[1.1rem] leading-snug mb-2">{highlightText(item.a)}</div>
+                                        <div className={`text-sm font-medium ${isSelected ? 'text-orange-200' : 'text-slate-400'}`}>💡 {item.th}</div>
+                                        {isMatched && <div className="absolute top-2 right-2 text-green-500"><Check size={24}/></div>}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                    
+                    {matchedIds.length === qaPairs.length && (
+                        <div className="mt-8 p-6 bg-green-100 border-4 border-green-400 rounded-3xl text-center animate-bounce shadow-xl">
+                            <h3 className="text-3xl font-black text-green-700 flex items-center justify-center gap-2">
+                                <Check size={40} /> Excellent Matching! 🎉
+                            </h3>
+                            <p className="text-green-600 font-bold mt-2">หนูเห็นไหมว่าประโยคยาวๆ แค่เติม Because, And, But หรือ Like เข้าไปเอง!</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // --- 3. Sentence Linkers Tab (Focus on specific connectors) ---
+        function SentenceLinkerTab({ speak }) {
+            const linkerData = [
+                {
+                    title: "Giving Reasons (เหตุผล)",
+                    word: "because",
+                    th: "เพราะว่า",
+                    base: "I want to study here",
+                    extended: "I want to study here because Bulgaria is beautiful."
+                },
+                {
+                    title: "Adding Ideas (เพิ่มเติม)",
+                    word: "and",
+                    th: "และ",
+                    base: "I like Science",
+                    extended: "I like Science, and I like Art."
+                },
+                {
+                    title: "Contrasting (ขัดแย้ง)",
+                    word: "but",
+                    th: "แต่",
+                    base: "I want to see snow",
+                    extended: "I want to see snow, but I don't like the cold."
+                },
+                {
+                    title: "Giving Examples (ยกตัวอย่าง)",
+                    word: "like",
+                    th: "เช่น",
+                    base: "I like many animals",
+                    extended: "I like many animals like dogs, cats, and birds."
+                },
+                {
+                    title: "Time Travel (อดีต ปัจจุบัน อนาคต)",
+                    word: "Before / Now / Later",
+                    th: "เมื่อก่อน / ตอนนี้ / หลังจากนี้",
+                    base: "I lived in Thailand.",
+                    extended: "Before, I lived in Thailand. Now, I live in Bulgaria. Later, I will study here."
+                }
+            ];
+
+            return (
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-black text-emerald-600 mb-2 flex items-center justify-center gap-2"><LinkIcon size={32}/> Sentence Linkers</h2>
+                        <p className="text-emerald-600 font-medium text-lg">คำวิเศษที่ช่วยต่อประโยคสั้นๆ ให้กลายเป็นประโยคยาวที่ดูโปรสุดๆ!</p>
+                    </div>
+
+                    <div className="space-y-6">
+                        {linkerData.map((item, idx) => (
+                            <div key={idx} className="bg-white rounded-3xl p-6 shadow-md border-4 border-emerald-100 flex flex-col md:flex-row gap-6 items-center">
+                                
+                                {/* Connector Badge */}
+                                <div className="md:w-1/4 flex flex-col items-center text-center">
+                                    <div className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-2">{item.title}</div>
+                                    <button onClick={() => speak(item.word)} className="bg-emerald-500 text-white text-2xl font-black px-6 py-3 rounded-2xl shadow-md hover:bg-emerald-400 hover:scale-105 transition-transform">
+                                        {item.word}
+                                    </button>
+                                    <div className="text-emerald-600 font-bold mt-2 text-sm">{item.th}</div>
+                                </div>
+
+                                {/* Sentence Transformation */}
+                                <div className="md:w-3/4 w-full flex flex-col gap-3 bg-slate-50 p-5 rounded-2xl border-2 border-slate-200">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-slate-400 font-bold shrink-0">Short:</span>
+                                        <div className="flex-1 bg-white p-3 rounded-xl border border-slate-200 text-slate-600 line-through decoration-slate-300 decoration-2">
+                                            {item.base}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-emerald-500 font-black shrink-0">LONG:</span>
+                                        <button onClick={() => speak(item.extended)} className="flex-1 text-left bg-emerald-100 p-3 rounded-xl border-2 border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-200 transition-colors flex justify-between items-center group">
+                                            <span>
+                                                {item.extended.split(new RegExp(`(${item.word.split(' / ')[0]}|${item.word.split(' / ')[1]}|${item.word.split(' / ')[2]}|${item.word})`, 'gi')).map((part, i) => 
+                                                    part.toLowerCase() === item.word.toLowerCase() || item.word.toLowerCase().includes(part.toLowerCase())
+                                                    ? <span key={i} className="bg-emerald-400 text-white px-2 py-0.5 rounded-lg mx-1">{part}</span> 
+                                                    : part
+                                                )}
+                                            </span>
+                                            <Volume2 size={20} className="text-emerald-500 opacity-50 group-hover:opacity-100 shrink-0 ml-2" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 4. Survival Phrases Tab (NEW) ---
+        function SurvivalTab({ speak }) {
+            const [scenarioActive, setScenarioActive] = useState(false);
+            const [teacherText, setTeacherText] = useState("");
+
+            const phrases = [
+                {
+                    en: "Sorry?",
+                    th: "ขอโทษนะคะ? (ใช้เพื่อให้เขาพูดซ้ำหรือพูดให้ช้าลง)",
+                    desc: "If you didn't hear them or they spoke too fast."
+                },
+                {
+                    en: "Could you rephrase the question?",
+                    th: "รบกวนช่วยถามอีกแบบนึงได้ไหมคะ?",
+                    desc: "If you heard the question, but don't understand the words they used."
+                }
+            ];
+
+            const triggerScenario = () => {
+                setScenarioActive(true);
+                const complexQuestion = "Considering your previous educational background in Southeast Asia, what specific pedagogical methodologies are you hoping to experience in our Eastern European curriculum?";
+                setTeacherText(complexQuestion);
+                speak(complexQuestion, 1.1); // Speak it fast to simulate confusion
+            };
+
+            const useRescue = (phrase) => {
+                speak(phrase);
+                setTimeout(() => {
+                    setTeacherText("Oh, sorry! I mean... What do you like about our school?");
+                    speak("Oh, sorry! I mean... What do you like about our school?", 0.85);
+                }, 2000);
+            };
+
+            return (
+                <div className="max-w-4xl mx-auto space-y-8">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-black text-rose-600 mb-2 flex items-center justify-center gap-2"><LifeBuoy size={32}/> Survival Guide</h2>
+                        <p className="text-rose-600 font-medium text-lg">ไม่ต้องกลัวถ้าฟังกรรมการไม่ออก! เรามีประโยคเอาตัวรอด</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {phrases.map((p, idx) => (
+                            <button key={idx} onClick={() => speak(p.en)} className="bg-white p-6 rounded-3xl shadow-md border-4 border-rose-100 hover:border-rose-400 hover:shadow-xl transition-all text-left flex flex-col justify-between group">
+                                <div>
+                                    <h3 className="text-2xl font-black text-slate-800 mb-3 flex items-center justify-between">
+                                        "{p.en}"
+                                        <Volume2 size={24} className="text-rose-400 group-hover:text-rose-600" />
+                                    </h3>
+                                    <p className="text-rose-600 font-bold mb-2">{p.th}</p>
+                                </div>
+                                <p className="text-sm text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 mt-4">{p.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Interactive Roleplay Scenario */}
+                    <div className="mt-12 bg-slate-800 rounded-3xl p-8 border-4 border-slate-900 shadow-2xl relative overflow-hidden">
+                        <div className="text-center mb-6 relative z-10">
+                            <h3 className="text-2xl font-black text-yellow-400 mb-2">🚨 Panic Room Simulator! 🚨</h3>
+                            <p className="text-slate-300">ลองกดปุ่มด้านล่างเพื่อจำลองสถานการณ์ที่ครูถามคำถามยากๆ รัวๆ</p>
+                        </div>
+
+                        {!scenarioActive ? (
+                            <div className="flex justify-center relative z-10">
+                                <button onClick={triggerScenario} className="bg-rose-500 hover:bg-rose-400 text-white font-black text-xl px-8 py-4 rounded-full shadow-[0_0_20px_rgba(244,63,94,0.6)] hover:scale-105 transition-all">
+                                    Start Simulation! (เริ่มจำลอง)
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-6 relative z-10">
+                                {/* Teacher Bubble */}
+                                <div className="flex items-start gap-4">
+                                    <div className="w-12 h-12 rounded-full bg-slate-600 flex items-center justify-center text-2xl shrink-0 border-2 border-slate-500">👨‍💼</div>
+                                    <div className="bg-slate-700 p-4 rounded-2xl rounded-tl-none border border-slate-600 text-white font-medium text-lg flex-1">
+                                        {teacherText}
+                                    </div>
+                                </div>
+                                
+                                <div className="text-center text-yellow-400 font-bold animate-pulse">
+                                    อ้าว ฟังไม่ทัน! รีบกดปุ่มเอาตัวรอดเร็ว! 👇
+                                </div>
+
+                                {/* Student Buttons */}
+                                <div className="flex flex-col md:flex-row gap-4 justify-center">
+                                    <button onClick={() => useRescue("Sorry?")} className="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-3 rounded-full flex items-center justify-center gap-2 border-2 border-blue-300">
+                                        <Volume2 size={20}/> Say "Sorry?"
+                                    </button>
+                                    <button onClick={() => useRescue("Could you rephrase the question?")} className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-6 py-3 rounded-full flex items-center justify-center gap-2 border-2 border-emerald-300">
+                                        <Volume2 size={20}/> Say "Could you rephrase..."
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
