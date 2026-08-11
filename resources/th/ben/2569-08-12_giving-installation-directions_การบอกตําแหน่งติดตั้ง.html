@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>การบอกตำแหน่งติดตั้ง</title>
+<style>
+  
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+  :root {
+    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body.modern-thai {
+    --font-main: "Noto Sans Thai", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+
+  :root {
+    --bg: #fffaf4;
+    --card: #ffffff;
+    --ink: #202124;
+    --muted: #6b7280;
+    --line: #eadfd2;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  header {
+    padding: 32px 20px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 48px;
+  }
+
+  h1,
+  h2 {
+    margin: 0;
+  }
+
+  .heading-block {
+    margin: 0 0 12px;
+  }
+
+  .heading-controls {
+    margin-top: 6px;
+  }
+
+  .page-title {
+    margin: 0 0 8px;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.25;
+  }
+
+  .section-title {
+    margin: 32px 0 8px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.35;
+  }
+
+  .subtitle {
+    color: var(--muted);
+  }
+
+  .video-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .lesson-film {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px;
+    margin: 16px 0 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  }
+
+  .lesson-film-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+  }
+
+  .lesson-film-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .lesson-film-note {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 8px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,.03);
+  }
+
+  .meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 8px;
+  }
+
+  .emoji {
+    font-size: 1.2rem;
+  }
+
+  .main-text {
+    font-size: 1.35rem;
+    line-height: 1.8;
+    margin-top: 6px;
+  }
+
+  .main-text.thai {
+    font-size: 1.45rem;
+  }
+
+  .main-text.english {
+    font-size: 1.25rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 4px;
+  }
+
+  .controls button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .support-text,
+  .ipa-support {
+    display: none;
+  }
+
+  .support-text.show,
+  .ipa-support.show {
+    display: block;
+  }
+
+  .en-support,
+  .thai-support {
+    color: #374151;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .ipa {
+    color: #7c3aed;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .examples {
+    margin-top: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .examples summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .examples-main {
+    margin-top: 8px;
+  }
+
+  .examples-main,
+  .examples .support-text,
+  .examples .ipa-support {
+    white-space: pre-line;
+  }
+  
+  .font-toggle {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+  footer {
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 32px;
+    font-size: .9rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="heading-block" id="title-การบอกตําแหน่งติดตั้ง" data-tts-lang="th-TH">
+    <h1 class="page-title">การบอกตำแหน่งติดตั้ง</h1>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('title-การบอกตําแหน่งติดตั้ง')">🔊</button>
+      
+      <button type="button" onclick="togglePart('title-การบอกตําแหน่งติดตั้ง', 'support')">EN</button>
+    </div>
+    
+    <div class="support-text en-support">giving-installation-directions</div>
+  </div>
+  
+  <div class="subtitle">
+    <button type="button" class="font-toggle" onclick="toggleThaiFont()">Aa เปลี่ยนฟอนต์</button>
+  </div>
+</header>
+
+<main>
+
+<section class="section">
+  <div class="heading-block" id="section-คําถามนําเข้าสู่บทเรียน" data-tts-lang="th-TH">
+    <h2 class="section-title">คำถามนำเข้าสู่บทเรียน</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําถามนําเข้าสู่บทเรียน')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําถามนําเข้าสู่บทเรียน', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําถามนําเข้าสู่บทเรียน', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kam-tăam nam kâo sòo bòt-riian</div>
+    <div class="support-text en-support">Lead-in Questions</div>
+  </div>
+  <article class="card text-block" id="row-lead-in-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👨‍👩‍👧‍👦</span>
+    </div>
+
+    <div class="main-text thai">ปกติคุณทำงานกับใครบ้างคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bpòk-gà-dtì kun tam-ngaan gàp krai bâang ká?</div>
+    <div class="support-text en-support">Who do you normally work with?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-lead-in-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🏠</span>
+    </div>
+
+    <div class="main-text thai">คุณทำงานที่บ้านหรือที่ทำงานของลูกค้าคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">kun tam-ngaan têe bâan rʉ̌ʉ têe tam-ngaan kŏng lûuk-káa ká?</div>
+    <div class="support-text en-support">Do you work at home or at the client&#39;s workplace?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-lead-in-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🛠️</span>
+    </div>
+
+    <div class="main-text thai">เวลาติดตั้งโรงหนังที่บ้าน คุณติดตั้งอะไรบ้างคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">wee-laa dtìt-dtâng roong-nǎng têe bâan, kun dtìt-dtâng à-rai bâang ká?</div>
+    <div class="support-text en-support">When you install a home cinema, what things do you install?</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คําศัพท์ใหม่-คําบุพบทบอกตําแหน่ง" data-tts-lang="th-TH">
+    <h2 class="section-title">คำศัพท์ใหม่: คำบุพบทบอกตำแหน่ง</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําศัพท์ใหม่-คําบุพบทบอกตําแหน่ง')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําศัพท์ใหม่-คําบุพบทบอกตําแหน่ง', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําศัพท์ใหม่-คําบุพบทบอกตําแหน่ง', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kam-sàp mài: kam-bùp-pá-bòt bòk dtam-nàeng</div>
+    <div class="support-text en-support">New Vocabulary: Prepositions of Place</div>
+  </div>
+  <article class="card text-block" id="row-target-vocab-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔛</span>
+    </div>
+
+    <div class="main-text thai">บน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-target-vocab-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-target-vocab-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-target-vocab-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bon</div>
+    <div class="support-text en-support">on</div>
+
+    
+  </article>
+<article class="card text-block" id="row-target-vocab-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔽</span>
+    </div>
+
+    <div class="main-text thai">ใต้</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-target-vocab-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-target-vocab-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-target-vocab-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtâi</div>
+    <div class="support-text en-support">under</div>
+
+    
+  </article>
+<article class="card text-block" id="row-target-vocab-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🧍</span>
+    </div>
+
+    <div class="main-text thai">ข้างหน้า</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-target-vocab-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-target-vocab-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-target-vocab-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">kâang nâa</div>
+    <div class="support-text en-support">in front of</div>
+
+    
+  </article>
+<article class="card text-block" id="row-target-vocab-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">⬅️</span>
+    </div>
+
+    <div class="main-text thai">ซ้าย</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-target-vocab-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-target-vocab-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-target-vocab-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">sáai</div>
+    <div class="support-text en-support">left</div>
+
+    
+  </article>
+<article class="card text-block" id="row-target-vocab-5" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">➡️</span>
+    </div>
+
+    <div class="main-text thai">ขวา</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-target-vocab-5')">🔊</button>
+      <button type="button" onclick="togglePart('row-target-vocab-5', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-target-vocab-5', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">kwǎa</div>
+    <div class="support-text en-support">right</div>
+
+    
+  </article>
+<article class="card text-block" id="row-target-vocab-6" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🗣️</span>
+    </div>
+
+    <div class="main-text thai">วันนี้เราจะใช้ประโยคคำสั่งนี้นะคะ: ติดตั้ง</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-target-vocab-6')">🔊</button>
+      <button type="button" onclick="togglePart('row-target-vocab-6', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-target-vocab-6', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">wan-níi rao jà chái bprà-yôhk kam-sàng níi ná ká: dtìt-dtâng ...</div>
+    <div class="support-text en-support">Today we will use this command sentence: Install the...</div>
+
+    
+    <details class="examples" id="row-target-vocab-6-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        ติดตั้งลำโพงบนเฟอร์นิเจอร์<br>ติดตั้งไฟบนจอ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-target-vocab-6-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-target-vocab-6-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-target-vocab-6-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">dtìt-dtâng lam-poong bon fer-ní-jêr<br>dtìt-dtâng fai bon jor</div>
+      <div class="support-text en-support">Install speakers on furniture.<br>Install lights on the screen.</div>
+    </details>
+  
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-แบบฝึกหัดที่-1-ดูรูปแล้วเลือกประโยค" data-tts-lang="th-TH">
+    <h2 class="section-title">แบบฝึกหัดที่ 1: ดูรูปแล้วเลือกประโยค</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-แบบฝึกหัดที่-1-ดูรูปแล้วเลือกประโยค')">🔊</button>
+      <button type="button" onclick="togglePart('section-แบบฝึกหัดที่-1-ดูรูปแล้วเลือกประโยค', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-แบบฝึกหัดที่-1-ดูรูปแล้วเลือกประโยค', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">bàep-fùek-hàt têe nùeng: duu rôop láaeo lʉ̂ʉak bprà-yôhk</div>
+    <div class="support-text en-support">Exercise 1: Look at the picture and choose the sentence</div>
+  </div>
+  <article class="card text-block" id="row-controlled-practice-1-matching-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🖥️</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้งจอข้างหน้า</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-1-matching-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng jor kâang nâa</div>
+    <div class="support-text en-support">Install the screen in front.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-1-matching-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔊</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้งลำโพงทางซ้าย</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-1-matching-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng lam poong taang sáai</div>
+    <div class="support-text en-support">Install the speaker on the left.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-1-matching-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔊</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้งลำโพงอีกตัวทางขวา</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-1-matching-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng lam poong ìik dtua taang kwǎa</div>
+    <div class="support-text en-support">Install the other speaker on the right.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-1-matching-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">💡</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้งไฟบนทีวี</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-1-matching-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng fai bon tee-wee</div>
+    <div class="support-text en-support">Install the light on the TV.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-1-matching-5" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔌</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้งเคเบิลใต้เฟอร์นิเจอร์</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-1-matching-5')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-5', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-1-matching-5', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng kay-bûhn dtâai fur-ní-jêr</div>
+    <div class="support-text en-support">Install the cables under the furniture.</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-แบบฝึกหัดที่-2-เรียงประโยค" data-tts-lang="th-TH">
+    <h2 class="section-title">แบบฝึกหัดที่ 2: เรียงประโยค</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-แบบฝึกหัดที่-2-เรียงประโยค')">🔊</button>
+      <button type="button" onclick="togglePart('section-แบบฝึกหัดที่-2-เรียงประโยค', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-แบบฝึกหัดที่-2-เรียงประโยค', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">bàep-fùek-hàt têe sŏng: riiang bprà-yôhk</div>
+    <div class="support-text en-support">Exercise 2: Unscramble the sentences</div>
+  </div>
+  <article class="card text-block" id="row-controlled-practice-2-jumbled-sentences-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔄</span>
+    </div>
+
+    <div class="main-text thai">เฟอร์นิเจอร์ / ติดตั้ง / บน / ลำโพง</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-2-jumbled-sentences-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">fer-ní-jêr / dtìt-dtâng / bon / lam-poong</div>
+    <div class="support-text en-support">Unscramble these words.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-2-jumbled-sentences-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔄</span>
+    </div>
+
+    <div class="main-text thai">จอ / ไฟ / ติดตั้ง / บน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-2-jumbled-sentences-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">jor / fai / dtìt-dtâng / bon</div>
+    <div class="support-text en-support">Unscramble these words.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-2-jumbled-sentences-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔄</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้ง / ข้างหน้า / จอ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-2-jumbled-sentences-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng / kâang nâa / jor</div>
+    <div class="support-text en-support">Unscramble these words.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-controlled-practice-2-jumbled-sentences-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔄</span>
+    </div>
+
+    <div class="main-text thai">ติดตั้ง / เฟอร์นิเจอร์ / เคเบิล / ใต้</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-controlled-practice-2-jumbled-sentences-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-controlled-practice-2-jumbled-sentences-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtìt dtâng / fur-ní-jêr / kay-bûhn / dtâai</div>
+    <div class="support-text en-support">Unscramble these words.</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-ฝึกพูด-สั่งงานครอบครัว" data-tts-lang="th-TH">
+    <h2 class="section-title">ฝึกพูด: สั่งงานครอบครัว</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-ฝึกพูด-สั่งงานครอบครัว')">🔊</button>
+      <button type="button" onclick="togglePart('section-ฝึกพูด-สั่งงานครอบครัว', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-ฝึกพูด-สั่งงานครอบครัว', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">fùek pôot: sàng ngaan krôp-kruua</div>
+    <div class="support-text en-support">Speaking Practice: Giving Instructions to Family</div>
+  </div>
+  <article class="card text-block" id="row-speaking-task-roleplay-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🎭</span>
+    </div>
+
+    <div class="main-text thai">เรามาแสดงบทบาทสมมติกันค่ะ คุณเป็นหัวหน้าครอบครัว และกำลังจะติดตั้งโรงหนังที่บ้านค่ะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-task-roleplay-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">rao maa sà-daeng bòt-bàat sŏm-mút gan kâ. kun bpen hǔua-nâa krôp-kruua láe gam-lang jà dtìt-dtâng roong-nǎng têe bâan kâ.</div>
+    <div class="support-text en-support">Let&#39;s role-play. You are the head of the family, and you&#39;re installing a home cinema.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-speaking-task-roleplay-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👩</span>
+    </div>
+
+    <div class="main-text thai">บอกภรรยาว่าจะให้วางจอที่ไหน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-task-roleplay-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bòk pan-rá-yaa wâa jà hâi waang jor têe nǎi</div>
+    <div class="support-text en-support">Tell your wife where to put the monitor.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-speaking-task-roleplay-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👦</span>
+    </div>
+
+    <div class="main-text thai">บอกลูกชายว่าจะให้วางลำโพงซ้ายที่ไหน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-task-roleplay-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bòk lûuk-chaai wâa jà hâi waang lam-poong sáai têe nǎi</div>
+    <div class="support-text en-support">Tell your son where to put the left speaker.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-speaking-task-roleplay-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👧</span>
+    </div>
+
+    <div class="main-text thai">บอกลูกสาวว่าจะให้วางลำโพงขวาที่ไหน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-task-roleplay-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bòk lûuk-sǎao wâa jà hâi waang lam-poong kwăa têe nǎi</div>
+    <div class="support-text en-support">Tell your daughter where to put the right speaker.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-speaking-task-roleplay-5" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">💡</span>
+    </div>
+
+    <div class="main-text thai">บอกครอบครัวว่าจะให้ติดไฟ ที่ไหน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-task-roleplay-5')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-5', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-task-roleplay-5', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bòk krôp-kruua wâa jà hâi dtìt fai têe nǎi</div>
+    <div class="support-text en-support">Tell your family where to install the light.</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-กิจกรรมเพิ่มเติม" data-tts-lang="th-TH">
+    <h2 class="section-title">กิจกรรมเพิ่มเติม</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-กิจกรรมเพิ่มเติม')">🔊</button>
+      <button type="button" onclick="togglePart('section-กิจกรรมเพิ่มเติม', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-กิจกรรมเพิ่มเติม', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">gìt-jà-gam pôem-dtəəm</div>
+    <div class="support-text en-support">Extension Activities</div>
+  </div>
+  <article class="card text-block" id="row-extension-activities-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🤔</span>
+    </div>
+
+    <div class="main-text thai">ลองเล่าเกี่ยวกับโปรเจคที่คุณเคยทำค่ะ คุณติดลำโพงไว้ที่ไหนคะ คุณติดจอไว้ที่ไหนคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-extension-activities-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-extension-activities-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-extension-activities-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">long lâo gìao-gàp bproh-jèk têe kun koei tam kâ. kun dtìt lam-poong wái têe nǎi ká? kun dtìt jɔɔ wái têe nǎi ká?</div>
+    <div class="support-text en-support">Option 1: Talk about a real project you did. Where did you put the speakers? Where did you put the monitor?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-extension-activities-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔄</span>
+    </div>
+
+    <div class="main-text thai">สลับบทบาทกันค่ะ เดี๋ยวเค้กจะเป็นคนสั่ง และให้คุณลองชี้ในรูปภาพว่าของอยู่ที่ไหน</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-extension-activities-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-extension-activities-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-extension-activities-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">sà-làp bòt-bàat gan kâ. dĭao kék jà bpen kon sàng láe hâi kun long chée nai rôop-pâap wâa kŏng yùu têe nǎi.</div>
+    <div class="support-text en-support">Option 2: Switch roles. Cake will give the commands, and you point to the correct place in the picture.</div>
+
+    
+  </article>
+</section>
+<footer>Generated from the edited Lesson_Builder sheet.</footer>
+</main>
+
+<script>
+function togglePart(rowId, type) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+
+  let el = null;
+
+  if (type === 'ipa') {
+    el = block.querySelector('.ipa-support');
+  } else {
+    el = block.querySelector('.support-text');
+  }
+
+  if (el) el.classList.toggle('show');
+}
+
+function speakMainText(rowId) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+
+  const main = block.querySelector('.main-text, .page-title, .section-title, .heading-text, .examples-main');
+  if (!main || !main.textContent.trim()) return;
+
+  speechSynthesis.cancel();
+
+  const u = new SpeechSynthesisUtterance(main.textContent.trim());
+  u.lang = block.dataset.ttsLang || 'th-TH';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+function toggleThaiFont() {
+  document.body.classList.toggle('modern-thai');
+  localStorage.setItem(
+    'talkacakeThaiFont',
+    document.body.classList.contains('modern-thai') ? 'modern' : 'default'
+  );
+}
+
+(function initThaiFont() {
+  const saved = localStorage.getItem('talkacakeThaiFont');
+  if (saved === 'modern') {
+    document.body.classList.add('modern-thai');
+  }
+})();
+
+</script>
+</body>
+</html>
