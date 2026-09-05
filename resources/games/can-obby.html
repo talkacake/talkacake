@@ -1,0 +1,1045 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Can Obby</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Mali:wght@400;500;600;700&family=Rubik:wght@400;500;700;800;900&display=swap">
+<style>
+/* ===== tokens: dark-first (this is a game HUD), light build below ===== */
+:root{
+  --bg:#11141B;
+  --bg-2:#171C25;
+  --panel:#1E242F;
+  --panel-2:#27303D;
+  --line:#33404F;
+  --line-hi:#465668;
+  --ink:#F1F5FA;
+  --muted:#94A3B8;
+  --azure:#3BA3FF;
+  --azure-deep:#1B6FBF;
+  --lime:#4ADE80;
+  --lime-deep:#17944D;
+  --lime-soft:#12351F;
+  --red:#FF5468;
+  --red-deep:#B32133;
+  --red-soft:#3A1720;
+  --gold:#FFC93C;
+  --violet:#A375FF;
+  --violet-soft:#241C3D;
+  --stud:rgba(255,255,255,.16);
+  --drop:rgba(0,0,0,.5);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#E9EEF5;
+    --bg-2:#F4F7FB;
+    --panel:#FFFFFF;
+    --panel-2:#EDF2F8;
+    --line:#CBD6E3;
+    --line-hi:#A9B8CB;
+    --ink:#161C26;
+    --muted:#5E6E85;
+    --azure:#1183EC;
+    --azure-deep:#0B5CA8;
+    --lime:#12A053;
+    --lime-deep:#0A6E39;
+    --lime-soft:#DCF7E7;
+    --red:#DC2B45;
+    --red-deep:#96162A;
+    --red-soft:#FDE4E8;
+    --gold:#C98A00;
+    --violet:#7A4CE0;
+    --violet-soft:#EDE5FF;
+    --stud:rgba(0,0,0,.10);
+    --grid:rgba(22,28,38,.045);
+    --drop:rgba(22,28,38,.18);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#E9EEF5;
+  --bg-2:#F4F7FB;
+  --panel:#FFFFFF;
+  --panel-2:#EDF2F8;
+  --line:#CBD6E3;
+  --line-hi:#A9B8CB;
+  --ink:#161C26;
+  --muted:#5E6E85;
+  --azure:#1183EC;
+  --azure-deep:#0B5CA8;
+  --lime:#12A053;
+  --lime-deep:#0A6E39;
+  --lime-soft:#DCF7E7;
+  --red:#DC2B45;
+  --red-deep:#96162A;
+  --red-soft:#FDE4E8;
+  --gold:#C98A00;
+  --violet:#7A4CE0;
+  --violet-soft:#EDE5FF;
+  --stud:rgba(0,0,0,.10);
+  --grid:rgba(22,28,38,.045);
+  --drop:rgba(22,28,38,.18);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px;line-height:1.5;overscroll-behavior-y:none;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:34px 34px;
+}
+.th{font-family:"Mali","Rubik",sans-serif;font-weight:500}
+h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
+.tag{font-family:"Bungee",system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+
+#app{max-width:620px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;position:relative}
+.screen{display:none;flex:1;flex-direction:column}
+.screen.on{display:flex}
+
+/* ===== plastic-brick buttons ===== */
+.btn{
+  font-family:"Rubik",sans-serif;font-weight:800;font-size:1.02rem;letter-spacing:.01em;
+  color:var(--ink);background:var(--panel-2);
+  border:2px solid var(--line-hi);border-bottom-width:6px;border-radius:12px;
+  padding:13px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform .07s ease,filter .15s ease;
+  box-shadow:inset 0 2px 0 var(--stud);
+}
+.btn:active{transform:translateY(3px);border-bottom-width:3px}
+.btn:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn-go{background:var(--azure);border-color:var(--azure-deep);color:#04121F}
+.btn-ok{background:var(--lime);border-color:var(--lime-deep);color:#04180C}
+.btn-bad{background:var(--red);border-color:var(--red-deep);color:#210408}
+.btn-ghost{background:transparent;border-color:var(--line);border-bottom-width:2px;color:var(--muted);font-size:.88rem;padding:8px 13px;border-radius:10px;box-shadow:none}
+.icon-btn{border:none;background:transparent;color:var(--muted);font-size:1.3rem;line-height:1;padding:6px 8px;border-radius:9px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.icon-btn:hover{background:var(--panel-2)}
+.icon-btn:focus-visible{outline:3px solid var(--violet);outline-offset:1px}
+
+/* ===== blocky avatar ===== */
+.noob{position:relative;width:44px;height:56px;flex:none}
+.noob .head{
+  position:absolute;left:7px;top:0;width:30px;height:24px;background:var(--gold);
+  border-radius:5px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.16)
+}
+.noob .eye{position:absolute;top:8px;width:5px;height:6px;background:#20160A;border-radius:1px}
+.noob .eye.l{left:7px}.noob .eye.r{left:18px}
+.noob .mouth{position:absolute;top:16px;left:11px;width:9px;height:3px;background:#20160A;border-radius:0 0 3px 3px}
+.noob .torso{position:absolute;left:11px;top:26px;width:22px;height:20px;background:var(--lime);border-radius:4px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)}
+.noob .arm{position:absolute;top:26px;width:8px;height:18px;background:var(--gold);border-radius:3px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.16)}
+.noob .arm.l{left:1px}.noob .arm.r{right:1px}
+.noob .leg{position:absolute;top:46px;width:9px;height:10px;background:var(--azure);border-radius:0 0 3px 3px}
+.noob .leg.l{left:12px}.noob .leg.r{left:23px}
+.noob.hop{animation:hop .5s ease}
+@keyframes hop{0%{transform:translateY(0)}40%{transform:translateY(-16px) rotate(-6deg)}100%{transform:translateY(0)}}
+
+/* ===== lobby ===== */
+.lobby{padding:20px 18px 36px;display:flex;flex-direction:column;gap:18px}
+.crumb{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:.74rem}
+.crumb .pip{width:9px;height:9px;background:var(--lime);border-radius:2px}
+.hero{
+  position:relative;overflow:hidden;background:var(--panel);
+  border:2px solid var(--line);border-bottom-width:7px;border-radius:18px;padding:20px;
+  box-shadow:0 14px 30px -18px var(--drop);
+}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 92% 6%, color-mix(in srgb, var(--azure) 26%, transparent), transparent 55%),
+             radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--violet) 22%, transparent), transparent 52%);
+}
+.hero > *{position:relative}
+.hero h1{font-family:"Bungee",sans-serif;font-size:clamp(2rem,9vw,3.1rem);letter-spacing:.02em}
+.hero h1 span{color:var(--lime);display:block}
+.hero p{margin:10px 0 0;color:var(--muted);max-width:36ch}
+.herorow{display:flex;gap:16px;align-items:flex-end;margin-top:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chips b{
+  background:var(--panel-2);border:1.5px solid var(--line);border-radius:8px;
+  padding:5px 10px;font-size:.8rem;font-weight:700;color:var(--ink)
+}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+
+.statbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{
+  background:var(--panel);border:2px solid var(--line);border-bottom-width:5px;border-radius:12px;
+  padding:10px;text-align:center;box-shadow:inset 0 2px 0 var(--stud)
+}
+.stat b{display:block;font-family:"Bungee",sans-serif;font-size:1.25rem;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat span{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stat.coins b{color:var(--gold)}
+
+/* stage list = obby platforms */
+.stages{display:flex;flex-direction:column;gap:2px}
+.stages h2{font-family:"Bungee",sans-serif;font-size:1.05rem;letter-spacing:.04em;margin-bottom:8px}
+.stage-row{display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:center}
+.tower{display:flex;flex-direction:column;align-items:center;align-self:stretch}
+.tower .rope{flex:1;width:4px;background:repeating-linear-gradient(var(--line-hi) 0 7px, transparent 7px 14px);min-height:8px}
+.plat{
+  position:relative;width:56px;height:44px;border-radius:9px;flex:none;
+  background:var(--panel-2);border:2px solid var(--line-hi);border-bottom-width:7px;
+  display:grid;place-items:center;font-size:1.35rem;box-shadow:inset 0 2px 0 var(--stud)
+}
+.plat::before,.plat::after{
+  content:"";position:absolute;top:-6px;width:12px;height:7px;border-radius:3px 3px 0 0;
+  background:var(--line-hi)
+}
+.plat::before{left:9px}.plat::after{right:9px}
+.stage-row.clear .plat{background:var(--lime-soft);border-color:var(--lime)}
+.stage-row.clear .plat::before,.stage-row.clear .plat::after{background:var(--lime)}
+.stage-row.locked .plat{opacity:.45;filter:grayscale(.7)}
+.card{
+  width:100%;text-align:left;font:inherit;color:inherit;background:var(--panel);
+  border:2px solid var(--line);border-bottom-width:5px;border-radius:13px;padding:12px 14px;margin:7px 0;
+  cursor:pointer;transition:transform .07s ease,border-color .15s ease;-webkit-tap-highlight-color:transparent;
+  box-shadow:inset 0 2px 0 var(--stud)
+}
+.card:hover{border-color:var(--azure)}
+.card:active{transform:translateY(2px)}
+.card:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.stage-row.locked .card{opacity:.5;cursor:not-allowed}
+.stage-row.locked .card:hover{border-color:var(--line)}
+.card .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.card .nm{font-family:"Bungee",sans-serif;font-size:.98rem;letter-spacing:.03em}
+.card .sk{color:var(--muted);font-size:.85rem;margin-top:3px}
+.card .th{color:var(--muted);font-size:.8rem}
+.badges{flex:none;font-size:.85rem;letter-spacing:1px;color:var(--gold)}
+.badges .off{opacity:.22;color:var(--ink)}
+
+/* ===== play HUD ===== */
+.hud{
+  position:sticky;top:0;z-index:5;background:color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter:blur(6px);border-bottom:2px solid var(--line);
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+}
+.track{flex:1;display:flex;gap:3px;align-items:center;height:16px}
+.track i{flex:1;height:9px;border-radius:2px;background:var(--panel-2);border:1px solid var(--line)}
+.track i.on{background:var(--lime);border-color:var(--lime-deep);box-shadow:0 0 10px -2px var(--lime)}
+.track i.now{background:var(--azure);border-color:var(--azure-deep)}
+.lives{flex:none;font-size:.95rem;letter-spacing:1px;color:var(--red)}
+.lives .gone{opacity:.25;filter:grayscale(1)}
+.coins{flex:none;font-weight:800;font-size:.9rem;color:var(--gold);font-variant-numeric:tabular-nums}
+.combo{
+  position:fixed;right:14px;top:56px;z-index:6;font-family:"Bungee",sans-serif;font-size:.95rem;
+  color:var(--gold);text-shadow:0 2px 0 var(--drop);opacity:0;transition:opacity .2s
+}
+.combo.on{opacity:1}
+
+.stage{padding:16px 16px 168px;display:flex;flex-direction:column;gap:14px;flex:1}
+.qhead{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.qtitle{font-family:"Bungee",sans-serif;font-size:1.02rem;letter-spacing:.04em;color:var(--muted);padding-top:4px}
+.hint{display:none;background:var(--violet-soft);border:2px dashed var(--violet);border-radius:11px;padding:9px 12px;font-size:.95rem}
+.hint.show{display:block}
+
+/* role-play */
+.scene{display:flex;flex-direction:column;gap:10px}
+.npc{display:flex;gap:10px;align-items:flex-end}
+.bubble{
+  background:var(--panel);border:2px solid var(--line);border-bottom-width:5px;border-radius:14px 14px 14px 4px;
+  padding:11px 14px;max-width:80%;box-shadow:inset 0 2px 0 var(--stud)
+}
+.bubble .who{font-family:"Bungee",sans-serif;font-size:.66rem;letter-spacing:.1em;color:var(--azure);margin-bottom:4px}
+.bubble .line{font-size:1.08rem;font-weight:700}
+.bubble .th{color:var(--muted);font-size:.9rem;margin-top:4px;display:none}
+.bubble .th.show{display:block}
+.you{color:var(--muted);font-size:.7rem;letter-spacing:.14em;font-weight:800;text-transform:uppercase;text-align:right}
+
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{
+  display:flex;gap:11px;align-items:center;text-align:left;font:inherit;color:inherit;background:var(--panel);
+  border:2px solid var(--line);border-bottom-width:5px;border-radius:12px;padding:12px 14px;cursor:pointer;
+  transition:transform .07s ease,border-color .12s ease,background .12s ease;-webkit-tap-highlight-color:transparent;
+  box-shadow:inset 0 2px 0 var(--stud)
+}
+.opt:active{transform:translateY(2px)}
+.opt:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.opt .key{
+  width:25px;height:25px;flex:none;border-radius:6px;background:var(--panel-2);border:1.5px solid var(--line);
+  display:grid;place-items:center;font-size:.78rem;font-weight:800;color:var(--muted)
+}
+.opt .txt{font-weight:600;font-size:1.02rem}
+.opt.sel{border-color:var(--azure);background:color-mix(in srgb, var(--azure) 14%, var(--panel))}
+.opt.right{border-color:var(--lime);background:var(--lime-soft)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+/* build */
+.slotline{
+  min-height:92px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding:10px;
+  background:var(--bg-2);border:2px dashed var(--line);border-radius:12px
+}
+.bank{display:flex;flex-wrap:wrap;gap:8px;min-height:48px}
+.tile{
+  font:inherit;font-weight:700;color:var(--ink);background:var(--panel-2);
+  border:2px solid var(--line-hi);border-bottom-width:5px;border-radius:9px;padding:8px 12px;cursor:pointer;
+  box-shadow:inset 0 2px 0 var(--stud);transition:transform .07s ease;-webkit-tap-highlight-color:transparent
+}
+.tile:active{transform:translateY(2px)}
+.tile:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.tile.ghost{opacity:.2;pointer-events:none;border-style:dashed}
+
+/* gap fill + mistake hunt */
+.sentence{
+  font-family:"Rubik",sans-serif;font-weight:800;font-size:1.42rem;line-height:1.85;
+  display:flex;flex-wrap:wrap;gap:5px 7px;align-items:center;justify-content:center;text-align:center
+}
+.blank{display:inline-block;min-width:96px;border-bottom:5px solid var(--azure);text-align:center;color:var(--azure)}
+.word{font:inherit;background:transparent;border:2px solid transparent;border-radius:8px;padding:0 6px;cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
+.word:hover{border-color:var(--line-hi)}
+.word.sel{border-color:var(--azure);background:color-mix(in srgb, var(--azure) 16%, transparent)}
+.word.wrong{border-color:var(--red);background:var(--red-soft);text-decoration:line-through}
+.word:focus-visible{outline:3px solid var(--violet);outline-offset:1px}
+.pic{font-size:3.4rem;text-align:center;line-height:1}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two .opt{justify-content:center}
+.two .opt .txt{font-family:"Bungee",sans-serif;font-size:1.15rem;letter-spacing:.03em}
+
+/* listen */
+.playbtn{
+  display:flex;align-items:center;gap:12px;justify-content:center;width:100%;font:inherit;
+  font-family:"Bungee",sans-serif;font-size:1rem;letter-spacing:.05em;color:var(--ink);cursor:pointer;
+  background:var(--violet-soft);border:2px solid var(--violet);border-bottom-width:6px;border-radius:14px;padding:20px;
+  box-shadow:inset 0 2px 0 var(--stud)
+}
+.playbtn .spk{font-size:1.8rem}
+.playbtn:active{transform:translateY(3px);border-bottom-width:3px}
+.slow{display:block;margin:8px auto 0}
+
+/* match */
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mcol{display:flex;flex-direction:column;gap:9px}
+.mitem{
+  font:inherit;font-weight:700;font-size:.95rem;text-align:left;color:inherit;background:var(--panel);
+  border:2px solid var(--line);border-bottom-width:5px;border-radius:11px;padding:11px;cursor:pointer;
+  box-shadow:inset 0 2px 0 var(--stud);-webkit-tap-highlight-color:transparent
+}
+.mitem.sel{border-color:var(--azure);background:color-mix(in srgb, var(--azure) 14%, var(--panel))}
+.mitem.gone{opacity:.35;border-style:dashed;pointer-events:none;background:var(--lime-soft);border-color:var(--lime)}
+.mitem.shake{animation:shake .35s}
+.mitem:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* footer */
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--bg-2);border-top:3px solid var(--line);padding:13px 16px calc(15px + env(safe-area-inset-bottom))}
+.foot-in{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.foot .btn{width:100%;font-size:1.1rem;padding:15px}
+.fb{display:none;gap:11px;align-items:flex-start}
+.fb.show{display:flex}
+.fb .mark{font-size:1.6rem;line-height:1;flex:none}
+.fb .msg{font-family:"Bungee",sans-serif;font-size:1rem;letter-spacing:.04em}
+.fb .sub{font-size:.93rem;font-weight:500;margin-top:3px;color:var(--ink)}
+.fb.good .msg{color:var(--lime)}
+.fb.bad .msg{color:var(--red)}
+.foot.good{background:var(--lime-soft);border-top-color:var(--lime)}
+.foot.bad{background:var(--red-soft);border-top-color:var(--red)}
+
+/* results */
+.result{padding:28px 20px 40px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center}
+.result .big{font-size:4rem;line-height:1}
+.result h2{font-family:"Bungee",sans-serif;font-size:1.8rem;letter-spacing:.03em}
+.result p{margin:0;color:var(--muted)}
+.result .statbar{width:100%}
+.badgebox{
+  width:100%;background:var(--panel);border:2px solid var(--line);border-bottom-width:5px;border-radius:14px;
+  padding:14px 16px;text-align:left;box-shadow:inset 0 2px 0 var(--stud)
+}
+.badgebox h3{font-family:"Bungee",sans-serif;font-size:.82rem;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+.badgebox ul{margin:0;padding-left:18px}
+.badgebox li{margin:5px 0;font-size:.95rem}
+.badgebox code{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:inherit;font-weight:800;color:var(--lime)}
+.result .btn{width:100%;max-width:330px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:9;display:none}
+.tinynote{color:var(--muted);font-size:.78rem;text-align:center;padding:0 18px 24px}
+.tinynote button{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
+
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
+@media (max-width:380px){body{font-size:16px}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ================= LOBBY ================= -->
+<section class="screen on" id="s-home">
+  <div class="lobby">
+    <div class="crumb"><span class="pip"></span> <span class="tag">TalkaCake</span> · can &amp; can't obby</div>
+
+    <div class="hero">
+      <div class="herorow">
+        <div>
+          <h1>CAN<span>OBBY</span></h1>
+        </div>
+        <div class="noob" aria-hidden="true">
+          <div class="head"><span class="eye l"></span><span class="eye r"></span><span class="mouth"></span></div>
+          <div class="arm l"></div><div class="arm r"></div><div class="torso"></div>
+          <div class="leg l"></div><div class="leg r"></div>
+        </div>
+      </div>
+      <p>Five stages. Every answer is a jump. Say what you <b>can</b> and <b>can't</b> do — get it right and you land on the next block. Get it wrong and you fall.</p>
+      <div class="chips"><b>🗣️ Role-play</b><b>🧱 Build sentences</b><b>👂 Listen</b><b>🐞 Find the glitch</b></div>
+      <div class="cta">
+        <button class="btn btn-go" id="btn-start">▶ Play</button>
+        <button class="btn btn-ghost" id="btn-sound" aria-pressed="true">🔊 Sound on</button>
+      </div>
+    </div>
+
+    <div class="statbar">
+      <div class="stat coins"><b id="h-coins">0</b><span>Coins</span></div>
+      <div class="stat"><b id="h-badges">0/5</b><span>Badges</span></div>
+      <div class="stat"><b id="h-best">—</b><span>Best combo</span></div>
+    </div>
+
+    <div class="stages">
+      <h2>The course <span class="th" style="font-family:Mali;font-weight:400;color:var(--muted);font-size:.9rem;letter-spacing:0">— ด่านทั้งหมด</span></h2>
+      <div id="map"></div>
+    </div>
+  </div>
+  <div class="tinynote">Progress saves on this device. <button id="btn-reset">Reset progress</button></div>
+</section>
+
+<!-- ================= PLAY ================= -->
+<section class="screen" id="s-play">
+  <div class="hud">
+    <button class="icon-btn" id="btn-quit" aria-label="Leave the stage">✕</button>
+    <div class="track" id="track" aria-label="Blocks cleared"></div>
+    <div class="coins" id="hud-coins">0</div>
+    <div class="lives" id="lives" aria-label="Lives left"></div>
+  </div>
+  <div class="combo" id="combo"></div>
+  <div class="stage" id="stagebox"></div>
+  <div class="foot" id="foot">
+    <div class="foot-in">
+      <div class="fb" id="fb">
+        <div class="mark" id="fb-mark">✓</div>
+        <div><div class="msg" id="fb-msg"></div><div class="sub" id="fb-sub"></div></div>
+      </div>
+      <button class="btn btn-go" id="btn-check" disabled>Check</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section class="screen" id="s-done">
+  <div class="result">
+    <div class="big" id="r-emoji">🏁</div>
+    <h2 id="r-title">Stage clear</h2>
+    <p id="r-sub"></p>
+    <div class="statbar">
+      <div class="stat coins"><b id="r-coins">0</b><span>Coins</span></div>
+      <div class="stat"><b id="r-acc">0%</b><span>Landed</span></div>
+      <div class="stat"><b id="r-badge">☆☆☆</b><span>Badge</span></div>
+    </div>
+    <div class="badgebox" id="r-notes"></div>
+    <button class="btn btn-go" id="btn-next">Next stage →</button>
+    <button class="btn" id="btn-again">Retry this stage</button>
+    <button class="btn btn-ghost" id="btn-home">Back to lobby</button>
+  </div>
+</section>
+
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* =====================================================================
+   CAN OBBY — a can / can't practice game for TalkaCake
+   Every exercise is one object. Types: reply, build, pick, listen, fix, match
+   ===================================================================== */
+
+const STAGES = [
+{
+  id:"s1", icon:"🟢", name:"SPAWN POINT", th:"จุดเกิด",
+  skill:"can + verb · Yes, I can. / No, I can't.",
+  items:[
+    {t:"reply", who:"NOOB", face:"noob",
+     say:"Hey! Welcome to my obby. Can you jump?", sayTh:"ยินดีต้อนรับ! คุณกระโดดได้ไหม",
+     opts:[
+       {x:"Yes, I can.", ok:true, note:"Short answer = Yes, I + can. Nothing else needed."},
+       {x:"Yes, I can jump to.", note:"No 'to' with can. Just: Yes, I can jump."},
+       {x:"Yes, I do can.", note:"Never put 'do' with can."}
+     ]},
+    {t:"reply", who:"NOOB", face:"noob",
+     say:"Cool. Can you fly to the top of the tower?", sayTh:"บินขึ้นไปบนยอดหอคอยได้ไหม",
+     opts:[
+       {x:"No, I can't. I can only jump.", ok:true, note:"can't = cannot. Use it for things you are not able to do."},
+       {x:"No, I don't can. I can only jump.", note:"No 'don't' with can — use can't."},
+       {x:"No, I can't to fly.", note:"No 'to' after can't."}
+     ]},
+    {t:"pick", pic:"🧱", text:"A builder ___ make a house.", th:"ช่างสร้างบ้านได้",
+     a:"can", why:"He is able to do it → can."},
+    {t:"pick", pic:"🚗", text:"A car ___ swim.", th:"รถว่ายน้ำไม่ได้",
+     a:"can't", why:"Not able to → can't (cannot)."},
+    {t:"build", ask:"Build this sentence", th:"ฉันสร้างบ้านได้",
+     answer:["I","can","build","a","house"], extra:["builds","to","am"],
+     why:"can + base verb: can build (never can builds / can to build)."},
+    {t:"fix", ask:"One block is broken. Tap it.",
+     words:["Noob","can","builds","towers"], bad:2, fixed:"build",
+     why:"After can we never add -s: he can build, she can build, it can build."}
+  ]
+},
+{
+  id:"s2", icon:"💎", name:"TRADE PLAZA", th:"ลานแลกของ",
+  skill:"Can I…? · asking and giving permission",
+  items:[
+    {t:"reply", who:"TRADER", face:"🧑‍🌾",
+     say:"I have three extra swords in my backpack!", sayTh:"ฉันมีดาบเกินอยู่สามเล่ม",
+     opts:[
+       {x:"Can I have one, please?", ok:true, note:"“Can I…?” is the polite way to ask for something."},
+       {x:"Can I to have one, please?", note:"Base verb after can: Can I have…?"},
+       {x:"I can have one, please?", note:"Questions start with Can: Can I have…?"}
+     ]},
+    {t:"build", ask:"Ask to join", th:"ขอเข้าทีมได้ไหม",
+     answer:["Can","I","join","your","team"], extra:["joining","to"],
+     why:"Requests: Can + I + base verb…?"},
+    {t:"pick", pic:"🪜", text:"___ I use your ladder?", th:"ขอใช้บันไดได้ไหม",
+     a:"Can", opts:["Can","Can't"], why:"Ask for permission with Can I…?"},
+    {t:"reply", who:"PLAYER2", face:"🧑‍🚀",
+     say:"Can I ride on your boat?", sayTh:"ขอนั่งเรือของคุณได้ไหม",
+     opts:[
+       {x:"Yes, you can. Jump in!", ok:true, note:"They asked about themself, so answer with you: Yes, you can."},
+       {x:"Yes, I can. Jump in!", note:"They asked about themself — answer “Yes, you can.”"},
+       {x:"Yes, you can to. Jump in!", note:"No 'to' after can."}
+     ]},
+    {t:"fix", ask:"One block is broken. Tap it.",
+     words:["Can","you","to","open","the","gate","?"], bad:2, fixed:"(nothing)",
+     why:"Delete 'to'. Can + you + open: Can you open the gate?"},
+    {t:"build", ask:"Ask the shop", th:"ขอซื้อหมวกใบนี้ได้ไหม",
+     answer:["Can","I","buy","this","hat"], extra:["buying","to"],
+     why:"Same shape every time: Can I + base verb…?"}
+  ]
+},
+{
+  id:"s3", icon:"🎧", name:"SOUND TUNNEL", th:"อุโมงค์เสียง",
+  skill:"hearing the difference: can / can't",
+  items:[
+    {t:"listen", say:"I can beat this level.", th:"ฉันผ่านด่านนี้ได้",
+     opts:["I can beat this level.","I can't beat this level."], a:0,
+     why:"can is short and quiet: /kən/."},
+    {t:"listen", say:"She can't reach the checkpoint.", th:"เธอไปถึงเช็คพอยต์ไม่ได้",
+     opts:["She can reach the checkpoint.","She can't reach the checkpoint."], a:1,
+     why:"can't is longer and louder, and stops hard at the end: can‑t."},
+    {t:"listen", say:"Can you hear me?", th:"ได้ยินฉันไหม",
+     opts:["Can you hear me?","You can hear me."], a:0,
+     why:"A question puts Can first, and the voice goes up ↗."},
+    {t:"listen", say:"They can't join the game today.", th:"พวกเขาเข้าเกมวันนี้ไม่ได้",
+     opts:["They can join the game today.","They can't join the game today."], a:1,
+     why:"Listen for the stop before the next word: can't join."},
+    {t:"reply", who:"GUIDE BOT", face:"🤖",
+     say:"WARNING — the music in this tunnel is too loud!", sayTh:"เพลงในอุโมงค์เสียงดังเกินไป",
+     opts:[
+       {x:"I can't hear you!", ok:true, note:"can't = not able to, right now."},
+       {x:"I can't to hear you!", note:"No 'to' after can't."},
+       {x:"I don't can hear you!", note:"can't already contains the 'not'."}
+     ]},
+    {t:"pick", pic:"🔊", text:"It's too loud. I ___ hear you.", th:"เสียงดังไป ฉันไม่ได้ยินคุณ",
+     a:"can't", why:"Not able to hear → can't hear."}
+  ]
+},
+{
+  id:"s4", icon:"🐞", name:"GLITCH BRIDGE", th:"สะพานบั๊ก",
+  skill:"he / she / they · always the base verb",
+  items:[
+    {t:"fix", ask:"Find the glitch. Tap it.",
+     words:["She","cans","fly","in","this","game"], bad:1, fixed:"can",
+     why:"can never changes: I can, you can, he can, she can, we can, they can."},
+    {t:"fix", ask:"Find the glitch. Tap it.",
+     words:["They","can","not","to","swim"], bad:3, fixed:"(nothing)",
+     why:"cannot / can't + base verb: They cannot swim."},
+    {t:"fix", ask:"Find the glitch. Tap it.",
+     words:["Can","he","speaks","English","?"], bad:2, fixed:"speak",
+     why:"In questions too, use the base verb: Can he speak English?"},
+    {t:"build", ask:"Build this sentence", th:"เพื่อนฉันเล่นวันนี้ไม่ได้",
+     answer:["My","friend","can't","play","today"], extra:["cant","not","plays"],
+     why:"can't always keeps its apostrophe: can't."},
+    {t:"pick", pic:"🐧", text:"A penguin ___ fly.", th:"เพนกวินบินไม่ได้",
+     a:"can't", why:"Penguins swim fast, but they can't fly. (True fact!)"},
+    {t:"match", ask:"Match the question to the answer.",
+     pairs:[
+       ["Can you build?","Yes, I can."],
+       ["Can she swim?","No, she can't."],
+       ["Can birds fly?","Yes, they can."],
+       ["Can I join you?","Sure, you can!"]
+     ],
+     why:"Match the person: I → I can, she → she can't, they → they can."}
+  ]
+},
+{
+  id:"s5", icon:"👑", name:"BOSS TOWER", th:"หอคอยบอส",
+  skill:"boss stage · full role-play tryout",
+  items:[
+    {t:"reply", who:"TEAM CAPTAIN", face:"🦸",
+     say:"Tryouts are open. Tell me — what can you do?", sayTh:"บอกหน่อย คุณทำอะไรได้บ้าง",
+     opts:[
+       {x:"I can build and I can fight.", ok:true, note:"One can for each verb. Clear and strong."},
+       {x:"I can build and I can to fight.", note:"No 'to' after can."},
+       {x:"I can building and fighting.", note:"Base verb: can build, can fight."}
+     ]},
+    {t:"reply", who:"TEAM CAPTAIN", face:"🦸",
+     say:"Can you speak English in voice chat?", sayTh:"คุยภาษาอังกฤษในวอยซ์แชตได้ไหม",
+     opts:[
+       {x:"Yes, I can. A little!", ok:true, note:"“A little” is an honest, natural answer."},
+       {x:"Yes, I am can.", note:"Never use be (am/is/are) with can."},
+       {x:"Yes, I can speaking.", note:"can + base verb: can speak."}
+     ]},
+    {t:"build", ask:"Tell the captain", th:"ฉันวิ่งเร็วได้ แต่ว่ายน้ำไม่ได้",
+     answer:["I","can","run","fast","but","I","can't","swim"], extra:["runs","to"],
+     why:"Use but to join something you can do and something you can't."},
+    {t:"listen", say:"Can he beat the boss?", th:"เขาชนะบอสได้ไหม",
+     opts:["Can he beat the boss?","He can beat the boss."], a:0,
+     why:"Question word order: Can + he + beat…?"},
+    {t:"reply", who:"TEAM CAPTAIN", face:"🦸",
+     say:"Last question. Can you play every weekend?", sayTh:"เล่นได้ทุกสุดสัปดาห์ไหม",
+     opts:[
+       {x:"I can play on Saturday, but I can't play on Sunday.", ok:true, note:"Both forms, used perfectly. You're on the team."},
+       {x:"I can play on Saturday, but I no can play on Sunday.", note:"'no can' isn't English — use can't."},
+       {x:"I can playing on Saturday, but not Sunday.", note:"can + base verb: can play."}
+     ]},
+    {t:"pick", pic:"👑", text:"You made it! Now you ___ say what you can do.", th:"ตอนนี้คุณบอกได้แล้วว่าทำอะไรได้",
+     a:"can", why:"You can. 🏆"}
+  ]
+}
+];
+
+const RULES = [
+  "<code>can</code> + base verb → I can <b>jump</b>. She can <b>jump</b>. (never <i>cans</i>, never <i>can to</i>)",
+  "<code>can't</code> = cannot → He <b>can't</b> fly.",
+  "Questions: <code>Can</code> + person + verb → <b>Can</b> you help me?",
+  "Short answers: Yes, I <b>can</b>. / No, I <b>can't</b>.",
+  "Asking: <b>Can I</b> join your team?"
+];
+
+/* ---------- save ---------- */
+const KEY="talkacake.canobby.v1";
+let save=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}})();
+const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
+
+/* ---------- sound ---------- */
+let soundOn=true, actx=null;
+function beep(kind){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const seq = kind==="good" ? [[523,0],[784,.08]]
+              : kind==="bad"  ? [[240,0],[150,.11]]
+              : [[523,0],[659,.09],[784,.18],[1047,.27]];
+    seq.forEach(([f,at])=>{
+      const o=actx.createOscillator(), g=actx.createGain();
+      o.type = kind==="bad" ? "square" : "triangle";
+      o.frequency.value=f;
+      g.gain.setValueAtTime(.0001, actx.currentTime+at);
+      g.gain.exponentialRampToValueAtTime(kind==="bad"?.09:.11, actx.currentTime+at+.02);
+      g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime+at+.25);
+      o.connect(g); g.connect(actx.destination);
+      o.start(actx.currentTime+at); o.stop(actx.currentTime+at+.3);
+    });
+  }catch(e){}
+}
+function say(text, rate){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US"; u.rate=rate||.95;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- tiny helpers ---------- */
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{const n=document.createElement(t); if(c)n.className=c; if(h!=null)n.innerHTML=h; return n;};
+const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(p=>p[1]);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const NOOB='<div class="noob"><div class="head"><span class="eye l"></span><span class="eye r"></span><span class="mouth"></span></div><div class="arm l"></div><div class="arm r"></div><div class="torso"></div><div class="leg l"></div><div class="leg r"></div></div>';
+const faceHTML=f=> f==="noob" ? NOOB :
+  '<div style="width:44px;height:44px;flex:none;border-radius:9px;background:var(--panel-2);border:2px solid var(--line-hi);display:grid;place-items:center;font-size:1.5rem;box-shadow:inset 0 2px 0 var(--stud)">'+f+'</div>';
+
+/* ---------- lobby ---------- */
+const badgeOf=id=>(save[id]&&save[id].badge)||0;
+const openAt=i=> i===0 || badgeOf(STAGES[i-1].id)>0;
+
+function drawLobby(){
+  const map=$("#map"); map.innerHTML="";
+  STAGES.forEach((s,i)=>{
+    const open=openAt(i), b=badgeOf(s.id);
+    const row=el("div","stage-row"+(b?" clear":"")+(open?"":" locked"));
+    const tower=el("div","tower");
+    const top=el("div","rope"), bot=el("div","rope");
+    if(i===0) top.style.visibility="hidden";
+    if(i===STAGES.length-1) bot.style.visibility="hidden";
+    tower.append(top, el("div","plat", open?s.icon:"🔒"), bot);
+    const card=el("button","card"); card.type="button"; card.disabled=!open;
+    card.innerHTML='<div class="top"><span class="nm">'+(i+1)+'. '+esc(s.name)+'</span>'+
+      '<span class="badges">'+[1,2,3].map(n=>n<=b?"★":'<span class="off">★</span>').join("")+'</span></div>'+
+      '<div class="sk">'+esc(s.skill)+'</div>'+
+      '<div class="th">'+esc(s.th)+' · '+s.items.length+' บล็อก</div>';
+    card.addEventListener("click",()=>open&&startStage(i));
+    row.append(tower,card); map.append(row);
+  });
+  const coins=STAGES.reduce((n,s)=>n+((save[s.id]&&save[s.id].coins)||0),0);
+  const badges=STAGES.filter(s=>badgeOf(s.id)>0).length;
+  const best=STAGES.reduce((n,s)=>Math.max(n,(save[s.id]&&save[s.id].combo)||0),0);
+  $("#h-coins").textContent=coins;
+  $("#h-badges").textContent=badges+"/"+STAGES.length;
+  $("#h-best").textContent=best?("x"+best):"—";
+}
+
+/* ---------- state ---------- */
+let G=null;
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  $("#"+id).classList.add("on"); window.scrollTo(0,0);
+}
+function startStage(i){
+  const s=STAGES[i];
+  G={si:i, stg:s, queue:s.items.slice(), pos:0, lives:3, coins:0, streak:0, best:0,
+     right:0, asked:0, answered:false, current:null, missed:[], dead:false};
+  show("s-play"); renderQ();
+}
+function paintHUD(){
+  $("#lives").innerHTML=[1,2,3].map(n=>n<=G.lives?"♥":'<span class="gone">♥</span>').join("");
+  $("#hud-coins").textContent="🪙 "+G.coins;
+  const tr=$("#track"); tr.innerHTML="";
+  G.queue.forEach((_,i)=>{
+    const b=el("i"); if(i<G.pos)b.className="on"; else if(i===G.pos)b.className="now";
+    tr.append(b);
+  });
+  const c=$("#combo");
+  if(G.streak>=2){ c.textContent="COMBO x"+G.streak; c.classList.add("on"); }
+  else c.classList.remove("on");
+}
+
+/* ---------- render one exercise ---------- */
+function renderQ(){
+  if(G.pos>=G.queue.length) return finish();
+  const item=G.queue[G.pos];
+  G.answered=false; G.current=null;
+  paintHUD();
+
+  const box=$("#stagebox"); box.innerHTML="";
+  $("#foot").className="foot"; $("#fb").className="fb";
+  const chk=$("#btn-check"); chk.textContent="Check"; chk.className="btn btn-go"; chk.disabled=true;
+
+  const head=el("div","qhead");
+  const titles={reply:"Choose your reply", build:item.ask||"Build the sentence", pick:"Fill the gap",
+                listen:"Listen and choose", fix:item.ask||"Find the glitch", match:item.ask||"Match the pairs"};
+  head.append(el("div","qtitle",titles[item.t]));
+  const hintBtn=el("button","icon-btn","💡");
+  hintBtn.type="button"; hintBtn.setAttribute("aria-label","Thai hint");
+  head.append(hintBtn); box.append(head);
+
+  const hint=el("div","hint th", esc(item.th||item.sayTh||"อ่านช้าๆ แล้วเลือกคำตอบที่ถูก"));
+  hintBtn.addEventListener("click",()=>{
+    hint.classList.toggle("show");
+    box.querySelectorAll(".bubble .th").forEach(n=>n.classList.toggle("show"));
+  });
+  box.append(hint);
+
+  ({reply:qReply, build:qBuild, pick:qPick, listen:qListen, fix:qFix, match:qMatch})[item.t](item, box);
+}
+function arm(fn){ G.current=fn; $("#btn-check").disabled=false; }
+
+function qReply(item, box){
+  const scene=el("div","scene"), npc=el("div","npc");
+  npc.innerHTML=faceHTML(item.face);
+  const b=el("div","bubble");
+  b.innerHTML='<div class="who">'+esc(item.who)+'</div><div class="line">'+esc(item.say)+'</div>'+
+              '<div class="th">'+esc(item.sayTh||"")+'</div>';
+  const spk=el("button","icon-btn","🔊"); spk.type="button"; spk.setAttribute("aria-label","Hear it");
+  spk.addEventListener("click",()=>say(item.say));
+  npc.append(b,spk);
+  scene.append(npc, el("div","you","your reply"));
+  box.append(scene);
+
+  const opts=el("div","opts");
+  const list=shuffle(item.opts.map(o=>({...o})));
+  list.forEach((o,n)=>{
+    const btn=el("button","opt"); btn.type="button";
+    btn.innerHTML='<span class="key">'+(n+1)+'</span><span class="txt">'+esc(o.x)+'</span>';
+    btn.addEventListener("click",()=>{
+      if(G.answered) return;
+      opts.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+      btn.classList.add("sel");
+      arm(()=>{
+        list.forEach((oo,k)=>{
+          if(oo.ok) opts.children[k].classList.add("right");
+          else if(opts.children[k]===btn) opts.children[k].classList.add("wrong");
+        });
+        return {ok:!!o.ok, note:o.note, best:item.opts.find(z=>z.ok).x};
+      });
+    });
+    opts.append(btn);
+  });
+  box.append(opts);
+}
+
+function qBuild(item, box){
+  const target=el("div"); target.style.textAlign="center"; target.style.color="var(--muted)";
+  target.innerHTML='<span class="th" style="font-size:1.05rem">'+esc(item.th||"")+'</span>';
+  box.append(target);
+  const slot=el("div","slotline"), bank=el("div","bank");
+  box.append(slot,bank);
+
+  const pool=shuffle(item.answer.concat(item.extra||[]));
+  const chosen=[];
+  pool.forEach((w,i)=>{
+    const t=el("button","tile",esc(w)); t.type="button";
+    t.addEventListener("click",()=>{
+      if(G.answered) return;
+      t.classList.add("ghost");
+      const s=el("button","tile",esc(w)); s.type="button";
+      s.addEventListener("click",()=>{
+        if(G.answered) return;
+        s.remove(); t.classList.remove("ghost");
+        chosen.splice(chosen.indexOf(w+"#"+i),1); sync();
+      });
+      slot.append(s); chosen.push(w+"#"+i); sync();
+    });
+    bank.append(t);
+  });
+  function sync(){
+    const words=chosen.map(c=>c.split("#")[0]);
+    if(!words.length){ $("#btn-check").disabled=true; G.current=null; return; }
+    arm(()=>{
+      const got=words.join(" ").toLowerCase(), want=item.answer.join(" ");
+      return {ok:got===want.toLowerCase(), note:item.why, best:want+"."};
+    });
+  }
+}
+
+function qPick(item, box){
+  box.append(el("div","pic", item.pic||"❓"));
+  const parts=item.text.split("___");
+  const s=el("div","sentence");
+  s.append(document.createTextNode(parts[0]));
+  const blank=el("span","blank","?");
+  s.append(blank, document.createTextNode(parts[1]||""));
+  box.append(s);
+
+  const wrap=el("div","two");
+  (item.opts||["can","can't"]).forEach(c=>{
+    const b=el("button","opt"); b.type="button";
+    b.innerHTML='<span class="txt">'+esc(c)+'</span>';
+    b.addEventListener("click",()=>{
+      if(G.answered) return;
+      wrap.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+      b.classList.add("sel"); blank.textContent=c;
+      arm(()=>{
+        const ok=c.toLowerCase()===item.a.toLowerCase();
+        wrap.querySelectorAll(".opt").forEach(x=>{
+          const txt=x.querySelector(".txt").textContent;
+          if(txt.toLowerCase()===item.a.toLowerCase()) x.classList.add("right");
+          else if(x===b) x.classList.add("wrong");
+        });
+        if(!ok) blank.textContent=item.a;
+        return {ok, note:item.why, best:item.text.replace("___",item.a)};
+      });
+    });
+    wrap.append(b);
+  });
+  box.append(wrap);
+}
+
+function qListen(item, box){
+  const play=el("button","playbtn",'<span class="spk">🔊</span> Play the sound');
+  play.type="button"; play.addEventListener("click",()=>say(item.say));
+  const slow=el("button","btn btn-ghost slow","🐢 Slower");
+  slow.type="button"; slow.addEventListener("click",()=>say(item.say,.6));
+  box.append(play,slow);
+  setTimeout(()=>say(item.say),350);
+
+  const opts=el("div","opts");
+  item.opts.forEach((o,n)=>{
+    const b=el("button","opt"); b.type="button";
+    b.innerHTML='<span class="key">'+(n+1)+'</span><span class="txt">'+esc(o)+'</span>';
+    b.addEventListener("click",()=>{
+      if(G.answered) return;
+      opts.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));
+      b.classList.add("sel");
+      arm(()=>{
+        opts.children[item.a].classList.add("right");
+        if(n!==item.a) b.classList.add("wrong");
+        return {ok:n===item.a, note:item.why, best:item.opts[item.a]};
+      });
+    });
+    opts.append(b);
+  });
+  box.append(opts);
+}
+
+function qFix(item, box){
+  const s=el("div","sentence");
+  item.words.forEach((w,i)=>{
+    const b=el("button","word",esc(w)); b.type="button";
+    b.addEventListener("click",()=>{
+      if(G.answered) return;
+      s.querySelectorAll(".word").forEach(x=>x.classList.remove("sel"));
+      b.classList.add("sel");
+      arm(()=>{
+        s.querySelectorAll(".word").forEach((x,k)=>{ if(k===item.bad) x.classList.add("wrong"); });
+        const fixed=item.words.slice();
+        if(item.fixed==="(nothing)") fixed.splice(item.bad,1); else fixed[item.bad]=item.fixed;
+        return {ok:i===item.bad, note:item.why, best:fixed.join(" ").replace(/ \?/,"?")};
+      });
+    });
+    s.append(b);
+  });
+  box.append(s);
+  const tip=el("div","hint show th","แตะคำที่ผิดหนึ่งคำ");
+  tip.style.textAlign="center"; box.append(tip);
+}
+
+function qMatch(item, box){
+  const grid=el("div","matchgrid"), left=el("div","mcol"), right=el("div","mcol");
+  const L=shuffle(item.pairs.map((p,i)=>({txt:p[0],i}))), R=shuffle(item.pairs.map((p,i)=>({txt:p[1],i})));
+  let pick=null, misses=0, done=0;
+  function make(o,col){
+    const b=el("button","mitem",esc(o.txt)); b.type="button"; b.dataset.i=o.i; b.dataset.col=col;
+    b.addEventListener("click",()=>{
+      if(G.answered||b.classList.contains("gone")) return;
+      if(!pick){ pick=b; b.classList.add("sel"); return; }
+      if(pick===b){ pick=null; b.classList.remove("sel"); return; }
+      if(pick.dataset.col===col){ pick.classList.remove("sel"); pick=b; b.classList.add("sel"); return; }
+      if(pick.dataset.i===b.dataset.i){
+        beep("good");
+        pick.classList.remove("sel"); pick.classList.add("gone"); b.classList.add("gone");
+        pick=null; done++;
+        if(done===item.pairs.length){
+          arm(()=>({ok:misses<=1, note:item.why,
+            best: misses<=1 ? "All four matched!" : "Match the person: I → I can, she → she can't."}));
+          $("#btn-check").click();
+        }
+      }else{
+        misses++; beep("bad");
+        const a=pick,c=b; a.classList.add("shake"); c.classList.add("shake");
+        setTimeout(()=>{a.classList.remove("shake","sel"); c.classList.remove("shake");},400);
+        pick=null;
+      }
+    });
+    return b;
+  }
+  L.forEach(o=>left.append(make(o,"L")));
+  R.forEach(o=>right.append(make(o,"R")));
+  grid.append(left,right); box.append(grid);
+  const tip=el("div","hint show th","จับคู่คำถามกับคำตอบให้ครบ");
+  tip.style.textAlign="center"; box.append(tip);
+}
+
+/* ---------- check / continue ---------- */
+$("#btn-check").addEventListener("click",()=>{
+  const btn=$("#btn-check");
+  if(G.answered){ G.pos++; renderQ(); return; }
+  if(!G.current) return;
+
+  const res=G.current();
+  G.answered=true; G.asked++;
+  const fb=$("#fb"), foot=$("#foot");
+
+  if(res.ok){
+    G.right++; G.streak++; G.best=Math.max(G.best,G.streak);
+    G.coins += 10 + Math.min(G.streak-1,5)*5;
+    beep("good");
+    fb.className="fb show good";
+    $("#fb-mark").textContent="🟢";
+    $("#fb-msg").textContent=["NICE LANDING!","GG!","PERFECT JUMP!","YOU GOT IT!","EASY!"][Math.floor(Math.random()*5)];
+    $("#fb-sub").innerHTML=res.note?esc(res.note):"";
+    foot.className="foot good"; btn.className="btn btn-ok";
+  }else{
+    G.streak=0; G.lives--;
+    G.missed.push(res.note||"");
+    beep("bad");
+    fb.className="fb show bad";
+    $("#fb-mark").textContent="💥";
+    $("#fb-msg").textContent="YOU FELL!";
+    $("#fb-sub").innerHTML='<b>'+esc(res.best||"")+'</b>'+(res.note?"<br>"+esc(res.note):"");
+    foot.className="foot bad"; btn.className="btn btn-bad";
+    G.queue.push(G.queue[G.pos]);          // respawn this block later in the stage
+  }
+  if(G.lives<=0) G.dead=true;
+  btn.textContent = G.dead ? "See results" : "Continue";
+  btn.disabled=false;
+  paintHUD();
+});
+
+document.addEventListener("keydown",e=>{
+  if(!$("#s-play").classList.contains("on")) return;
+  if(e.key==="Enter"){ const b=$("#btn-check"); if(!b.disabled){ e.preventDefault(); b.click(); } return; }
+  if(/^[1-4]$/.test(e.key)){ const l=$("#stagebox").querySelectorAll(".opt"); if(l[+e.key-1]) l[+e.key-1].click(); }
+});
+
+/* ---------- results ---------- */
+function finish(){
+  const acc=G.asked?Math.round(G.right/G.asked*100):0;
+  const badge=G.dead?1:acc>=90?3:acc>=70?2:1;
+  const prev=save[G.stg.id]||{};
+  save[G.stg.id]={badge:Math.max(badge,prev.badge||0), coins:Math.max(G.coins,prev.coins||0),
+                  combo:Math.max(G.best,prev.combo||0), acc};
+  store();
+
+  $("#r-emoji").textContent=G.dead?"💥":badge===3?"👑":"🏁";
+  $("#r-title").textContent=G.dead?"OUT OF LIVES":G.stg.name+" CLEAR";
+  $("#r-sub").textContent=G.dead
+    ? "You used all three lives. Respawn and run the stage again — you keep the coins you earned."
+    : "Checkpoint saved. The next platform is unlocked.";
+  $("#r-coins").textContent=G.coins;
+  $("#r-acc").textContent=acc+"%";
+  $("#r-badge").innerHTML=[1,2,3].map(n=>n<=badge?"★":'<span style="opacity:.25">★</span>').join("");
+
+  const missed=[...new Set(G.missed.filter(Boolean))].slice(0,4);
+  $("#r-notes").innerHTML="<h3>"+(missed.length?"Fix before next run":"Rules you used")+"</h3><ul>"+
+    (missed.length?missed.map(m=>"<li>"+esc(m)+"</li>").join(""):RULES.map(m=>"<li>"+m+"</li>").join(""))+"</ul>";
+
+  const nx=G.si+1;
+  $("#btn-next").style.display=(!G.dead&&nx<STAGES.length)?"":"none";
+  if(nx<STAGES.length) $("#btn-next").textContent="Next: "+STAGES[nx].name+" →";
+
+  show("s-done");
+  if(!G.dead){ beep("win"); bricks(); }
+  drawLobby();
+}
+
+$("#btn-next").addEventListener("click",()=>startStage(Math.min(G.si+1,STAGES.length-1)));
+$("#btn-again").addEventListener("click",()=>startStage(G.si));
+$("#btn-home").addEventListener("click",()=>{show("s-home"); drawLobby();});
+$("#btn-quit").addEventListener("click",()=>{ if(confirm("Leave the stage? You'll lose this run.")){ show("s-home"); drawLobby(); } });
+$("#btn-start").addEventListener("click",()=>{
+  const i=STAGES.findIndex((s,n)=>openAt(n)&&badgeOf(s.id)===0);
+  startStage(i<0?0:i);
+});
+$("#btn-sound").addEventListener("click",e=>{
+  soundOn=!soundOn;
+  e.currentTarget.textContent=soundOn?"🔊 Sound on":"🔇 Sound off";
+  e.currentTarget.setAttribute("aria-pressed",String(soundOn));
+});
+$("#btn-reset").addEventListener("click",()=>{ if(confirm("Clear all badges and coins?")){ save={}; store(); drawLobby(); } });
+
+/* ---------- falling bricks ---------- */
+function bricks(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c=$("#fx"), ctx=c.getContext("2d");
+  c.style.display="block";
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  c.width=innerWidth*dpr; c.height=innerHeight*dpr; ctx.scale(dpr,dpr);
+  const cols=["#4ADE80","#3BA3FF","#FFC93C","#A375FF","#FF5468"];
+  const bits=Array.from({length:80},()=>({
+    x:Math.random()*innerWidth, y:-30-Math.random()*innerHeight*.6,
+    w:10+Math.random()*12, vy:2.5+Math.random()*3.5, vx:-1+Math.random()*2,
+    a:Math.random()*6, va:-.15+Math.random()*.3, col:cols[Math.floor(Math.random()*cols.length)]
+  }));
+  let t=0;
+  (function frame(){
+    t++; ctx.clearRect(0,0,innerWidth,innerHeight);
+    bits.forEach(b=>{
+      b.x+=b.vx; b.y+=b.vy; b.a+=b.va;
+      ctx.save(); ctx.translate(b.x,b.y); ctx.rotate(b.a);
+      ctx.fillStyle=b.col; ctx.fillRect(-b.w/2,-b.w*.3,b.w,b.w*.6);
+      ctx.fillStyle="rgba(255,255,255,.28)"; ctx.fillRect(-b.w/2,-b.w*.3,b.w,b.w*.16);
+      ctx.restore();
+    });
+    if(t<180) requestAnimationFrame(frame);
+    else{ ctx.clearRect(0,0,innerWidth,innerHeight); c.style.display="none"; }
+  })();
+}
+
+drawLobby();
+</script>
+</body>
+</html>
