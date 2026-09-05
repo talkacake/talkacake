@@ -231,6 +231,11 @@ h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
 .stage{padding:16px 16px 168px;display:flex;flex-direction:column;gap:14px;flex:1}
 .qhead{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
 .qtitle{font-family:"Bungee",sans-serif;font-size:1.02rem;letter-spacing:.04em;color:var(--muted);padding-top:4px}
+.voicewarn{display:none;background:var(--red-soft);border:2px solid var(--red);border-radius:11px;padding:9px 12px;font-size:.88rem;font-weight:600}
+body.no-voice .voicewarn{display:block}
+.reveal{display:none;margin:6px auto 0;font-weight:700;text-align:center;font-size:1.15rem;
+  background:var(--panel-2);border:2px dashed var(--line-hi);border-radius:11px;padding:10px}
+.reveal.show{display:block}
 .hint{display:none;background:var(--violet-soft);border:2px dashed var(--violet);border-radius:11px;padding:9px 12px;font-size:.95rem}
 .hint.show{display:block}
 
@@ -383,6 +388,7 @@ h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
         <button class="btn btn-go" id="btn-start">▶ Play</button>
         <button class="btn btn-ghost" id="btn-sound" aria-pressed="true">🔊 Sound on</button>
       </div>
+      <div class="voicewarn" style="margin-top:12px">🔇 The talking voice is blocked in this window. Beeps still work. Open the page in its own browser tab to hear the sentences.</div>
     </div>
 
     <div class="statbar">
@@ -614,33 +620,101 @@ const KEY="talkacake.canobby.v1";
 let save=(()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}})();
 const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
 
-/* ---------- sound ---------- */
-let soundOn=true, actx=null;
-function beep(kind){
-  if(!soundOn) return;
-  try{
-    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-    const seq = kind==="good" ? [[523,0],[784,.08]]
-              : kind==="bad"  ? [[240,0],[150,.11]]
-              : [[523,0],[659,.09],[784,.18],[1047,.27]];
-    seq.forEach(([f,at])=>{
-      const o=actx.createOscillator(), g=actx.createGain();
-      o.type = kind==="bad" ? "square" : "triangle";
-      o.frequency.value=f;
-      g.gain.setValueAtTime(.0001, actx.currentTime+at);
-      g.gain.exponentialRampToValueAtTime(kind==="bad"?.09:.11, actx.currentTime+at+.02);
-      g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime+at+.25);
-      o.connect(g); g.connect(actx.destination);
-      o.start(actx.currentTime+at); o.stop(actx.currentTime+at+.3);
-    });
-  }catch(e){}
-}
-function say(text, rate){
-  if(!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="en-US"; u.rate=rate||.95;
-  speechSynthesis.speak(u);
+/* ---------- sound ----------
+   Two independent channels:
+   1. beeps  — WebAudio, needs an AudioContext that is unlocked by a real tap
+   2. voice  — speech synthesis, which some browsers and embedded frames block
+   Both are unlocked on the first tap; if the voice is blocked we say so
+   instead of failing silently, and every listening block can reveal its text.
+------------------------------------------------------------------ */
+let soundOn = true;
+
+const Snd = {
+  ctx:null, primed:false, voice:null, state:"unknown",   // unknown | ok | blocked
+
+  unlock(){
+    if(!this.ctx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(AC){ try{ this.ctx = new AC(); }catch(e){ this.ctx = null; } }
+    }
+    if(this.ctx && this.ctx.state !== "running"){ try{ this.ctx.resume(); }catch(e){} }
+    if(!this.primed && "speechSynthesis" in window){
+      this.primed = true;
+      try{
+        const warm = new SpeechSynthesisUtterance(" ");
+        warm.volume = 0;
+        speechSynthesis.speak(warm);
+      }catch(e){}
+    }
+    this.pickVoice();
+  },
+
+  pickVoice(){
+    if(!("speechSynthesis" in window)) return;
+    let vs = [];
+    try{ vs = speechSynthesis.getVoices() || []; }catch(e){}
+    if(!vs.length) return;
+    this.voice = vs.find(v=>/^en[-_]US/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+  },
+
+  beep(kind){
+    if(!soundOn) return;
+    this.unlock();
+    if(!this.ctx) return;
+    try{
+      const t0 = this.ctx.currentTime;
+      const seq = kind==="good" ? [[523,0],[784,.08]]
+                : kind==="bad"  ? [[240,0],[150,.11]]
+                : [[523,0],[659,.09],[784,.18],[1047,.27]];
+      seq.forEach(([f,at])=>{
+        const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+        o.type = kind==="bad" ? "square" : "triangle";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(.0001, t0+at);
+        g.gain.exponentialRampToValueAtTime(kind==="bad"?.09:.11, t0+at+.02);
+        g.gain.exponentialRampToValueAtTime(.0001, t0+at+.25);
+        o.connect(g); g.connect(this.ctx.destination);
+        o.start(t0+at); o.stop(t0+at+.3);
+      });
+    }catch(e){}
+  },
+
+  say(text, rate){
+    if(!soundOn) return;
+    if(!("speechSynthesis" in window)){ this.blocked(); return; }
+    this.unlock();
+    try{ speechSynthesis.cancel(); }catch(e){}
+    let started = false;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = rate || .95;
+    if(this.voice) u.voice = this.voice;
+    u.onstart = ()=>{ started = true; this.working(); };
+    u.onend   = ()=>{ if(started) this.working(); };
+    u.onerror = ()=>{ if(!started) this.blocked(); };
+    // Chrome drops an utterance queued in the same tick as cancel()
+    setTimeout(()=>{
+      try{ speechSynthesis.resume(); speechSynthesis.speak(u); }
+      catch(e){ this.blocked(); }
+    }, 45);
+    setTimeout(()=>{
+      let live = false;
+      try{ live = speechSynthesis.speaking || speechSynthesis.pending; }catch(e){}
+      if(!started && !live) this.blocked();
+    }, 1500);
+  },
+
+  working(){ this.state = "ok"; document.body.classList.remove("no-voice"); },
+  blocked(){ if(this.state === "ok") return; this.state = "blocked"; document.body.classList.add("no-voice"); }
+};
+
+const beep = k => Snd.beep(k);
+const say  = (t,r) => Snd.say(t,r);
+
+document.addEventListener("pointerdown", ()=>Snd.unlock(), {capture:true});
+document.addEventListener("keydown",     ()=>Snd.unlock(), {capture:true});
+if("speechSynthesis" in window && speechSynthesis.addEventListener){
+  speechSynthesis.addEventListener("voiceschanged", ()=>Snd.pickVoice());
 }
 
 /* ---------- tiny helpers ---------- */
@@ -732,6 +806,10 @@ function renderQ(){
     box.querySelectorAll(".bubble .th").forEach(n=>n.classList.toggle("show"));
   });
   box.append(hint);
+
+  box.append(el("div","voicewarn",
+    "🔇 This browser is blocking the voice here. Beeps still work — tap 🔊 once more, "+
+    "or open the page in its own tab. Listening blocks can show their words instead."));
 
   ({reply:qReply, build:qBuild, pick:qPick, listen:qListen, fix:qFix, match:qMatch})[item.t](item, box);
 }
@@ -843,8 +921,12 @@ function qListen(item, box){
   play.type="button"; play.addEventListener("click",()=>say(item.say));
   const slow=el("button","btn btn-ghost slow","🐢 Slower");
   slow.type="button"; slow.addEventListener("click",()=>say(item.say,.6));
-  box.append(play,slow);
-  setTimeout(()=>say(item.say),350);
+  const reveal=el("div","reveal");
+  const revealBtn=el("button","btn btn-ghost slow","👀 Can't hear it? Show the words");
+  revealBtn.type="button";
+  revealBtn.addEventListener("click",()=>{ reveal.textContent=item.say; reveal.classList.add("show"); revealBtn.style.display="none"; });
+  box.append(play,slow,revealBtn,reveal);
+  setTimeout(()=>say(item.say),400);
 
   const opts=el("div","opts");
   item.opts.forEach((o,n)=>{
@@ -1008,6 +1090,8 @@ $("#btn-sound").addEventListener("click",e=>{
   soundOn=!soundOn;
   e.currentTarget.textContent=soundOn?"🔊 Sound on":"🔇 Sound off";
   e.currentTarget.setAttribute("aria-pressed",String(soundOn));
+  if(soundOn){ Snd.beep("good"); Snd.say("Let's play!"); }   // proves both channels
+  else { try{ speechSynthesis.cancel(); }catch(e2){} }
 });
 $("#btn-reset").addEventListener("click",()=>{ if(confirm("Clear all badges and coins?")){ save={}; store(); drawLobby(); } });
 
