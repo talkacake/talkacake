@@ -36,9 +36,9 @@
           <p class="text-sm text-green-600">Thai Language Companion</p>
         </div>
         <div class="mt-2">
-          <p class="text-slate-500">ป้อนอักษรไทยเพื่อรับสัทศาสตร์ (ไพบูลย์) และคำแปลภาษาอังกฤษ</p>
-          <p class="text-xs text-blue-600">bpɔ̂ɔn àk-sɔ̌ɔn tai pʉ̂ʉa ráp sàt-tà-sàat (pai-buun) lɛ́ kam-bplɛɛ paa-sǎa ang-grìt</p>
-          <p class="text-xs text-green-600">Enter Thai script to get Paiboon phonetics and English translation.</p>
+          <p class="text-slate-500">ป้อนภาษาไทยหรือภาษาอังกฤษเพื่อรับสัทศาสตร์ตามรูปแบบที่เลือกและคำแปลภาษาอังกฤษ</p>
+          <p class="text-xs text-blue-600">lʉ̂ak rúup-bàep sàt-tà-sàat láe rá-bòp AI thîi dtông-gaan</p>
+          <p class="text-xs text-green-600">Choose a phonetic system and AI model, then translate Thai or English text.</p>
         </div>
       </header>
 
@@ -81,6 +81,29 @@
         <textarea id="thai-input" rows="5" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="e.g., สวัสดีครับ&#10;hello&#10;sawatdee"></textarea>
       </div>
 
+      <!-- Translation options -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label for="phonetic-type" class="block text-sm font-semibold text-slate-700 mb-2">Phonetic type</label>
+          <select id="phonetic-type" class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="paiboon">Paiboon — tone marks</option>
+            <option value="ipa">IPA — phonemic symbols</option>
+            <option value="initials">Initials — tone letters</option>
+            <option value="numbers">Numbers — tone numbers</option>
+          </select>
+          <p id="phonetic-help" class="mt-2 text-xs text-slate-500"></p>
+        </div>
+        <div>
+          <label for="model-select" class="block text-sm font-semibold text-slate-700 mb-2">AI model</label>
+          <select id="model-select" class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview — highest accuracy</option>
+            <option value="gemini-3.6-flash">Gemini 3.6 Flash — faster</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash — legacy</option>
+          </select>
+          <p id="model-help" class="mt-2 text-xs text-slate-500"></p>
+        </div>
+      </div>
+
       <!-- Buttons -->
       <div class="text-center mb-8 flex flex-wrap justify-center gap-4">
         <button id="translate-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-200 shadow-md">Translate</button>
@@ -95,7 +118,7 @@
           <div id="original-output" class="text-lg text-slate-600 min-h-[100px] whitespace-pre-wrap"></div>
         </div>
         <div class="bg-slate-50 p-6 rounded-lg shadow-inner">
-          <h2 class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">Paiboon Phonetics</h2>
+          <h2 id="phonetics-heading" class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">Paiboon Phonetics</h2>
           <div id="phonetics-output" class="text-lg text-slate-600 min-h-[100px] whitespace-pre-wrap"></div>
         </div>
         <div class="bg-slate-50 p-6 rounded-lg shadow-inner md:col-span-1">
@@ -108,10 +131,195 @@
   </div>
 
   <script>
-    // ---- Constants: model & endpoint (header auth) ----
-    const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+    const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-    // ---- Page wiring ----
+    const MODEL_CONFIGS = {
+      'gemini-3.1-pro-preview': {
+        help: 'Highest accuracy and reasoning quality. This preview model may require billing or preview access for your API key.'
+      },
+      'gemini-3.6-flash': {
+        help: 'Faster stable model with lower latency. Use this if Pro Preview is unavailable for your API key.'
+      },
+      'gemini-2.5-flash': {
+        help: 'Legacy option kept for compatibility with API keys that cannot access newer models.'
+      }
+    };
+
+    const PHONETIC_CONFIGS = {
+      paiboon: {
+        heading: 'Paiboon Phonetics',
+        help: 'Learner-friendly Paiboon-style romanization with tone marks.',
+        rules: [
+          'Use learner-friendly Paiboon-style romanization, not IPA.',
+          'Use consonant spellings such as bp, dt, g, kh, ng, ch and j, and vowel spellings such as aa, ii, uu, ɛɛ, ɔɔ, ʉʉ and əə where appropriate.',
+          'Mark tones on the vowel nucleus: unmarked for mid, à for low, â for falling, á for high and ǎ for rising.',
+          'Use hyphens between syllables or closely connected chunks in the style shown by the anchors.',
+          'Never use IPA symbols, tone numbers, or parenthesized tone letters.'
+        ],
+        examples: [
+          'ใต้ => dtâi',
+          'อ่าน => àan',
+          'ทำไม => tam-mai',
+          'เรียน => riian',
+          'พุธ => pút',
+          'ใคร => krai',
+          'แกงเขียวหวาน => gaaeng kǐao wǎan',
+          'เขียน => kǐian',
+          'กับ => gàp',
+          'เสียง => sĭang',
+          'อยาก => yàak',
+          'ยาก => yâak',
+          'น้ำเปล่า => náam-plào',
+          'ไม่ใช่ => mâi châi',
+          'ใช่ไหม => châi mái',
+          'ดีใจที่ได้เจอกันนะ => dii-jai tii dâi jer gan ná',
+          'ทำงานที่บ้าน => tham-ngaan-thîi-bâan',
+          'ของหวาน => kɔ̌ɔng wǎan',
+          'มะม่วง => má-mûang',
+          'กระต่าย => grà-dtàai',
+          'เมื่อวาน => mûuea-waan',
+          'ยินดีต้อนรับ => yin-dee-dtôn-ráp',
+          'ฝึก => fèuk',
+          'บังเอิญ => bang-eern'
+        ]
+      },
+      ipa: {
+        heading: 'IPA Phonetics',
+        help: 'Broad Bangkok Thai IPA with vowel length and lexical tones.',
+        rules: [
+          'Use broad Bangkok Thai IPA, not learner romanization.',
+          'Use IPA symbols such as ʔ, tɕ, tɕʰ, kʰ, pʰ, tʰ, ɯ, ɤ, ɛ, ɔ and ŋ as needed.',
+          'Use ː for long vowels, periods between syllables within a word, and spaces between words.',
+          'Mark lexical tone consistently with diacritics.',
+          'Never use Paiboon spellings, tone numbers, or parenthesized tone letters.'
+        ],
+        examples: [
+          'ไหม => máj',
+          'ไม่ => mâj',
+          'ใช่ไหม => tɕʰâj máj',
+          'ไม่ใช่ => mâj tɕʰâj',
+          'ไม่เผ็ด => mâj pʰèt',
+          'น้ำแข็ง => nám kʰɛ̌ŋ',
+          'นม => nom',
+          'เย็น => jen',
+          'น้ำเย็น => nám jen',
+          'อร่อยไหม => ʔa.rɔ̀j máj',
+          'เผ็ดไหม => pʰèt máj',
+          'เรียนสั่งอาหารยังไง => rian sàŋ ʔaː.hǎːn jaŋ.ŋaj',
+          'อาหาร => ʔaː.hǎːn',
+          'สั่ง => sàŋ',
+          'ใส่ => sàj',
+          'เป็นยังไง => pen jaŋ.ŋaj',
+          'อร่อย => ʔa.rɔ̀j',
+          'กับ => kàp',
+          'เผ็ด => pʰèt',
+          'นิดหน่อย => nít.nɔ̀j',
+          'ไก่ทอด => kàj tʰɔ̂ːt',
+          'ขอโทษ => kʰɔ̌ː tʰôːt',
+          'ผัดผักบุ้ง => pʰàt pʰàk bûŋ'
+        ]
+      },
+      initials: {
+        heading: 'Initials Phonetics',
+        help: 'Learner romanization with tone initials: (m), (l), (f), (h), and (r).',
+        rules: [
+          'Use simple learner-friendly romanization and append a parenthesized tone initial to every syllable.',
+          'Tone initials are (m) mid, (l) low, (f) falling, (h) high and (r) rising.',
+          'Follow the consonant and vowel spellings in the anchors, including bp, dt, mh and ue where shown.',
+          'Use spaces between syllables or words.',
+          'Never use tone diacritics, IPA transcription, or tone numbers.'
+        ],
+        examples: [
+          'ยังอยู่ไหม => yang(m) you(l) mhai(h)',
+          'อยากให้ช่วย => yaak(l) hai(f) chuay(f)',
+          'ทำงานอยู่ที่ทำงาน => tam(m) ngaan(m) you(l) tii(f) tam(m) ngaan(m)',
+          'ทำงาน => tam(m) ngaan(m)',
+          'สำหรับนักท่องเที่ยว => saam(r) rab(l) nak(h) tong(f) tiew(f)',
+          'ทราบ => saab(f)',
+          'เริ่มธุรกิจ => rerm(f) tu(h) ra(h) kit(l)',
+          'เร่ง => reng(f)',
+          'ไม่เสมอไป => mai(f) sa(l) mer(r) bpai(m)',
+          'ไม่ได้หมายความว่า => mai(f) dai(f) mai(r) kwaam(m) waa(f)',
+          'แม่เคยเป็นโรคหัวใจ => mae(f) koei(m) bpen(m) roke(f) hua(r) jai(m)',
+          'ลำโพง => lam(m) pong(m)',
+          'กินกาแฟแล้วบ่ายจะง่วงเหรอ => kin(m) gaa(m) fae(h) leaw(h) baai(l) ja(l) nguang(f) ror(r)',
+          'กลางเมือง => glaang(m) muang(m)',
+          'ตรงเวลา => dtrong(m) way(m) laa(m)',
+          'ตอนจบ => dtɔɔn jòp',
+          'ต่่อไป => dtor(l) bpai(m)',
+          'ตลาดกลางวัน => dtlàat glaang wan',
+          'ตัดยาให้วัว => dtad(l) yaa(f) hai(f) wua(m)'
+        ]
+      },
+      numbers: {
+        heading: 'Numbered Phonetics',
+        help: 'Learner romanization with a tone number after every syllable.',
+        rules: [
+          'Use learner-friendly romanization and append a tone number directly after every syllable.',
+          'Follow the custom 1–5 tone-number convention demonstrated by the anchors exactly.',
+          'Keep spaces between words and syllables in the style shown by the anchors.',
+          'Use ɛ, ɔ, ʉ and ə where the anchors require them.',
+          'Never use tone diacritics, IPA transcription, or parenthesized tone letters.'
+        ],
+        examples: [
+          'เล่น => len3',
+          'บาท => baat4',
+          'แปด => bɛɛt2',
+          'ตอนเรียน => dtɔɔn1 rian1',
+          'คำถาม => kam1 taam5',
+          'ปี => bpii1',
+          'อีก => iik2',
+          'ดูหนัง => duu1 nang5',
+          'ตลก => dta2 lok2',
+          'ประวัติศาสตร์ => bpra2 wat2 saat2',
+          'เพลง => pleeng1',
+          'เก้า => kaao2',
+          'เผ็ด => peet3',
+          'เยอะ => yə4',
+          'เค็ม => kem1',
+          'เรื่องสั้น => rʉang3 san3',
+          'มา => maa1',
+          'จาก => jaak2',
+          'จีน => jiin1',
+          'งาน => ngaan1',
+          'วิศวกร => wit4 sa2 wa4 (gɔɔn1)',
+          'น่าสนใจ => naa3 son4 jai1',
+          'หิว => hiu4',
+          'มาม่า => maa1 maa3',
+          'ชานมไข่มุก => chaa1 nom1 kai2 muk4',
+          'เปรี้ยว => bpriao3',
+          'ครอบครัว => krɔɔp3 krua1',
+          'เสียง => siang5',
+          'เช็ด => ched4',
+          'อาจจะ => aat2 ja2',
+          'บางครั้ง => baang1 krang4'
+        ]
+      }
+    };
+
+    const OUTPUT_SCHEMA = {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          original: {
+            type: 'string',
+            description: 'Thai-script equivalent of the input line.'
+          },
+          phonetics: {
+            type: 'string',
+            description: 'Pronunciation using only the selected phonetic convention.'
+          },
+          translation: {
+            type: 'string',
+            description: 'Natural English translation.'
+          }
+        },
+        required: ['original', 'phonetics', 'translation'],
+        additionalProperties: false
+      }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
       const translateBtn = document.getElementById('translate-btn');
       const copyBtn = document.getElementById('copy-btn');
@@ -121,6 +329,11 @@
       const toggleKeyVisibilityBtn = document.getElementById('toggle-key-visibility');
       const eyeIconOpen = document.getElementById('eye-icon-open');
       const eyeIconClosed = document.getElementById('eye-icon-closed');
+      const phoneticTypeSelect = document.getElementById('phonetic-type');
+      const modelSelect = document.getElementById('model-select');
+      const phoneticHelp = document.getElementById('phonetic-help');
+      const modelHelp = document.getElementById('model-help');
+      const phoneticsHeading = document.getElementById('phonetics-heading');
 
       const originalOutput = document.getElementById('original-output');
       const phoneticsOutput = document.getElementById('phonetics-output');
@@ -129,41 +342,59 @@
 
       let translationResults = [];
 
-      // Restore key
       const savedApiKey = localStorage.getItem('thaiCompanionApiKey');
       if (savedApiKey) apiKeyInput.value = savedApiKey;
 
-      function setLoading(isLoading) {
-        const buttons = [translateBtn, copyBtn, clearBtn];
-        if (isLoading) {
-          originalOutput.innerHTML = '<div class="loader"></div>';
-          phoneticsOutput.innerHTML = '<div class="loader"></div>';
-          translationOutput.innerHTML = '<div class="loader"></div>';
-          buttons.forEach(b => { b.disabled = true; b.classList.add('opacity-50','cursor-not-allowed'); });
-          errorBox.classList.add('hidden');
-        } else {
-          buttons.forEach(b => { b.disabled = false; b.classList.remove('opacity-50','cursor-not-allowed'); });
-        }
+      const savedPhoneticType = localStorage.getItem('thaiCompanionPhoneticType');
+      if (savedPhoneticType && PHONETIC_CONFIGS[savedPhoneticType]) {
+        phoneticTypeSelect.value = savedPhoneticType;
       }
 
-      function clearOutputs() {
-        originalOutput.innerHTML = '';
-        phoneticsOutput.innerHTML = '';
-        translationOutput.innerHTML = '';
-        translationResults = [];
+      const savedModel = localStorage.getItem('thaiCompanionModel');
+      if (savedModel && MODEL_CONFIGS[savedModel]) {
+        modelSelect.value = savedModel;
       }
 
-      async function callGemini(apiKey, payload, retriesLeft = 2) {
-        const res = await fetch(GEMINI_ENDPOINT, {
+      function updatePhoneticUi() {
+        const config = PHONETIC_CONFIGS[phoneticTypeSelect.value];
+        phoneticsHeading.textContent = config.heading;
+        phoneticHelp.textContent = config.help;
+        localStorage.setItem('thaiCompanionPhoneticType', phoneticTypeSelect.value);
+      }
+
+      function updateModelUi() {
+        modelHelp.textContent = MODEL_CONFIGS[modelSelect.value].help;
+        localStorage.setItem('thaiCompanionModel', modelSelect.value);
+      }
+
+      updatePhoneticUi();
+      updateModelUi();
+
+      apiKeyInput.addEventListener('input', () => {
+        localStorage.setItem('thaiCompanionApiKey', apiKeyInput.value.trim());
+      });
+
+      phoneticTypeSelect.addEventListener('change', updatePhoneticUi);
+      modelSelect.addEventListener('change', updateModelUi);
+
+      toggleKeyVisibilityBtn.addEventListener('click', () => {
+        const isPassword = apiKeyInput.type === 'password';
+        apiKeyInput.type = isPassword ? 'text' : 'password';
+        eyeIconOpen.classList.toggle('hidden', !isPassword);
+        eyeIconClosed.classList.toggle('hidden', isPassword);
+      });
+
+      async function callGemini(apiKey, model, payload, retriesLeft = 2) {
+        const endpoint = GEMINI_API_BASE + '/' + encodeURIComponent(model) + ':generateContent';
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey   // <— key in header (not query string)
+            'x-goog-api-key': apiKey
           },
           body: JSON.stringify(payload)
         });
 
-        // Try to read response body even on error for better messages
         let dataText = '';
         try { dataText = await res.text(); } catch {}
         let data;
@@ -171,24 +402,81 @@
 
         if (!res.ok) {
           if (res.status === 429 && retriesLeft > 0) {
-            const retryInfo = data?.error?.details?.find(d => d['@type']?.includes('RetryInfo'));
+            const retryInfo = data?.error?.details?.find(detail => detail['@type']?.includes('RetryInfo'));
             const retryDelay = parseFloat(retryInfo?.retryDelay) || (3 - retriesLeft) * 2;
-            await new Promise(r => setTimeout(r, (retryDelay + 0.5) * 1000));
-            return callGemini(apiKey, payload, retriesLeft - 1);
+            await new Promise(resolve => setTimeout(resolve, (retryDelay + 0.5) * 1000));
+            return callGemini(apiKey, model, payload, retriesLeft - 1);
           }
-          const msg = data?.error?.message || data?.message || `${res.status} ${res.statusText}`;
+
+          const message = data?.error?.message || data?.message || (res.status + ' ' + res.statusText);
           if (res.status === 429) {
-            throw new Error(`Rate limit reached for this API key's free tier. Please wait a minute and try again, or use a key with billing enabled for higher limits. (${msg})`);
+            throw new Error('Rate limit reached for this API key. Please wait and try again, or use a key with billing enabled. (' + message + ')');
           }
-          throw new Error(`API error: ${msg}`);
+          if (res.status === 404 && model === 'gemini-3.1-pro-preview') {
+            throw new Error('Gemini 3.1 Pro Preview is not available for this API key. Select Gemini 3.6 Flash and try again. (' + message + ')');
+          }
+          throw new Error('API error: ' + message);
         }
         return data;
       }
 
-      const systemPrompt = `You are an advanced language translation service. The user will provide text, line by line, which can be *either* Thai script *or* English/romanization. For EACH line:
-1) If the input is Thai script, use it as the original.
-2) If the input is English or romanization, find the most common Thai script equivalent.
-Return ONLY a single JSON array. Each item: {"original": "<Thai>", "phonetics": "<Paiboon>", "translation": "<English>"}.`;
+      function buildSystemPrompt(phoneticType, lineCount) {
+        const config = PHONETIC_CONFIGS[phoneticType];
+        return [
+          'You are a meticulous Thai linguist and translation service.',
+          'The user supplies exactly ' + lineCount + ' non-empty input lines. Produce exactly one result per input line, in the same order.',
+          'For Thai input, preserve the Thai text as original. For English or romanized input, infer the most natural common Thai equivalent and put that Thai script in original.',
+          'For each item, provide the Thai script, its pronunciation in ONLY the selected convention, and a natural English translation.',
+          'Use standard contemporary Bangkok Thai pronunciation. Preserve names and context faithfully. Check every syllable, vowel length, and lexical tone before answering.',
+          'Selected convention: ' + config.heading + '.',
+          '',
+          'CONVENTION RULES:',
+          config.rules.map((rule, index) => (index + 1) + '. ' + rule).join('\n'),
+          '',
+          'AUTHORITATIVE STYLE ANCHORS:',
+          config.examples.join('\n'),
+          '',
+          'The anchors define notation style, not a limited vocabulary list. Apply the same convention consistently to unseen words.',
+          'Do not mix conventions. Do not add commentary, Markdown, alternatives, slash-separated spellings, or fields outside the requested JSON schema.'
+        ].join('\n');
+      }
+
+      function extractJsonText(data) {
+        const parts = data?.candidates?.[0]?.content?.parts || [];
+        return parts
+          .filter(part => !part.thought && typeof part.text === 'string')
+          .map(part => part.text)
+          .join('')
+          .trim();
+      }
+
+      function parseJsonResponse(rawText) {
+        let cleanText = rawText.trim();
+        const fence = String.fromCharCode(96).repeat(3);
+        if (cleanText.startsWith(fence)) {
+          cleanText = cleanText.slice(fence.length).replace(/^json\s*/i, '');
+          if (cleanText.endsWith(fence)) cleanText = cleanText.slice(0, -fence.length);
+        }
+        return JSON.parse(cleanText.trim());
+      }
+
+      function validateResults(results, expectedCount) {
+        if (!Array.isArray(results)) {
+          throw new Error('The model returned an unexpected response format.');
+        }
+        if (results.length !== expectedCount) {
+          throw new Error('The model returned ' + results.length + ' results for ' + expectedCount + ' input lines. Please try again.');
+        }
+        const valid = results.every(item =>
+          item &&
+          typeof item.original === 'string' &&
+          typeof item.phonetics === 'string' &&
+          typeof item.translation === 'string'
+        );
+        if (!valid) {
+          throw new Error('The model returned an incomplete translation result. Please try again.');
+        }
+      }
 
       async function handleTranslate() {
         const apiKey = apiKeyInput.value.trim();
@@ -197,124 +485,125 @@ Return ONLY a single JSON array. Each item: {"original": "<Thai>", "phonetics": 
           errorBox.classList.remove('hidden');
           return;
         }
-        localStorage.setItem('thaiCompanionApiKey', apiKey);
 
-        const thaiText = thaiInput.value.trim();
-        if (!thaiText) {
-          errorBox.textContent = 'Please enter some Thai or English text.';
+        const inputText = thaiInput.value.trim();
+        if (!inputText) {
+          errorBox.textContent = 'Please enter some Thai or English text to translate.';
           errorBox.classList.remove('hidden');
           return;
         }
 
-        setLoading(true);
-        clearOutputs();
+        const inputLines = inputText
+          .split(/\r?\n/)
+          .map(line => line.trim())
+          .filter(Boolean);
 
+        clearOutputs();
+        setLoading(true);
+        errorBox.classList.add('hidden');
+
+        const phoneticType = phoneticTypeSelect.value;
+        const model = modelSelect.value;
         const payload = {
-          contents: [{ parts: [{ text: thaiText }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] }
+          contents: [{
+            role: 'user',
+            parts: [{ text: inputLines.join('\n') }]
+          }],
+          systemInstruction: {
+            parts: [{ text: buildSystemPrompt(phoneticType, inputLines.length) }]
+          },
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseJsonSchema: OUTPUT_SCHEMA,
+            temperature: 0.1,
+            maxOutputTokens: 8192
+          }
         };
 
         try {
-          const result = await callGemini(apiKey, payload);
-
-          // Find the model text output (free-form text)
-          const candidate = result?.candidates?.[0];
-          const rawText = candidate?.content?.parts?.[0]?.text || '';
-
-          if (!rawText) throw new Error('Empty response from model.');
-
-          // Strip any code fences if present
-          const clean = rawText.replace(/```json\s*|\s*```/g, '').trim();
-
-          let parsed;
-          try {
-            parsed = JSON.parse(clean);
-          } catch (e) {
-            // Try a very light fallback if the model added trailing content
-            const firstBracket = clean.indexOf('[');
-            const lastBracket = clean.lastIndexOf(']');
-            if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
-              parsed = JSON.parse(clean.slice(firstBracket, lastBracket + 1));
-            } else {
-              throw e;
-            }
+          const data = await callGemini(apiKey, model, payload);
+          const responseText = extractJsonText(data);
+          if (!responseText) {
+            throw new Error('No usable text was returned by the model.');
           }
 
-          if (!Array.isArray(parsed)) throw new Error('API did not return a JSON array as expected.');
+          const results = parseJsonResponse(responseText);
+          validateResults(results, inputLines.length);
 
-          translationResults = parsed;
-
-          translationResults.forEach(item => {
-            const o = document.createElement('div');
-            o.textContent = item.original || '';
-            originalOutput.appendChild(o);
-
-            const p = document.createElement('div');
-            p.textContent = item.phonetics || '';
-            phoneticsOutput.appendChild(p);
-
-            const t = document.createElement('div');
-            t.textContent = item.translation || '';
-            translationOutput.appendChild(t);
-          });
-
-        } catch (err) {
-          errorBox.textContent = `An error occurred: ${err.message}`;
-          errorBox.classList.remove('hidden');
           clearOutputs();
+          translationResults = results;
+          results.forEach(result => {
+            appendOutput(originalOutput, result.original);
+            appendOutput(phoneticsOutput, result.phonetics);
+            appendOutput(translationOutput, result.translation);
+          });
+        } catch (error) {
+          clearOutputs();
+          errorBox.textContent = 'Translation failed: ' + error.message;
+          errorBox.classList.remove('hidden');
+          console.error(error);
         } finally {
           setLoading(false);
         }
       }
 
+      function appendOutput(container, text) {
+        const item = document.createElement('div');
+        item.className = 'mb-2 pb-2 border-b border-slate-200 last:border-b-0';
+        item.textContent = text;
+        container.appendChild(item);
+      }
+
+      function clearOutputs() {
+        originalOutput.innerHTML = '';
+        phoneticsOutput.innerHTML = '';
+        translationOutput.innerHTML = '';
+        translationResults = [];
+        errorBox.classList.add('hidden');
+      }
+
+      function setLoading(isLoading) {
+        translateBtn.disabled = isLoading;
+        translateBtn.classList.toggle('opacity-50', isLoading);
+        translateBtn.textContent = isLoading ? 'Translating...' : 'Translate';
+        if (isLoading) {
+          const loaderHtml = '<div class="loader"></div>';
+          originalOutput.innerHTML = loaderHtml;
+          phoneticsOutput.innerHTML = loaderHtml;
+          translationOutput.innerHTML = loaderHtml;
+        }
+      }
+
       function handleCopy() {
-        if (translationResults.length === 0) {
+        if (!translationResults.length) {
           errorBox.textContent = 'Nothing to copy. Please translate some text first.';
           errorBox.classList.remove('hidden');
           return;
         }
-        const copyText = translationResults
-          .map(item => `${item.original || ''}\t${item.phonetics || ''}\t${item.translation || ''}`)
+
+        const textToCopy = translationResults
+          .map(item => [item.original, item.phonetics, item.translation].join('\t'))
           .join('\n');
 
-        const ta = document.createElement('textarea');
-        ta.value = copyText;
-        document.body.appendChild(ta);
-        ta.select();
-        try {
-          document.execCommand('copy');
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          const oldText = copyBtn.textContent;
           copyBtn.textContent = 'Copied!';
-          setTimeout(() => { copyBtn.textContent = 'Copy for Sheets'; }, 1500);
-        } catch {
-          errorBox.textContent = 'Failed to copy text to clipboard.';
+          copyBtn.classList.replace('bg-green-600', 'bg-green-500');
+          setTimeout(() => {
+            copyBtn.textContent = oldText;
+            copyBtn.classList.replace('bg-green-500', 'bg-green-600');
+          }, 2000);
+        }).catch(error => {
+          errorBox.textContent = 'Failed to copy text: ' + error;
           errorBox.classList.remove('hidden');
-        }
-        document.body.removeChild(ta);
-      }
-
-      function handleClear() {
-        thaiInput.value = '';
-        clearOutputs();
-        errorBox.classList.add('hidden');
-      }
-
-      function toggleApiKeyVisibility() {
-        const isPassword = apiKeyInput.type === 'password';
-        apiKeyInput.type = isPassword ? 'text' : 'password';
-        eyeIconOpen.classList.toggle('hidden', isPassword);
-        eyeIconClosed.classList.toggle('hidden', !isPassword);
+        });
       }
 
       translateBtn.addEventListener('click', handleTranslate);
       copyBtn.addEventListener('click', handleCopy);
-      clearBtn.addEventListener('click', handleClear);
-      toggleKeyVisibilityBtn.addEventListener('click', toggleApiKeyVisibility);
-
-      thaiInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          handleTranslate();
-        }
+      clearBtn.addEventListener('click', () => {
+        thaiInput.value = '';
+        clearOutputs();
       });
     });
   </script>
