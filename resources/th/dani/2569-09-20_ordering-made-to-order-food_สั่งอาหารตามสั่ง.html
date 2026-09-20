@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สั่งอาหารตามสั่ง</title>
+<style>
+  
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+  :root {
+    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body.modern-thai {
+    --font-main: "Noto Sans Thai", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+
+  :root {
+    --bg: #fffaf4;
+    --card: #ffffff;
+    --ink: #202124;
+    --muted: #6b7280;
+    --line: #eadfd2;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  header {
+    padding: 32px 20px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 48px;
+  }
+
+  h1,
+  h2 {
+    margin: 0;
+  }
+
+  .heading-block {
+    margin: 0 0 12px;
+  }
+
+  .heading-controls {
+    margin-top: 6px;
+  }
+
+  .page-title {
+    margin: 0 0 8px;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.25;
+  }
+
+  .section-title {
+    margin: 32px 0 8px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.35;
+  }
+
+  .subtitle {
+    color: var(--muted);
+  }
+
+  .video-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .lesson-film {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px;
+    margin: 16px 0 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  }
+
+  .lesson-film-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+  }
+
+  .lesson-film-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .lesson-film-note {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 8px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,.03);
+  }
+
+  .meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 8px;
+  }
+
+  .emoji {
+    font-size: 1.2rem;
+  }
+
+  .main-text {
+    font-size: 1.35rem;
+    line-height: 1.8;
+    margin-top: 6px;
+  }
+
+  .main-text.thai {
+    font-size: 1.45rem;
+  }
+
+  .main-text.english {
+    font-size: 1.25rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 4px;
+  }
+
+  .controls button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .support-text,
+  .ipa-support {
+    display: none;
+  }
+
+  .support-text.show,
+  .ipa-support.show {
+    display: block;
+  }
+
+  .en-support,
+  .thai-support {
+    color: #374151;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .ipa {
+    color: #7c3aed;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .examples {
+    margin-top: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .examples summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .examples-main {
+    margin-top: 8px;
+  }
+
+  .examples-main,
+  .examples .support-text,
+  .examples .ipa-support {
+    white-space: pre-line;
+  }
+  
+  .font-toggle {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+  footer {
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 32px;
+    font-size: .9rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="heading-block" id="title-สั่งอาหารตามสั่ง" data-tts-lang="th-TH">
+    <h1 class="page-title">สั่งอาหารตามสั่ง</h1>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('title-สั่งอาหารตามสั่ง')">🔊</button>
+      
+      <button type="button" onclick="togglePart('title-สั่งอาหารตามสั่ง', 'support')">EN</button>
+    </div>
+    
+    <div class="support-text en-support">ordering-made-to-order-food</div>
+  </div>
+  <div class="subtitle"><a class="video-link" href="ttps://drive.google.com/drive/folders/1q3vOV31Eq5dBd-Nzr8-99S36J8UWzwaN" target="_blank" rel="noopener noreferrer">🎬 Open video</a></div>
+  <div class="subtitle">
+    <button type="button" class="font-toggle" onclick="toggleThaiFont()">Aa เปลี่ยนฟอนต์</button>
+  </div>
+</header>
+
+<main>
+
+<section class="section">
+  <div class="heading-block" id="section-คําถามนําเข้าสู่บทเรียน" data-tts-lang="th-TH">
+    <h2 class="section-title">คำถามนำเข้าสู่บทเรียน</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําถามนําเข้าสู่บทเรียน')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําถามนําเข้าสู่บทเรียน', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําถามนําเข้าสู่บทเรียน', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kam-tǎam nam kâo sùu bòt-rian</div>
+    <div class="support-text en-support">Lead-in Questions</div>
+  </div>
+  <article class="card text-block" id="row-lead-in-questions-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🤔</span>
+    </div>
+
+    <div class="main-text thai">ปกติกินอาหารที่ร้านอาหารหรือทำอาหารเองที่บ้านคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-questions-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-questions-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-questions-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bpòk-gà-dtì gin aa-hǎan tîi ráan aa-hǎan rʉ̌ʉ tam aa-hǎan eeng tîi bâan ká</div>
+    <div class="support-text en-support">Do you normally eat at a restaurant or cook for yourself at home?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-lead-in-questions-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🍛</span>
+    </div>
+
+    <div class="main-text thai">ชอบกินข้าวผัดไหมคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-questions-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-questions-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-questions-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">chɔ̂ɔp gin kâao-pàt mái ká</div>
+    <div class="support-text en-support">Do you like to eat fried rice?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-lead-in-questions-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🇹🇭</span>
+    </div>
+
+    <div class="main-text thai">เวลาไปร้านอาหารไทย ปกติสั่งอะไรคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-questions-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-questions-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-questions-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">wee-laa bpai ráan aa-hǎan tai bpòk-gà-dtì sàng à-rai ká</div>
+    <div class="support-text en-support">When you go to a Thai restaurant, what do you usually order?</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-มาดูบทสนทนากันค่ะ" data-tts-lang="th-TH">
+    <h2 class="section-title">มาดูบทสนทนากันค่ะ</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-มาดูบทสนทนากันค่ะ')">🔊</button>
+      <button type="button" onclick="togglePart('section-มาดูบทสนทนากันค่ะ', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-มาดูบทสนทนากันค่ะ', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">maa duu bòt-sǒn-tá-naa gan kâ</div>
+    <div class="support-text en-support">Let&#39;s look at the dialogue</div>
+  </div>
+  <article class="card text-block" id="row-video-script-breakdown-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🗣️</span>
+    </div>
+
+    <div class="main-text thai">คนเสิร์ฟ: จะสั่งอะไรดีครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-video-script-breakdown-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">kon sə̀əp: jà sàng à-rai dii kráp</div>
+    <div class="support-text en-support">Waiter: What would you like to order?</div>
+
+    
+    <details class="examples" id="row-video-script-breakdown-1-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        โครงสร้าง &#39;จะ + verb + อะไรดี&#39; ใช้ถามว่า &#39;จะทำ...อะไรดี&#39; ค่ะ<br>1. จะกินอะไรดี (ja gin à-rai dii)<br>2. จะดูอะไรดี (ja duu à-rai dii)<br>ลองแต่งประโยคดูนะคะ: &#39;จะ...อะไรดี&#39;
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-video-script-breakdown-1-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-1-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-1-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">kroong-sâang &#39;jà + verb + à-rai dii&#39; chái tǎam wâa &#39;jà tam...à-rai dii&#39; kâ<br>1. jà gin à-rai dii<br>2. jà duu à-rai dii<br>lɔɔng dtɛ̀ng bprà-yòok duu ná ká: &#39;jà...à-rai dii&#39;</div>
+      <div class="support-text en-support">The structure &#39;จะ + verb + อะไรดี&#39; (jà + verb + à-rai dii) is used to ask &#39;What should I/we do?&#39;<br>1. What should I/we eat?<br>2. What should I/we watch?<br>Your turn, try making a sentence: &#39;จะ...อะไรดี&#39; (What should I/we...?)</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-video-script-breakdown-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🍛</span>
+    </div>
+
+    <div class="main-text thai">ลูกค้า: ขอข้าวผัดหนึ่งจานค่ะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-video-script-breakdown-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lûuk-káa: kɔ̌ɔ kâao-pàt nʉ̀ng jaan kâ</div>
+    <div class="support-text en-support">Customer: One plate of fried rice, please.</div>
+
+    
+    <details class="examples" id="row-video-script-breakdown-2-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        คำศัพท์ใหม่: จาน (jaan) เป็นคำลักษณนามของอาหารที่ใส่จานค่ะ<br>1. ขอข้าวผัด 2 จาน (kɔ̌ɔ kâao-pàt sɔ̌ɔng jaan) <br>2. ขอข้าวไข่เจียว 1 จาน (kɔ̌ɔ kâao kài-jiao nʉ̀ng jaan) <br>ลองใช้คำว่า &#39;จาน&#39; แต่งประโยคดูนะคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-video-script-breakdown-2-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-2-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-2-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">kam-sàp mài: jaan bpen kam lák-sà-nà-naam kɔ̌ɔng aa-hǎan tîi sài jaan kâ<br>1. kɔ̌ɔ kâao-pàt sɔ̌ɔng jaan<br>2. kɔ̌ɔ kâao kài-jiao nʉ̀ng jaan<br>lɔɔng chái kam wâa &#39;jaan&#39; dtɛ̀ng bprà-yòok duu ná ká</div>
+      <div class="support-text en-support">New vocab: จาน (jaan) is a classifier for food served on a plate.<br>1. I&#39;d like 2 plates of fried rice.<br>2. I&#39;d like 1 plate of rice with omelette.<br>Your turn, try making a sentence with &#39;จาน&#39; (plate).</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-video-script-breakdown-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🤔</span>
+    </div>
+
+    <div class="main-text thai">คนเสิร์ฟ: ข้าวผัดใส่ไก่หรือหมูครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-video-script-breakdown-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">kon sə̀əp: kâao-pàt sài gài rʉ̌ʉ mǔu kráp</div>
+    <div class="support-text en-support">Waiter: Fried rice with chicken or pork?</div>
+
+    
+    <details class="examples" id="row-video-script-breakdown-3-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        คำศัพท์ใหม่: ใส่ (sài) แปลว่า to put in / to add ค่ะ และ หรือ (rʉ̌ʉ) แปลว่า or ค่ะ<br>1. กาแฟใส่หรือไม่ใส่น้ำตาลคะ (gaa-fɛɛ sài rʉ̌ʉ mâi sài nám-dtaan ká) <br>2. อยากกินข้าวผัดหมูหรือไก่คะ (yàak gin kâao-pàt mǔu rʉ̌ʉ gài ká) <br>ลองใช้คำว่า &#39;ใส่&#39; และ &#39;หรือ&#39; แต่งประโยคดูนะคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-video-script-breakdown-3-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-3-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-3-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">kam-sàp mài: sài bplɛɛ wâa to put in / to add kâ lɛ́ rʉ̌ʉ bplɛɛ wâa or kâ<br>1. gaa-fɛɛ sài rʉ̌ʉ mâi sài nám-dtaan ká<br>2. yàak gin kâao-pàt mǔu rʉ̌ʉ gài ká<br>lɔɔng chái kam wâa &#39;sài&#39; lɛ́ &#39;rʉ̌ʉ&#39; dtɛ̀ng bprà-yòok duu ná ká</div>
+      <div class="support-text en-support">New vocab: ใส่ (sài) means to put in/to add, and หรือ (rʉ̌ʉ) means or.<br>1. Coffee with or without sugar?<br>2. Do you want to eat fried rice with pork or chicken?<br>Your turn, try making a sentence using &#39;ใส่&#39; (to add) and &#39;หรือ&#39; (or).</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-video-script-breakdown-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🚫</span>
+    </div>
+
+    <div class="main-text thai">ลูกค้า: ใส่ค่ะ แต่ไม่ใส่ผงชูรสนะคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-video-script-breakdown-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lûuk-káa: sài kâ, dtɛ̀ɛ mâi sài pǒng-chuu-rót ná ká</div>
+    <div class="support-text en-support">Customer: Add it (the egg), but no MSG please.</div>
+
+    
+    <details class="examples" id="row-video-script-breakdown-4-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        คำศัพท์ใหม่: ผงชูรส (pǒng-chuu-rót) คือ MSG ค่ะ เราใช้ &#39;ไม่ใส่&#39; เพื่อบอกว่าไม่ต้องการสิ่งนั้นค่ะ<br>1. ขอชาไม่ใส่น้ำตาล (kɔ̌ɔ chaa mâi sài nám-dtaan) <br>2. ขอกะเพราหมูไม่ใส่พริก (kɔ̌ɔ gà-prao mǔu mâi sài prík) <br>ลองใช้ &#39;ไม่ใส่&#39; บอกอาหารที่ไม่ต้องการดูนะคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-video-script-breakdown-4-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-4-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-4-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">kam-sàp mài: pǒng-chuu-rót kʉʉ MSG kâ. rao chái &#39;mâi sài&#39; pʉ̂ʉa bɔ̀ɔk wâa mâi dtɔ̂ɔng-gaan sìng nán kâ<br>1. kɔ̌ɔ chaa mâi sài nám-dtaan<br>2. kɔ̌ɔ gà-prao mǔu mâi sài prík<br>lɔɔng chái &#39;mâi sài&#39; bɔ̀ɔk aa-hǎan tîi mâi dtɔ̂ɔng-gaan duu ná ká</div>
+      <div class="support-text en-support">New vocab: ผงชูรส (pǒng-chuu-rót) is MSG. We use &#39;ไม่ใส่&#39; (mâi sài) to say we don&#39;t want something.<br>1. I&#39;d like tea without sugar.<br>2. I&#39;d like holy basil with pork, no chili.<br>Your turn, try using &#39;ไม่ใส่&#39; to say what you don&#39;t want in your food.</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-video-script-breakdown-5" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">➕</span>
+    </div>
+
+    <div class="main-text thai">คนเสิร์ฟ: จะสั่งอะไรเพิ่มอีกไหมครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-video-script-breakdown-5')">🔊</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-5', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-5', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">kon sə̀əp: jà sàng à-rai pə̂əm ìik mái kráp</div>
+    <div class="support-text en-support">Waiter: Would you like to order anything else?</div>
+
+    
+    <details class="examples" id="row-video-script-breakdown-5-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        คำศัพท์ใหม่: เพิ่ม (pə̂əm) แปลว่า to add หรือ more ค่ะ<br>1. ขอไข่ดาวเพิ่ม 1 ฟอง (kɔ̌ɔ kài daao pə̂əm nʉ̀ng fɔɔng) <br>2. จะรับอะไรเพิ่มไหมคะ (jà ráp à-rai pə̂əm mái ká) <br>ลองใช้คำว่า &#39;เพิ่ม&#39; แต่งประโยคดูนะคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-video-script-breakdown-5-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-5-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-5-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">kam-sàp mài: pə̂əm bplɛɛ wâa to add rʉ̌ʉ more kâ<br>1. kɔ̌ɔ kài daao pə̂əm nʉ̀ng fɔɔng<br>2. jà ráp à-rai pə̂əm mái ká<br>lɔɔng chái kam wâa &#39;pə̂əm&#39; dtɛ̀ng bprà-yòok duu ná ká</div>
+      <div class="support-text en-support">New vocab: เพิ่ม (pə̂əm) means to add or more.<br>1. I&#39;d like one more fried egg.<br>2. Would you like to have anything else?<br>Your turn, try making a sentence with &#39;เพิ่ม&#39; (more/add).</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-video-script-breakdown-6" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">✋</span>
+    </div>
+
+    <div class="main-text thai">ลูกค้า: ไม่ละคะ พอแล้ว</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-video-script-breakdown-6')">🔊</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-6', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-video-script-breakdown-6', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lûuk-káa: mâi lâ ká, pɔɔ lɛ́ɛo</div>
+    <div class="support-text en-support">Customer: No, that&#39;s enough.</div>
+
+    
+    <details class="examples" id="row-video-script-breakdown-6-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        พอแล้ว (pɔɔ lɛ́ɛo) แปลว่า That&#39;s enough ค่ะ<br>1. A: เอาเพิ่มอีกไหมคะ (ao pə̂əm ìik mái ká) / B: ไม่เป็นไรค่ะ พอแล้ว (mâi bpen rai kâ, pɔɔ lɛ́ɛo) <br>ลองฝึกพูด &#39;พอแล้ว&#39; นะคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-video-script-breakdown-6-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-6-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-video-script-breakdown-6-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">pɔɔ lɛ́ɛo bplɛɛ wâa That&#39;s enough kâ<br>1. A: ao pə̂əm ìik mái ká / B: mâi bpen rai kâ, pɔɔ lɛ́ɛo<br>lɔɔng fʉ̀k pûut &#39;pɔɔ lɛ́ɛo&#39; ná ká</div>
+      <div class="support-text en-support">พอแล้ว (pɔɔ lɛ́ɛo) means &#39;That&#39;s enough.&#39;<br>1. A: Do you want more? / B: No, thank you. That&#39;s enough.<br>Your turn, try practicing saying &#39;พอแล้ว&#39; (That&#39;s enough).</div>
+    </details>
+  
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คําถามเช็คความเข้าใจ" data-tts-lang="th-TH">
+    <h2 class="section-title">คำถามเช็คความเข้าใจ</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําถามเช็คความเข้าใจ')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําถามเช็คความเข้าใจ', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําถามเช็คความเข้าใจ', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kam-tǎam chék kwaam kâo-jai</div>
+    <div class="support-text en-support">Comprehension Questions</div>
+  </div>
+  <article class="card text-block" id="row-comprehension-questions-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">1️⃣</span>
+    </div>
+
+    <div class="main-text thai">ลูกค้าสั่งอาหารกี่จานคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-comprehension-questions-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lûuk-káa sàng aa-hǎan gìi jaan ká</div>
+    <div class="support-text en-support">How many dishes did the customer order? (Answer: หนึ่งจาน - One dish)</div>
+
+    
+  </article>
+<article class="card text-block" id="row-comprehension-questions-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🐔</span>
+    </div>
+
+    <div class="main-text thai">ลูกค้าสั่งข้าวผัดใส่อะไรคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-comprehension-questions-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lûuk-káa sàng kâao-pàt sài à-rai ká</div>
+    <div class="support-text en-support">What did the customer order in their fried rice? (Answer: ใส่ไก่กับไข่ - With chicken and egg)</div>
+
+    
+  </article>
+<article class="card text-block" id="row-comprehension-questions-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🚫</span>
+    </div>
+
+    <div class="main-text thai">ลูกค้าไม่ใส่อะไรในข้าวผัดคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-comprehension-questions-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lûuk-káa mâi sài à-rai nai kâao-pàt ká</div>
+    <div class="support-text en-support">What did the customer not want in the fried rice? (Answer: ไม่ใส่ผงชูรส - No MSG)</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คําถามสําหรับคุยกัน" data-tts-lang="th-TH">
+    <h2 class="section-title">คำถามสำหรับคุยกัน</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําถามสําหรับคุยกัน')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําถามสําหรับคุยกัน', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําถามสําหรับคุยกัน', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kam-tǎam sǎm-ràp kui gan</div>
+    <div class="support-text en-support">Discussion Questions</div>
+  </div>
+  <article class="card text-block" id="row-discussion-questions-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">💬</span>
+    </div>
+
+    <div class="main-text thai">ปกติกินอาหารที่ร้านบ่อยแค่ไหนคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-discussion-questions-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bpòk-gà-dtì gin aa-hǎan tîi ráan bɔ̀ɔi kâe nǎi ká</div>
+    <div class="support-text en-support">How often do you usually eat at restaurants?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-discussion-questions-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🦐</span>
+    </div>
+
+    <div class="main-text thai">ชอบกินข้าวผัดไหมคะ แล้วชอบใส่หมู ไก่ หรือกุ้งคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-discussion-questions-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">chɔ̂ɔp gin kâao-pàt mái ká, lɛ́ɛo chɔ̂ɔp sài mǔu, gài, rʉ̌ʉ gûng ká</div>
+    <div class="support-text en-support">Do you like fried rice? And do you like it with pork, chicken, or shrimp?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-discussion-questions-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🌶️</span>
+    </div>
+
+    <div class="main-text thai">มีอาหารอะไรที่ต้องบอกร้านว่า &#39;ไม่ใส่&#39; คะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-discussion-questions-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">mii aa-hǎan à-rai tîi dtɔ̂ɔng bɔ̀ɔk ráan wâa &#39;mâi sài&#39; ká</div>
+    <div class="support-text en-support">Is there any food where you have to tell the restaurant &#39;don&#39;t add&#39; something?</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-มาฝึกพูดกันค่ะ" data-tts-lang="th-TH">
+    <h2 class="section-title">มาฝึกพูดกันค่ะ</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-มาฝึกพูดกันค่ะ')">🔊</button>
+      <button type="button" onclick="togglePart('section-มาฝึกพูดกันค่ะ', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-มาฝึกพูดกันค่ะ', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">maa fʉ̀k pûut gan kâ</div>
+    <div class="support-text en-support">Let&#39;s Practice Speaking</div>
+  </div>
+  <article class="card text-block" id="row-speaking-tasks-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🎭</span>
+    </div>
+
+    <div class="main-text thai">สั่งอาหาร<br>เค้กเป็นคนเสิร์ฟ คุณเป็นลูกค้า ลองสั่ง &#39;ข้าวกะเพราหมู&#39; แล้วบอกว่า &#39;ใส่ไข่ดาว&#39; และ &#39;ไม่เผ็ด&#39; นะคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-tasks-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-tasks-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-tasks-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">sàng aa-hǎan<br>kéek bpen kon sə̀əp, kun bpen lûuk-káa. lɔɔng sàng &#39;kâao gà-prao mǔu&#39; lɛ́ɛo bɔ̀ɔk wâa &#39;sài kài daao&#39; lɛ́ &#39;mâi pèt&#39; ná ká</div>
+    <div class="support-text en-support">Role-play: Ordering food.<br>Cake is the server, you are the customer. Try to order &#39;Pad Krapow with pork&#39; and say you want a &#39;fried egg&#39; and &#39;not spicy&#39;.</div>
+
+    
+    <details class="examples" id="row-speaking-tasks-1-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        ตัวอย่าง:<br>คนเสิร์ฟ: รับอะไรดีคะ<br>ลูกค้า: ขอข้าวกะเพราหมู 1 จานค่ะ ใส่ไข่ดาว ไม่เผ็ดค่ะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-speaking-tasks-1-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-speaking-tasks-1-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-speaking-tasks-1-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">dtua-yàang:<br>kon-sə̀əp: ráp à-rai dii ká<br>lûuk-káa: kɔ̌ɔ kâao gà-prao mǔu nʉ̀ng jaan kâ, sài kài daao, mâi pèt kâ</div>
+      <div class="support-text en-support">Example:<br>Server: What would you like?<br>Customer: I&#39;d like one plate of Pad Krapow with pork, please. Add a fried egg, not spicy.</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-speaking-tasks-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">✍️</span>
+    </div>
+
+    <div class="main-text thai">บอกว่าคุณอยากกินอะไร และอยาก/ไม่อยากใส่อะไร<br>เช่น: อยากกินข้าวไข่เจียว ใส่หมูสับ ไม่ใส่ต้นหอม</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-tasks-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-tasks-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-tasks-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">bɔ̀ɔk wâa kun yàak gin à-rai lɛ́ yàak/mâi yàak sài à-rai<br>chêen: yàak gin kâao kài-jiao sài mǔu-sàp mâi sài dtôn-hɔ̌ɔm</div>
+    <div class="support-text en-support">Create sentences: Say what you want to eat, and what you want/don&#39;t want to add.<br>Example: I want to eat an omelette on rice, with minced pork, no spring onions.</div>
+
+    
+    <details class="examples" id="row-speaking-tasks-2-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        1. อยากกินก๋วยเตี๋ยว... (yàak gin gǔai-dtǐao...)<br>2. อยากกินส้มตำ... (yàak gin sôm-dtam...)<br>3. อยากกินต้มยำ... (yàak gin dtôm-yam...)
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-speaking-tasks-2-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-speaking-tasks-2-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-speaking-tasks-2-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">1. yàak gin gǔai-dtǐao...<br>2. yàak gin sôm-dtam...<br>3. yàak gin dtôm-yam...</div>
+      <div class="support-text en-support">1. I want to eat noodles...<br>2. I want to eat som tum...<br>3. I want to eat tom yum...</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-speaking-tasks-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🍽️</span>
+    </div>
+
+    <div class="main-text thai">สั่งอาหารเพิ่ม<br>คุณกินข้าวผัดแล้ว แต่ยังไม่อิ่ม ลองสั่งอาหารเพิ่ม 1 อย่างกับเค้กนะคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-tasks-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-tasks-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-tasks-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">sàng aa-hǎan pə̂əm<br>kun gin kâao-pàt lɛ́ɛo, dtɛ̀ɛ yang mâi ìm. lɔɔng sàng aa-hǎan pə̂əm nʉ̀ng yàang gàp kéek ná ká</div>
+    <div class="support-text en-support">Role-play: Ordering more food.<br>You&#39;ve eaten fried rice but you&#39;re still not full. Try ordering one more dish from Cake.</div>
+
+    
+    <details class="examples" id="row-speaking-tasks-3-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        คนเสิร์ฟ: รับอะไรเพิ่มไหมคะ<br>ลูกค้า: ขอ...เพิ่มอีก 1 จานค่ะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-speaking-tasks-3-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-speaking-tasks-3-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-speaking-tasks-3-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">kon-sə̀əp: ráp à-rai pə̂əm mái ká<br>lûuk-káa: kɔ̌ɔ... pə̂əm ìik nʉ̀ng jaan kâ</div>
+      <div class="support-text en-support">Server: Would you like anything else?<br>Customer: I&#39;d like one more plate of..., please.</div>
+    </details>
+  
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-กิจกรรมเพิ่มเติม" data-tts-lang="th-TH">
+    <h2 class="section-title">กิจกรรมเพิ่มเติม</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-กิจกรรมเพิ่มเติม')">🔊</button>
+      <button type="button" onclick="togglePart('section-กิจกรรมเพิ่มเติม', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-กิจกรรมเพิ่มเติม', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">gìt-jà-gam pə̂əm-dtəəm</div>
+    <div class="support-text en-support">Extension Activities</div>
+  </div>
+  <article class="card text-block" id="row-extension-activities-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">📖</span>
+    </div>
+
+    <div class="main-text thai">ฝึกสั่งอาหารอื่นๆ ที่ร้านอาหารตามสั่ง<br>เค้กจะให้ชื่อเมนู แล้วลองสั่งโดยใช้ &#39;ขอ... 1 จาน&#39; และบอกว่าอยาก/ไม่อยากใส่อะไรนะคะ<br>1. ข้าวคะน้าหมูกรอบ (kâao ká-náa mǔu grɔ̀ɔp)<br>2. ข้าวพริกแกงไก่ (kâao prík gɛɛng gài)</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-extension-activities-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-extension-activities-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-extension-activities-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">fʉ̀k sàng aa-hǎan ʉ̀ʉn-ʉ̀ʉn tîi ráan aa-hǎan dtaam sàng<br>kéek jà hâi chʉ̂ʉ mee-nuu, lɛ́ɛo lɔɔng sàng dooi chái &#39;kɔ̌ɔ... nʉ̀ng jaan&#39; lɛ́ bɔ̀ɔk wâa yàak/mâi yàak sài à-rai ná ká<br>1. kâao ká-náa mǔu grɔ̀ɔp<br>2. kâao prík gɛɛng gài</div>
+    <div class="support-text en-support">Practice ordering other dishes at a made-to-order food stall.<br>Cake will give you a menu item, and you try to order it using &#39;I&#39;d like... one plate&#39; and say what you want/don&#39;t want in it.<br>1. Rice with crispy pork and Chinese kale<br>2. Rice with chicken and red curry stir-fry</div>
+
+    
+    <details class="examples" id="row-extension-activities-1-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        ตัวอย่าง: ขอข้าวคะน้าหมูกรอบ 1 จานค่ะ ไม่เผ็ดค่ะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-extension-activities-1-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-extension-activities-1-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-extension-activities-1-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">dtua-yàang: kɔ̌ɔ kâao ká-náa mǔu grɔ̀ɔp nʉ̀ng jaan kâ, mâi pèt kâ</div>
+      <div class="support-text en-support">Example: I&#39;d like one plate of rice with crispy pork and Chinese kale, please. Not spicy.</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-extension-activities-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🔁</span>
+    </div>
+
+    <div class="main-text thai">ตอนนี้คุณเป็นคนเสิร์ฟ ลองถามเค้กว่า &#39;จะสั่งอะไรดีครับ/คะ&#39; และถามเกี่ยวกับรายละเอียดอาหารนะคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-extension-activities-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-extension-activities-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-extension-activities-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">dtɔɔn-níi kun bpen kon sə̀əp, lɔɔng tǎam kéek wâa &#39;jà sàng à-rai dii&#39; lɛ́ tǎam gìao-gàp raai-lá-ìat aa-hǎan ná ká</div>
+    <div class="support-text en-support">Switch roles: Now you are the server. Try asking Cake &#39;What would you like to order?&#39; and ask about the details of the food.</div>
+
+    
+    <details class="examples" id="row-extension-activities-2-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        ตัวอย่างคำถาม:<br>- จะสั่งอะไรดีคะ (jà sàng à-rai dii ká)<br>- รับอะไรเพิ่มไหมคะ (ráp à-rai pə̂əm mái ká)<br>- ใส่ไข่ดาวไหมคะ (sài kài-daao mái ká)
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-extension-activities-2-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-extension-activities-2-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-extension-activities-2-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">dtua-yàang kam-tǎam:<br>- jà sàng à-rai dii ká<br>- ráp à-rai pə̂əm mái ká<br>- sài kài-daao mái ká</div>
+      <div class="support-text en-support">Example questions:<br>- What would you like to order?<br>- Would you like anything else?<br>- Would you like a fried egg?</div>
+    </details>
+  
+  </article>
+</section>
+<footer>Generated from the edited Lesson_Builder sheet.</footer>
+</main>
+
+<script>
+function togglePart(rowId, type) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+
+  let el = null;
+
+  if (type === 'ipa') {
+    el = block.querySelector('.ipa-support');
+  } else {
+    el = block.querySelector('.support-text');
+  }
+
+  if (el) el.classList.toggle('show');
+}
+
+function speakMainText(rowId) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+
+  const main = block.querySelector('.main-text, .page-title, .section-title, .heading-text, .examples-main');
+  if (!main || !main.textContent.trim()) return;
+
+  speechSynthesis.cancel();
+
+  const u = new SpeechSynthesisUtterance(main.textContent.trim());
+  u.lang = block.dataset.ttsLang || 'th-TH';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+function toggleThaiFont() {
+  document.body.classList.toggle('modern-thai');
+  localStorage.setItem(
+    'talkacakeThaiFont',
+    document.body.classList.contains('modern-thai') ? 'modern' : 'default'
+  );
+}
+
+(function initThaiFont() {
+  const saved = localStorage.getItem('talkacakeThaiFont');
+  if (saved === 'modern') {
+    document.body.classList.add('modern-thai');
+  }
+})();
+
+</script>
+</body>
+</html>
