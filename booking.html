@@ -113,6 +113,39 @@
     .duration-link:hover {
       transform: translateY(-2px);
     }
+
+    /* Booking builder: all options work locally; pricing/checkout need integration. */
+    .wizard-step[hidden], [hidden] { display: none !important; }
+    .choice-button {
+      width: 100%; text-align: left; border: 2px solid #e8e3e7;
+      border-radius: 1.3rem; background: rgba(255,255,255,.94);
+      padding: 1.1rem; transition: border-color .15s, transform .15s, background .15s;
+      cursor: pointer;
+    }
+    .choice-button:hover { border-color: var(--pink); transform: translateY(-2px); }
+    .choice-button[aria-pressed="true"] {
+      border-color: #e75682; background: #fff1f6;
+      box-shadow: 0 0 0 2px rgba(231,86,130,.08);
+    }
+    .choice-button:focus-visible, .booking-action:focus-visible {
+      outline: 3px solid #1d4ed8; outline-offset: 3px;
+    }
+    .step-number {
+      width: 2.2rem; height: 2.2rem; display: inline-flex;
+      align-items: center; justify-content: center; background: var(--soft-pink);
+      color: #9e2554; border-radius: 999px; font-weight: 900;
+    }
+    .wizard-step { scroll-margin-top: 6.5rem; }
+    .summary-line { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    .summary-line > :last-child { text-align: right; }
+    .booking-action {
+      display: block; width: 100%; border-radius: 999px; padding: 1rem 1.25rem;
+      text-align: center; font-weight: 900; color: white; background: #e75682;
+      box-shadow: 0 12px 28px rgba(231,86,130,.22);
+    }
+    .booking-action:hover { background: #d63b6d; }
+    .booking-action[disabled] { color: #65606a; background: #e5e2e6; box-shadow: none; cursor: not-allowed; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
@@ -127,6 +160,7 @@
       <div class="hidden items-center gap-8 text-sm font-bold md:flex">
         <a class="nav-link" href="./index.html">Home<br /><span class="thai text-xs text-zinc-500">หน้าแรก</span></a>
         <a class="nav-link" href="#subjects">Lessons<br /><span class="thai text-xs text-zinc-500">บทเรียน</span></a>
+        <a class="nav-link" href="#group-lessons">Group lessons<br /><span class="thai text-xs text-zinc-500">คลาสกลุ่ม</span></a>
         <a class="nav-link" href="#policy">Policy<br /><span class="thai text-xs text-zinc-500">นโยบาย</span></a>
       </div>
       <a href="#subjects" class="cute-button rounded-full bg-pink-400 px-5 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-pink-200">Book<br /><span class="thai text-xs">จองคลาส</span></a>
@@ -166,91 +200,132 @@
       </div>
     </section>
 
-    <section class="px-5 pb-8 lg:px-8">
+    <section class="px-5 pb-6 lg:px-8">
       <div class="mx-auto max-w-6xl rounded-[2rem] bg-white/85 p-5 shadow-sm ring-1 ring-white/80 md:p-6 sticker">
-        <div class="grid gap-4 md:grid-cols-3">
-          <div class="rounded-3xl bg-pink-50 p-5">
-            <p class="font-extrabold text-pink-700">1. Choose subject</p>
-            <p class="thai mt-1 font-bold text-pink-600">เลือกวิชา</p>
-            <p class="mt-2 text-sm text-zinc-600">Thai, English, or Maths</p>
-            <p class="thai mt-1 text-sm text-zinc-500">ภาษาไทย ภาษาอังกฤษ หรือคณิตศาสตร์</p>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[.12em] text-pink-600">Build your lesson</p>
+            <h2 class="text-2xl font-black">One choice at a time ✨</h2>
+            <p class="thai mt-1 text-sm font-bold text-zinc-500">เลือกวิชา ระยะเวลา และรูปแบบการซื้อทีละขั้นตอน</p>
           </div>
-          <div class="rounded-3xl bg-sky-50 p-5">
-            <p class="font-extrabold text-sky-700">2. Choose duration</p>
-            <p class="thai mt-1 font-bold text-sky-600">เลือกระยะเวลา</p>
-            <p class="mt-2 text-sm text-zinc-600">30, 45, or 60 minutes</p>
-            <p class="thai mt-1 text-sm text-zinc-500">30, 45 หรือ 60 นาที</p>
-          </div>
-          <div class="rounded-3xl bg-amber-50 p-5">
-            <p class="font-extrabold text-amber-700">3. Confirm booking</p>
-            <p class="thai mt-1 font-bold text-amber-600">ยืนยันการจอง</p>
-            <p class="mt-2 text-sm text-zinc-600">Pay online to secure your slot</p>
-            <p class="thai mt-1 text-sm text-zinc-500">ชำระเงินออนไลน์เพื่อยืนยันเวลาเรียน</p>
-          </div>
+          <span class="rounded-full bg-zinc-100 px-4 py-2 text-xs font-extrabold text-zinc-600">New checkout: preview mode</span>
         </div>
+        <p class="mt-3 text-sm leading-6 text-zinc-600">Single lessons without add-ons still lead to the existing Google Calendar booking pages. Package and Anki checkout will be enabled only after pricing and payments are connected.</p>
+        <p class="thai mt-1 text-sm leading-6 text-zinc-500">ขณะนี้ยังจองคลาสเดี่ยวแบบไม่มีบริการเสริมผ่าน Google Calendar ได้ตามปกติ ส่วนแพ็กเกจและ Anki ยังไม่เปิดชำระเงิน</p>
       </div>
     </section>
 
     <section id="subjects" class="px-5 py-8 lg:px-8">
-      <div class="mx-auto max-w-6xl">
-        <div class="mx-auto mb-10 max-w-3xl text-center">
-          <p class="font-extrabold uppercase tracking-[0.25em] text-pink-400">Lesson Options</p>
-          <p class="thai mt-1 font-bold text-zinc-500">ตัวเลือกบทเรียน</p>
-          <h2 class="section-title mt-3 text-3xl font-black sm:text-4xl"><span>Choose your lesson type</span></h2>
-          <p class="thai mt-2 text-2xl font-extrabold text-zinc-700">เลือกประเภทคลาสที่ต้องการ</p>
+      <div class="mx-auto max-w-6xl grid items-start gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,1fr)]">
+        <div class="space-y-5">
+          <section id="step-subject" class="wizard-step glass-card rounded-[2rem] p-6" aria-labelledby="subject-heading">
+            <div class="mb-5 flex items-center gap-3"><span class="step-number">1</span><div>
+              <h2 id="subject-heading" class="text-xl font-black">What would you like to learn?</h2>
+              <p class="thai text-sm text-zinc-500">อยากเรียนวิชาอะไร?</p>
+            </div></div>
+            <div class="grid gap-3 sm:grid-cols-3" id="subject-options">
+              <button type="button" class="choice-button" data-subject="Thai" aria-pressed="false"><span class="block text-3xl">🇹🇭</span><span class="mt-2 block text-lg font-black">Thai</span><span class="thai block text-sm text-zinc-500">ภาษาไทย</span></button>
+              <button type="button" class="choice-button" data-subject="English" aria-pressed="false"><span class="block text-3xl">🌍</span><span class="mt-2 block text-lg font-black">English</span><span class="thai block text-sm text-zinc-500">ภาษาอังกฤษ</span></button>
+              <button type="button" class="choice-button" data-subject="Maths" aria-pressed="false"><span class="block text-3xl">➗</span><span class="mt-2 block text-lg font-black">Maths</span><span class="thai block text-sm text-zinc-500">คณิตศาสตร์</span></button>
+            </div>
+          </section>
+
+          <section id="step-duration" class="wizard-step glass-card rounded-[2rem] p-6" aria-labelledby="duration-heading" hidden>
+            <div class="mb-5 flex items-center gap-3"><span class="step-number">2</span><div>
+              <h2 id="duration-heading" class="text-xl font-black">How long would you like to learn?</h2>
+              <p class="thai text-sm text-zinc-500">อยากเรียนกี่นาทีต่อครั้ง?</p>
+            </div></div>
+            <div class="grid gap-3 sm:grid-cols-3" id="duration-options">
+              <button type="button" class="choice-button text-center" data-duration="30" aria-pressed="false"><span class="block text-2xl font-black">30</span><span class="block text-sm text-zinc-500">minutes · นาที</span></button>
+              <button type="button" class="choice-button text-center" data-duration="45" aria-pressed="false"><span class="block text-2xl font-black">45</span><span class="block text-sm text-zinc-500">minutes · นาที</span></button>
+              <button type="button" class="choice-button text-center" data-duration="60" aria-pressed="false"><span class="block text-2xl font-black">60</span><span class="block text-sm text-zinc-500">minutes · นาที</span></button>
+            </div>
+          </section>
+
+          <section id="step-anki" class="wizard-step glass-card rounded-[2rem] p-6" aria-labelledby="anki-heading" hidden>
+            <div class="mb-4 flex items-center gap-3"><span class="step-number">3</span><div>
+              <h2 id="anki-heading" class="text-xl font-black">Add Anki vocabulary flashcards?</h2>
+              <p class="thai text-sm text-zinc-500">ต้องการบัตรคำศัพท์ Anki เพิ่มไหม?</p>
+            </div></div>
+            <p class="mb-4 text-sm text-zinc-600">Optional, +US$2 per lesson. The add-on is priced separately from tuition discounts.</p>
+            <div class="grid gap-3 sm:grid-cols-2" id="anki-options">
+              <button type="button" class="choice-button" data-anki="yes" aria-pressed="false"><span class="block font-black">Yes, please! 🃏</span><span class="text-sm text-zinc-500">+US$2 for each lesson</span></button>
+              <button type="button" class="choice-button" data-anki="no" aria-pressed="false"><span class="block font-black">No, thanks</span><span class="text-sm text-zinc-500">No extra charge</span></button>
+            </div>
+          </section>
+
+          <section id="step-package" class="wizard-step glass-card rounded-[2rem] p-6" aria-labelledby="package-heading" hidden>
+            <div class="mb-4 flex items-center gap-3"><span class="step-number">4</span><div>
+              <h2 id="package-heading" class="text-xl font-black">Single lesson or package?</h2>
+              <p class="thai text-sm text-zinc-500">จองครั้งเดียวหรือซื้อแพ็กเกจ?</p>
+            </div></div>
+            <div class="grid gap-3 sm:grid-cols-3" id="package-options">
+              <button type="button" class="choice-button" data-quantity="1" aria-pressed="false"><span class="block text-lg font-black">1 lesson</span><span class="block text-sm text-zinc-500">Standard price</span><span class="thai text-xs text-zinc-500">คลาสเดี่ยว</span></button>
+              <button type="button" class="choice-button" data-quantity="5" aria-pressed="false"><span class="block text-lg font-black">5 lessons</span><span class="block text-sm font-extrabold text-pink-700">Save 2% on tuition</span><span class="thai text-xs text-zinc-500">แพ็กเกจ 5 คลาส</span></button>
+              <button type="button" class="choice-button" data-quantity="10" aria-pressed="false"><span class="block text-lg font-black">10 lessons</span><span class="block text-sm font-extrabold text-pink-700">Save 4% on tuition</span><span class="thai text-xs text-zinc-500">แพ็กเกจ 10 คลาส</span></button>
+            </div>
+            <p class="mt-4 text-sm leading-6 text-zinc-600">Package lessons will be booked one at a time, subject to availability. Buying a package does not reserve a recurring time slot.</p>
+          </section>
+
+          <section id="step-review" class="wizard-step glass-card rounded-[2rem] p-6" aria-labelledby="review-heading" hidden>
+            <div class="mb-4 flex items-center gap-3"><span class="step-number">5</span><div>
+              <h2 id="review-heading" class="text-xl font-black">Review your selection</h2>
+              <p class="thai text-sm text-zinc-500">ตรวจสอบตัวเลือกก่อนจอง</p>
+            </div></div>
+            <p class="text-sm leading-6 text-zinc-600" id="review-explanation" role="status" aria-live="polite"></p>
+            <a id="live-booking-link" class="booking-action mt-5" href="#" rel="noopener noreferrer" hidden>Continue to available times →</a>
+            <button id="unavailable-checkout" type="button" class="booking-action mt-5" disabled hidden>Package + add-on checkout coming soon</button>
+            <p class="thai mt-2 text-center text-xs text-zinc-500" id="review-thai"></p>
+            <button type="button" id="reset-purchase" class="mt-5 text-sm font-bold text-pink-700 underline underline-offset-4" hidden>Switch to a regular single lesson</button>
+          </section>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-3">
-          <article class="glass-card rounded-[2rem] p-6">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <h3 class="text-2xl font-black text-zinc-900">Thai Lessons</h3>
-                <p class="thai mt-1 text-xl font-extrabold text-pink-600">ภาษาไทย</p>
-                <p class="mt-3 text-sm leading-6 text-zinc-600">Speaking, pronunciation, reading, writing, vocabulary and real-life communication.</p>
-                <p class="thai mt-1 text-sm leading-6 text-zinc-500">ฝึกพูด ออกเสียง อ่าน เขียน คำศัพท์ และการสื่อสารในชีวิตจริง</p>
-              </div>
-              <span class="text-4xl">🇹🇭</span>
+        <aside class="lg:sticky lg:top-28">
+          <div class="glass-card rounded-[2rem] p-6" aria-live="polite" aria-atomic="true">
+            <p class="text-sm font-black uppercase tracking-widest text-pink-500">Your selection</p>
+            <h2 class="mt-1 text-2xl font-black">Lesson summary</h2>
+            <p class="thai text-sm text-zinc-500">สรุปการจอง</p>
+            <div class="mt-6 space-y-3 text-sm">
+              <div class="summary-line"><span class="text-zinc-500">Subject</span><strong id="summary-subject">Choose a subject</strong></div>
+              <div class="summary-line"><span class="text-zinc-500">Duration</span><strong id="summary-duration">—</strong></div>
+              <div class="summary-line"><span class="text-zinc-500">Anki</span><strong id="summary-anki">—</strong></div>
+              <div class="summary-line"><span class="text-zinc-500">Lessons</span><strong id="summary-quantity">—</strong></div>
             </div>
-            <div class="mt-6 space-y-3">
-              <a href="https://calendar.app.google/gmokzq2qzUWpdjnp8" class="duration-link bg-pink-400 text-white shadow-lg shadow-pink-200 hover:bg-pink-500">Book Thai · 30 min<br /><span class="thai text-sm font-bold">จองภาษาไทย · 30 นาที</span></a>
-              <a href="https://calendar.app.google/X8U7XSqayHsyF3wr8" class="duration-link bg-pink-100 text-pink-800 hover:bg-pink-200">Book Thai · 45 min<br /><span class="thai text-sm font-bold">จองภาษาไทย · 45 นาที</span></a>
-              <a href="https://calendar.app.google/DDuWDYEb7Qp6ZQZE7" class="duration-link bg-white text-pink-700 ring-1 ring-pink-200 hover:bg-pink-50">Book Thai · 60 min<br /><span class="thai text-sm font-bold">จองภาษาไทย · 60 นาที</span></a>
+            <hr class="my-5 border-zinc-200" />
+            <div class="space-y-3 text-sm">
+              <div class="summary-line"><span class="text-zinc-500">Tuition (before discount)</span><strong id="summary-subtotal">—</strong></div>
+              <div class="summary-line"><span class="text-zinc-500">Package discount</span><strong id="summary-discount">—</strong></div>
+              <div class="summary-line"><span class="text-zinc-500">Anki add-on</span><strong id="summary-addon">—</strong></div>
+              <div class="summary-line items-center"><span class="font-black">Total</span><strong class="text-2xl font-black" id="summary-total">—</strong></div>
             </div>
-          </article>
-
-          <article class="glass-card rounded-[2rem] p-6">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <h3 class="text-2xl font-black text-zinc-900">English Lessons</h3>
-                <p class="thai mt-1 text-xl font-extrabold text-sky-600">ภาษาอังกฤษ</p>
-                <p class="mt-3 text-sm leading-6 text-zinc-600">Conversation, IELTS, TOEIC, HKDSE, TSA, writing, CVs, cover letters and SOPs.</p>
-                <p class="thai mt-1 text-sm leading-6 text-zinc-500">สนทนา IELTS, TOEIC, HKDSE, TSA, การเขียน CV, Cover Letter และ SOP</p>
-              </div>
-              <span class="text-4xl">🌍</span>
-            </div>
-            <div class="mt-6 space-y-3">
-              <a href="https://calendar.app.google/w8eaGH7dZ2Ye3kmR6" class="duration-link bg-sky-400 text-white shadow-lg shadow-sky-200 hover:bg-sky-500">Book English · 30 min<br /><span class="thai text-sm font-bold">จองภาษาอังกฤษ · 30 นาที</span></a>
-              <a href="https://calendar.app.google/hYUMsytdgQyvDmaT9" class="duration-link bg-sky-100 text-sky-800 hover:bg-sky-200">Book English · 45 min<br /><span class="thai text-sm font-bold">จองภาษาอังกฤษ · 45 นาที</span></a>
-              <a href="https://calendar.app.google/74WbbLkbsPpapXu96" class="duration-link bg-white text-sky-700 ring-1 ring-sky-200 hover:bg-sky-50">Book English · 60 min<br /><span class="thai text-sm font-bold">จองภาษาอังกฤษ · 60 นาที</span></a>
-            </div>
-          </article>
-
-          <article class="glass-card rounded-[2rem] p-6">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <h3 class="text-2xl font-black text-zinc-900">Maths Lessons</h3>
-                <p class="thai mt-1 text-xl font-extrabold text-amber-600">คณิตศาสตร์</p>
-                <p class="mt-3 text-sm leading-6 text-zinc-600">Maths support up to Year 7, including homework help, confidence building and problem solving.</p>
-                <p class="thai mt-1 text-sm leading-6 text-zinc-500">คณิตศาสตร์ถึง Year 7 ช่วยทำการบ้าน เพิ่มความมั่นใจ และฝึกแก้โจทย์</p>
-              </div>
-              <span class="text-4xl">➗</span>
-            </div>
-            <div class="mt-6 space-y-3">
-              <a href="https://calendar.app.google/rYkHcq4reW8o5coYA" class="duration-link bg-amber-400 text-white shadow-lg shadow-amber-200 hover:bg-amber-500">Book Maths · 30 min<br /><span class="thai text-sm font-bold">จองคณิตศาสตร์ · 30 นาที</span></a>
-              <a href="https://calendar.app.google/Wcof9HBRyXaaYECt7" class="duration-link bg-amber-100 text-amber-800 hover:bg-amber-200">Book Maths · 45 min<br /><span class="thai text-sm font-bold">จองคณิตศาสตร์ · 45 นาที</span></a>
-              <a href="https://calendar.app.google/nss1J5hxGNHryQiz7" class="duration-link bg-white text-amber-700 ring-1 ring-amber-200 hover:bg-amber-50">Book Maths · 60 min<br /><span class="thai text-sm font-bold">จองคณิตศาสตร์ · 60 นาที</span></a>
-            </div>
-          </article>
+            <p id="pricing-note" class="mt-5 rounded-2xl bg-amber-50 p-3 text-xs leading-5 text-zinc-700">Real lesson prices still need to be configured before an estimated total can be shown. The existing Google Calendar booking page remains the source of live single-lesson prices.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <!-- Group interest: this is deliberately separate from the paid booking wizard. -->
+    <section id="group-lessons" class="px-5 py-10 lg:px-8 scroll-mt-24" aria-labelledby="group-lessons-heading">
+      <div class="mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-purple-100 bg-white/90 p-6 shadow-lg shadow-purple-100/40 md:p-10">
+        <div class="grid items-center gap-8 md:grid-cols-[1.45fr_1fr]">
+          <div>
+            <p class="text-sm font-black uppercase tracking-widest text-purple-600">Group lessons · Interest survey</p>
+            <h2 id="group-lessons-heading" class="mt-2 text-3xl font-black text-zinc-900">Would you like to learn with others? 👥</h2>
+            <p class="thai mt-2 text-xl font-extrabold text-purple-700">สนใจเรียนแบบกลุ่มไหม?</p>
+            <p class="mt-4 leading-7 text-zinc-600">I'm exploring small group classes in Thai, English and Maths. Tell me your level, the topics you'd enjoy, your preferred days and times, and your ideal group size. Your answers will help me decide which groups to offer.</p>
+            <p class="thai mt-2 text-sm leading-6 text-zinc-500">เค้กกำลังสำรวจความสนใจเรียนแบบกลุ่ม ลองบอกระดับ หัวข้อ วันที่ เวลา และจำนวนคนที่อยากเรียนด้วยกันได้นะ</p>
+            <p class="mt-3 text-sm font-bold text-zinc-700">No payment, commitment or guaranteed place — I'll contact you if a suitable group becomes possible.</p>
+            <a id="group-interest-link" href="#" hidden target="_blank" rel="noopener noreferrer" class="cute-button mt-6 inline-flex items-center justify-center rounded-full bg-purple-600 px-6 py-3 font-extrabold text-white shadow-lg shadow-purple-100 hover:bg-purple-700">Register your interest →</a>
+            <p id="group-interest-pending" class="mt-5 inline-block rounded-xl bg-purple-50 px-4 py-3 text-sm font-bold text-purple-800">The interest form is being connected. Registration is not open yet.</p>
+          </div>
+          <div class="rounded-[1.6rem] bg-gradient-to-br from-purple-50 via-pink-50 to-sky-50 p-6">
+            <h3 class="text-lg font-black text-purple-800">What would I like to know?</h3>
+            <ul class="mt-4 space-y-3 text-sm font-bold text-zinc-700">
+              <li>📚 Subject, level and learning interests</li>
+              <li>📆 Days and times that work for you</li>
+              <li>🌏 Your time zone</li>
+              <li>👥 Preferred group size (2–3, 4–6 or 7–10)</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -265,8 +340,8 @@
           <div class="rounded-3xl bg-pink-50 p-5">
             <p class="font-extrabold text-zinc-800">Payment confirms your booking</p>
             <p class="thai mt-1 font-bold text-pink-600">การชำระเงินเป็นการยืนยันการจอง</p>
-            <p class="mt-3 text-sm leading-6 text-zinc-600">Your lesson slot is confirmed once payment is completed during booking.</p>
-            <p class="thai mt-1 text-sm leading-6 text-zinc-500">เวลาเรียนจะได้รับการยืนยันเมื่อชำระเงินเรียบร้อยระหว่างการจอง</p>
+            <p class="mt-3 text-sm leading-6 text-zinc-600">For current single lessons, your lesson slot is confirmed after payment on Google Calendar. New package checkout is not active yet.</p>
+            <p class="thai mt-1 text-sm leading-6 text-zinc-500">สำหรับคลาสเดี่ยวในปัจจุบัน จะยืนยันเวลาเรียนหลังชำระเงินใน Google Calendar ส่วนระบบชำระเงินแพ็กเกจยังไม่เปิดใช้งาน</p>
           </div>
           <div class="rounded-3xl bg-sky-50 p-5">
             <p class="font-extrabold text-zinc-800">Refunds and rescheduling</p>
@@ -287,7 +362,192 @@
   </main>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    'use strict';
+    /*
+      FRONTEND-ONLY PREVIEW. No Apps Script calls or Stripe payments are made.
+      Do not interpret these calculations as proof of payment or available slots.
+      These 9 prices must be configured from the actual Pricing sheet later.
+      null means "do not display a made-up price".
+    */
+    const BOOKING_CONFIG = {
+      currency: 'USD',
+      ankiPricePerLesson: 2,
+      discounts: {1: 0, 5: 0.02, 10: 0.04},
+      prices: {
+        Thai: {30: null, 45: null, 60: null},
+        English: {30: null, 45: null, 60: null},
+        Maths: {30: null, 45: null, 60: null}
+      },
+      currentCalendarLinks: {
+        Thai: {
+          30: 'https://calendar.app.google/gmokzq2qzUWpdjnp8',
+          45: 'https://calendar.app.google/X8U7XSqayHsyF3wr8',
+          60: 'https://calendar.app.google/DDuWDYEb7Qp6ZQZE7'
+        },
+        English: {
+          30: 'https://calendar.app.google/w8eaGH7dZ2Ye3kmR6',
+          45: 'https://calendar.app.google/hYUMsytdgQyvDmaT9',
+          60: 'https://calendar.app.google/74WbbLkbsPpapXu96'
+        },
+        Maths: {
+          30: 'https://calendar.app.google/rYkHcq4reW8o5coYA',
+          45: 'https://calendar.app.google/Wcof9HBRyXaaYECt7',
+          60: 'https://calendar.app.google/nss1J5hxGNHryQiz7'
+        }
+      }
+    };
+
+    // CODING LESSON: After deploying the separate Group Interest Apps Script,
+    // paste the *web app /exec URL* between these quotes to enable registration.
+    // Example format: https://script.google.com/macros/s/DEPLOYMENT_ID/exec
+    const GROUP_INTEREST_FORM_URL = '';
+
+    const state = { subject: null, duration: null, wantsAnki: null, quantity: null };
+    const $ = id => document.getElementById(id);
+    const show = (id, yes) => { $(id).hidden = !yes; };
+    const money = value => new Intl.NumberFormat('en-US', {
+      style: 'currency', currency: BOOKING_CONFIG.currency
+    }).format(value);
+    const scrollToStep = id => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      $(id).scrollIntoView({behavior: 'smooth', block: 'start'});
+    };
+
+    function updatePressed() {
+      document.querySelectorAll('[data-subject]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.subject === state.subject));
+      });
+      document.querySelectorAll('[data-duration]').forEach(button => {
+        button.setAttribute('aria-pressed', String(Number(button.dataset.duration) === state.duration));
+      });
+      document.querySelectorAll('[data-anki]').forEach(button => {
+        button.setAttribute('aria-pressed', String((button.dataset.anki === 'yes') === state.wantsAnki && state.wantsAnki !== null));
+      });
+      document.querySelectorAll('[data-quantity]').forEach(button => {
+        button.setAttribute('aria-pressed', String(Number(button.dataset.quantity) === state.quantity));
+      });
+    }
+
+    function updateSummary() {
+      $('summary-subject').textContent = state.subject || 'Choose a subject';
+      $('summary-duration').textContent = state.duration ? `${state.duration} minutes` : '—';
+      $('summary-anki').textContent = state.wantsAnki === null ? '—' : (state.wantsAnki ? 'Yes (+$2 / lesson)' : 'No');
+      $('summary-quantity').textContent = state.quantity === null ? '—' : `${state.quantity} ${state.quantity === 1 ? 'lesson' : 'lessons'}`;
+
+      const hasPrice = state.subject && state.duration &&
+        Number.isFinite(BOOKING_CONFIG.prices[state.subject][state.duration]);
+      const hasOrder = state.quantity !== null && state.wantsAnki !== null;
+      if (!hasOrder) {
+        $('summary-subtotal').textContent = '—';
+        $('summary-discount').textContent = '—';
+        $('summary-addon').textContent = '—';
+        $('summary-total').textContent = '—';
+      } else {
+        const addon = state.wantsAnki ? BOOKING_CONFIG.ankiPricePerLesson * state.quantity : 0;
+        const discountRate = BOOKING_CONFIG.discounts[state.quantity];
+        $('summary-addon').textContent = money(addon);
+        $('summary-discount').textContent = `${Math.round(discountRate * 100)}% of tuition`;
+        if (hasPrice) {
+          const tuition = BOOKING_CONFIG.prices[state.subject][state.duration] * state.quantity;
+          const discount = Math.round(tuition * discountRate * 100) / 100;
+          $('summary-subtotal').textContent = money(tuition);
+          $('summary-discount').textContent = '−' + money(discount);
+          $('summary-total').textContent = money(tuition - discount + addon);
+        } else {
+          $('summary-subtotal').textContent = 'Price not set';
+          $('summary-total').textContent = 'Price pending';
+        }
+      }
+      $('pricing-note').textContent = 'Preview only. Real prices and payment will be calculated securely by the booking backend once connected. Until then, the Google Calendar page controls the live price for regular single lessons.';
+    }
+
+    function updateReview() {
+      const ready = state.subject && state.duration && state.wantsAnki !== null && state.quantity !== null;
+      show('step-review', Boolean(ready));
+      show('reset-purchase', Boolean(ready && (state.quantity !== 1 || state.wantsAnki)));
+      if (!ready) {
+        show('live-booking-link', false);
+        show('unavailable-checkout', false);
+        return;
+      }
+      const regularSingle = state.quantity === 1 && !state.wantsAnki;
+      show('live-booking-link', regularSingle);
+      show('unavailable-checkout', !regularSingle);
+      if (regularSingle) {
+        $('live-booking-link').href = BOOKING_CONFIG.currentCalendarLinks[state.subject][state.duration];
+        $('review-explanation').textContent = 'You can book this regular single lesson now. The button opens the existing Google Calendar page to choose an available time and pay.';
+        $('review-thai').textContent = 'จองคลาสเดี่ยวได้แล้ว โดยจะเลือกเวลาและชำระเงินใน Google Calendar';
+      } else {
+        $('review-explanation').textContent = 'This combination is a preview. Anki add-ons and packages are not connected to Stripe or Google Calendar yet, so payment and confirmation are disabled.';
+        $('review-thai').textContent = 'แพ็กเกจและ Anki อยู่ระหว่างเตรียมระบบ ยังไม่สามารถชำระเงินหรือยืนยันการจองได้';
+      }
+    }
+
+    function refresh() {
+      const hasSubject = state.subject !== null;
+      const hasDuration = state.duration !== null;
+      show('step-duration', hasSubject);
+      show('step-anki', hasSubject && hasDuration && state.subject !== 'Maths');
+      show('step-package', hasSubject && hasDuration && state.wantsAnki !== null);
+      updatePressed();
+      updateSummary();
+      updateReview();
+    }
+
+    document.querySelectorAll('[data-subject]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.subject = button.dataset.subject;
+        state.duration = null;
+        state.wantsAnki = state.subject === 'Maths' ? false : null;
+        state.quantity = null;
+        refresh();
+        scrollToStep('step-duration');
+      });
+    });
+
+    document.querySelectorAll('[data-duration]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.duration = Number(button.dataset.duration);
+        state.wantsAnki = state.subject === 'Maths' ? false : null;
+        state.quantity = null;
+        refresh();
+        scrollToStep(state.subject === 'Maths' ? 'step-package' : 'step-anki');
+      });
+    });
+
+    document.querySelectorAll('[data-anki]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.wantsAnki = button.dataset.anki === 'yes';
+        state.quantity = null;
+        refresh();
+        scrollToStep('step-package');
+      });
+    });
+
+    document.querySelectorAll('[data-quantity]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.quantity = Number(button.dataset.quantity);
+        refresh();
+        scrollToStep('step-review');
+      });
+    });
+
+    $('reset-purchase').addEventListener('click', () => {
+      state.quantity = 1;
+      state.wantsAnki = false;
+      refresh();
+    });
+
+    // Show the interest button only after a real Apps Script URL has been configured.
+    // This avoids a public button that collects no data.
+    if (/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec(?:\?.*)?$/.test(GROUP_INTEREST_FORM_URL)) {
+      $('group-interest-link').href = GROUP_INTEREST_FORM_URL;
+      $('group-interest-link').hidden = false;
+      $('group-interest-pending').hidden = true;
+    }
+
+    $('year').textContent = new Date().getFullYear();
+    refresh();
   </script>
 </body>
 </html>
