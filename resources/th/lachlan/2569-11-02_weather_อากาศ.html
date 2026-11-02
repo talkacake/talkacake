@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>อากาศ</title>
+<style>
+  
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+  :root {
+    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body.modern-thai {
+    --font-main: "Noto Sans Thai", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+
+  :root {
+    --bg: #fffaf4;
+    --card: #ffffff;
+    --ink: #202124;
+    --muted: #6b7280;
+    --line: #eadfd2;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  header {
+    padding: 32px 20px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 48px;
+  }
+
+  h1,
+  h2 {
+    margin: 0;
+  }
+
+  .heading-block {
+    margin: 0 0 12px;
+  }
+
+  .heading-controls {
+    margin-top: 6px;
+  }
+
+  .page-title {
+    margin: 0 0 8px;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.25;
+  }
+
+  .section-title {
+    margin: 32px 0 8px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.35;
+  }
+
+  .subtitle {
+    color: var(--muted);
+  }
+
+  .video-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .lesson-film {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px;
+    margin: 16px 0 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  }
+
+  .lesson-film-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+  }
+
+  .lesson-film-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .lesson-film-note {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 8px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,.03);
+  }
+
+  .meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 8px;
+  }
+
+  .emoji {
+    font-size: 1.2rem;
+  }
+
+  .main-text {
+    font-size: 1.35rem;
+    line-height: 1.8;
+    margin-top: 6px;
+  }
+
+  .main-text.thai {
+    font-size: 1.45rem;
+  }
+
+  .main-text.english {
+    font-size: 1.25rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 4px;
+  }
+
+  .controls button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .support-text,
+  .ipa-support {
+    display: none;
+  }
+
+  .support-text.show,
+  .ipa-support.show {
+    display: block;
+  }
+
+  .en-support,
+  .thai-support {
+    color: #374151;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .ipa {
+    color: #7c3aed;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .examples {
+    margin-top: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .examples summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .examples-main {
+    margin-top: 8px;
+  }
+
+  .examples-main,
+  .examples .support-text,
+  .examples .ipa-support {
+    white-space: pre-line;
+  }
+  
+  .font-toggle {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+  footer {
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 32px;
+    font-size: .9rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="heading-block" id="title-อากาศ" data-tts-lang="th-TH">
+    <h1 class="page-title">อากาศ</h1>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('title-อากาศ')">🔊</button>
+      
+      <button type="button" onclick="togglePart('title-อากาศ', 'support')">EN</button>
+    </div>
+    
+    <div class="support-text en-support">weather</div>
+  </div>
+  
+  <div class="subtitle">
+    <button type="button" class="font-toggle" onclick="toggleThaiFont()">Aa เปลี่ยนฟอนต์</button>
+  </div>
+</header>
+
+<main>
+
+<section class="section">
+  <div class="heading-block" id="section-นําเข้าสู่บทเรียน" data-tts-lang="th-TH">
+    <h2 class="section-title">นำเข้าสู่บทเรียน</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-นําเข้าสู่บทเรียน')">🔊</button>
+      <button type="button" onclick="togglePart('section-นําเข้าสู่บทเรียน', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-นําเข้าสู่บทเรียน', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">nam-khâo-sùu-bòt-riian</div>
+    <div class="support-text en-support">Lead-in</div>
+  </div>
+  <article class="card text-block" id="row-lead-in-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🇦🇺</span>
+    </div>
+
+    <div class="main-text thai">ที่ออสเตรเลีย ตอนนี้อากาศเป็นยังไงคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">thîi ɔ́ɔt-dtree-liia. dtɔɔn-níi aa-gàat bpen yang-ngai ká?</div>
+    <div class="support-text en-support">In Australia, how is the weather right now?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-lead-in-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🥵</span>
+    </div>
+
+    <div class="main-text thai">ที่นั่นอากาศร้อนไหมคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">thîi-nân aa-gàat rɔ́ɔn mǎi ká?</div>
+    <div class="support-text en-support">Is it hot there?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-lead-in-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🌍</span>
+    </div>
+
+    <div class="main-text thai">คุณมาจากประเทศอะไรคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-lead-in-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-lead-in-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-lead-in-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">khun maa jàak bprà-têet à-rai ká?</div>
+    <div class="support-text en-support">What country are you from?</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คําศัพท์ใหม่" data-tts-lang="th-TH">
+    <h2 class="section-title">คำศัพท์ใหม่</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําศัพท์ใหม่')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําศัพท์ใหม่', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําศัพท์ใหม่', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kham-sàp-mài</div>
+    <div class="support-text en-support">New Vocabulary</div>
+  </div>
+  <article class="card text-block" id="row-new-vocabulary-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🥶</span>
+    </div>
+
+    <div class="main-text thai">หนาว</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-new-vocabulary-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">nǎao</div>
+    <div class="support-text en-support">cold</div>
+
+    
+    <details class="examples" id="row-new-vocabulary-1-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        • ที่ออสเตรเลีย อากาศหนาว<br>• ผมไม่ชอบอากาศหนาว
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-new-vocabulary-1-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-1-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-1-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">• thîi ɔ́ɔt-dtree-liia aa-gàat nǎao<br>• phǒm mâi chɔ̂ɔp aa-gàat nǎao</div>
+      <div class="support-text en-support">• In Australia, the weather is cold.<br>• I don&#39;t like cold weather.<br>• Your turn: Try to make a sentence with the word &#39;cold&#39;.</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-new-vocabulary-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🌧️</span>
+    </div>
+
+    <div class="main-text thai">ฝนตก</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-new-vocabulary-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">fǒn-dtòk</div>
+    <div class="support-text en-support">to rain / it&#39;s raining</div>
+
+    
+    <details class="examples" id="row-new-vocabulary-2-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        • วันนี้ฝนตก<br>• ที่กรุงเทพฯ ฝนตกหนักมาก<br>• ที่บ้านคุณ ตอนนี้ฝนตกไหมคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-new-vocabulary-2-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-2-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-2-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">• wan-níi fǒn-dtòk<br>• thîi grung-thêep fǒn-dtòk nàk mâak<br>• thîi bâan khun, dtɔɔn-níi fǒn-dtòk mǎi ká?</div>
+      <div class="support-text en-support">• It&#39;s raining today.<br>• In Bangkok, it&#39;s raining very heavily.<br>• Your turn: Is it raining at your house now?</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-new-vocabulary-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🌬️</span>
+    </div>
+
+    <div class="main-text thai">เย็น</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-new-vocabulary-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">yen</div>
+    <div class="support-text en-support">cool</div>
+
+    
+    <details class="examples" id="row-new-vocabulary-3-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        • ตอนเย็นอากาศเย็นสบาย<br>• ผมชอบอากาศเย็นๆ<br>• คุณชอบอากาศเย็นๆ ไหมคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-new-vocabulary-3-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-3-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-3-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">• dtɔɔn-yen aa-gàat yen-sà-baai<br>• phǒm chɔ̂ɔp aa-gàat yen-yen<br>• khun chɔ̂ɔp aa-gàat yen-yen mǎi ká?</div>
+      <div class="support-text en-support">• The weather is nice and cool in the evening.<br>• I like cool weather.<br>• Your turn: Do you like cool weather?</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-new-vocabulary-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🍂☀️</span>
+    </div>
+
+    <div class="main-text thai">ฤดู</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-new-vocabulary-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">réu-duu</div>
+    <div class="support-text en-support">season</div>
+
+    
+    <details class="examples" id="row-new-vocabulary-4-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        • ประเทศไทยมี 3 ฤดู<br>• คุณชอบฤดูอะไรที่สุด<br>• ที่ออสเตรเลียมีกี่ฤดูคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-new-vocabulary-4-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-4-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-4-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">• bprà-têet thai mii sǎam réu-duu<br>• khun chɔ̂ɔp réu-duu à-rai thîi-sùt<br>• thîi ɔ́ɔt-dtree-liia mii gìi réu-duu ká?</div>
+      <div class="support-text en-support">• Thailand has 3 seasons.<br>• What season do you like the most?<br>• Your turn: How many seasons are there in Australia?</div>
+    </details>
+  
+  </article>
+<article class="card text-block" id="row-new-vocabulary-5" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👍</span>
+    </div>
+
+    <div class="main-text thai">ชอบ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-new-vocabulary-5')">🔊</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-5', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-new-vocabulary-5', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">chɔ̂ɔp</div>
+    <div class="support-text en-support">to like</div>
+
+    
+    <details class="examples" id="row-new-vocabulary-5-examples" data-tts-lang="th-TH">
+      <summary>Examples</summary>
+
+      <div class="examples-main main-text thai">
+        • ผมชอบอาหารไทย<br>• แฟนผมชอบอากาศร้อน<br>• คุณชอบทำอะไรคะ
+      </div>
+
+      <div class="controls">
+        <button type="button" onclick="speakMainText('row-new-vocabulary-5-examples')">🔊</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-5-examples', 'ipa')">IPA</button>
+        <button type="button" onclick="togglePart('row-new-vocabulary-5-examples', 'support')">EN</button>
+      </div>
+
+      <div class="ipa ipa-support">• phǒm chɔ̂ɔp aa-hǎan thai<br>• faen phǒm chɔ̂ɔp aa-gàat rɔ́ɔn<br>• khun chɔ̂ɔp tham à-rai ká?</div>
+      <div class="support-text en-support">• I like Thai food.<br>• My girlfriend likes hot weather.<br>• Your turn: What do you like to do?</div>
+    </details>
+  
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-บทสนทนา-คุยเรื่องอากาศ" data-tts-lang="th-TH">
+    <h2 class="section-title">บทสนทนา: คุยเรื่องอากาศ</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-บทสนทนา-คุยเรื่องอากาศ')">🔊</button>
+      <button type="button" onclick="togglePart('section-บทสนทนา-คุยเรื่องอากาศ', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-บทสนทนา-คุยเรื่องอากาศ', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">bòt-sǒn-thá-naa: khui rûeang aa-gàat</div>
+    <div class="support-text en-support">Dialogue: Talking about the Weather</div>
+  </div>
+  <article class="card text-block" id="row-dialogue-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👩</span>
+    </div>
+
+    <div class="main-text thai">แม่: สวัสดีจ้ะลุค ที่ออสเตรเลียตอนนี้อากาศเป็นยังไงบ้าง</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">mâe: sà-wàt-dii jâ lúk. thîi ɔ́ɔt-dtree-liia dtɔɔn-níi aa-gàat bpen yang-ngai bâang?</div>
+    <div class="support-text en-support">Mother: Hello, Luke. How&#39;s the weather in Australia right now?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🙋‍♂️</span>
+    </div>
+
+    <div class="main-text thai">ลุค: สวัสดีครับคุณแม่ ที่นี่อากาศหนาวครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lúk: sà-wàt-dii khráp khun mâe. thîi-nîi aa-gàat nǎao khráp.</div>
+    <div class="support-text en-support">Luke: Hello, ma&#39;am. It&#39;s cold here.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🇹🇭</span>
+    </div>
+
+    <div class="main-text thai">แม่: หนาวเหรอ ที่เมืองไทยตอนนี้ร้อนมากเลย</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">mâe: nǎao rə̌ə? thîi mueang thai dtɔɔn-níi rɔ́ɔn mâak loei.</div>
+    <div class="support-text en-support">Mother: Cold? It&#39;s very hot in Thailand right now.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-4" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🌧️</span>
+    </div>
+
+    <div class="main-text thai">ลุค: ที่นั่นฝนตกไหมครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-4')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-4', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lúk: thîi nân fǒn-dtòk mǎi khráp?</div>
+    <div class="support-text en-support">Luke: Is it raining there?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-5" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🌬️</span>
+    </div>
+
+    <div class="main-text thai">แม่: ไม่ตกจ้ะ แต่ตอนเย็นๆ อากาศเย็นสบายดี</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-5')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-5', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-5', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">mâe: mâi dtòk jâ. dtàe dtɔɔn yen-yen aa-gàat yen sà-baai dii.</div>
+    <div class="support-text en-support">Mother: No, it&#39;s not. But in the evenings, the weather is nice and cool.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-6" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">👍</span>
+    </div>
+
+    <div class="main-text thai">ลุค: ดีจังครับ ผมชอบอากาศเย็นๆ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-6')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-6', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-6', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lúk: dii jang khráp. phǒm chɔ̂ɔp aa-gàat yen-yen.</div>
+    <div class="support-text en-support">Luke: That&#39;s great. I like cool weather.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-7" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🍂</span>
+    </div>
+
+    <div class="main-text thai">แม่: แล้วที่ออสเตรเลียมีกี่ฤดูจ๊ะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-7')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-7', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-7', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">mâe: láew thîi ɔ́ɔt-dtree-liia mii gìi réu-duu jà?</div>
+    <div class="support-text en-support">Mother: And how many seasons are there in Australia?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-8" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">4️⃣</span>
+    </div>
+
+    <div class="main-text thai">ลุค: มี 4 ฤดูครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-8')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-8', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-8', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lúk: mii sìi réu-duu khráp.</div>
+    <div class="support-text en-support">Luke: There are 4 seasons.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-9" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">☀️🌧️🥶</span>
+    </div>
+
+    <div class="main-text thai">แม่: เมืองไทยมี 3 ฤดู มีฤดูร้อน ฤดูฝน แล้วก็ฤดูหนาว</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-9')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-9', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-9', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">mâe: mueang thai mii sǎam réu-duu. mii réu-duu rɔ́ɔn, réu-duu fǒn, láew gâw réu-duu nǎao.</div>
+    <div class="support-text en-support">Mother: Thailand has 3 seasons: hot season, rainy season, and cold season.</div>
+
+    
+  </article>
+<article class="card text-block" id="row-dialogue-10" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">💡</span>
+    </div>
+
+    <div class="main-text thai">ลุค: โอ้ เข้าใจแล้วครับ ขอบคุณครับ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-dialogue-10')">🔊</button>
+      <button type="button" onclick="togglePart('row-dialogue-10', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-dialogue-10', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lúk: ôo, khâo-jai láew khráp. khɔ̀ɔp-khun khráp.</div>
+    <div class="support-text en-support">Luke: Oh, I understand now. Thank you.</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คําถามจากบทสนทนา" data-tts-lang="th-TH">
+    <h2 class="section-title">คำถามจากบทสนทนา</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําถามจากบทสนทนา')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําถามจากบทสนทนา', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําถามจากบทสนทนา', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kham-thǎam jàak bòt-sǒn-thá-naa</div>
+    <div class="support-text en-support">Comprehension Questions</div>
+  </div>
+  <article class="card text-block" id="row-comprehension-questions-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">1️⃣</span>
+    </div>
+
+    <div class="main-text thai">ที่ออสเตรเลีย อากาศเป็นยังไงคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-comprehension-questions-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">thîi ɔ́ɔt-dtree-liia, aa-gàat bpen yang-ngai ká?</div>
+    <div class="support-text en-support">In Australia, what is the weather like? (Expected answer: อากาศหนาว / aa-gàat nǎao)</div>
+
+    
+  </article>
+<article class="card text-block" id="row-comprehension-questions-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">2️⃣</span>
+    </div>
+
+    <div class="main-text thai">ที่เมืองไทย ฝนตกไหมคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-comprehension-questions-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">thîi mueang thai, fǒn-dtòk mǎi ká?</div>
+    <div class="support-text en-support">Is it raining in Thailand? (Expected answer: ไม่ตก / mâi dtòk)</div>
+
+    
+  </article>
+<article class="card text-block" id="row-comprehension-questions-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">3️⃣</span>
+    </div>
+
+    <div class="main-text thai">ลุคชอบอากาศแบบไหนคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-comprehension-questions-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-comprehension-questions-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lúk chɔ̂ɔp aa-gàat bàep nǎi ká?</div>
+    <div class="support-text en-support">What kind of weather does Luke like? (Expected answer: อากาศเย็นๆ / aa-gàat yen-yen)</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คําถามชวนคุย" data-tts-lang="th-TH">
+    <h2 class="section-title">คำถามชวนคุย</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คําถามชวนคุย')">🔊</button>
+      <button type="button" onclick="togglePart('section-คําถามชวนคุย', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-คําถามชวนคุย', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kham-thǎam chuan-khui</div>
+    <div class="support-text en-support">Discussion Questions</div>
+  </div>
+  <article class="card text-block" id="row-discussion-questions-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">❤️</span>
+    </div>
+
+    <div class="main-text thai">คุณชอบฤดูอะไรมากที่สุดคะ เพราะอะไรคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-discussion-questions-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">khun chɔ̂ɔp réu-duu à-rai mâak thîi-sùt ká? phrɔ́ à-rai ká?</div>
+    <div class="support-text en-support">What season do you like the most? Why?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-discussion-questions-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">☔</span>
+    </div>
+
+    <div class="main-text thai">เวลาฝนตก คุณชอบทำอะไรคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-discussion-questions-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">wee-laa fǒn-dtòk, khun chɔ̂ɔp tham à-rai ká?</div>
+    <div class="support-text en-support">When it rains, what do you like to do?</div>
+
+    
+  </article>
+<article class="card text-block" id="row-discussion-questions-3" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🥶</span>
+    </div>
+
+    <div class="main-text thai">ที่ออสเตรเลีย ฤดูหนาว หนาวมากไหมคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-discussion-questions-3')">🔊</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-discussion-questions-3', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">thîi ɔ́ɔt-dtree-liia, réu-duu nǎao, nǎao mâak mǎi ká?</div>
+    <div class="support-text en-support">In Australia, is the winter very cold?</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-ฝึกพูด" data-tts-lang="th-TH">
+    <h2 class="section-title">ฝึกพูด</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-ฝึกพูด')">🔊</button>
+      <button type="button" onclick="togglePart('section-ฝึกพูด', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-ฝึกพูด', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">fùek phûut</div>
+    <div class="support-text en-support">Speaking Practice</div>
+  </div>
+  <article class="card text-block" id="row-speaking-practice-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🗣️</span>
+    </div>
+
+    <div class="main-text thai">คุยเรื่องอากาศกับเค้ก</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-practice-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-practice-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-practice-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">khui rûeang aa-gàat gàp kéek</div>
+    <div class="support-text en-support">Task 1: Talk about the weather with Cake</div>
+
+    
+  </article>
+<article class="card text-block" id="row-speaking-practice-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🤔</span>
+    </div>
+
+    <div class="main-text thai">ชอบอากาศแบบไหนมากที่สุด (ร้อน, เย็น, หนาว) <br>แล้วคุณชอบทำอะไรในอากาศแบบนั้นคะ</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-speaking-practice-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-speaking-practice-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-speaking-practice-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">chɔ̂ɔp aa-gàat bàep nǎi mâak thîi-sùt (rɔ́ɔn, yen, nǎao). <br>láew khun chɔ̂ɔp tham à-rai nai aa-gàat bàep nán ká?</div>
+    <div class="support-text en-support">Please tell Cake what kind of weather you like the most (hot, cool, cold), and what do you like to do in that weather?</div>
+
+    
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-กิจกรรมเพิ่มเติม" data-tts-lang="th-TH">
+    <h2 class="section-title">กิจกรรมเพิ่มเติม</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-กิจกรรมเพิ่มเติม')">🔊</button>
+      <button type="button" onclick="togglePart('section-กิจกรรมเพิ่มเติม', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('section-กิจกรรมเพิ่มเติม', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">gìt-jà-gam phôoem-dtôoem</div>
+    <div class="support-text en-support">Extension Activities</div>
+  </div>
+  <article class="card text-block" id="row-extension-activities-1" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🇦🇺</span>
+    </div>
+
+    <div class="main-text thai">ฤดูในประเทศออสเตรเลีย</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-extension-activities-1')">🔊</button>
+      <button type="button" onclick="togglePart('row-extension-activities-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-extension-activities-1', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">réu-duu nai bprà-têet ɔ́ɔt-dtree-liia</div>
+    <div class="support-text en-support">Seasons in Australia</div>
+
+    
+  </article>
+<article class="card text-block" id="row-extension-activities-2" data-tts-lang="th-TH">
+    <div class="meta">
+      <span class="emoji">🎤</span>
+    </div>
+
+    <div class="main-text thai">ลองเป็นนักข่าวพยากรณ์อากาศให้เมืองของคุณวันนี้ค่ะ ลองใช้โครงสร้างนี้นะคะ: &quot;วันนี้ที่ [ชื่อเมือง], อากาศจะ... ตอนเช้าจะ... ตอนเย็นจะ...&quot;</div>
+
+    <div class="controls">
+      <button type="button" onclick="speakMainText('row-extension-activities-2')">🔊</button>
+      <button type="button" onclick="togglePart('row-extension-activities-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('row-extension-activities-2', 'support')">EN</button>
+    </div>
+
+    <div class="ipa ipa-support">lɔɔng bpen nák-khàao phá-yaa-gɔɔn aa-gàat hâi mueang khɔ̌ɔng khun wan-níi kâ. lɔɔng chái kroong-sâang níi ná ká: &quot;wan-níi thîi [chûe mueang], aa-gàat jà... dtɔɔn cháo jà... dtɔɔn yen jà...&quot;</div>
+    <div class="support-text en-support">Try to be a weather reporter for your city today. Try using this structure: &quot;Today in [city name], the weather will be... In the morning, it will be... In the evening, it will be...&quot;</div>
+
+    
+  </article>
+</section>
+<footer>Generated from the edited Lesson_Builder sheet.</footer>
+</main>
+
+<script>
+function togglePart(rowId, type) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+
+  let el = null;
+
+  if (type === 'ipa') {
+    el = block.querySelector('.ipa-support');
+  } else {
+    el = block.querySelector('.support-text');
+  }
+
+  if (el) el.classList.toggle('show');
+}
+
+function speakMainText(rowId) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+
+  const main = block.querySelector('.main-text, .page-title, .section-title, .heading-text, .examples-main');
+  if (!main || !main.textContent.trim()) return;
+
+  speechSynthesis.cancel();
+
+  const u = new SpeechSynthesisUtterance(main.textContent.trim());
+  u.lang = block.dataset.ttsLang || 'th-TH';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+function toggleThaiFont() {
+  document.body.classList.toggle('modern-thai');
+  localStorage.setItem(
+    'talkacakeThaiFont',
+    document.body.classList.contains('modern-thai') ? 'modern' : 'default'
+  );
+}
+
+(function initThaiFont() {
+  const saved = localStorage.getItem('talkacakeThaiFont');
+  if (saved === 'modern') {
+    document.body.classList.add('modern-thai');
+  }
+})();
+
+</script>
+</body>
+</html>
