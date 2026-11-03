@@ -634,9 +634,9 @@
     */
 
     const BOOKING_CONFIG = {
-      currency: 'USD',
-      ankiPricePerLesson: 2,
-
+      currency: 'THB',
+      ankiPricePerLesson: null,
+      
       discounts: {
         1: 0,
         5: 0.02,
@@ -681,7 +681,13 @@
     */
 
     const GROUP_INTEREST_FORM_URL = 'https://script.google.com/macros/s/AKfycbyvIQ_4_csNIrSUMAblI6AXUmWUwuZYmYYueTI5Dci6qBzvSz-bLIeHwxlXjz2eCNqh/exec';
+    
+    const PRICING_API_URL =
+      'https://talkacake-booking-api.rkomkai.workers.dev/pricing';
+    
+    let pricingStatus = 'loading';
 
+    
     // Booking state
     const state = {
       subject: null,
@@ -763,7 +769,11 @@
         state.wantsAnki === null
           ? '—'
           : state.wantsAnki
-            ? 'Yes (+$2 / lesson)'
+            ? (
+    pricingStatus === 'ready'
+      ? `Yes (+${money(BOOKING_CONFIG.ankiPricePerLesson)} / lesson)`
+      : 'Yes'
+  )
             : 'No';
 
       $('summary-quantity').textContent =
@@ -789,6 +799,26 @@
         $('summary-total').textContent = '—';
         return;
       }
+
+      
+if (pricingStatus !== 'ready') {
+
+  const message = pricingStatus === 'error'
+    ? 'Price unavailable'
+    : 'Loading price...';
+
+  $('summary-subtotal').textContent = message;
+  $('summary-discount').textContent = '—';
+  $('summary-addon').textContent = '—';
+  $('summary-total').textContent = message;
+
+  $('pricing-note').textContent =
+  'Prices are calculated from Talk a Cake pricing data. ' +
+  'Checkout is not connected yet. ' +
+  'The final payment amount will be confirmed at checkout.';
+
+  return;
+}
 
       const addon =
         state.wantsAnki
@@ -980,8 +1010,125 @@
     // FOOTER YEAR
     $('year').textContent = new Date().getFullYear();
 
+    
+async function loadPublicPricing() {
+
+  try {
+    console.log('Loading Talk a Cake prices...');
+
+    // Request the pricing catalogue from Cloudflare.
+    const response = await fetch(PRICING_API_URL, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      },
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        'Pricing request failed: HTTP ' + response.status
+      );
+    }
+
+    // Convert the JSON response into a JavaScript object.
+    const data = await response.json();
+
+    if (!data.ok || !data.catalogue) {
+      throw new Error('Invalid pricing response');
+    }
+
+    const catalogue = data.catalogue;
+
+    if (catalogue.currency !== 'THB') {
+      throw new Error('Expected THB pricing');
+    }
+
+    // Validate prices before displaying them.
+    const subjects = ['Thai', 'English', 'Maths'];
+    const durations = [30, 45, 60];
+
+    for (const subject of subjects) {
+      for (const duration of durations) {
+        const price = catalogue.prices?.[subject]?.[duration];
+
+        if (
+          typeof price !== 'number' ||
+          !Number.isFinite(price) ||
+          price <= 0
+        ) {
+          throw new Error(
+            `Invalid price for ${subject} ${duration} min`
+          );
+        }
+      }
+    }
+
+    // Check Anki prices.
+    const thaiAnki = catalogue.ankiPrices?.Thai;
+    const englishAnki = catalogue.ankiPrices?.English;
+
+    if (
+      thaiAnki !== 70 ||
+      englishAnki !== 70
+    ) {
+      throw new Error('Unexpected Anki pricing');
+    }
+
+    // Read the discounts supplied by Apps Script.
+    const discounts = {};
+
+    for (const quantity of [1, 5, 10]) {
+      const percent =
+        catalogue.packages?.[quantity]?.discountPercent;
+
+      if (
+        typeof percent !== 'number' ||
+        !Number.isFinite(percent) ||
+        percent < 0 ||
+        percent > 100
+      ) {
+        throw new Error(
+          `Invalid discount for ${quantity} lessons`
+        );
+      }
+
+      // Convert a percentage to a decimal.
+      // Example: 2% becomes 0.02.
+      discounts[quantity] = percent / 100;
+    }
+
+    // Update the website configuration.
+    BOOKING_CONFIG.currency = catalogue.currency;
+    BOOKING_CONFIG.prices = catalogue.prices;
+    BOOKING_CONFIG.ankiPricePerLesson = thaiAnki;
+    BOOKING_CONFIG.discounts = discounts;
+
+    pricingStatus = 'ready';
+
+    console.log('Pricing loaded successfully!');
+    console.log(catalogue);
+
+  } catch (error) {
+
+    pricingStatus = 'error';
+
+    console.error(
+      'Unable to load pricing:',
+      error
+    );
+  }
+
+  // Update the displayed prices after loading.
+  refresh();
+}
+
+
+    
     // INITIALIZE
     refresh();
+    loadPublicPricing();
+
 
   </script>
 </body>
