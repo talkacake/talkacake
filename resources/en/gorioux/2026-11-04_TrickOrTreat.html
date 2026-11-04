@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trick or Treat! 🎃🍬</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff7ed; /* Light orange background */
+            color: #1f2937;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            border: 2px solid #fed7aa;
+            margin-bottom: 2rem;
+        }
+        .card:hover {
+            border-color: #f97316;
+        }
+        .btn-icon {
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: #f1f5f9;
+            font-size: 0.85rem;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            white-space: nowrap;
+        }
+        .btn-icon:hover { background-color: #e2e8f0; }
+        .btn-icon:active { transform: scale(0.95); }
+        
+        .eng-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .eng-text {
+            flex-grow: 1;
+            color: #1e293b;
+        }
+        .btn-group {
+            display: flex;
+            gap: 0.25rem;
+            flex-shrink: 0;
+        }
+        .th-text {
+            display: none;
+            color: #ea580c;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid #fdba74;
+        }
+        .th-text.active {
+            display: block;
+        }
+        .hw-btn {
+            background-color: #ea580c;
+            color: white;
+            border: 2px solid #9a3412;
+            transition: all 0.2s;
+        }
+        .hw-btn:hover {
+            background-color: #c2410c;
+        }
+    </style>
+    <script>
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8; // Slower for A1 level
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleThai(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('active');
+        }
+    </script>
+</head>
+<body class="pb-12">
+
+    <!-- Header -->
+    <header class="bg-gray-900 shadow-md sticky top-0 z-50 border-b-4 border-orange-500">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
+            <div>
+                <div class="flex items-center justify-center md:justify-start gap-2">
+                    <h1 class="text-2xl md:text-3xl font-bold text-orange-400">Trick or Treat! 🎃🍬</h1>
+                    <button onclick="speak('Trick or Treat!')" class="btn-icon border-none bg-gray-700 text-white hover:bg-gray-600">🔊</button>
+                    <button onclick="toggleThai('h1-th')" class="btn-icon border-none bg-gray-700 text-white hover:bg-gray-600">🇹🇭</button>
+                </div>
+                <div id="h1-th" class="th-text !text-orange-200 !border-orange-400 mt-1 !mb-0 !pb-0">หลอกหรือเลี้ยง! (วันฮาโลวีน)</div>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-xs md:text-sm bg-purple-700 text-purple-100 py-1 px-3 rounded-full font-bold shadow-sm">120 Mins</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-8 space-y-8">
+
+        <!-- PART 1: WARM UP & PAIR CATCH-UP -->
+        <section class="card p-6 md:p-8">
+            <div class="eng-block mb-4">
+                <h2 class="text-2xl font-bold text-orange-700 flex items-center gap-2">🧠 1. Warm Up & Partner Chat</h2>
+                <div class="btn-group">
+                    <button onclick="speak('1. Warm Up and Partner Chat')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s1-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s1-th" class="th-text">1. อุ่นเครื่องและคุยกับคู่ของคุณ</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Word Spinner -->
+                <div class="bg-orange-50 p-6 rounded-2xl border-2 border-orange-200 flex flex-col items-center justify-center text-center">
+                    <p class="text-gray-700 mb-4 font-bold">Spin a word & make a simple sentence!</p>
+                    <div id="wordDisplay" class="text-xl md:text-2xl font-bold text-gray-800 min-h-[90px] flex items-center justify-center w-full mb-4">
+                        <div class="text-5xl">🎃</div>
+                    </div>
+                    <button onclick="pickRandomWord()" class="hw-btn font-bold py-2 px-8 rounded-full shadow transform active:scale-95 text-lg">
+                        SPIN 🎰
+                    </button>
+                </div>
+
+                <!-- Pairwork Catch-up -->
+                <div class="bg-purple-50 p-6 rounded-2xl border-2 border-purple-200">
+                    <div class="eng-block mb-2">
+                        <h3 class="text-xl font-bold text-purple-900">Partner Check-In 👥</h3>
+                        <div class="btn-group">
+                            <button onclick="speak('Partner Check-In. Ask your friend!')" class="btn-icon bg-white">🔊</button>
+                            <button onclick="toggleThai('s1-news-th')" class="btn-icon bg-white">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="s1-news-th" class="th-text !text-purple-700 !border-purple-300">ผลัดกันถาม-ตอบกับเพื่อนของคุณ!</div>
+                    
+                    <div class="space-y-3 mt-4 text-gray-800">
+                        <div class="bg-white p-3 rounded-lg border border-purple-100">
+                            <div class="eng-block">
+                                <span class="eng-text font-bold">1. "Are you busy today?" 💻</span>
+                                <div class="btn-group">
+                                    <button onclick="speak('Are you busy today?')" class="btn-icon text-xs">🔊</button>
+                                    <button onclick="toggleThai('wu1-th')" class="btn-icon text-xs">🇹🇭</button>
+                                </div>
+                            </div>
+                            <div id="wu1-th" class="th-text !text-purple-600 !text-xs">1. วันนี้คุณงานยุ่งไหม?</div>
+                            <p class="text-xs text-gray-500 mt-1">Answer: "Yes, very busy!" / "No, I am okay."</p>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-purple-100">
+                            <div class="eng-block">
+                                <span class="eng-text font-bold">2. "What did you eat today?" 🍜</span>
+                                <div class="btn-group">
+                                    <button onclick="speak('What did you eat today?')" class="btn-icon text-xs">🔊</button>
+                                    <button onclick="toggleThai('wu2-th')" class="btn-icon text-xs">🇹🇭</button>
+                                </div>
+                            </div>
+                            <div id="wu2-th" class="th-text !text-purple-600 !text-xs">2. วันนี้คุณกินอะไรมา?</div>
+                            <p class="text-xs text-gray-500 mt-1">Answer: "I ate..."</p>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-lg border border-purple-100">
+                            <div class="eng-block">
+                                <span class="eng-text font-bold">3. "Do you have any news?" 📰</span>
+                                <div class="btn-group">
+                                    <button onclick="speak('Do you have any news?')" class="btn-icon text-xs">🔊</button>
+                                    <button onclick="toggleThai('wu3-th')" class="btn-icon text-xs">🇹🇭</button>
+                                </div>
+                            </div>
+                            <div id="wu3-th" class="th-text !text-purple-600 !text-xs">3. มีข่าวหรือเรื่องอะไรอยากเล่าไหม?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: LEAD-IN PAIRWORK -->
+        <section class="card p-6 md:p-8 bg-orange-50 border-orange-200">
+            <div class="eng-block mb-4">
+                <h2 class="text-2xl font-bold text-orange-900 flex items-center gap-2">🗣️ 2. Pairwork: Halloween Chat!</h2>
+                <div class="btn-group">
+                    <button onclick="speak('2. Pairwork: Halloween Chat!')" class="btn-icon bg-white">🔊</button>
+                    <button onclick="toggleThai('s2-th')" class="btn-icon bg-white">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s2-th" class="th-text">2. จับคู่คุยกันเรื่องวันฮาโลวีน! (คนหนึ่งถาม คนหนึ่งตอบ)</div>
+
+            <div class="bg-white p-5 rounded-xl border border-orange-200 space-y-4">
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                    <div class="eng-block font-bold text-orange-900 text-lg">
+                        <span class="eng-text">1. Are you scared of ghosts? 👻😱</span>
+                        <div class="btn-group">
+                            <button onclick="speak('Are you scared of ghosts?')" class="btn-icon bg-white">🔊</button>
+                            <button onclick="toggleThai('q1-th')" class="btn-icon bg-white">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="q1-th" class="th-text">1. คุณกลัวผีไหม?</div>
+                    <p class="text-sm text-gray-600 mt-1">👉 <strong>Answer:</strong> "Yes, I am very scared!" / "No, I am not scared."</p>
+                </div>
+
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                    <div class="eng-block font-bold text-orange-900 text-lg">
+                        <span class="eng-text">2. Do you like eating candy and chocolate? 🍬🍫</span>
+                        <div class="btn-group">
+                            <button onclick="speak('Do you like eating candy and chocolate?')" class="btn-icon bg-white">🔊</button>
+                            <button onclick="toggleThai('q2-th')" class="btn-icon bg-white">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="q2-th" class="th-text">2. คุณชอบกินลูกอมและช็อกโกแลตไหม?</div>
+                    <p class="text-sm text-gray-600 mt-1">👉 <strong>Answer:</strong> "Yes, I love it!" / "No, it is too sweet."</p>
+                </div>
+
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                    <div class="eng-block font-bold text-orange-900 text-lg">
+                        <span class="eng-text">3. For a party, what costume do you want to wear? 🧛‍♂️🧙‍♀️</span>
+                        <div class="btn-group">
+                            <button onclick="speak('For a party, what costume do you want to wear?')" class="btn-icon bg-white">🔊</button>
+                            <button onclick="toggleThai('q3-th')" class="btn-icon bg-white">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="q3-th" class="th-text">3. ถ้าไปงานปาร์ตี้ คุณอยากใส่ชุดคอสตูมเป็นตัวอะไร?</div>
+                    <p class="text-sm text-gray-600 mt-1">👉 <strong>Answer:</strong> "I want to be a..." (witch / zombie / princess / cat / rich boss)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 3: THE VIDEO & DUBBING -->
+        <section class="card p-6 md:p-8 border-purple-300">
+            <div class="eng-block mb-4">
+                <h2 class="text-2xl font-bold text-purple-900 flex items-center gap-2">📺 3. Watch & Dub the Video!</h2>
+                <div class="btn-group">
+                    <button onclick="speak('3. Watch and Dub the Video!')" class="btn-icon">🔊</button>
+                    <button onclick="toggleThai('s3-th')" class="btn-icon">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s3-th" class="th-text !text-purple-700 !border-purple-300">3. ดูวิดีโอ ตอบคำถาม และพากย์เสียงคู่กัน!</div>
+
+            <div class="mb-6 text-center">
+                <a href="https://www.tiktok.com/@jackfallsdown/video/7702983729676815629" target="_blank" class="inline-flex items-center gap-2 bg-gray-900 text-orange-400 border-2 border-orange-400 px-6 py-3 rounded-full hover:bg-orange-500 hover:text-white transition font-bold shadow-md text-lg">
+                    🎬 Watch TikTok Video
+                </a>
+            </div>
+
+            <!-- Easy Comprehension -->
+            <div class="bg-purple-50 p-5 rounded-xl border border-purple-200 mb-6">
+                <div class="eng-block font-bold text-purple-900 mb-3">
+                    <span class="eng-text text-lg">Easy Questions 🤔</span>
+                    <div class="btn-group">
+                        <button onclick="speak('Easy Questions')" class="btn-icon bg-white">🔊</button>
+                        <button onclick="toggleThai('cq-title-th')" class="btn-icon bg-white">🇹🇭</button>
+                    </div>
+                </div>
+                <div id="cq-title-th" class="th-text !text-purple-700">คำถามง่ายๆ จากวิดีโอ</div>
+
+                <div class="space-y-3">
+                    <div class="bg-white p-3 rounded-lg">
+                        <div class="eng-block">
+                            <span class="eng-text font-bold">1. What do you see in the video? 👀</span>
+                            <div class="btn-group">
+                                <button onclick="speak('What do you see in the video?')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('cq1-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="cq1-th" class="th-text !text-purple-600">1. คุณเห็นอะไรในวิดีโอบ้าง? (บอกเป็นคำศัพท์ง่ายๆ ได้เลย)</div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg">
+                        <div class="eng-block">
+                            <span class="eng-text font-bold">2. Are the people happy, scared, or funny? 😂</span>
+                            <div class="btn-group">
+                                <button onclick="speak('Are the people happy, scared, or funny?')" class="btn-icon text-xs">🔊</button>
+                                <button onclick="toggleThai('cq2-th')" class="btn-icon text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="cq2-th" class="th-text !text-purple-600">2. คนในคลิปดูมีความสุข กลัว หรือตลก?</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pairwork Acting & Dubbing -->
+            <div class="bg-white p-5 rounded-xl border-2 border-orange-200 shadow-sm">
+                <div class="eng-block font-bold text-gray-800 mb-4 pb-2 border-b">
+                    <span class="eng-text text-lg text-orange-700">🎙️ Pairwork Acting: "Trick or Treat!"</span>
+                    <div class="btn-group">
+                        <button onclick="speak('Pairwork Acting: Trick or Treat!')" class="btn-icon">🔊</button>
+                        <button onclick="toggleThai('scr-title-th')" class="btn-icon">🇹🇭</button>
+                    </div>
+                </div>
+                <div id="scr-title-th" class="th-text">ฝึกอ่านบทสนทนาฮาๆ คู่กัน (Student A กับ Student B) จากนั้นลองปิดเสียงคลิปแล้วพากย์ทับดูนะ!</div>
+
+                <div class="space-y-3 text-lg text-gray-800">
+                    
+                    <div class="border-b border-gray-100 pb-2 bg-orange-50 p-3 rounded">
+                        <div class="eng-block">
+                            <span class="eng-text"><span class="font-bold text-orange-600">Student A:</span> "Knock, knock! Trick or treat!" 🚪🎃</span>
+                            <div class="btn-group">
+                                <button onclick="speak('Knock, knock! Trick or treat!')" class="btn-icon bg-white text-xs">🔊</button>
+                                <button onclick="toggleThai('l1-th')" class="btn-icon bg-white text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="l1-th" class="th-text !text-sm">นักเรียน A: "ก๊อกๆๆ! หลอกหรือเลี้ยง (ขอขนมหน่อย)!"</div>
+                    </div>
+
+                    <div class="border-b border-gray-100 pb-2 bg-purple-50 p-3 rounded">
+                        <div class="eng-block">
+                            <span class="eng-text"><span class="font-bold text-purple-700">Student B:</span> "Hello! Wow, I like your costume." 🧛‍♂️👍</span>
+                            <div class="btn-group">
+                                <button onclick="speak('Hello! Wow, I like your costume.')" class="btn-icon bg-white text-xs">🔊</button>
+                                <button onclick="toggleThai('l2-th')" class="btn-icon bg-white text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="l2-th" class="th-text !text-purple-600 !border-purple-300 !text-sm">นักเรียน B: "สวัสดี! ว้าว ฉันชอบชุดของคุณจัง"</div>
+                    </div>
+
+                    <div class="border-b border-gray-100 pb-2 bg-orange-50 p-3 rounded">
+                        <div class="eng-block">
+                            <span class="eng-text"><span class="font-bold text-orange-600">Student A:</span> "Thank you! Give me candy, please!" 🍬🤲</span>
+                            <div class="btn-group">
+                                <button onclick="speak('Thank you! Give me candy, please!')" class="btn-icon bg-white text-xs">🔊</button>
+                                <button onclick="toggleThai('l3-th')" class="btn-icon bg-white text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="l3-th" class="th-text !text-sm">นักเรียน A: "ขอบคุณค่ะ! ขอขนมให้ฉันหน่อย!"</div>
+                    </div>
+
+                    <div class="border-b border-gray-100 pb-2 bg-purple-50 p-3 rounded">
+                        <div class="eng-block">
+                            <span class="eng-text"><span class="font-bold text-purple-700">Student B:</span> "Wait... You are not a child! You are an accountant!" 📊😲</span>
+                            <div class="btn-group">
+                                <button onclick="speak('Wait... You are not a child! You are an accountant!')" class="btn-icon bg-white text-xs">🔊</button>
+                                <button onclick="toggleThai('l4-th')" class="btn-icon bg-white text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="l4-th" class="th-text !text-purple-600 !border-purple-300 !text-sm">นักเรียน B: "เดี๋ยวนะ... คุณไม่ใช่เด็กนี่นา! คุณเป็นนักบัญชี!"</div>
+                    </div>
+
+                    <div class="border-b border-gray-100 pb-2 bg-orange-50 p-3 rounded">
+                        <div class="eng-block">
+                            <span class="eng-text"><span class="font-bold text-orange-600">Student A:</span> "I am tired! I want chocolate and money, please!" 🍫💰</span>
+                            <div class="btn-group">
+                                <button onclick="speak('I am tired! I want chocolate and money, please!')" class="btn-icon bg-white text-xs">🔊</button>
+                                <button onclick="toggleThai('l5-th')" class="btn-icon bg-white text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="l5-th" class="th-text !text-sm">นักเรียน A: "ฉันเหนื่อย! ฉันอยากได้ช็อกโกแลตกับเงินค่ะ!"</div>
+                    </div>
+
+                    <div class="bg-purple-50 p-3 rounded">
+                        <div class="eng-block">
+                            <span class="eng-text"><span class="font-bold text-purple-700">Student B:</span> "Okay, here is 20 Baht. Happy Halloween!" 💵🎃</span>
+                            <div class="btn-group">
+                                <button onclick="speak('Okay, here is 20 Baht. Happy Halloween!')" class="btn-icon bg-white text-xs">🔊</button>
+                                <button onclick="toggleThai('l6-th')" class="btn-icon bg-white text-xs">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="l6-th" class="th-text !text-purple-600 !border-purple-300 !text-sm">นักเรียน B: "โอเค อะนี่ 20 บาท สุขสันต์วันฮาโลวีนนะ!"</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 4: EASY A1 VOCABULARY -->
+        <section class="card p-6 md:p-8 bg-yellow-50 border-yellow-200">
+            <div class="eng-block mb-4">
+                <h2 class="text-2xl font-bold text-yellow-900 flex items-center gap-2">🎯 4. Easy Vocabulary</h2>
+                <div class="btn-group">
+                    <button onclick="speak('4. Easy Vocabulary')" class="btn-icon bg-white">🔊</button>
+                    <button onclick="toggleThai('s4-th')" class="btn-icon bg-white">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s4-th" class="th-text !text-yellow-700 !border-yellow-400">4. คำศัพท์ง่ายๆ 4 คำ</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-yellow-200 shadow-sm">
+                    <div class="text-3xl mb-1">🚪✊</div>
+                    <div class="eng-block">
+                        <span class="eng-text font-bold text-xl">1. Knock</span>
+                        <div class="btn-group">
+                            <button onclick="speak('Knock. Knock on the door.')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v1-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="v1-th" class="th-text">เคาะ (ประตู)</div>
+                    <p class="text-sm text-gray-600">Example: "<strong>Knock</strong> on the door."</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-yellow-200 shadow-sm">
+                    <div class="text-3xl mb-1">🧛‍♂️👗</div>
+                    <div class="eng-block">
+                        <span class="eng-text font-bold text-xl">2. Costume</span>
+                        <div class="btn-group">
+                            <button onclick="speak('Costume. A spooky costume.')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v2-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="v2-th" class="th-text">ชุดแฟนซี / เครื่องแต่งกาย</div>
+                    <p class="text-sm text-gray-600">Example: "I wear a ghost <strong>costume</strong>."</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-yellow-200 shadow-sm">
+                    <div class="text-3xl mb-1">🍬🍭</div>
+                    <div class="eng-block">
+                        <span class="eng-text font-bold text-xl">3. Candy / Sweets</span>
+                        <div class="btn-group">
+                            <button onclick="speak('Candy. Sweets.')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v3-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="v3-th" class="th-text">ลูกอม / ขนมหวาน</div>
+                    <p class="text-sm text-gray-600">Example: "Kids love <strong>candy</strong>."</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-yellow-200 shadow-sm">
+                    <div class="text-3xl mb-1">👻😱</div>
+                    <div class="eng-block">
+                        <span class="eng-text font-bold text-xl">4. Spooky / Scary</span>
+                        <div class="btn-group">
+                            <button onclick="speak('Spooky. Scary.')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('v4-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="v4-th" class="th-text">หลอนๆ / น่ากลัว</div>
+                    <p class="text-sm text-gray-600">Example: "This house is <strong>spooky</strong>!"</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 5: A1 GRAMMAR CORNER -->
+        <section class="card p-6 md:p-8 bg-green-50 border-green-200">
+            <div class="eng-block mb-4">
+                <h2 class="text-2xl font-bold text-green-900 flex items-center gap-2">⚖️ 5. Grammar Corner: Asking & Reacting</h2>
+                <div class="btn-group">
+                    <button onclick="speak('5. Grammar Corner: Asking and Reacting')" class="btn-icon bg-white">🔊</button>
+                    <button onclick="toggleThai('s5-th')" class="btn-icon bg-white">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s5-th" class="th-text !text-green-700 !border-green-300">5. ไวยากรณ์ง่ายๆ: การขอของ และการตอบรับ</div>
+
+            <div class="bg-white p-5 rounded-xl border border-green-200 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h3 class="font-bold text-green-800 text-lg mb-2">1. When you WANT it 😍</h3>
+                        <p class="text-lg font-bold text-gray-800">"Give me <span class="text-green-600">[item]</span>, please!"</p>
+                        <p class="text-lg font-bold text-gray-800 mt-2">"Thank you! I love it!"</p>
+                        <div class="mt-2">
+                            <button onclick="speak('Give me candy, please! Thank you! I love it!')" class="btn-icon bg-white text-xs">🔊 Listen</button>
+                            <button onclick="toggleThai('gr1-th')" class="btn-icon bg-white text-xs">🇹🇭 TH</button>
+                        </div>
+                        <div id="gr1-th" class="th-text !text-green-700">ขอ [สิ่งของ] ให้ฉันหน่อย! / ขอบคุณค่ะ ฉันชอบมาก!</div>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h3 class="font-bold text-red-800 text-lg mb-2">2. When you DON'T want it 🤢</h3>
+                        <p class="text-lg font-bold text-gray-800">"No, thank you!"</p>
+                        <p class="text-lg font-bold text-gray-800 mt-2">"I don't want <span class="text-red-600">[item]</span>!"</p>
+                        <div class="mt-2">
+                            <button onclick="speak('No, thank you! I do not want a cockroach!')" class="btn-icon bg-white text-xs">🔊 Listen</button>
+                            <button onclick="toggleThai('gr2-th')" class="btn-icon bg-white text-xs">🇹🇭 TH</button>
+                        </div>
+                        <div id="gr2-th" class="th-text !text-red-600">ไม่ล่ะ ขอบคุณ! / ฉันไม่อยากได้ [สิ่งของ]!</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 6: PAIRWORK GAME - THE MYSTERY DOOR -->
+        <section class="card p-6 md:p-8 bg-purple-50 border-purple-300 border-4">
+            <div class="eng-block mb-4">
+                <h2 class="text-2xl font-bold text-purple-900 flex items-center gap-2">🚪 6. Pairwork Roleplay: The Mystery Door!</h2>
+                <div class="btn-group">
+                    <button onclick="speak('6. Pairwork Roleplay: The Mystery Door!')" class="btn-icon bg-white">🔊</button>
+                    <button onclick="toggleThai('s6-th')" class="btn-icon bg-white">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s6-th" class="th-text !text-purple-700 !border-purple-300">6. โรลเพลย์คู่: ประตูปริศนา! (ผลัดกันเคาะประตูและสุ่มของขวัญ)</div>
+
+            <div class="bg-white p-6 rounded-xl border border-purple-200 space-y-4">
+                <p class="text-gray-700 font-bold">How to play (วิธีเล่น):</p>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700">
+                    <li><strong>Student A:</strong> Say <em>"Knock, knock! Trick or treat!"</em></li>
+                    <li><strong>Student B:</strong> Click the <strong>"OPEN DOOR"</strong> button below and say: <em>"Happy Halloween! Here is [Item] for you!"</em></li>
+                    <li><strong>Student A:</strong> React! (<em>"Thank you! I love it!"</em> OR <em>"No, thank you! I don't want..."</em>)</li>
+                    <li><strong>Swap roles!</strong> (สลับกัน!)</li>
+                </ol>
+
+                <!-- Random Treat Generator -->
+                <div class="bg-purple-100 p-6 rounded-2xl border-2 border-purple-300 text-center mt-6">
+                    <div id="treatDisplay" class="text-2xl md:text-3xl font-bold text-purple-900 min-h-[80px] flex flex-col items-center justify-center mb-4">
+                        🚪 Click to open the door!
+                    </div>
+                    <button onclick="spinTreat()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform active:scale-95 text-xl">
+                        🚪 OPEN DOOR! 🎁
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 7: 2-PLAYER TIKTOK GAMES -->
+        <section class="card p-6 md:p-8 bg-orange-50 border-orange-300 border-4">
+            <div class="eng-block mb-6">
+                <h2 class="text-2xl font-bold text-orange-900 flex items-center gap-2">📱 7. 2-Player TikTok Games! 🎉</h2>
+                <div class="btn-group">
+                    <button onclick="speak('7. Two Player TikTok Games!')" class="btn-icon bg-white">🔊</button>
+                    <button onclick="toggleThai('s7-th')" class="btn-icon bg-white">🇹🇭</button>
+                </div>
+            </div>
+            <div id="s7-th" class="th-text">7. เกมฮิตจาก TikTok สำหรับเล่นคู่กัน!</div>
+
+            <div class="space-y-6">
+                
+                <!-- Game 1: Telepathy / Mind Meld -->
+                <div class="bg-white rounded-xl p-5 border-2 border-orange-200 shadow-sm">
+                    <div class="eng-block mb-2">
+                        <h3 class="font-bold text-orange-800 text-xl">🧠 Game 1: Twin Telepathy (ใจตรงกันไหม?)</h3>
+                        <div class="btn-group">
+                            <button onclick="speak('Game 1: Twin Telepathy')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('g1-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="g1-th" class="th-text">ครูจะบอกหมวดหมู่ นับ 1-2-3 แล้วให้ทั้งสองคนพูดคำศัพท์ออกมาพร้อมกัน! มาดูกันว่าจะใจตรงกันพูดคำเดียวกันไหม!</div>
+                    <p class="text-gray-700 mb-3">The teacher says a category. Count <strong>1, 2, 3!</strong> Both students say ONE word at the same time. Can you say the <strong>SAME word</strong>?</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm font-bold text-center">
+                        <div class="bg-orange-100 p-2 rounded">1. A yellow fruit 🍌</div>
+                        <div class="bg-orange-100 p-2 rounded">2. A red fruit 🍎</div>
+                        <div class="bg-orange-100 p-2 rounded">3. A cute pet 🐶</div>
+                        <div class="bg-orange-100 p-2 rounded">4. A hot drink ☕</div>
+                        <div class="bg-orange-100 p-2 rounded">5. A famous singer 🎤</div>
+                        <div class="bg-orange-100 p-2 rounded">6. Something in 7-11 🏪</div>
+                    </div>
+                </div>
+
+                <!-- Game 2: What is in my bag? -->
+                <div class="bg-white rounded-xl p-5 border-2 border-purple-200 shadow-sm">
+                    <div class="eng-block mb-2">
+                        <h3 class="font-bold text-purple-800 text-xl">👜 Game 2: What is in my Halloween Bag?</h3>
+                        <div class="btn-group">
+                            <button onclick="speak('Game 2: What is in my Halloween Bag?')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('g2-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="g2-th" class="th-text">คนหนึ่งเลือกของ 1 อย่างในใจจากรายการด้านล่าง อีกคนต้องถามคำถาม Yes/No เพื่อทายว่าคืออะไร!</div>
+                    <p class="text-gray-700 mb-3"><strong>Student A:</strong> Choose 1 secret item below. <br><strong>Student B:</strong> Ask easy questions to guess it!</p>
+                    
+                    <div class="bg-purple-50 p-3 rounded-lg mb-3 text-sm text-purple-900">
+                        <strong>Questions to ask:</strong> "Can you eat it?" 🍽️ | "Is it sweet?" 🍬 | "Is it an animal?" 🐾 | "Is it big?" 🐘 | "Do you like it?" 😍
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center font-bold">
+                        <div class="p-3 border rounded-lg bg-gray-50">🍫 Chocolate</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">🐍 A Snake</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">📱 iPhone</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">🍜 Mama Noodles</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">🐱 A Cat</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">💄 Lipstick</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">🍺 Beer</div>
+                        <div class="p-3 border rounded-lg bg-gray-50">🪳 A Cockroach</div>
+                    </div>
+                </div>
+
+                <!-- Game 3: Word Chain / 2 Letters -->
+                <div class="bg-white rounded-xl p-5 border-2 border-green-200 shadow-sm">
+                    <div class="eng-block mb-2">
+                        <h3 class="font-bold text-green-800 text-xl">🔤 Game 3: A to Z Category Sprint!</h3>
+                        <div class="btn-group">
+                            <button onclick="speak('Game 3: Category Sprint')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('g3-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="g3-th" class="th-text">ผลัดกันพูดคำศัพท์ในหมวดหมู่ที่กำหนด ห้ามพูดซ้ำ! ใครนึกไม่ออกเกิน 5 วินาทีแพ้!</div>
+                    <p class="text-gray-700 mb-3">Take turns saying one word in the category. Don't repeat!</p>
+                    <ul class="list-disc pl-5 text-gray-700 font-bold">
+                        <li>Round 1: Food & Drinks 🍔🥤</li>
+                        <li>Round 2: Animals 🐶🦁</li>
+                        <li>Round 3: Colors & Clothes 👗🔴</li>
+                        <li>Round 4: Words starting with the letter "S" (Sun, Snake, Sleep...) 🐍</li>
+                    </ul>
+                </div>
+
+                <!-- Game 4: Draw a Monster -->
+                <div class="bg-white rounded-xl p-5 border-2 border-pink-200 shadow-sm">
+                    <div class="eng-block mb-2">
+                        <h3 class="font-bold text-pink-700 text-xl">🎨 Game 4: Draw a Cute Monster Together!</h3>
+                        <div class="btn-group">
+                            <button onclick="speak('Game 4: Draw a Cute Monster Together!')" class="btn-icon">🔊</button>
+                            <button onclick="toggleThai('g4-th')" class="btn-icon">🇹🇭</button>
+                        </div>
+                    </div>
+                    <div id="g4-th" class="th-text">ผลัดกันสั่งให้เพื่อนวาดอวัยวะของปีศาจฮาโลวีน!</div>
+                    <p class="text-gray-700">Take turns telling your partner what to draw on paper!</p>
+                    <p class="text-sm bg-pink-50 p-3 rounded mt-2 font-mono text-pink-900">
+                        "Please draw a big head." 🟢<br>
+                        "Please draw 3 eyes." 👀👁️<br>
+                        "Please draw a big mouth and 2 teeth." 👄🦷<br>
+                        "Please draw cat ears." 🐱
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Past Vocabulary for Warm-Up Spinner
+        const vocabData = [
+            { emoji: "👻", en: "Haunted house", th: "บ้านผีสิง" },
+            { emoji: "🧛‍♂️", en: "Costume", th: "เครื่องแต่งกาย" },
+            { emoji: "💄", en: "Wear make-up as a ghost", th: "แต่งหน้าเป็นผี" },
+            { emoji: "😱", en: "Scary", th: "น่ากลัว" },
+            { emoji: "🐍", en: "I'm scared of snakes.", th: "ฉันกลัวงู" },
+            { emoji: "🪳", en: "Cockroaches", th: "แมลงสาบ" },
+            { emoji: "🍫", en: "Chocolate", th: "ช็อกโกแลต" },
+            { emoji: "🍿", en: "Snacks", th: "ขนม" },
+            { emoji: "🎁", en: "Presents / Gifts", th: "ของขวัญ" },
+            { emoji: "🥴", en: "Tipsy", th: "กึ่มๆ (เมานิดหน่อย)" },
+            { emoji: "🎬", en: "Horror movies", th: "หนังผี" },
+            { emoji: "🤪", en: "Prank", th: "แกล้ง" },
+            { emoji: "🗣️", en: "Pretend", th: "แกล้งทำเป็น" },
+            { emoji: "🔮", en: "Superstitious", th: "สายมู / เชื่อเรื่องผี" },
+            { emoji: "🥱", en: "Tired", th: "เหนื่อย" },
+            { emoji: "😴", en: "I go back to sleep.", th: "กลับไปนอนต่อ" },
+            { emoji: "🍜", en: "Instant noodles", th: "บะหมี่กึ่งสำเร็จรูป" },
+            { emoji: "🥗", en: "Papaya salad", th: "ส้มตำ" },
+            { emoji: "🏖️", en: "Take a vacation leave", th: "ลาพักร้อน" },
+            { emoji: "🎟️", en: "Win the lottery", th: "ถูกหวย" }
+        ];
+
+        function pickRandomWord() {
+            const display = document.getElementById('wordDisplay');
+            display.style.opacity = '0';
+            
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * vocabData.length);
+                const item = vocabData[randomIndex];
+                const uniqueId = 'rand-' + Math.random().toString(36).substr(2, 9);
+                
+                display.innerHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="text-4xl animate-bounce">${item.emoji}</div>
+                        <div class="eng-block text-xl font-bold text-orange-900 px-2 text-center">
+                            <span class="eng-text">${item.en}</span>
+                            <div class="btn-group">
+                                <button onclick="speak('${item.en.replace(/'/g, "\\'")}')" class="btn-icon bg-white">🔊</button>
+                                <button onclick="toggleThai('${uniqueId}')" class="btn-icon bg-white">🇹🇭</button>
+                            </div>
+                        </div>
+                        <div id="${uniqueId}" class="th-text !text-center !border-0 text-base !mt-0">${item.th}</div>
+                    </div>
+                `;
+                display.style.opacity = '1';
+            }, 200);
+        }
+
+        // Mystery Door Treats for Part 6
+        const treats = [
+            { emoji: "🍫", en: "a big box of chocolate", th: "ช็อกโกแลตกล่องใหญ่" },
+            { emoji: "🪳", en: "a big cockroach", th: "แมลงสาบตัวใหญ่!" },
+            { emoji: "💰", en: "1,000,000 Baht", th: "เงิน 1 ล้านบาท!" },
+            { emoji: "📊", en: "more accounting work", th: "งานบัญชีกองโต!" },
+            { emoji: "🧦", en: "dirty old socks", th: "ถุงเท้าเน่าๆ!" },
+            { emoji: "💎", en: "a diamond ring", th: "แหวนเพชร!" },
+            { emoji: "🐟", en: "fermented fish (Pla-ra)", th: "ปลาร้า 1 ขวด!" },
+            { emoji: "📱", en: "a new iPhone 16", th: "ไอโฟนเครื่องใหม่!" },
+            { emoji: "🐍", en: "a green snake", th: "งูเขียว!" },
+            { emoji: "🍺", en: "a cold beer", th: "เบียร์เย็นๆ!" },
+            { emoji: "🥚", en: "10 boiled eggs", th: "ไข่ต้ม 10 ฟอง!" },
+            { emoji: "👻", en: "a spooky ghost", th: "ผีหลอก!" }
+        ];
+
+        function spinTreat() {
+            const display = document.getElementById('treatDisplay');
+            const randomIndex = Math.floor(Math.random() * treats.length);
+            const item = treats[randomIndex];
+            const thId = 'treat-th-' + Date.now();
+
+            display.innerHTML = `
+                <div class="text-5xl mb-2 animate-bounce">${item.emoji}</div>
+                <div class="flex items-center gap-2 justify-center">
+                    <span>"Here is <strong>${item.en}</strong> for you!"</span>
+                    <button onclick="speak('Here is ${item.en} for you!')" class="btn-icon bg-white text-sm">🔊</button>
+                    <button onclick="toggleThai('${thId}')" class="btn-icon bg-white text-sm">🇹🇭</button>
+                </div>
+                <div id="${thId}" class="th-text !text-purple-700 !border-0 text-base mt-1">${item.th}</div>
+            `;
+        }
+    </script>
+</body>
+</html>
