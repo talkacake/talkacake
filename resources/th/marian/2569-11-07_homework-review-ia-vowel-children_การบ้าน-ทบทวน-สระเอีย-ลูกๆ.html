@@ -255,6 +255,11 @@
   .opts button.correct, .tap.found { border-color: #22c55e; background: #dcfce7; }
   .opts button.wrong { border-color: #ef4444; background: #fee2e2; opacity: .7; }
   .q-feedback { min-height: 1.4em; font-weight: 600; }
+  .mc .q-row { display: flex; align-items: center; gap: 10px; }
+  .mc .q-num { color: var(--muted); font-weight: 600; }
+  .mc .main-text { font-size: 1.7rem; margin: 0; }
+  .mc .q-listen { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .mc .opts button { font-size: 1.05rem; text-align: left; }
   .quiz-score, .tap-count { font-weight: 600; margin: 8px 0; }
   .tap-grid { display: flex; flex-wrap: wrap; gap: 8px; }
   .tap.miss { border-color: #ef4444; background: #fee2e2; animation: shake .3s; }
@@ -278,6 +283,8 @@
   .rec-hint { margin: 6px 0 0; }
   .send-count { font-weight: 700; margin: 0 0 6px; }
   .send-item { font-size: 1.1rem; margin: 4px 0; }
+  .sent-tag { color: #16a34a; font-size: .9rem; font-weight: 600; }
+  .send-btn:disabled { opacity: .6; cursor: wait; }
 </style>
 </head>
 <body>
@@ -329,190 +336,147 @@
   </div>
   <article class="card text-block " id="review-intro" data-tts-lang="th-TH">
     <div class="meta"><span class="emoji">📚</span></div>
-    <div class="main-text thai">อ่านคำศัพท์ แล้วบอกความหมาย กด EN เพื่อเช็ก</div>
+    <div class="main-text thai">คำนี้แปลว่าอะไร เลือกคำตอบค่ะ</div>
     <div class="controls">
       <button type="button" onclick="speakMainText('review-intro')">🔊</button>
       <button type="button" onclick="togglePart('review-intro', 'support')">EN</button>
     </div>
-    <div class="support-text en-support">Read each word and say what it means. Press EN to check.</div>
+    <div class="support-text en-support">What does each word mean? Choose the answer.</div>
   </article>
-  <div class="tile-grid">
-    <div class="tile" id="vocab-1" data-tts-lang="th-TH">
-      <div class="main-text thai">ศูนย์</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-1')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-1', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">centre; zero</div>
+  <div class="quiz" id="quiz-meaning">
+    <div class="quiz-q card mc" id="quiz-meaning-1" data-answer="centre; zero" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">1.</span><span class="main-text thai">ศูนย์</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-1')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">owner</button><button type="button" onclick="answerQuiz(this)">family</button><button type="button" onclick="answerQuiz(this)">centre; zero</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-2" data-tts-lang="th-TH">
-      <div class="main-text thai">ความรู้</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-2')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-2', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">knowledge</div>
+    <div class="quiz-q card mc" id="quiz-meaning-2" data-answer="knowledge" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">2.</span><span class="main-text thai">ความรู้</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-2')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">real life</button><button type="button" onclick="answerQuiz(this)">to know</button><button type="button" onclick="answerQuiz(this)">knowledge</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-3" data-tts-lang="th-TH">
-      <div class="main-text thai">รู้</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-3')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-3', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">to know</div>
+    <div class="quiz-q card mc" id="quiz-meaning-3" data-answer="to know" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">3.</span><span class="main-text thai">รู้</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-3')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">to tell</button><button type="button" onclick="answerQuiz(this)">to read</button><button type="button" onclick="answerQuiz(this)">to know</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-4" data-tts-lang="th-TH">
-      <div class="main-text thai">ขาย</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-4')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-4', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">to sell</div>
+    <div class="quiz-q card mc" id="quiz-meaning-4" data-answer="to sell" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">4.</span><span class="main-text thai">ขาย</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-4')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">to sell</button><button type="button" onclick="answerQuiz(this)">to tell</button><button type="button" onclick="answerQuiz(this)">to read</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-5" data-tts-lang="th-TH">
-      <div class="main-text thai">หนังสือ</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-5')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-5', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">book(s)</div>
+    <div class="quiz-q card mc" id="quiz-meaning-5" data-answer="book(s)" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">5.</span><span class="main-text thai">หนังสือ</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-5')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">curry</button><button type="button" onclick="answerQuiz(this)">book(s)</button><button type="button" onclick="answerQuiz(this)">T-shirt</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-6" data-tts-lang="th-TH">
-      <div class="main-text thai">อ่าน</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-6')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-6', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">to read</div>
+    <div class="quiz-q card mc" id="quiz-meaning-6" data-answer="to read" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">6.</span><span class="main-text thai">อ่าน</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-6')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">to know</button><button type="button" onclick="answerQuiz(this)">to sell</button><button type="button" onclick="answerQuiz(this)">to read</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-7" data-tts-lang="th-TH">
-      <div class="main-text thai">ชีวิตจริง</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-7')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-7', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">real life</div>
+    <div class="quiz-q card mc" id="quiz-meaning-7" data-answer="real life" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">7.</span><span class="main-text thai">ชีวิตจริง</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-7')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">real life</button><button type="button" onclick="answerQuiz(this)">family</button><button type="button" onclick="answerQuiz(this)">knowledge</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-8" data-tts-lang="th-TH">
-      <div class="main-text thai">นาย</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-8')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-8', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">Mr.</div>
+    <div class="quiz-q card mc" id="quiz-meaning-8" data-answer="Mr." data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">8.</span><span class="main-text thai">นาย</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-8')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">Mrs.</button><button type="button" onclick="answerQuiz(this)">Mr.</button><button type="button" onclick="answerQuiz(this)">No. (number)</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-9" data-tts-lang="th-TH">
-      <div class="main-text thai">นาง</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-9')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-9', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">Mrs.</div>
+    <div class="quiz-q card mc" id="quiz-meaning-9" data-answer="Mrs." data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">9.</span><span class="main-text thai">นาง</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-9')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">Mrs.</button><button type="button" onclick="answerQuiz(this)">Mr.</button><button type="button" onclick="answerQuiz(this)">they</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-10" data-tts-lang="th-TH">
-      <div class="main-text thai">เลขที่</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-10')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-10', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">No. (number)</div>
+    <div class="quiz-q card mc" id="quiz-meaning-10" data-answer="No. (number)" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">10.</span><span class="main-text thai">เลขที่</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-10')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">No. (number)</button><button type="button" onclick="answerQuiz(this)">the most</button><button type="button" onclick="answerQuiz(this)">centre; zero</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-11" data-tts-lang="th-TH">
-      <div class="main-text thai">เป็นยังไง</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-11')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-11', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">How is ...?</div>
+    <div class="quiz-q card mc" id="quiz-meaning-11" data-answer="How is ...?" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">11.</span><span class="main-text thai">เป็นยังไง</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-11')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">the most</button><button type="button" onclick="answerQuiz(this)">How is ...?</button><button type="button" onclick="answerQuiz(this)">"So believable!" (said sarcastically)</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-12" data-tts-lang="th-TH">
-      <div class="main-text thai">เสื้อยืด</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-12')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-12', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">T-shirt</div>
+    <div class="quiz-q card mc" id="quiz-meaning-12" data-answer="T-shirt" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">12.</span><span class="main-text thai">เสื้อยืด</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-12')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">book(s)</button><button type="button" onclick="answerQuiz(this)">T-shirt</button><button type="button" onclick="answerQuiz(this)">curry</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-13" data-tts-lang="th-TH">
-      <div class="main-text thai">แกง</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-13')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-13', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">curry</div>
+    <div class="quiz-q card mc" id="quiz-meaning-13" data-answer="curry" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">13.</span><span class="main-text thai">แกง</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-13')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">family</button><button type="button" onclick="answerQuiz(this)">T-shirt</button><button type="button" onclick="answerQuiz(this)">curry</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-14" data-tts-lang="th-TH">
-      <div class="main-text thai">พิเศษ</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-14')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-14', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">special</div>
+    <div class="quiz-q card mc" id="quiz-meaning-14" data-answer="special" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">14.</span><span class="main-text thai">พิเศษ</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-14')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">special</button><button type="button" onclick="answerQuiz(this)">very proud</button><button type="button" onclick="answerQuiz(this)">ordinary, normal</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-15" data-tts-lang="th-TH">
-      <div class="main-text thai">เจ้าของ</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-15')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-15', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">owner</div>
+    <div class="quiz-q card mc" id="quiz-meaning-15" data-answer="owner" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">15.</span><span class="main-text thai">เจ้าของ</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-15')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">owner</button><button type="button" onclick="answerQuiz(this)">Mr.</button><button type="button" onclick="answerQuiz(this)">they</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-16" data-tts-lang="th-TH">
-      <div class="main-text thai">ภาคภูมิใจนัก</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-16')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-16', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">very proud</div>
+    <div class="quiz-q card mc" id="quiz-meaning-16" data-answer="very proud" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">16.</span><span class="main-text thai">ภาคภูมิใจนัก</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-16')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">special</button><button type="button" onclick="answerQuiz(this)">ordinary, normal</button><button type="button" onclick="answerQuiz(this)">very proud</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-17" data-tts-lang="th-TH">
-      <div class="main-text thai">ปกติธรรมดา</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-17')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-17', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">ordinary, normal</div>
+    <div class="quiz-q card mc" id="quiz-meaning-17" data-answer="ordinary, normal" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">17.</span><span class="main-text thai">ปกติธรรมดา</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-17')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">ordinary, normal</button><button type="button" onclick="answerQuiz(this)">real life</button><button type="button" onclick="answerQuiz(this)">special</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-18" data-tts-lang="th-TH">
-      <div class="main-text thai">พวกเขา</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-18')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-18', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">they</div>
+    <div class="quiz-q card mc" id="quiz-meaning-18" data-answer="they" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">18.</span><span class="main-text thai">พวกเขา</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-18')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">family</button><button type="button" onclick="answerQuiz(this)">owner</button><button type="button" onclick="answerQuiz(this)">they</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-19" data-tts-lang="th-TH">
-      <div class="main-text thai">บอก</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-19')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-19', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">to tell</div>
+    <div class="quiz-q card mc" id="quiz-meaning-19" data-answer="to tell" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">19.</span><span class="main-text thai">บอก</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-19')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">to sell</button><button type="button" onclick="answerQuiz(this)">to tell</button><button type="button" onclick="answerQuiz(this)">to know</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-20" data-tts-lang="th-TH">
-      <div class="main-text thai">ที่สุด</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-20')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-20', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">the most</div>
+    <div class="quiz-q card mc" id="quiz-meaning-20" data-answer="the most" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">20.</span><span class="main-text thai">ที่สุด</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-20')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">the most</button><button type="button" onclick="answerQuiz(this)">No. (number)</button><button type="button" onclick="answerQuiz(this)">special</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-21" data-tts-lang="th-TH">
-      <div class="main-text thai">เชื่อเขาเลย</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-21')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-21', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">"So believable!" (said sarcastically)</div>
+    <div class="quiz-q card mc" id="quiz-meaning-21" data-answer="&quot;So believable!&quot; (said sarcastically)" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">21.</span><span class="main-text thai">เชื่อเขาเลย</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-21')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">How is ...?</button><button type="button" onclick="answerQuiz(this)">"So believable!" (said sarcastically)</button><button type="button" onclick="answerQuiz(this)">very proud</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
-    <div class="tile" id="vocab-22" data-tts-lang="th-TH">
-      <div class="main-text thai">ครอบครัว</div>
-      <div class="controls">
-        <button type="button" onclick="speakMainText('vocab-22')">🔊</button>
-        <button type="button" onclick="togglePart('vocab-22', 'support')">EN</button>
-      </div>
-      <div class="support-text en-support">family</div>
+    <div class="quiz-q card mc" id="quiz-meaning-22" data-answer="family" data-tts-lang="th-TH">
+      <div class="q-row"><span class="q-num">22.</span><span class="main-text thai">ครอบครัว</span>
+        <button type="button" class="q-listen" onclick="speakMainText('quiz-meaning-22')">🔊</button></div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">they</button><button type="button" onclick="answerQuiz(this)">family</button><button type="button" onclick="answerQuiz(this)">owner</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
     </div>
+    <p class="quiz-score">ทำแล้ว 0/22 ข้อ <span class="muted">(Done 0/22)</span></p>
   </div>
   <article class="card text-block " id="quiz-vocab-intro" data-tts-lang="th-TH">
     <div class="meta"><span class="emoji">✅</span></div>
@@ -1034,7 +998,7 @@
   <div class="card send-box">
     <div id="send-list" class="send-list"></div>
     <div class="rec-row">
-      <button type="button" class="send-btn" onclick="shareAll()">📤 ส่งให้เค้ก <span class="muted">(Send to Cake)</span></button>
+      <button type="button" class="send-btn" onclick="sendHomework()">📤 ส่งให้เค้ก <span class="muted">(Send to Cake)</span></button>
       <button type="button" class="save-btn" onclick="saveAll()">💾 บันทึกไฟล์ <span class="muted">(Save files)</span></button>
     </div>
     <div id="send-msg" class="rec-msg" aria-live="polite"></div>
@@ -1090,9 +1054,11 @@ function answerQuiz(btn) {
   if (btn.textContent.trim() === q.dataset.answer) {
     btn.classList.add('correct');
     q.classList.add('done');
-    q.querySelector('.blank').textContent = q.dataset.answer;
+    const blank = q.querySelector('.blank');
+    if (blank) blank.textContent = q.dataset.answer;
     q.querySelectorAll('.opts button').forEach(b => { b.disabled = true; });
-    q.querySelector('.q-say').hidden = false;
+    const say = q.querySelector('.q-say');
+    if (say) say.hidden = false;
     feedback.textContent = '✓ ถูกต้อง! (Correct!)';
     feedback.style.color = '#16a34a';
     const quiz = q.closest('.quiz');
@@ -1138,7 +1104,6 @@ function tapWord(btn) {
 const MAX_SECONDS = 180;
 const recordings = {};
 let activeRec = null;
-let sent = false;
 const REC_MIME = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus']
   .find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
 
@@ -1269,7 +1234,6 @@ async function saveRecording(recId, raw) {
     if (old) URL.revokeObjectURL(old.url);
     const file = new File([blob], `marian-homework-${box.dataset.label}.${ext}`, { type: blob.type });
     recordings[recId] = { recId, title: box.dataset.title, file, url: URL.createObjectURL(file) };
-    sent = false;
     setRecMsg(box, '');
     renderTake(recId);
     renderSendList();
@@ -1304,33 +1268,90 @@ function renderSendList() {
   const done = recordedList().length;
   document.getElementById('send-list').innerHTML =
     `<p class="send-count">อัดแล้ว ${done}/${boxes.length} ข้อ <span class="muted">(Recorded ${done}/${boxes.length})</span></p>`
-    + boxes.map(b => `<div class="send-item">${recordings[b.dataset.rec] ? '✅' : '⬜'} ${b.dataset.title}</div>`).join('');
+    + boxes.map(b => {
+      const r = recordings[b.dataset.rec];
+      return `<div class="send-item">${r ? '✅' : '⬜'} ${b.dataset.title}`
+        + (r && r.uploaded ? ' <span class="sent-tag">ส่งแล้ว (Sent)</span>' : '') + '</div>';
+    }).join('');
 }
 
-async function shareAll() {
+// ---------------- Sending ----------------
+// With HOMEWORK_API_URL set, recordings go straight to Cake's Google Drive (TalkaCake homework Apps Script).
+// Without it, the phone's share sheet is used, or the files are saved to send by LINE or email.
+const HOMEWORK_API_URL = '';
+const HOMEWORK = { student: 'marian', homework: '2569-11-07 การบ้าน ทบทวนคำศัพท์ สระเอีย ลูกๆ' };
+
+function setSendMsg(text, color) {
   const msg = document.getElementById('send-msg');
-  msg.style.color = '';
-  const files = recordedList().map(r => r.file);
-  if (!files.length) {
-    msg.textContent = 'ยังไม่มีเสียงที่อัดค่ะ (No recordings yet.)';
-    return;
+  msg.textContent = text;
+  msg.style.color = color || '';
+}
+
+function toBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function apiPost(data) {
+  // text/plain keeps this a "simple" request, which Apps Script accepts from other sites.
+  const res = await fetch(HOMEWORK_API_URL, { method: 'POST', body: JSON.stringify(data) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+async function sendHomework() {
+  const list = recordedList();
+  if (!list.length) return setSendMsg('ยังไม่มีเสียงที่อัดค่ะ (No recordings yet.)');
+  if (!HOMEWORK_API_URL) return shareFiles(list);
+  const todo = list.filter(r => !r.uploaded);
+  if (!todo.length) return setSendMsg('ส่งครบแล้วค่ะ ✅ (Already sent.)', '#16a34a');
+  const total = document.querySelectorAll('.recorder').length;
+  if (list.length < total && !confirm(`อัดแล้ว ${list.length}/${total} ข้อ ส่งเลยไหมคะ? (You've recorded ${list.length} of ${total}. Send now?)`)) return;
+  const btn = document.querySelector('.send-btn');
+  btn.disabled = true;
+  try {
+    for (let i = 0; i < todo.length; i++) {
+      setSendMsg(`กำลังส่ง ${i + 1}/${todo.length}... (Sending ${i + 1}/${todo.length}...)`, 'var(--muted)');
+      const r = todo[i];
+      await apiPost({ action: 'upload', ...HOMEWORK, task: r.title, type: r.file.type, audio: await toBase64(r.file) });
+      r.uploaded = true;
+      renderSendList();
+    }
+    try {
+      await apiPost({ action: 'done', ...HOMEWORK, tasks: todo.map(r => r.title) });
+    } catch (e) {
+      // the recordings are already in Drive; only the email to Cake failed
+    }
+    setSendMsg('ส่งแล้ว ขอบคุณค่ะ! ✅ (Sent. Thank you!)', '#16a34a');
+  } catch (e) {
+    setSendMsg('ส่งไม่ได้ กด 📤 อีกครั้งนะคะ หรือกด 💾 บันทึกไฟล์ แล้วส่งทาง LINE (Couldn\'t send. Press 📤 again, or press 💾 Save files and send them by LINE.)');
+  } finally {
+    btn.disabled = false;
   }
+}
+
+async function shareFiles(list) {
+  const files = list.map(r => r.file);
   if (navigator.canShare && navigator.canShare({ files })) {
     try {
       await navigator.share({ files, title: 'การบ้านของ Marian' });
-      sent = true;
-      msg.style.color = '#16a34a';
-      msg.textContent = 'ส่งแล้ว ขอบคุณค่ะ! (Sent. Thank you!)';
+      list.forEach(r => { r.saved = true; });
+      setSendMsg('ส่งแล้ว ขอบคุณค่ะ! (Sent. Thank you!)', '#16a34a');
     } catch (e) {
       if (e.name !== 'AbortError') {
         saveAll();
-        msg.textContent = 'ส่งไม่ได้ บันทึกไฟล์แล้วส่งทาง LINE หรืออีเมลนะคะ (Couldn\'t send. The files were saved; please send them by LINE or email.)';
+        setSendMsg('ส่งไม่ได้ บันทึกไฟล์แล้วส่งทาง LINE หรืออีเมลนะคะ (Couldn\'t send. The files were saved; please send them by LINE or email.)');
       }
     }
   } else {
     saveAll();
-    msg.style.color = 'var(--ink)';
-    msg.textContent = 'บันทึกไฟล์แล้ว ส่งให้เค้กทาง LINE หรืออีเมลนะคะ (Files saved. Please send them to Cake by LINE or email.)';
+    setSendMsg('บันทึกไฟล์แล้ว ส่งให้เค้กทาง LINE หรืออีเมลนะคะ (Files saved. Please send them to Cake by LINE or email.)', 'var(--ink)');
   }
 }
 
@@ -1344,11 +1365,11 @@ function saveAll() {
     a.click();
     a.remove();
   }, i * 400));
-  if (list.length) sent = true;
+  list.forEach(r => { r.saved = true; });
 }
 
 window.addEventListener('beforeunload', e => {
-  if (recordedList().length && !sent) {
+  if (recordedList().some(r => !r.uploaded && !r.saved)) {
     e.preventDefault();
     e.returnValue = '';
   }
