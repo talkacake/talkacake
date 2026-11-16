@@ -96,7 +96,7 @@
         <div>
           <label for="model-select" class="block text-sm font-semibold text-slate-700 mb-2">AI model</label>
           <select id="model-select" class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="fast">Claude Opus 5.5 — fast (recommended)</option>
+            <option value="fast">Claude Haiku 5.5 — fast (recommended)</option>
             <option value="careful">Claude Opus 5.5 — extra careful (slower)</option>
           </select>
           <p id="model-help" class="mt-2 text-xs text-slate-500"></p>
@@ -133,18 +133,17 @@
     // Official Anthropic SDK (JavaScript), pinned. Loaded as soon as the page opens so the first
     // Translate click doesn't wait for the download.
     const ANTHROPIC_SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.3.0/+esm';
-    const CLAUDE_MODEL = 'claude-opus-5-5';
-
-    // Both modes use Claude Opus 5.5. Effort sets how long it thinks before answering:
-    // low keeps short words and phrases quick; high checks harder and takes longer.
+    // Fast uses a low-latency model; careful preserves the original high-accuracy model.
     const MODEL_CONFIGS = {
       fast: {
+        model: 'claude-haiku-5-5',
         effort: 'low',
-        help: 'Claude Opus 5.5 with a short think. Best for words and short phrases.'
+        help: 'Claude Haiku 5.5 for quicker words, phrases and everyday translations.'
       },
       careful: {
+        model: 'claude-opus-5-5',
         effort: 'high',
-        help: 'Claude Opus 5.5 thinks longer before answering. Slower; use it for long or tricky text.'
+        help: 'Claude Opus 5.5 for more challenging Thai, nuanced context and careful phonetics (slower).'
       }
     };
 
@@ -417,7 +416,7 @@
             throw new Error('Your Claude API key was not accepted. Please check it in Settings. (' + error.message + ')');
           }
           if (error instanceof Anthropic.PermissionDeniedError) {
-            throw new Error('This API key is not allowed to use Claude Opus 5.5. (' + error.message + ')');
+            throw new Error('This API key is not allowed to use the selected Claude model. (' + error.message + ')');
           }
           if (error instanceof Anthropic.RateLimitError) {
             throw new Error('Rate limit reached for this API key. Please wait a moment and try again. (' + error.message + ')');
@@ -526,11 +525,9 @@
         const phoneticType = phoneticTypeSelect.value;
         const mode = MODEL_CONFIGS[modelSelect.value] || MODEL_CONFIGS.fast;
         const request = {
-          model: CLAUDE_MODEL,
-          max_tokens: 16000,
-          // If Claude declines a request, the API retries it on a fallback model in the same call.
-          betas: ['server-side-fallback-2026-07-01'],
-          fallbacks: 'default',
+          model: mode.model,
+          // A short translation should not reserve the same output budget as a long passage.
+          max_tokens: Math.min(8192, Math.max(1024, inputLines.length * 384)),
           // Rules and anchors for the chosen phonetic type: the same on every request, so they are cached.
           system: [{
             type: 'text',
