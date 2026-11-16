@@ -12,7 +12,7 @@
 <section class="panel">
 <h1>คู่มือภาษาไทย · Thai Language Companion</h1>
 <p class="muted">Fast, completely AI-free dictionary. No API keys, requests to AI, or translation charges. Exact matches come from reviewed examples; unfamiliar words are shown for manual editing rather than guessed.</p>
-<div class="notice">A rule-based sentence composer joins pronunciations of known Thai words and phrases, without using AI. <b>Unknown words remain marked [?]</b> until you correct them. English for new sentences is a word-by-word gloss, not an automatic natural translation.</div>
+<div class="notice">A rule-based sentence composer joins pronunciations of known Thai words and phrases, without using AI. <b>Unknown words remain marked [?]</b> until you correct them. English for a new sentence comes from fixed sentence patterns where one fits (ทำไมไม่นอน → Why don't you sleep?); other sentences get a word-by-word gloss. Please check both.</div>
 </section>
 <section class="panel">
 <label for="text-input">Thai or English text (one item per line)</label>
@@ -151,7 +151,8 @@ const PHONETIC_RULES={
 function showRules(){
  const system=$("system").value,rule=PHONETIC_RULES[system],target=$("rule-guide");
  target.replaceChildren();
- for(const text of [rule.description,"Sentence rule: split the sentence into reviewed Thai words and phrases that have "+labels[system]+", choosing the split with the fewest unknown pieces, then the fewest pieces. A match must end where a Thai word can end (so ข้า is never matched inside ข้าว, or ที inside ที่). Pieces are joined with spaces; numbers, punctuation and English words stay as written; unknown pieces become [?]. Pronunciations are copied exactly as reviewed.",...rule.examples,rule.caution]){
+ for(const text of [rule.description,"Sentence rule: split the sentence into reviewed Thai words and phrases that have "+labels[system]+", choosing the split with the fewest unknown pieces, then the fewest pieces. A match must end where a Thai word can end (so ข้า is never matched inside ข้าว, or ที inside ที่). Pieces are joined with spaces; numbers, punctuation and English words stay as written; unknown pieces become [?]. Pronunciations are copied exactly as reviewed.",...rule.examples,rule.caution,
+  "English rule (all systems): a new sentence that fits a common pattern gets an English sentence — question words (ทำไม อะไร ที่ไหน ใคร เมื่อไหร่ ยังไง เท่าไหร่ กี่), ไม่, ไหม / หรือเปล่า / หรือยัง / ใช่ไหม / เหรอ, จะ / แล้ว / กำลัง / เคย / ได้, อยาก / ชอบ / ต้อง / ควร, ช่วย / อย่า / ขอ / เถอะ, pronouns, and ครับ / ค่ะ / นะ dropped. Missing subjects become “you” in questions and “I” in statements (“it” for things like อร่อย or ร้อน). Anything else gets a word-by-word gloss (word · word)."]){
   const p=document.createElement("p");p.style.margin="5px 0";p.textContent=text;target.appendChild(p);
  }
 }
@@ -175,7 +176,7 @@ const conflictingPronunciations=new Map();
 const importedCounts={};
 let entriesLoading=true,sortedThaiKeys=[],thaiKeysByFirst=new Map();
 function rebuildThaiKeys(){
- sortedThaiKeys=Array.from(new Set([...lexicon.keys(),...Object.keys(corrections).filter(v=>/[\u0E00-\u0E7F]/.test(v))]))
+ sortedThaiKeys=Array.from(new Set([...lexicon.keys(),...englishSentence.keys,...Object.keys(corrections).filter(v=>/[\u0E00-\u0E7F]/.test(v))]))
    .filter(v=>/[\u0E00-\u0E7F]/.test(v)&&!/[+*]/.test(v)&&!v.includes("...")&&!v.includes("…"))
    .sort((a,b)=>b.length-a.length);
  thaiKeysByFirst=new Map();
@@ -233,8 +234,9 @@ function wordEnds(str){
 // Picks the split with the fewest unknown pieces, then the fewest pieces (so longer phrases win).
 // A match may end inside a word only if more matches carry on to a word end, so ข้า is never
 // read inside ข้าว; unknown text is always a whole word. Digits, punctuation and Latin stay literal.
-function segmentThai(str,system){
+function segmentThai(str,system,pick){
  str=normText(str);
+ pick=pick||(key=>{const entry=lookup(key);return entry&&entry[system]?{text:key,entry}:null;});
  const n=str.length,ends=wordEnds(str),best=new Array(n+1).fill(null);
  best[0]={unknown:0,count:0,from:-1,piece:null};
  const offer=(j,c)=>{const b=best[j];if(!b||c.unknown<b.unknown||(c.unknown===b.unknown&&c.count<b.count))best[j]=c;};
@@ -249,9 +251,9 @@ function segmentThai(str,system){
    if(!str.startsWith(key,i))continue;
    const j=i+key.length;
    if(j<n&&THAI_DEPENDENT.test(str[j]))continue;
-   const entry=lookup(key);
-   if(!entry||!entry[system])continue;
-   offer(j,{unknown:cur.unknown,count:cur.count+1,from:i,piece:{text:key,entry}});
+   const piece=pick(key);
+   if(!piece)continue;
+   offer(j,{unknown:cur.unknown,count:cur.count+1,from:i,piece});
   }
   if(ends.has(i)){
    let j=i+1;while(j<n&&!ends.has(j))j++;
@@ -272,6 +274,537 @@ function joinPieces(pieces,text,separator){
  }
  return out;
 }
+// ================================================================== English sentences (rule-based, no AI)
+// Common Thai sentence patterns become English sentences through fixed rules. English words come
+// from the short lists below first (English only, never phonetics), then from the dictionary.
+// A sentence that doesn't fit a pattern returns null, and the page keeps the word-by-word gloss.
+const englishSentence=(()=>{
+ const W=new Map();
+ const add=(k,list,fn)=>{for(const item of list.split("|")){const s=item.trim();if(!s)continue;const at=s.indexOf("=");
+  const th=normText(at<0?s:s.slice(0,at)).trim(),val=at<0?"":s.slice(at+1).trim();W.set(th,{k,th,...(fn?fn(val):{v:val})});}};
+ // ---- grammar words
+ add("part","ๆ|ครับ|คับ|ค่ะ|คะ|ขา|จ้ะ|จ้า|จ๊ะ|จ๋า|ฮะ|ครับผม|นะ|นะคะ|นะครับ|น่ะ|ล่ะ|หรอก|สิ|ซิ|หน่อย|เลย|เนี่ย|ก็|อ่ะ");
+ add("lets","เถอะ|กันเถอะ");
+ add("gan","กัน");
+ add("conj","และ|แต่|หรือ|เพราะ|เพราะว่า|ถ้า|ว่า|แล้วก็|ก็เลย|เมื่อ|ตอนที่|ซึ่ง|จึง|กว่า|ให้|ถึงแม้|เพื่อ|แล้วแต่|ทั้ง|หรือว่า|เอง|ก็ได้|ถึง|ในใจ|ตัวเอง|ข้างนอก|ข้างใน|แค่|เท่านี้|น่าจะ|อื่น|เหมือน|ซ้ำ|ไว้|ขึ้น|ลง|ออก|เข้า|ทุก|บาง|หลาย|ทั้งหมด|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ|ยี่สิบ|ร้อย|พัน|หมื่น|แสน|ล้าน|โดน|ถูกใจ|เคยชิน|ตาม|ระหว่าง|นอกจาก|ต่อ");
+ add("q","ไหม=yn|มั้ย=yn|มั๊ย=yn|ไม๊=yn|หรือเปล่า=yn|รึเปล่า=yn|หรือไม่=yn|ป่ะ=yn|ปะ=yn|หรือยัง=yet|รึยัง=yet|ใช่ไหม=tag|ใช่มั้ย=tag|ใช่หรือเปล่า=tag|ใช่ป่ะ=tag|เนอะ=tag|เหรอ=echo|หรอ=echo");
+ add("wh","ทำไม=why|อะไร=what|ที่ไหน=where|ไหน=where|ใคร=who|เมื่อไหร่=when|เมื่อไร=when|ตอนไหน=when|ยังไง=how|อย่างไร=how|เท่าไหร่=howmuch|เท่าไร=howmuch|กี่โมง=whattime|กี่=howmany");
+ add("neg","ไม่=not|ยังไม่ได้=notyet|ไม่ค่อย=notmuch|ยังไม่=notyet|ไม่ได้=didnt|ไม่เคย=never|อย่า=dont|ไม่ต้อง=noneed|ไม่เป็น=cantskill");
+ add("aux","จะ=will|กำลัง=prog|กำลังจะ=goingto|เคย=ever|อยาก=want|อยากจะ=want|ต้อง=must|ควร=should|ควรจะ=should|อาจ=might|อาจจะ=might|คง=probably|คงจะ=probably|เพิ่ง=just|ยัง=still|สามารถ=can|กรุณา=please|ช่วย=please|ขอ=request");
+ add("dai","ได้");
+ add("post","แล้ว=already|ด้วย=too|ก่อน=first");
+ add("deg","มาก=very|มากๆ=very|จัง=so|จริงๆ=really|นิดหน่อย=alittle|เกินไป=too|ที่สุด=most");
+ add("pdeg","ค่อนข้าง=quite");
+ add("time","วันนี้=today|พรุ่งนี้=tomorrow:f|เมื่อวาน=yesterday:p|เมื่อวานนี้=yesterday:p|ตอนนี้=now|เดี๋ยวนี้=now|คืนนี้=tonight:f|เมื่อคืน=last night:p|เมื่อเช้า=this morning:p|เช้านี้=this morning|ตลอด=all the time|ตลอดเวลา=all the time|ทุกวัน=every day|ทุกเช้า=every morning|ทุกคืน=every night|บ่อย=often|บ่อยๆ=often|ปีหน้า=next year:f|ปีที่แล้ว=last year:p|อาทิตย์หน้า=next week:f|อาทิตย์ที่แล้ว=last week:p|สัปดาห์หน้า=next week:f|สัปดาห์ที่แล้ว=last week:p|เดือนหน้า=next month:f|เดือนที่แล้ว=last month:p|เมื่อกี้=just now:p|ตอนเช้า=in the morning|ตอนเย็น=in the evening|ตอนบ่าย=in the afternoon|ตอนกลางคืน=at night|ตอนกลางวัน=during the day|เสาร์อาทิตย์นี้=this weekend:f|ปีนี้=this year|เดือนนี้=this month|อาทิตย์นี้=this week|วันจันทร์=on Monday|วันอังคาร=on Tuesday|วันพุธ=on Wednesday|วันพฤหัส=on Thursday|วันพฤหัสบดี=on Thursday|วันศุกร์=on Friday|วันเสาร์=on Saturday|วันอาทิตย์=on Sunday",
+  v=>{const [en,t]=v.split(":");return {en,tense:t==="p"?"past":t==="f"?"future":""};});
+ add("pron","ฉัน=I|ผม=I|ดิฉัน=I|กู=I|เรา=we|พวกเรา=we|คุณ=you|เธอ=you|มึง=you|พวกคุณ=you|เขา=he/she|พวกเขา=they|มัน=it");
+ add("dem","นี่=this|นั่น=that|โน่น=that");
+ add("det","นี้=this|นั้น=that|โน้น=that");
+ add("clf","อัน|ตัว|เล่ม|ใบ|ชิ้น|คัน|หลัง|แก้ว|จาน|ขวด|เครื่อง|ดอก|ต้น|แผ่น|เม็ด|กล่อง|คู่|ชุด|ชาม|ถ้วย|เรื่อง|ครั้ง|หน|ที");
+ add("prep","ที่=at|ใน=in|บน=on|ใต้=under|กับ=with|จาก=from|สำหรับ=for|ของ=of|แถว=around");
+ add("cop","เป็น=be|คือ=be|อยู่=at");
+ // ---- verbs: * takes an object ("it" when none), > place after it takes "to", + followed by another verb (like to / try -ing),
+ //      @ กิน with a drink becomes "drink", [for] a preposition used only before an object
+ add("verb","กิน=eat@|ทาน=eat@|กินข้าว=eat|ดื่ม=drink*|นอน=sleep|หลับ=sleep|ไป=go>|มา=come>|กลับ=go back>|กลับมา=come back>|กลับไป=go back>|ทำ=do*|ทำงาน=work|เรียน=study|สอน=teach*|อ่าน=read*|อ่านหนังสือ=read|เขียน=write*|พูด=speak|คุย=talk|บอก=tell*|ถาม=ask*|ตอบ=answer*|ฟัง=listen [to]|ดู=watch*|เห็น=see*|มอง=look [at]|ซื้อ=buy*|ซื้อของ=go shopping|ขาย=sell*|จ่าย=pay*|ใช้=use*|เล่น=play*|ร้องเพลง=sing|เต้น=dance|อาบน้ำ=take a shower|ตื่น=wake up|ตื่นนอน=wake up|นั่ง=sit|ยืน=stand|เดิน=walk|วิ่ง=run|ขับ=drive*|ขับรถ=drive|ขี่=ride*|รอ=wait [for]|หา=look for*|ชอบ=like*+|รัก=love*|เกลียด=hate*|รู้=know|รู้จัก=know*|เข้าใจ=understand|คิด=think|คิดถึง=miss*|จำ=remember*|ลืม=forget|เอา=want*|เปิด=open|ปิด=close|เริ่ม=start|หยุด=stop|รับ=pick up*|ได้รับ=receive*|จอด=park*|โทร=call*|โทรหา=call*|ส่ง=send*|ทำอาหาร=cook|ทำกับข้าว=cook|ล้าง=wash*|ซักผ้า=do the laundry|ทำความสะอาด=clean*|ทำการบ้าน=do homework|ทำงานบ้าน=do housework|เที่ยว=travel|ไปเที่ยว=go on a trip>|เดินทาง=travel|พัก=rest|พักผ่อน=relax|มี=have*|ได้ยิน=hear*|ยิ้ม=smile|หัวเราะ=laugh|ร้องไห้=cry|แต่งงาน=get married|เจอ=meet*|พบ=meet*|ชนะ=win|แพ้=lose|เปลี่ยน=change*|เลือก=choose*|ลอง=try*+|จอง=book*|สั่ง=order*|ชิม=taste*|ตัด=cut*|ปลูก=plant*|ย้าย=move|ทิ้ง=throw away*|เล่า=tell*|ว่ายน้ำ=swim|วาดรูป=draw|ถ่ายรูป=take photos|ฝัน=dream|ต้องการ=need*|เก็บ=keep*|สูบบุหรี่=smoke|ออกกำลังกาย=exercise|ซ่อม=fix*|สร้าง=build*|เรียก=call*|พา=take*|ยืม=borrow*|ฟังเพลง=listen to music|เล่นเกม=play games|เล่นกีฬา=play sports|ทำผิด=make a mistake|ตาย=die|ช่วยเหลือ=help*",
+  v=>{const o={};const m=v.match(/\s*\[(\w+)\]/);if(m){o.prep=m[1];v=v.replace(m[0],"");}
+   o.needObj=v.includes("*");o.motion=v.includes(">");o.cat=v.includes("+")?(v.startsWith("try")?"ing":"to"):"";o.drink=v.includes("@");
+   o.en=v.replace(/[*>+@]/g,"").trim();return o;});
+ // ---- adjectives: ! describes a person (so "Are you hungry?", not "Is it hungry?"), ~ the adverb after a verb
+ add("adj","ดี=good~well|สวย=beautiful|หล่อ=handsome!|น่ารัก=cute|อร่อย=delicious|ร้อน=hot|หนาว=cold!|เย็น=cool|อุ่น=warm|แพง=expensive|ถูก=cheap|ใหญ่=big|เล็ก=small|ยาว=long|สั้น=short|สูง=tall|เตี้ย=short|ใหม่=new|เก่า=old|แก่=old!|ยาก=difficult|ง่าย=easy~easily|ไกล=far|ใกล้=near|เร็ว=fast~fast|ช้า=slow~slowly|เผ็ด=spicy|หวาน=sweet|เค็ม=salty|เปรี้ยว=sour|ขม=bitter|จืด=bland|สนุก=fun|น่าเบื่อ=boring|สะอาด=clean|สกปรก=dirty|เงียบ=quiet~quietly|ดัง=loud~loudly|หนัก=heavy~hard|เบา=light~softly|หิว=hungry!|หิวน้ำ=thirsty!|อิ่ม=full!|เหนื่อย=tired!|ง่วง=sleepy!|ป่วย=sick!|ไม่สบาย=sick!|ว่าง=free!|ยุ่ง=busy!|เบื่อ=bored!|กลัว=scared!|ดีใจ=glad!|เสียใจ=sorry!|โกรธ=angry!|เศร้า=sad!|มีความสุข=happy!|สบาย=comfortable|สบายดี=fine!|พร้อม=ready!|เก่ง=clever!~well|ขี้เกียจ=lazy!|ขยัน=hardworking!|อ้วน=fat!|ผอม=thin!|รวย=rich!|จน=poor!|แข็งแรง=strong!|ปลอดภัย=safe|อันตราย=dangerous|สำคัญ=important|จริง=true|ผิด=wrong|ถูกต้อง=correct|มืด=dark|สว่าง=bright|เปียก=wet|แห้ง=dry|สด=fresh|ตลก=funny|น่ากลัว=scary|แย่=bad~badly|เสีย=broken|เหงา=lonely!|ตื่นเต้น=excited!|เครียด=stressed!|กังวล=worried!|ใจดี=kind!|ซน=naughty!|คนไทย=Thai!|คนอังกฤษ=English!|คนจีน=Chinese!|คนญี่ปุ่น=Japanese!|คนอเมริกัน=American!|คนลาว=Lao!|คนเกาหลี=Korean!|คนฝรั่งเศส=French!|คนเยอรมัน=German!",
+  v=>{const o={};if(v.includes("!")){o.person=true;v=v.replace("!","");}const [en,adv]=v.split("~");o.en=en.trim();if(adv)o.adv=adv.trim();return o;});
+ // ---- nouns: # no plural (rice, water), + always plural, % no "the" (school, work), /plural if irregular, Capital = a name
+ add("noun","กาแฟ=coffee#|ชา=tea#|น้ำ=water#|นม=milk#|เบียร์=beer#|น้ำส้ม=orange juice#|ไวน์=wine#|ข้าว=rice#|อาหาร=food#|อาหารไทย=Thai food#|ขนม=snack|ผลไม้=fruit#|ข้าวผัด=fried rice#|ส้มตำ=papaya salad#|ผัดไทย=pad thai#|ต้มยำ=tom yum#|ก๋วยเตี๋ยว=noodles+|ขนมปัง=bread#|ไข่=egg|ผัก=vegetables+|เนื้อ=beef#|หมู=pork#|ไก่=chicken#|ปลา=fish#|กุ้ง=shrimp/shrimp|ส้ม=orange|กล้วย=banana|มะม่วง=mango|หมา=dog|สุนัข=dog|แมว=cat|งู=snake|นก=bird|ช้าง=elephant|ครู=teacher|นักเรียน=student|นักศึกษา=student|เพื่อน=friend|แม่=mother|พ่อ=father|พ่อแม่=parents+|พี่=older sibling|น้อง=younger sibling|พี่ชาย=older brother|พี่สาว=older sister|น้องชาย=younger brother|น้องสาว=younger sister|พี่น้อง=sibling|ลูก=child/children|สามี=husband|ภรรยา=wife|แฟน=partner|ครอบครัว=family|เด็ก=kid|คน=person/people|ผู้ชาย=man/men|ผู้หญิง=woman/women|หมอ=doctor|พยาบาล=nurse|ตำรวจ=police officer|ห้องน้ำ=bathroom|บ้าน=house|โรงเรียน=school%|โรงพยาบาล=hospital|ตลาด=market|ร้าน=shop|ร้านอาหาร=restaurant|ร้านกาแฟ=café|โรงแรม=hotel|สนามบิน=airport|ทะเล=the sea|ภูเขา=the mountains|วัด=temple|ห้าง=mall|ธนาคาร=bank|ที่ทำงาน=work%|มหาวิทยาลัย=university%|ห้อง=room|ห้องเรียน=classroom|ห้องนอน=bedroom|ครัว=kitchen|รถ=car|รถเมล์=bus|รถไฟ=train|เครื่องบิน=plane|แท็กซี่=taxi|มอเตอร์ไซค์=motorbike|จักรยาน=bicycle|เงิน=money#|เวลา=time#|งาน=work#|การบ้าน=homework#|หนังสือ=book|หนัง=movie|เพลง=song|ทีวี=TV|โทรศัพท์=phone|มือถือ=phone|คอมพิวเตอร์=computer|กระเป๋า=bag|เสื้อ=shirt|รองเท้า=shoes+|ร่ม=umbrella|ชื่อ=name|ชื่อเล่น=nickname|นามสกุล=surname|อายุ=age|ราคา=price|ภาษา=language|ภาษาไทย=Thai#|ภาษาอังกฤษ=English#|ภาษาจีน=Chinese#|ภาษาญี่ปุ่น=Japanese#|ประเทศไทย=Thailand|เมืองไทย=Thailand|กรุงเทพ=Bangkok|กรุงเทพฯ=Bangkok|เชียงใหม่=Chiang Mai|ภูเก็ต=Phuket|พัทยา=Pattaya|ญี่ปุ่น=Japan|จีน=China|อเมริกา=America|อังกฤษ=England|เกาหลี=Korea|ลาว=Laos|เวียดนาม=Vietnam|ออสเตรเลีย=Australia|สิงคโปร์=Singapore|ฝรั่งเศส=France|เยอรมัน=Germany|อินเดีย=India|ยุโรป=Europe|อีสาน=Isan|วัน=day|คืน=night|เช้า=morning|เดือน=month|ปี=year|อาทิตย์=week|สัปดาห์=week|ชั่วโมง=hour|นาที=minute|อากาศ=weather#|ฝน=rain#|ประตู=door|หน้าต่าง=window|โต๊ะ=table|เก้าอี้=chair|เตียง=bed|ถนน=road|สถานี=station|เมนู=menu|บิล=bill|ตั๋ว=ticket|กุญแจ=key|แว่นตา=glasses+|นาฬิกา=watch|ปากกา=pen|กระดาษ=paper#|ยา=medicine#|บาท=baht/baht|ของขวัญ=present|ดอกไม้=flower|ต้นไม้=tree|แม่น้ำ=river|เกาะ=island|ชายหาด=beach|สวน=garden|สวนสาธารณะ=park|ร้านขายยา=pharmacy|ห้องสมุด=library|บริษัท=company|ออฟฟิศ=office|ปาร์ตี้=party|วันเกิด=birthday|รูป=photo|สี=color|ปัญหา=problem|คำถาม=question|อาชีพ=job|เบอร์โทร=phone number|อีเมล=email",
+  v=>{const o={};for(const [f,key] of [["#","mass"],["+","plOnly"],["%","noArt"]])if(v.endsWith(f)){o[key]=true;v=v.slice(0,-1);}
+   const [en,pl]=v.split("/");o.en=en.trim();if(pl)o.pl=pl.trim();o.proper=/^[A-Z]/.test(o.en)||/^the /.test(o.en);return o;});
+ const CLF_NOUN=new Set(["คน","วัน","ปี","เดือน","ชั่วโมง","นาที","บาท","ห้อง","อาทิตย์","สัปดาห์","คืน"].map(normText));
+ // family words take "my/your/his…" in English: แม่ = my mother (statement) / your mother (question)
+ const FAMILY=new Set(["mother","father","parents","older sibling","younger sibling","older brother","older sister","younger brother","younger sister","sibling","husband","wife","partner","family"]);
+ let familyPoss={subj:"my",other:"my"};
+ const ASK_YOUR=new Set(["name","nickname","surname","age","job","phone number","email"]);
+ // whole sentences (after polite particles are removed) that no pattern would get right
+ const PHRASES=new Map(Object.entries({"สวัสดี":"Hello.","ขอบคุณ":"Thank you.","ขอบคุณมาก":"Thank you very much.","ขอโทษ":"Sorry.","ไม่เป็นไร":"Never mind.","สบายดีไหม":"How are you?","สบายดีหรือเปล่า":"How are you?","ไปไหนมา":"Where have you been?","กี่โมงแล้ว":"What time is it?","ใช่":"Yes.","ไม่ใช่":"No.","ได้":"Okay.","ไม่รู้":"I don't know.","เป็นอะไร":"What's wrong?","เป็นอะไรไหม":"Are you okay?","เท่าไหร่":"How much is it?","เท่าไร":"How much is it?","ราคาเท่าไหร่":"How much is it?","ราคาเท่าไร":"How much is it?","ลาก่อน":"Goodbye.","แล้วเจอกัน":"See you.","เจอกันใหม่":"See you again.","ยินดีที่ได้รู้จัก":"Nice to meet you.","โชคดี":"Good luck."}).map(([k,v])=>[normText(k),v]));
+ const PARTS=[...W.values()].filter(w=>w.k==="part").map(w=>w.th).sort((a,b)=>b.length-a.length);
+ const PREFIX_KINDS=new Set(["neg","aux","wh","q","part","lets","dai","conj"]),SUFFIX_KINDS=new Set(["q","part","wh","deg","post","dai","lets","gan","conj"]);
+ // a dictionary gloss that is not a plain noun ("too much", "other colours", "always") can't be an object
+ const NOT_NOUN=/^(a|an|too|very|so|more|most|less|always|never|often|already|again|still|just|only|also|even|on|in|at|to|by|with|from|for|of|about|same|the same|much|many|some|any|other|another|outside|inside|alone|together|well|really|quite|then|now|here|there|one|two|three|four|five|six|seven|eight|nine|ten|hundred|thousand|until|while|when|because|if|not|no|yes|can|will|must|should|may|might|likely|probably|maybe|perhaps|please|sorry|hello|thank|thanks)\b|-|\b(ly)$/i;
+
+ // ---- English word forms
+ const IRR={be:["was","been"],eat:["ate","eaten"],drink:["drank","drunk"],sleep:["slept","slept"],go:["went","gone"],come:["came","come"],do:["did","done"],make:["made","made"],see:["saw","seen"],buy:["bought","bought"],sell:["sold","sold"],pay:["paid","paid"],read:["read","read"],write:["wrote","written"],speak:["spoke","spoken"],teach:["taught","taught"],think:["thought","thought"],know:["knew","known"],understand:["understood","understood"],forget:["forgot","forgotten"],give:["gave","given"],take:["took","taken"],get:["got","got"],find:["found","found"],meet:["met","met"],have:["had","had"],run:["ran","run"],drive:["drove","driven"],ride:["rode","ridden"],sit:["sat","sat"],stand:["stood","stood"],sing:["sang","sung"],swim:["swam","swum"],wake:["woke","woken"],leave:["left","left"],tell:["told","told"],say:["said","said"],hear:["heard","heard"],send:["sent","sent"],win:["won","won"],lose:["lost","lost"],choose:["chose","chosen"],cut:["cut","cut"],put:["put","put"],begin:["began","begun"],become:["became","become"],bring:["brought","brought"],feel:["felt","felt"],keep:["kept","kept"],wear:["wore","worn"],fly:["flew","flown"],draw:["drew","drawn"],grow:["grew","grown"],throw:["threw","thrown"],spend:["spent","spent"],lend:["lent","lent"],build:["built","built"],fall:["fell","fallen"],hold:["held","held"],hurt:["hurt","hurt"],cost:["cost","cost"],hit:["hit","hit"],feed:["fed","fed"],fight:["fought","fought"],mean:["meant","meant"],steal:["stole","stolen"],lead:["led","led"],shut:["shut","shut"],let:["let","let"],learn:["learned","learned"]};
+ const CVC=w=>/^[^aeiou]*[aeiou][^aeiouwxy]$/.test(w);
+ const third=w=>w==="have"?"has":w==="be"?"is":/(s|sh|ch|x|z|o)$/.test(w)?w+"es":/[^aeiou]y$/.test(w)?w.slice(0,-1)+"ies":w+"s";
+ const ed=w=>/e$/.test(w)?w+"d":/[^aeiou]y$/.test(w)?w.slice(0,-1)+"ied":CVC(w)?w+w.slice(-1)+"ed":w+"ed";
+ const ing=w=>w==="be"?"being":/ie$/.test(w)?w.slice(0,-2)+"ying":/[^aeiouy]e$/.test(w)?w.slice(0,-1)+"ing":CVC(w)?w+w.slice(-1)+"ing":w+"ing";
+ function forms(phrase){
+  const [w,...more]=phrase.split(" "),r=more.length?" "+more.join(" "):"",irr=IRR[w];
+  return {base:w+r,s:third(w)+r,past:(irr?irr[0]:ed(w))+r,pp:(irr?irr[1]:ed(w))+r,ing:ing(w)+r,word:w};
+ }
+ const plural=n=>n.pl||(/[^aeiou]y$/.test(n.en)?n.en.slice(0,-1)+"ies":/(s|sh|ch|x|z)$/.test(n.en)?n.en+"es":n.en+"s");
+ const aAn=s=>(/^(uni|use|eu|one)/i.test(s)?"a ":/^(hour|honest)/i.test(s)||/^[aeiou]/i.test(s)?"an ":"a ")+s;
+ const PRON={I:{s:"I",o:"me",p:"my",a:"1"},we:{s:"we",o:"us",p:"our",a:"pl"},you:{s:"you",o:"you",p:"your",a:"pl"},"he/she":{s:"he/she",o:"him/her",p:"his/her",a:"3"},they:{s:"they",o:"them",p:"their",a:"pl"},it:{s:"it",o:"it",p:"its",a:"3"}};
+
+ // ---- tokens
+ function cleanGloss(s){
+  s=String(s||"").replace(/\([^)]*\)/g," ").split(/\s*[\/;,]\s*|\s+or\s+/)[0].trim().replace(/^to\s+/i,"").replace(/[.?!]+$/,"").trim();
+  if(!s||/[฀-๿=+…]/.test(s)||s.split(/\s+/).length>4)return "";
+  return /^[A-Z][a-z]/.test(s)&&!/^(Thai|English|Thailand|Bangkok)\b/.test(s)?s[0].toLowerCase()+s.slice(1):s;
+ }
+ function edgeIsGrammar(key){
+  const ends=wordEnds(key),known=x=>W.has(x)||Boolean(lookup(x));
+  for(let n=1;n<key.length;n++){
+   const head=key.slice(0,n),tail=key.slice(n),a=W.get(head),b=W.get(tail);
+   if(!ends.has(n)&&!(a&&known(tail))&&!(b&&known(head)))continue;
+   if((a&&PREFIX_KINDS.has(a.k))||(b&&SUFFIX_KINDS.has(b.k)))return true;
+   if(a&&a.k==="verb"&&b&&b.k==="noun")return true;
+  }
+  return false;
+ }
+ const picker=whole=>key=>{
+  const w=W.get(key);if(w)return {text:key,tbl:w};
+  const entry=lookup(key);if(!entry||!entry.en)return null;
+  if(key!==whole&&edgeIsGrammar(key))return null;
+  return {text:key,entry};
+ };
+ function tokens(pieces){
+  const T=[];
+  for(const p of pieces){
+   if(p.literal){
+    if(/^[.,!?;:…"'“”‘’()\[\]-]+$/.test(p.text))continue;
+    if(/^[A-Za-z][A-Za-z'’.-]*$/.test(p.text)){T.push({k:"noun",th:p.text,en:p.text,proper:true});continue;}
+    return null;
+   }
+   if(p.text==="ๆ"){if(T.length&&T[T.length-1].k==="noun")return null;continue;}
+   if(p.tbl){T.push(p.tbl);continue;}
+   if(!p.entry)return null;
+   const raw=String(p.entry.en||"").trim(),en=cleanGloss(raw);if(!en)return null;
+   const lead=[...W.values()].find(w=>w.k==="verb"&&p.text.startsWith(w.th)&&p.text!==w.th&&forms(w.en).word===en.split(" ")[0].toLowerCase());
+   if(/^to\s/i.test(raw)||lead)T.push({k:"verb",th:p.text,en:en.toLowerCase(),needObj:false,motion:Boolean(lead&&lead.motion)});
+   else if(/^be\s/i.test(en))T.push({k:"adj",th:p.text,en:en.slice(3)});
+   else{if(NOT_NOUN.test(en)&&!/family|belly|jelly|July|Italy/i.test(en))return null;T.push({k:"noun",th:p.text,en,proper:/^[A-Z]/.test(en),dict:true});}
+  }
+  return T;
+ }
+
+ // ---- noun phrases: pronoun | this/that | [noun] [adjective] [my/your…] [classifier] [this/that/which/what]
+ function nounPhrase(T,i,end,role){
+  const t=i<end?T[i]:null;if(!t)return null;
+  if(t.k==="pron")return {pron:t.v,next:i+1};
+  if(t.k==="dem")return {fixed:t.v,a:"3",next:i+1};
+  const nx=i+1<end?T[i+1]:null;
+  if((t.k==="clf"||CLF_NOUN.has(t.th))&&nx&&(nx.k==="det"||nx.th==="ไหน")&&t.k==="clf")
+   return nx.k==="det"?{fixed:nx.v+" one",a:"3",next:i+2}:{fixed:"which one",wh:"which",a:"3",next:i+2};
+  if(t.k!=="noun"||(role==="subj"&&t.dict))return null;
+  const np={noun:t,next:i+1};let j=i+1,x=j<end?T[j]:null;
+  if(role!=="subj"&&x&&x.k==="adj"&&!x.person){np.adj=x;j++;x=j<end?T[j]:null;}
+  if(x&&x.k==="pron"){np.poss=x.v;j++;x=j<end?T[j]:null;}
+  else if(x&&x.th==="ของ"){const y=j+1<end?T[j+1]:null;if(!y)return null;
+   if(y.k==="pron")np.poss=y.v;else if(y.k==="noun"&&!y.dict)np.possNoun=y;else return null;j+=2;x=j<end?T[j]:null;}
+  const y=j+1<end?T[j+1]:null;
+  if(x&&(x.k==="clf"||CLF_NOUN.has(x.th))&&y&&(y.k==="det"||y.th==="ไหน")){j++;x=y;}
+  if(x&&x.k==="det"){np.det=x.v;j++;}
+  else if(x&&x.th==="ไหน"){np.wh="which";j++;}
+  else if(x&&x.th==="อะไร"){np.wh="what";j++;}
+  np.next=j;return np;
+ }
+ const npAgr=np=>np.pron?PRON[np.pron].a:np.fixed?np.a:(np.noun.plOnly||/s$/.test(np.noun.en)&&np.noun.plOnly)?"pl":np.noun.en==="people"?"pl":"3";
+ function npText(np,role,verb){
+  if(np.pron)return role==="subj"?PRON[np.pron].s:PRON[np.pron].o;
+  if(np.fixed)return np.fixed;
+  const n=np.noun;let base=(np.adj?np.adj.en+" ":"")+n.en;
+  const det=np.det||(np.poss?PRON[np.poss].p:"")||(np.possNoun?"the "+np.possNoun.en+(/s$/.test(np.possNoun.en)?"'":"'s"):"")||np.wh||"";
+  if(role==="place"&&n.en==="house"&&!det)return "home";
+  if(det)return det+" "+base;
+  if(FAMILY.has(n.en)&&!np.adj)return (role==="subj"?familyPoss.subj:familyPoss.other)+" "+base;
+  if(n.proper||n.noArt)return base;
+  if(role==="subj"||role==="place")return "the "+base;
+  if(role==="pred")return n.mass||n.plOnly?base:aAn(base);
+  if(role==="ask")return n.mass?"some "+base:n.plOnly?base:aAn(base);
+  if(role==="with")return n.mass||n.plOnly?base:(np.adj?np.adj.en+" ":"")+plural(n);
+  if(verb&&/^(like|love|hate)$/.test(verb.en))return n.mass||n.plOnly?base:(np.adj?np.adj.en+" ":"")+plural(n);
+  if(n.dict&&/s$/.test(n.en)||verb&&/^play\b/.test(verb.en))return base;
+  return n.mass||n.plOnly?base:aAn(base);
+ }
+ function placeText(np,prep){  // after go/come (to), อยู่/ที่ (at/in), ใน (in)…
+  const s=npText(np,"place");
+  if(s==="home")return prep==="to"||prep==="at"?"home":prep+" home";
+  if(prep==="at"&&np.noun&&np.noun.proper&&!/^the /.test(np.noun.en))return "in "+s;
+  return prep+" "+s;
+ }
+
+ // ---- sentence structure
+ function parse(T){
+  let lets=false,gan=false;
+  const loei=T.some(t=>t.th==="เลย"),also=T.some((t,n)=>t.th==="ก็"&&n>0&&T[n-1].k==="pron");
+  T=T.filter(t=>{if(t.k==="part")return false;if(t.k==="lets"){lets=true;return false;}if(t.k==="gan"){gan=true;return false;}return true;});
+  if(gan&&!lets||!T.length)return null;
+  const S={q:null,wh:null,time:[],post:new Set(),deg:null,pdeg:null,mods:[],neg:null,lets,loei,also,subj:null,head:null,verbs:[],comps:[]};
+  let end=T.length;
+  const last=k=>end-1-k>=0?T[end-1-k]:null;
+  if(last(0).k==="q"){S.q=last(0).v;end--;}
+  else if(end>1&&last(0).th==="หรือ"){S.q="echo";end--;}
+  else if(end>1&&last(0).th==="ยัง"){S.q="yet";end--;}
+  if(T.slice(0,end).some(t=>t.k==="conj"))return null;
+  if(end>2&&last(0).th==="ดี"&&last(1).k==="wh"&&["how","what","where","when","who"].includes(last(1).v)){S.shouldQ=true;end--;}
+  for(;end>1;){
+   const t=last(0),b=last(1);
+   if(t.k==="time"){S.time.unshift(t);end--;continue;}
+   if(t.k==="deg"&&!S.deg){S.deg=t.v;end--;continue;}
+   if(t.k==="post"&&!S.post.has(t.v)){S.post.add(t.v);end--;continue;}
+   if(t.k==="dai"&&!["aux","neg"].includes(b.k)&&!S.post.has("can")){S.post.add("can");end--;continue;}
+   if(t.th==="ไม่ได้"&&!S.post.has("can")&&b.k!=="aux"){S.post.add("cant");end--;continue;}
+   if(t.th==="ไม่เป็น"&&b.k==="verb"){S.post.add("cant");end--;continue;}
+   if(t.th==="เป็น"&&b.k==="verb"){S.post.add("can");end--;continue;}
+   if(t.th==="อยู่"&&T.slice(0,end-1).some(x=>x.k==="verb")){S.post.add("prog");end--;continue;}
+   break;
+  }
+  let i=0;const at=(k=0)=>i+k<end?T[i+k]:null;
+  const leading=()=>{for(let t=at();t;t=at()){
+   if(t.k==="time"){S.time.push(t);i++;}else if(t.k==="wh"&&t.v==="why"&&!S.wh){S.wh={v:"why"};i++;}
+   else if(t.k==="pdeg"&&!S.pdeg){S.pdeg=t.v;i++;}else break;}};
+  leading();
+  // who/what as the subject: ใครมา = Who is coming? อะไรอร่อย = What is delicious?
+  let t=at();
+  if(t&&t.k==="wh"&&(t.v==="who"||t.v==="what")&&at(1)&&["verb","adj","aux","neg","cop"].includes(at(1).k)){S.whSubj=t.v;i++;t=at();}
+  // subject
+  if(!S.whSubj&&t&&["pron","dem","noun","clf"].includes(t.k)){
+   const np=nounPhrase(T,i,end,"subj");if(!np)return null;
+   S.subj=np;i=np.next;
+   // คุณชื่ออะไร, เขาอายุเท่าไหร่: "your name", "his/her age"
+   if(np.pron&&at()&&at().k==="noun"){const np2=nounPhrase(T,i,end,"subj");if(np2&&!np2.poss&&!np2.det&&(np2.next===end||(np2.next===end-1&&T[end-1].k==="wh"))){np2.poss=np.pron;S.subj=np2;i=np2.next;}}
+  }
+  leading();
+  // a noun phrase and a question word, with no verb: นี่อะไร, ห้องน้ำ(อยู่)ที่ไหน, อันนี้เท่าไหร่, ชื่ออะไร
+  if(S.subj&&!S.q){
+   let k=i;if(at()&&at().k==="cop"&&at().v!=="be"||at()&&at().th==="คือ")k++;
+   const w=k<end?T[k]:null;
+   if(w&&w.k==="wh"&&k===end-1&&["what","who","where","howmuch"].includes(w.v)&&!S.subj.pron){S.head={type:"whbe",wh:w.v};i=end;}
+   else if(i===end&&S.subj.wh){S.head={type:"whbe",wh:"np"};}
+   else if(w&&w.k==="wh"&&k===end-1&&S.subj.pron&&(w.v==="where")){S.head={type:"cop",v:"at"};S.comps.push({kind:"wh",v:"where"});i=end;}
+  }
+  if(!S.head){
+   for(t=at();t;t=at()){
+    if(t.k==="neg"){if(S.neg)return null;S.neg=t.v==="not"&&S.mods.some(m=>m.v==="must")?"mustnot":t.v;i++;continue;}
+    if(t.k==="aux"){S.mods.push({v:t.v,th:t.th});i++;continue;}
+    if(t.k==="dai"&&at(1)&&at(1).k==="verb"){S.mods.push({v:"past"});i++;continue;}
+    if(t.k==="wh"&&t.v==="why"&&!S.wh){S.wh={v:"why"};i++;continue;}
+    if(t.k==="time"){S.time.push(t);i++;continue;}
+    if(t.k==="pdeg"&&!S.pdeg){S.pdeg=t.v;i++;continue;}
+    break;
+   }
+   t=at();
+   const lastMod=S.mods[S.mods.length-1];
+   if(lastMod&&lastMod.th==="ช่วย"&&t&&t.k!=="verb"){S.mods.pop();S.mods.push({v:"please"});S.head={type:"verb"};S.verbs.push({k:"verb",th:"ช่วย",en:"help",needObj:true});}
+   else if(lastMod&&lastMod.v==="request"&&t&&t.k!=="verb"){S.head={type:"verb"};S.verbs.push({k:"verb",th:"ขอ",en:"have",needObj:true});}
+   else if(!t)return null;
+   else if(t.k==="verb"){S.head={type:"verb"};S.verbs.push(t);i++;
+    while(at()&&at().k==="verb"&&(S.verbs[S.verbs.length-1].cat||S.verbs[S.verbs.length-1].motion)&&S.verbs.length<3){S.verbs.push(at());i++;}
+   }
+   else if(t.k==="dai"){S.head={type:"verb"};S.verbs.push({k:"verb",th:"ได้",en:"get",needObj:true});i++;}
+   else if(t.k==="adj"){S.head={type:"adj",a:t};i++;}
+   else if(t.k==="cop"){S.head={type:"cop",v:t.th==="อยู่"?"at":"be"};i++;}
+   else return null;
+  }
+  // objects and complements
+  let objects=0;
+  for(t=at();t;t=at()){
+   if(S.comps.some(c=>c.kind==="wh"||c.kind==="prepwh"||c.kind==="howmany")&&!["adj","deg","time"].includes(t.k))return null;
+   if(["noun","pron","dem","clf"].includes(t.k)){
+    const role=S.head.type==="cop"?(S.head.v==="at"?"place":"pred"):"obj";
+    const np=nounPhrase(T,i,end,role);if(!np||++objects>1)return null;
+    if(S.head.type==="adj")return null;
+    S.comps.push({kind:"np",np});i=np.next;
+    if(at()&&at().k==="wh"&&at().v==="howmany"){const c=at(1);if(!c||!(c.k==="clf"||CLF_NOUN.has(c.th)))return null;S.comps[S.comps.length-1].howmany=true;i+=2;}
+    continue;
+   }
+   if(t.k==="prep"&&t.th!=="ของ"){
+    if(S.head.type==="adj")return null;
+    const n2=at(1);
+    if(n2&&n2.k==="wh"&&["who","what","where"].includes(n2.v)){S.comps.push({kind:"prepwh",p:t.v,v:n2.v});i+=2;continue;}
+    const np=nounPhrase(T,i+1,end,"place");if(!np)return null;
+    if(np.pron&&!["with","for"].includes(t.v))return null;
+    S.comps.push({kind:"prep",p:t.v,np});i=np.next;continue;
+   }
+   if(t.k==="wh"&&t.v!=="why"){
+    if(t.v==="howmany"){const c=at(1);if(!c||!(c.k==="clf"||CLF_NOUN.has(c.th)))return null;S.comps.push({kind:"howmany",c});i+=2;continue;}
+    if(S.comps.some(c=>c.kind==="wh"))return null;
+    S.comps.push({kind:"wh",v:t.v});i++;continue;
+   }
+   if(t.k==="adj"&&S.head.type==="verb"&&t.adv){S.comps.push({kind:"adv",en:t.adv});i++;continue;}
+   if(t.k==="adj"&&S.head.type==="cop"&&S.head.v==="be"){S.comps.push({kind:"adj",a:t});i++;continue;}
+   if(t.k==="deg"&&!S.deg){S.deg=t.v;i++;continue;}
+   if(t.k==="time"){S.time.push(t);i++;continue;}
+   return null;
+  }
+  return S;
+ }
+
+ // ---- English
+ const BE={pres:{"1":"am","3":"is",pl:"are"},past:{"1":"was","3":"was",pl:"were"}};
+ const NEG={must:"mustn't",will:"won't",can:"can't",should:"shouldn't",might:"might not",do:"don't",does:"doesn't",did:"didn't",have:"haven't",has:"hasn't",had:"hadn't",is:"isn't",are:"aren't",was:"wasn't",were:"weren't",am:"am not"};
+ const NEXT={modal:"base",do:"base",perf:"pp",prog:"ing",goingto:"goingto"};
+ function verbWords(chain,agr,tense,neg,inverted,imperative){
+  const els=chain.slice();
+  if(!imperative&&els[0].kind==="lex"&&(inverted||neg))els.unshift({kind:"do"});
+  const out=[];let need=imperative?"base":"fin";
+  for(const el of els){
+   const f=el.kind==="lex"?el.f:el.kind==="perf"?forms("have"):["prog","be","goingto"].includes(el.kind)?forms("be"):null;
+   let w;
+   if(need==="fin"){
+    if(el.kind==="modal")w=el.w;
+    else if(el.kind==="do")w=tense==="past"?"did":agr==="3"?"does":"do";
+    else if(el.kind==="perf")w=tense==="past"?"had":agr==="3"?"has":"have";
+    else if(el.kind==="lex")w=tense==="past"?f.past:agr==="3"?f.s:f.base;
+    else w=BE[tense==="past"?"past":"pres"][agr];
+   }
+   else if(el.kind==="modal"||el.kind==="do")return null;
+   else if(need==="base")w=f.base;else if(need==="pp")w=f.pp;else if(need==="ing")w=f.ing;
+   else if(need==="to")w="to "+f.base;else if(need==="goingto")w="going to "+f.base;
+   out.push(w);
+   need=el.kind==="lex"?(el.next||null):NEXT[el.kind]||null;
+  }
+  return {words:out,lexFirst:els[0].kind==="lex"};
+ }
+ function realize(S){
+  const q=S.q,mods=S.mods.map(m=>m.v),has=v=>mods.includes(v),head=S.head;
+  const imp=has("please")?"please":S.neg==="dont"?"dont":S.lets?"lets":has("request")?"request":null;
+  if(imp==="request"&&S.head.type!=="verb")return null;
+  let wh=S.wh?S.wh.v:null,whComp=S.comps.find(c=>c.kind==="wh"||c.kind==="prepwh"||c.kind==="howmany"||((c.kind==="np"||c.kind==="prep")&&(c.np.wh||c.howmany)));
+  if(S.subj&&S.subj.wh&&!S.whSubj&&head.type!=="whbe"){S.whSubj="np";}
+  if(whComp&&wh)return null;
+  let indefinite=null;
+  if(S.neg&&whComp&&whComp.kind==="wh"&&["what","who","where"].includes(whComp.v)){
+   if(!S.loei)return null;
+   indefinite={what:"anything",who:"anyone",where:"anywhere"}[whComp.v];whComp=null;
+  }
+  const isQ=Boolean(q&&q!=="tag"&&q!=="echo")||Boolean(wh||whComp||S.whSubj);
+  if(S.shouldQ&&!whComp)return null;
+  if((q==="yn"||q==="yet")&&(wh||whComp))return null;
+  const pastTime=S.time.some(t=>t.tense==="past");
+  const future=S.time.some(t=>t.tense==="future");
+  const v0=S.verbs[0];
+  // what kind of word comes first after "be"
+  let adjText=null,personAdj=false;
+  if(head.type==="adj"){personAdj=Boolean(head.a.person);adjText=head.a.en;}
+  const adjComp=S.comps.find(c=>c.kind==="adj");
+  if(adjComp){personAdj=Boolean(adjComp.a.person);adjText=adjComp.a.en;}
+  // subject
+  let subjText,agr;
+  if(S.whSubj){subjText="";agr="3";}
+  else if(S.subj){subjText=npText(S.subj,"subj");agr=npAgr(S.subj);}
+  else if(imp&&imp!=="request"){subjText="";agr="pl";}
+  else if(imp==="request"){subjText="I";agr="1";}
+  else if(head.type==="whbe")return null;
+  else if(adjText!==null&&!personAdj){subjText="it";agr="3";}
+  else if(S.shouldQ||(has("should")&&isQ)){subjText="I";agr="1";}
+  else if(isQ||q==="tag"||q==="echo"){subjText="you";agr="pl";}
+  else if(head.type==="cop"){return null;}
+  else {subjText="I";agr="1";}
+  if(subjText==="I")agr="1";
+  const subjPoss=S.subj&&S.subj.pron?PRON[S.subj.pron].p:subjText==="you"?"your":subjText==="I"?"my":isQ?"your":"my";
+  familyPoss={subj:isQ?"your":"my",other:subjPoss};
+  // verbless questions: What is this? How much is this book? Where is the bathroom?
+  if(head.type==="whbe"){
+   const np=S.subj,noun=np.noun?np.noun.en:"";
+   familyPoss={subj:"your",other:"your"};
+   if(head.wh==="np"){
+    if(np.wh!=="what"&&np.wh!=="which")return null;
+    if(np.wh==="which")return cap(npText(np,"subj"))+"?";
+    return ASK_YOUR.has(noun)?"What is "+(np.poss?PRON[np.poss].p:"your")+" "+noun+"?":"What "+noun+" is it?";
+   }
+   if(head.wh==="howmuch"){
+    if(noun==="age"&&!np.det)return "How old "+(np.poss?(np.poss==="I"?"am I":BE.pres[PRON[np.poss].a]+" "+PRON[np.poss].s):"are you")+"?";
+    if(noun==="price"&&!np.poss&&!np.det)return "How much is it?";
+    return "How much "+(agr==="pl"?"are ":"is ")+npText(np,"subj")+"?";
+   }
+   if(head.wh==="what"&&noun&&ASK_YOUR.has(noun)&&!np.det)return "What is "+(np.poss?PRON[np.poss].p:"your")+" "+noun+"?";
+   const w={what:"What",who:"Who",where:"Where"}[head.wh];
+   return w+" "+(agr==="pl"?"are ":agr==="1"?"am ":"is ")+npText(np,"subj")+timeText(S)+"?";
+  }
+  // the verb chain, outermost first
+  const chain=[],adv=[],endAdv=[];
+  if(indefinite&&S.loei)endAdv.push("at all");
+  else if(S.loei&&S.neg&&!["dont","never"].includes(S.neg))endAdv.push("at all");
+  let neg=["not","notmuch","notyet","didnt","dont","noneed","cantskill","mustnot"].includes(S.neg)?"n't":S.neg==="never"?"never":"";
+  let modal=S.neg==="mustnot"?"must":S.shouldQ?"should":null;
+  for(const m of mods){if(["will","can","should","might"].includes(m)&&!modal)modal=m;}
+  if(S.post.has("can")||S.post.has("cant")||S.neg==="cantskill"){modal="can";if(S.post.has("cant"))neg="n't";}
+  if(has("probably")){adv.push("probably");if(!modal)modal="will";}
+  if(future&&!modal&&!has("goingto"))modal="will";
+  if(modal)chain.push({kind:"modal",w:modal});
+  // ไม่…แล้ว = not … anymore; มี/รู้/ชอบ…แล้ว = already have/know/like (no "have had")
+  const anymore=S.post.has("already")&&neg==="n't"&&["not","notmuch"].includes(S.neg);
+  if(anymore){S.post.delete("already");endAdv.push("anymore");}
+  const stative=head.type==="verb"&&/^(have|know|like|love|want|need|understand|remember|hate)\b/.test(S.verbs[S.verbs.length-1].en);
+  const already=S.post.has("already")&&head.type==="verb"&&!stative;
+  if(already&&(has("ever")||["didnt","notyet","never"].includes(S.neg)))return null;
+  let perf=has("ever")||S.neg==="never"||has("just")||already||S.neg==="notyet"||q==="yet";
+  if(perf&&pastTime)perf=false;   // "already ... yesterday" stays in the past tense
+  const tense=pastTime||(!perf&&(has("past")||S.neg==="didnt"))?"past":"pres";
+  if(perf&&!modal)chain.push({kind:"perf"});
+  if(has("ever")){if(isQ)adv.push("ever");else if(S.neg!=="never")endAdv.push("before");}
+  if(S.neg==="never")adv.push("never");
+  if(has("just"))adv.push("just");
+  if(already||(S.post.has("already")&&(head.type!=="verb"||stative)))adv.push("already");
+  if(has("still"))adv.push("still");
+  if(S.neg==="notmuch"&&head.type==="verb")adv.push("really");
+  if(S.deg==="really"&&head.type==="verb")adv.push("really");
+  if(S.neg==="notyet"||q==="yet")endAdv.push("yet");
+  if(S.neg==="noneed")chain.push({kind:"lex",f:forms("have"),next:"to"});
+  for(const m of mods){
+   if(m==="want")chain.push({kind:"lex",f:forms("want"),next:"to"});
+   else if(m==="must"&&S.neg!=="mustnot")chain.push({kind:"lex",f:forms("have"),next:"to"});
+   else if(m==="goingto")chain.push({kind:"goingto"});
+   else if(m==="try")chain.push({kind:"lex",f:forms("try"),next:"ing"});
+  }
+  const goCome=head.type==="verb"&&/^(go|come)( back)?$/.test(v0.en);
+  const prog=has("prog")||S.post.has("prog")||(goCome&&S.verbs.length===1&&!chain.length&&tense==="pres"&&!S.neg&&!S.time.some(t=>/every|often/.test(t.en))&&(q==="yn"||(whComp&&whComp.kind==="wh"&&whComp.v==="where")));
+  if(prog)chain.push({kind:"prog"});
+  // main verb(s) and what follows them
+  const rest=[];let strand="";
+  const objNP=S.comps.find(c=>c.kind==="np");
+  if(head.type==="verb"){
+   S.verbs.forEach((v,n)=>{
+    let en=v.en;
+    if(v.drink&&objNP&&objNP.np.noun&&/(coffee|tea|water|milk|beer|juice|wine)$/.test(objNP.np.noun.en))en="drink";
+    if(en==="go"&&perf&&(has("ever")||S.neg==="never")&&n===S.verbs.length-1)en="be";
+    const next=n<S.verbs.length-1?(v.cat||"to"):null;
+    chain.push({kind:"lex",f:forms(en),next});
+   });
+   const lastV=S.verbs[S.verbs.length-1];
+   let objectDone=false;
+   if(lastV.en==="go back"&&objNP&&objNP.np.noun&&objNP.np.noun.en==="house"&&!objNP.np.poss&&!objNP.np.det)chain[chain.length-1]={kind:"lex",f:forms("go"),next:null};
+   if(lastV.en==="work"&&whComp&&whComp.kind==="wh"&&whComp.v==="what"){chain[chain.length-1]={kind:"lex",f:forms("do"),next:null};rest.push("for work");}
+   for(const c of S.comps){
+    if(c.kind==="np"){
+     if(c.np.wh||c.howmany)continue;
+     const role=imp==="request"?"ask":"obj";
+     let text=lastV.motion?placeText(c.np,"to"):npText(c.np,role,lastV);
+     // มีปัญหานิดหน่อย = have some problems
+     if(S.deg==="alittle"&&/^(have|want|need|buy|eat|drink|get)$/.test(lastV.en)&&c.np.noun&&!c.np.det&&!c.np.poss){text="some "+(c.np.noun.mass||c.np.noun.plOnly?c.np.noun.en:plural(c.np.noun));S.deg=null;}
+     rest.push((lastV.prep?lastV.prep+" ":"")+text);objectDone=true;
+    }
+    else if(c.kind==="prep"&&c.np.wh)strand=c.p==="at"?"":c.p;
+    else if(c.kind==="prep"){
+     const p=c.p==="at"?"at":c.p;
+     rest.push(c.p==="with"&&!c.np.pron?"with "+npText(c.np,"with"):["with","for"].includes(c.p)?p+" "+npText(c.np,"obj"):placeText(c.np,p));
+    }
+    else if(c.kind==="adv")rest.push(c.en);
+    else if(c.kind==="prepwh")strand=c.p==="at"?"":c.p;
+   }
+   if(indefinite&&!S.subj&&lastV.en==="have"&&S.verbs.length===1&&!mods.length)return "There isn't "+indefinite+" at all.";
+   if(indefinite){rest.unshift((lastV.prep?lastV.prep+" ":"")+indefinite);objectDone=true;}
+   const whObj=whComp&&(["what","who","howmuch"].includes(whComp.v||"")&&whComp.kind==="wh"||whComp.kind==="np");
+   if(!objectDone&&!whObj&&lastV.needObj&&!(whComp&&whComp.kind==="howmany")&&!S.whSubj){
+    const ph=lastV.en.match(/^(\w+) (up|down|away|off|on|out|back)$/),el=chain[chain.length-1];
+    if(ph&&el.kind==="lex"&&el.f.word===ph[1]){chain[chain.length-1]={...el,f:forms(ph[1])};rest.unshift("it "+ph[2]);}
+    else rest.unshift((lastV.prep?lastV.prep+" ":"")+"it");
+   }
+   if(whObj&&lastV.prep)strand=lastV.prep;
+   if(whComp&&whComp.v==="how"&&/^(go|come)$/.test(lastV.en)&&!objectDone){chain[chain.length-1]={kind:"lex",f:forms("get"),next:null};rest.push("there");}
+   const advComp=S.comps.find(c=>c.kind==="adv");
+   if(advComp&&S.deg&&["very","so","really","too"].includes(S.deg)){rest[rest.indexOf(advComp.en)]=S.deg+" "+advComp.en;S.deg=null;}
+   if(S.comps.filter(c=>c.kind==="adv").length>1)return null;
+   if(S.deg)endAdv.unshift({very:/^(like|love|thank|miss)/.test(lastV.en)?"very much":"a lot",so:"so much",alittle:"a little",too:"too much",most:"the most",really:""}[S.deg]);
+  } else {
+   chain.push({kind:"be"});
+   let pred="";
+   if(adjText!==null){
+    const deg={very:"very ",so:"so ",really:"really ",alittle:"a little ",too:"too ",most:"the most "}[S.deg]||(S.pdeg==="quite"?"quite ":"");
+    pred=(S.neg==="notmuch"?"very ":deg)+adjText;
+   }
+   for(const c of S.comps){
+    if(c.kind==="np")pred=head.v==="at"?placeText(c.np,"at"):npText(c.np,"pred");
+    else if(c.kind==="prep")pred=c.p==="with"?"with "+npText(c.np,c.np.pron?"obj":"with"):placeText(c.np,c.p==="at"?"at":c.p);
+    else if(c.kind==="prepwh")strand=c.p==="at"?"":c.p;
+   }
+   if(head.type==="cop"&&head.v==="at"&&!pred&&!S.comps.some(c=>c.kind==="wh"||c.kind==="prepwh"))pred=isQ?"there":"here";
+   if(head.type==="cop"&&head.v==="be"&&!pred&&!S.comps.some(c=>c.kind==="wh"))return null;
+   if(pred)rest.push(pred);
+  }
+  if(S.post.has("too")||S.also)endAdv.push("too");
+  if(S.post.has("first"))endAdv.push("first");
+  // question word
+  let whWord="",whSubject=false;
+  if(wh==="why")whWord="Why";
+  else if(whComp){
+   if(whComp.kind==="howmany"){
+    const c=whComp.c,n=W.get(c.th);
+    const what=objNP&&objNP.howmany?plural(objNP.np.noun):n&&n.k==="noun"?(n.pl||plural(n)):c.th==="ครั้ง"?"times":"";
+    if(head.type==="verb"&&v0.en==="have"&&!objNP&&!S.subj&&what)return "How many "+what+" are there?";
+    whWord="How many"+(what?" "+what:"");
+   }
+   else if(whComp.kind==="np"||whComp.kind==="prep"){
+    const np=whComp.np;
+    if(np.howmany||whComp.howmany){whWord="How many "+plural(np.noun);}
+    else whWord=(np.wh==="which"?"Which ":"What ")+(np.noun?(np.adj?np.adj.en+" ":"")+(head.type==="verb"&&/^(like|love|hate)$/.test(S.verbs[S.verbs.length-1].en)&&!np.noun.mass&&!np.noun.plOnly?plural(np.noun):np.noun.en):"one");
+   }
+   else {
+    whWord={what:"What",who:"Who",where:"Where",when:"When",how:"How",howmuch:"How much",whattime:"What time"}[whComp.v];
+    if(whComp.v==="howmuch"&&head.type==="verb"&&!objNP&&lastIsHave(S))whWord="How much";
+   }
+  }
+  if(whComp&&whComp.v==="how"&&modal==="should"&&head.type==="verb"&&S.verbs.length===1&&v0.en==="do"&&!objNP){whWord="What";rest.splice(rest.indexOf("it"),1);}
+  if(S.whSubj){whSubject=true;whWord=S.whSubj==="np"?cap(npText(S.subj,"subj")):S.whSubj==="who"?"Who":"What";}
+  if(S.post.has("prog")&&!prog)return null;
+  const times=S.time.map(t=>t.en);
+  // build
+  const type=imp?"imp":whSubject?"whsubj":(isQ?(whWord?"wh":"yn"):"stmt");
+  const plain=type==="stmt"&&!q&&!S.neg&&!mods.length&&!S.post.size&&!S.deg&&!S.time.length&&!S.also&&!S.loei;
+  if(plain&&head.type==="verb"&&S.subj&&!S.subj.pron)return null;
+  if(plain&&head.type==="verb"&&!S.subj){
+   const vb=verbWords(chain,"pl","pres",false,false,true);if(!vb)return null;
+   return [...vb.words,...rest,...endAdv.filter(Boolean),...(strand?[strand]:[])].join(" ").replace(/\s+/g," ").trim();
+  }
+  const inverted=type==="yn"||type==="wh";
+  const vw=verbWords(chain,whSubject?"3":agr,tense,Boolean(neg==="n't"),inverted,type==="imp");
+  if(!vw)return null;
+  let words=vw.words.slice();
+  if(neg==="n't"&&type!=="imp")words[0]=NEG[words[0]]||words[0]+" not";
+  let notAfterSubject=false;
+  if(words[0]==="am not"&&inverted){words[0]="am";notAfterSubject=true;}
+  const tail=[...rest,...endAdv.filter(Boolean),...(strand?[strand]:[]),...times].filter(Boolean);
+  let out;
+  if(type==="imp"){
+   const lead=imp==="please"?(neg==="n't"?"Please don't":"Please"):imp==="dont"?"Don't":imp==="lets"?(neg==="n't"?"Let's not":"Let's"):"";
+   if(imp==="request")out=["Can I",...words,...tail];
+   else out=[lead,...words,...tail];
+   const s=out.join(" ").replace(/\s+/g," ").trim();
+   return imp==="request"?s+(objNP?", please?":"?"):s+".";
+  }
+  if(type==="stmt"){
+   const auxFirst=!vw.lexFirst||neg==="n't";
+   const before=neg==="n't"?adv.filter(a=>a==="probably"):[],after=adv.filter(a=>!before.includes(a));
+   out=auxFirst?[subjText,...before,words[0],...after,...words.slice(1),...tail]:[subjText,...adv,...words,...tail];
+  }
+  else if(type==="yn")out=[words[0],subjText,...(notAfterSubject?["not"]:[]),...adv,...words.slice(1),...tail];
+  else if(type==="wh")out=[whWord,words[0],subjText,...(notAfterSubject?["not"]:[]),...adv,...words.slice(1),...tail];
+  else out=[whWord,...adv,...words,...tail];
+  let s=cap(out.join(" ").replace(/\s+/g," ").trim());
+  if(q==="tag")return s+", right?";
+  return s+(isQ||q==="echo"?"?":".");
+ }
+ const lastIsHave=S=>S.verbs.length&&/^(pay|cost|have)$/.test(S.verbs[S.verbs.length-1].en);
+  const timeText=S=>S.time.length?" "+S.time.map(t=>t.en).join(" "):"";
+ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+ const english=function(query){
+  if(/\.\.\.|…|_{2,}/.test(query))return null;
+  let s=normText(query).trim().replace(/[?!.]+$/,"").trim();
+  if(!s||!THAI.test(s))return null;
+  const whole=lookup(s);if(whole&&whole.en)return whole.en;
+  let core=s;
+  for(let more=true;more;){more=false;
+   for(const p of PARTS)if(core.length>p.length&&core.endsWith(p)&&wordEnds(core).has(core.length-p.length)){core=core.slice(0,-p.length).trim();more=true;break;}
+  }
+  if(core!==s){const e=lookup(core);if(e&&e.en&&!/[=+]/.test(e.en))return e.en;}
+  if(PHRASES.has(core))return PHRASES.get(core);
+  const pieces=segmentThai(s,null,picker(s));
+  const T=tokens(pieces);if(!T||!T.length)return null;
+  const S=parse(T);if(!S)return null;
+  try{return realize(S);}catch(e){return null;}
+ };
+ english.keys=[...W.keys()];
+ return english;
+})();
 function render(){
  const tbody=$("output");tbody.replaceChildren();let unknown=0,missing=0;
  currentRows.forEach((r,index)=>{
@@ -283,12 +816,12 @@ function render(){
     ta.addEventListener("focus",()=>focused=ta);
     ta.addEventListener("input",()=>{r[field]=ta.value;r.changed=true;});
     td.appendChild(ta);
-    if(field==="th"){const flag=document.createElement("div");flag.className="status "+(r.unknown?"unknown":"good");flag.textContent=r.unknown?"⚠ Unreviewed / missing dictionary entry":(r.gloss?"Dictionary word-by-word gloss":"Dictionary match");td.appendChild(flag);}
+    if(field==="th"){const flag=document.createElement("div");flag.className="status "+(r.unknown?"unknown":"good");flag.textContent=r.pattern?"⚠ Composed by rules · English from a sentence pattern — please check":r.gloss?"⚠ Composed by rules · English word by word — please check":r.unknown?"⚠ Unreviewed / missing dictionary entry":"Dictionary match";td.appendChild(flag);}
     tr.appendChild(td);
   });tbody.appendChild(tr);if(r.unknown)unknown++;if(!r.phon)missing++;
  });
  $("warnings").replaceChildren();const notes=[];
- if(unknown)notes.push(unknown+" item(s) use rule-based composition or have unknown chunks. Their English is a gloss, not a fluent sentence translation. Please review.");
+ if(unknown)notes.push(unknown+" item(s) were composed by rules or have unknown chunks. Their English comes from a sentence pattern where one fits, otherwise it is word by word. Please review.");
  if(missing)notes.push(missing+" item(s) have no verified phonetics or conflicting examples. Blank is intentional; use the keyboard to correct.");
  for(const n of notes){const div=document.createElement("div");div.className="warn";div.textContent=n;$("warnings").appendChild(div);}
  $("phonetics-head").textContent=labels[$("system").value];showRules();
@@ -299,15 +832,16 @@ function translate(){
  lastRowsInput=queries;
  const system=$("system").value;
  currentRows=queries.map(q=>{
-  let e=lookup(q),gloss=false;
+  let e=lookup(q),gloss=false,pattern=false;
   if((!e||!e[system])&&THAI.test(q)){
     const rule=PHONETIC_RULES[system],parts=segmentThai(q,system);
     if(parts.length>1||(parts.length===1&&!e)){gloss=true;
+      const sentence=e?.en?"":englishSentence(q);pattern=Boolean(sentence);
       e={th:normText(q),
-         en:e?.en||joinPieces(parts,p=>p.literal?p.text:(p.entry?.en||"[unknown: "+p.text+"]")," · "),
+         en:e?.en||sentence||joinPieces(parts,p=>p.literal?p.text:(p.entry?.en||"[unknown: "+p.text+"]")," · "),
          [system]:joinPieces(parts,p=>p.literal?p.text:(p.entry?.[system]||rule.unknown),rule.separator)};}
   }
-  return {query:q,th:e?.th||(/[\u0E00-\u0E7F]/.test(q)?q:""),phon:e?.[system]||"",en:e?.en||"",unknown:!e||gloss,gloss,changed:false};
+  return {query:q,th:e?.th||(/[\u0E00-\u0E7F]/.test(q)?q:""),phon:e?.[system]||"",en:e?.en||"",unknown:!e||gloss,gloss,pattern,changed:false};
  });
  render();
 }
