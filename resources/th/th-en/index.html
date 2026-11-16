@@ -1,621 +1,225 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>คู่มือภาษาไทย</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    html, body { height: 100%; }
-    body {
-      font-family: 'Sarabun','Inter',sans-serif;
-      display: flex; align-items: flex-start; justify-content: center;
-    }
-    .loader {
-      border: 4px solid #f3f3f3; border-top: 4px solid #3498db;
-      border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite;
-      margin: 4px auto;
-    }
-    @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
-    details > summary { list-style: none; }
-    details > summary::-webkit-details-marker { display: none; }
-    .details-arrow { transition: transform .2s; }
-    details[open] .details-arrow { transform: rotate(180deg); }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalkACake — Thai Language Companion (Offline Dictionary)</title>
+<style>
+:root{font-family:system-ui,"Sarabun",sans-serif;color:#193047;background:#f1f5f9}*{box-sizing:border-box}body{margin:0;padding:20px}main{max-width:1080px;margin:auto}.panel{background:white;border:1px solid #dce5ee;border-radius:17px;padding:22px;margin-bottom:18px;box-shadow:0 3px 14px #17375a0d}h1{margin:0 0 6px;color:#164c81;font-size:2rem}h2{font-size:1.13rem;margin:0 0 12px}p{line-height:1.5}small,.muted{color:#526579}label{font-weight:650;display:block;margin-bottom:6px}textarea,input,select{font:inherit;color:#193047;border:1px solid #aebfce;border-radius:9px;background:white;padding:10px;width:100%}textarea{resize:vertical}button{font:inherit;border-radius:9px;padding:10px 14px;border:1px solid #aabccb;background:#fff;color:#17354e;cursor:pointer}button:hover{background:#eff7ff}button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid #8dc6ff;outline-offset:1px}.primary{background:#1760b4;color:#fff;border-color:#1760b4}.primary:hover{background:#0d4c94}.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:12px}.row{display:grid;grid-template-columns:1fr 1fr;gap:15px}.notice{background:#f2f8ff;border:1px solid #bad8f5;padding:12px;border-radius:9px}.warn{color:#8b3f09;background:#fff5e7;border:1px solid #f5d3a7;border-radius:9px;padding:9px;margin:9px 0}.good{color:#12623b}.results{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:670px}th{text-align:left;background:#eef4fa;color:#214561;padding:10px}td{padding:8px;vertical-align:top;border-bottom:1px solid #e2eaf1}td textarea{min-height:60px;font-size:15px}td:first-child{width:27%}td:nth-child(2){width:35%}td:nth-child(3){width:38%}.status{font-size:12px;font-weight:600;margin:5px 0}.unknown{color:#9b440d}.keyboard{position:relative}.keys{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.key{min-width:42px;padding:8px 10px;font-size:17px;background:#f3f7fb}.key:hover{background:#d9edff}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.toolbar select{max-width:260px}.foot{font-size:13px;color:#586c7c;margin:18px 0}.count{font-size:13px;color:#37608a}#message{min-height:20px}#file-input{display:none}@media(max-width:650px){body{padding:10px}.panel{padding:15px}.row{grid-template-columns:1fr}h1{font-size:1.6rem}}
+</style>
 </head>
-<body class="bg-slate-100 text-slate-800 p-4">
-  <div class="w-full max-w-5xl">
-    <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-
-      <!-- Header -->
-      <header class="text-center mb-6">
-        <div>
-          <h1 class="text-3xl md:text-4xl font-bold text-slate-700">คู่มือภาษาไทย</h1>
-          <p class="text-sm text-blue-600 -mt-1">kûu-mʉʉ paa-sǎa tai</p>
-          <p class="text-sm text-green-600">Thai Language Companion</p>
-        </div>
-        <div class="mt-2">
-          <p class="text-slate-500">ป้อนภาษาไทยหรือภาษาอังกฤษเพื่อรับสัทศาสตร์ตามรูปแบบที่เลือกและคำแปลภาษาอังกฤษ</p>
-          <p class="text-xs text-blue-600">lʉ̂ak rúup-bàep sàt-tà-sàat láe rá-bòp AI thîi dtông-gaan</p>
-          <p class="text-xs text-green-600">Choose a phonetic system and AI model, then translate Thai or English text.</p>
-        </div>
-      </header>
-
-      <!-- Settings -->
-      <details class="mb-6 bg-slate-50 border border-slate-200 rounded-lg">
-        <summary class="cursor-pointer p-4 font-semibold text-slate-600 flex justify-between items-center">
-          <div>
-            <span>ตั้งค่า (API Key)</span>
-            <span class="block text-xs font-normal text-blue-600">dtâng-kâa (ee-pii-ai kii)</span>
-            <span class="block text-xs font-normal text-green-600">Settings (API Key)</span>
-          </div>
-          <svg class="w-5 h-5 details-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <div class="p-4 border-t border-slate-200">
-          <p class="text-sm text-slate-500 mb-2">
-            ใช้ Gemini API Key (จะถูกเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น)
-            <span class="block text-xs text-blue-600">Your key is saved locally in your browser only. Get one from <a class="underline" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>. Use a restricted key; a server-side proxy is safer for a public website.</span>
-          </p>
-          <label for="api-key-input" class="block text-sm font-medium text-slate-600 mb-1">
-            คีย์ API ของคุณ:
-            <span class="block text-xs font-normal text-blue-600">kii ee-pii-ai kɔ̌ɔng kun:</span>
-            <span class="block text-xs font-normal text-green-600">Your Gemini API Key:</span>
-          </label>
-          <div class="relative">
-            <input type="password" id="api-key-input" class="w-full p-2 pr-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ป้อนคีย์ API ของคุณที่นี่">
-            <button id="toggle-key-visibility" class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 hover:text-slate-700" aria-label="Toggle API key visibility">
-              <svg id="eye-icon-open" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-              <svg id="eye-icon-closed" class="h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 .527-1.666 1.487-3.15 2.675-4.333m2.25-.917a14.953 14.953 0 011.825-.667M9 5.083A14.953 14.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.2 2.15M17.5 9.5a3 3 0 00-3-3M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/></svg>
-            </button>
-          </div>
-          <p class="text-xs text-slate-400 mt-1">
-            หมายเหตุ: เพื่อความปลอดภัยจริง ๆ ควรซ่อนไว้หลังพร็อกซีฝั่งเซิร์ฟเวอร์ (ไม่เปิดเผยคีย์ในเบราว์เซอร์)
-          </p>
-        </div>
-      </details>
-
-      <!-- Input -->
-      <div class="mb-6">
-        <label for="thai-input" class="block text-lg font-semibold mb-2 text-slate-600">Thai or English Text</label>
-        <textarea id="thai-input" rows="5" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="e.g., สวัสดีครับ&#10;hello&#10;sawatdee"></textarea>
-      </div>
-
-      <!-- Translation options -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div>
-          <label for="phonetic-type" class="block text-sm font-semibold text-slate-700 mb-2">Phonetic type</label>
-          <select id="phonetic-type" class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="paiboon">Paiboon — tone marks</option>
-            <option value="ipa">IPA — phonemic symbols</option>
-            <option value="initials">Initials — tone letters</option>
-            <option value="numbers">Numbers — tone numbers</option>
-          </select>
-          <p id="phonetic-help" class="mt-2 text-xs text-slate-500"></p>
-        </div>
-        <div>
-          <label for="model-select" class="block text-sm font-semibold text-slate-700 mb-2">AI model</label>
-          <select id="model-select" class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="fast">Gemini 3.5 Flash-Lite — fastest (recommended)</option>
-            <option value="careful">Gemini 3.5 Flash — more accurate (slower)</option>
-          </select>
-          <p id="model-help" class="mt-2 text-xs text-slate-500"></p>
-        </div>
-      </div>
-
-      <!-- Buttons -->
-      <div class="text-center mb-8 flex flex-wrap justify-center gap-4">
-        <button id="translate-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 duration-200 shadow-md">Translate</button>
-        <button id="copy-btn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-transform transform hover:scale-105 duration-200 shadow-md">Copy for Sheets</button>
-        <button id="clear-btn" class="bg-slate-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-600 transition-transform transform hover:scale-105 duration-200 shadow-md">Clear</button>
-      </div>
-
-      <!-- Output -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-slate-50 p-6 rounded-lg shadow-inner">
-          <h2 class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">Thai Script</h2>
-          <div id="original-output" class="text-lg text-slate-600 min-h-[100px] whitespace-pre-wrap"></div>
-        </div>
-        <div class="bg-slate-50 p-6 rounded-lg shadow-inner">
-          <h2 id="phonetics-heading" class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">Paiboon Phonetics</h2>
-          <div id="phonetics-output" class="text-lg text-slate-600 min-h-[100px] whitespace-pre-wrap"></div>
-        </div>
-        <div class="bg-slate-50 p-6 rounded-lg shadow-inner md:col-span-1">
-          <h2 class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">English Translation</h2>
-          <div id="translation-output" class="text-lg text-slate-600 min-h-[100px] whitespace-pre-wrap"></div>
-        </div>
-      </div>
-      <div id="error-box" class="mt-6 p-4 bg-red-100 text-red-700 rounded-lg hidden"></div>
-    </div>
-  </div>
-
-  <script>
-    // Direct REST calls avoid an extra SDK download and startup delay.
-    const MODEL_CONFIGS = {
-      fast: {
-        model: 'gemini-3.5-flash-lite',
-        thinkingLevel: 'minimal',
-        help: 'Gemini 3.5 Flash-Lite: fastest for everyday vocabulary and sentences.'
-      },
-      careful: {
-        model: 'gemini-3.5-flash',
-        thinkingLevel: 'low',
-        help: 'Gemini 3.5 Flash: stronger model for nuanced Thai and phonetics (may take longer).'
-      }
-    };
-
-    const PHONETIC_CONFIGS = {
-      paiboon: {
-        heading: 'Paiboon Phonetics',
-        help: 'Learner-friendly Paiboon-style romanization with tone marks.',
-        rules: [
-          'Use learner-friendly Paiboon-style romanization, not IPA.',
-          'Use consonant spellings such as bp, dt, g, kh, ng, ch and j, and vowel spellings such as aa, ii, uu, ɛɛ, ɔɔ, ʉʉ and əə where appropriate.',
-          'Mark tones on the vowel nucleus: unmarked for mid, à for low, â for falling, á for high and ǎ for rising.',
-          'Use hyphens between syllables or closely connected chunks in the style shown by the anchors.',
-          'Never use IPA symbols, tone numbers, or parenthesized tone letters.'
-        ],
-        examples: [
-          'ใต้ => dtâi',
-          'อ่าน => àan',
-          'ทำไม => tam-mai',
-          'เรียน => riian',
-          'พุธ => pút',
-          'ใคร => krai',
-          'แกงเขียวหวาน => gaaeng kǐao wǎan',
-          'เขียน => kǐian',
-          'กับ => gàp',
-          'เสียง => sĭang',
-          'อยาก => yàak',
-          'ยาก => yâak',
-          'น้ำเปล่า => náam-plào',
-          'ไม่ใช่ => mâi châi',
-          'ใช่ไหม => châi mái',
-          'ดีใจที่ได้เจอกันนะ => dii-jai tii dâi jer gan ná',
-          'ทำงานที่บ้าน => tham-ngaan-thîi-bâan',
-          'ของหวาน => kɔ̌ɔng wǎan',
-          'มะม่วง => má-mûang',
-          'กระต่าย => grà-dtàai',
-          'เมื่อวาน => mûuea-waan',
-          'ยินดีต้อนรับ => yin-dee-dtôn-ráp',
-          'ฝึก => fèuk',
-          'บังเอิญ => bang-eern'
-        ]
-      },
-      ipa: {
-        heading: 'IPA Phonetics',
-        help: 'Broad Bangkok Thai IPA with vowel length and lexical tones.',
-        rules: [
-          'Use broad Bangkok Thai IPA, not learner romanization.',
-          'Use IPA symbols such as ʔ, tɕ, tɕʰ, kʰ, pʰ, tʰ, ɯ, ɤ, ɛ, ɔ and ŋ as needed.',
-          'Use ː for long vowels, periods between syllables within a word, and spaces between words.',
-          'Mark lexical tone consistently with diacritics.',
-          'Never use Paiboon spellings, tone numbers, or parenthesized tone letters.'
-        ],
-        examples: [
-          'ไหม => máj',
-          'ไม่ => mâj',
-          'ใช่ไหม => tɕʰâj máj',
-          'ไม่ใช่ => mâj tɕʰâj',
-          'ไม่เผ็ด => mâj pʰèt',
-          'น้ำแข็ง => nám kʰɛ̌ŋ',
-          'นม => nom',
-          'เย็น => jen',
-          'น้ำเย็น => nám jen',
-          'อร่อยไหม => ʔa.rɔ̀j máj',
-          'เผ็ดไหม => pʰèt máj',
-          'เรียนสั่งอาหารยังไง => rian sàŋ ʔaː.hǎːn jaŋ.ŋaj',
-          'อาหาร => ʔaː.hǎːn',
-          'สั่ง => sàŋ',
-          'ใส่ => sàj',
-          'เป็นยังไง => pen jaŋ.ŋaj',
-          'อร่อย => ʔa.rɔ̀j',
-          'กับ => kàp',
-          'เผ็ด => pʰèt',
-          'นิดหน่อย => nít.nɔ̀j',
-          'ไก่ทอด => kàj tʰɔ̂ːt',
-          'ขอโทษ => kʰɔ̌ː tʰôːt',
-          'ผัดผักบุ้ง => pʰàt pʰàk bûŋ'
-        ]
-      },
-      initials: {
-        heading: 'Initials Phonetics',
-        help: 'Learner romanization with tone initials: (m), (l), (f), (h), and (r).',
-        rules: [
-          'Use simple learner-friendly romanization and append a parenthesized tone initial to every syllable.',
-          'Tone initials are (m) mid, (l) low, (f) falling, (h) high and (r) rising.',
-          'Follow the consonant and vowel spellings in the anchors, including bp, dt, mh and ue where shown.',
-          'Use spaces between syllables or words.',
-          'Never use tone diacritics, IPA transcription, or tone numbers.'
-        ],
-        examples: [
-          'ยังอยู่ไหม => yang(m) you(l) mhai(h)',
-          'อยากให้ช่วย => yaak(l) hai(f) chuay(f)',
-          'ทำงานอยู่ที่ทำงาน => tam(m) ngaan(m) you(l) tii(f) tam(m) ngaan(m)',
-          'ทำงาน => tam(m) ngaan(m)',
-          'สำหรับนักท่องเที่ยว => saam(r) rab(l) nak(h) tong(f) tiew(f)',
-          'ทราบ => saab(f)',
-          'เริ่มธุรกิจ => rerm(f) tu(h) ra(h) kit(l)',
-          'เร่ง => reng(f)',
-          'ไม่เสมอไป => mai(f) sa(l) mer(r) bpai(m)',
-          'ไม่ได้หมายความว่า => mai(f) dai(f) mai(r) kwaam(m) waa(f)',
-          'แม่เคยเป็นโรคหัวใจ => mae(f) koei(m) bpen(m) roke(f) hua(r) jai(m)',
-          'ลำโพง => lam(m) pong(m)',
-          'กินกาแฟแล้วบ่ายจะง่วงเหรอ => kin(m) gaa(m) fae(h) leaw(h) baai(l) ja(l) nguang(f) ror(r)',
-          'กลางเมือง => glaang(m) muang(m)',
-          'ตรงเวลา => dtrong(m) way(m) laa(m)',
-          'ต่อไป => dtor(l) bpai(m)',
-          'ตัดยาให้วัว => dtad(l) yaa(f) hai(f) wua(m)'
-        ]
-      },
-      numbers: {
-        heading: 'Numbered Phonetics',
-        help: 'Learner romanization with a tone number after every syllable.',
-        rules: [
-          'Use learner-friendly romanization and append a tone number directly after every syllable.',
-          'Follow the custom 1–5 tone-number convention demonstrated by the anchors exactly.',
-          'Keep spaces between words and syllables in the style shown by the anchors.',
-          'Use ɛ, ɔ, ʉ and ə where the anchors require them.',
-          'Never use tone diacritics, IPA transcription, or parenthesized tone letters.'
-        ],
-        examples: [
-          'เล่น => len3',
-          'บาท => baat4',
-          'แปด => bɛɛt2',
-          'ตอนเรียน => dtɔɔn1 rian1',
-          'คำถาม => kam1 taam5',
-          'ปี => bpii1',
-          'อีก => iik2',
-          'ดูหนัง => duu1 nang5',
-          'ตลก => dta2 lok2',
-          'ประวัติศาสตร์ => bpra2 wat2 saat2',
-          'เพลง => pleeng1',
-          'เก้า => kaao2',
-          'เผ็ด => peet3',
-          'เยอะ => yə4',
-          'เค็ม => kem1',
-          'เรื่องสั้น => rʉang3 san3',
-          'มา => maa1',
-          'จาก => jaak2',
-          'จีน => jiin1',
-          'งาน => ngaan1',
-          'วิศวกร => wit4 sa2 wa4 (gɔɔn1)',
-          'น่าสนใจ => naa3 son4 jai1',
-          'หิว => hiu4',
-          'มาม่า => maa1 maa3',
-          'ชานมไข่มุก => chaa1 nom1 kai2 muk4',
-          'เปรี้ยว => bpriao3',
-          'ครอบครัว => krɔɔp3 krua1',
-          'เสียง => siang5',
-          'เช็ด => ched4',
-          'อาจจะ => aat2 ja2',
-          'บางครั้ง => baang1 krang4'
-        ]
-      }
-    };
-
-    const RESULT_ITEM_SCHEMA = {
-      type: 'object',
-      properties: {
-        original: {
-          type: 'string',
-          description: 'Thai-script equivalent of the input line.'
-        },
-        phonetics: {
-          type: 'string',
-          description: 'Pronunciation using only the selected phonetic convention.'
-        },
-        translation: {
-          type: 'string',
-          description: 'Natural English translation.'
-        }
-      },
-      required: ['original', 'phonetics', 'translation'],
-      additionalProperties: false
-    };
-
-    // Structured outputs need an object at the top, so the per-line results sit in { results: [...] }.
-    const OUTPUT_SCHEMA = {
-      type: 'object',
-      properties: {
-        results: {
-          type: 'array',
-          description: 'One result per input line, in the same order.',
-          items: RESULT_ITEM_SCHEMA
-        }
-      },
-      required: ['results'],
-      additionalProperties: false
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const translateBtn = document.getElementById('translate-btn');
-      const copyBtn = document.getElementById('copy-btn');
-      const clearBtn = document.getElementById('clear-btn');
-      const thaiInput = document.getElementById('thai-input');
-      const apiKeyInput = document.getElementById('api-key-input');
-      const toggleKeyVisibilityBtn = document.getElementById('toggle-key-visibility');
-      const eyeIconOpen = document.getElementById('eye-icon-open');
-      const eyeIconClosed = document.getElementById('eye-icon-closed');
-      const phoneticTypeSelect = document.getElementById('phonetic-type');
-      const modelSelect = document.getElementById('model-select');
-      const phoneticHelp = document.getElementById('phonetic-help');
-      const modelHelp = document.getElementById('model-help');
-      const phoneticsHeading = document.getElementById('phonetics-heading');
-
-      const originalOutput = document.getElementById('original-output');
-      const phoneticsOutput = document.getElementById('phonetics-output');
-      const translationOutput = document.getElementById('translation-output');
-      const errorBox = document.getElementById('error-box');
-
-      let translationResults = [];
-
-      const savedApiKey = localStorage.getItem('thaiCompanionGeminiApiKey');
-      if (savedApiKey) apiKeyInput.value = savedApiKey;
-
-      const savedPhoneticType = localStorage.getItem('thaiCompanionPhoneticType');
-      if (savedPhoneticType && PHONETIC_CONFIGS[savedPhoneticType]) {
-        phoneticTypeSelect.value = savedPhoneticType;
-      }
-
-      const savedModel = localStorage.getItem('thaiCompanionGeminiMode');
-      if (savedModel && MODEL_CONFIGS[savedModel]) {
-        modelSelect.value = savedModel;
-      }
-
-      function updatePhoneticUi() {
-        const config = PHONETIC_CONFIGS[phoneticTypeSelect.value];
-        phoneticsHeading.textContent = config.heading;
-        phoneticHelp.textContent = config.help;
-        localStorage.setItem('thaiCompanionPhoneticType', phoneticTypeSelect.value);
-      }
-
-      function updateModelUi() {
-        modelHelp.textContent = MODEL_CONFIGS[modelSelect.value].help;
-        localStorage.setItem('thaiCompanionGeminiMode', modelSelect.value);
-      }
-
-      updatePhoneticUi();
-      updateModelUi();
-
-      apiKeyInput.addEventListener('input', () => {
-        localStorage.setItem('thaiCompanionGeminiApiKey', apiKeyInput.value.trim());
-      });
-
-      phoneticTypeSelect.addEventListener('change', updatePhoneticUi);
-      modelSelect.addEventListener('change', updateModelUi);
-
-      toggleKeyVisibilityBtn.addEventListener('click', () => {
-        const isPassword = apiKeyInput.type === 'password';
-        apiKeyInput.type = isPassword ? 'text' : 'password';
-        eyeIconOpen.classList.toggle('hidden', !isPassword);
-        eyeIconClosed.classList.toggle('hidden', isPassword);
-      });
-
-      // In-memory only: repeat requests are instantaneous, with no personal text stored persistently.
-      const translationCache = new Map();
-      const MAX_CACHE_ENTRIES = 100;
-
-      async function callGemini(apiKey, model, request) {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 25000);
-        try {
-          const response = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-goog-api-key': apiKey
-              },
-              body: JSON.stringify(request),
-              signal: controller.signal
-            }
-          );
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            const detail = data.error?.message || response.statusText;
-            throw new Error('Gemini API ' + response.status + ': ' + detail);
-          }
-          const candidate = data.candidates?.[0];
-          const responseText = (candidate?.content?.parts || [])
-            .filter(part => typeof part.text === 'string')
-            .map(part => part.text)
-            .join('')
-            .trim();
-          if (!responseText) {
-            throw new Error('No usable Gemini response. ' + (candidate?.finishReason || data.promptFeedback?.blockReason || 'Please try again.'));
-          }
-          return responseText;
-        } catch (error) {
-          if (error.name === 'AbortError') throw new Error('Request took over 25 seconds. Try fewer lines or retry.');
-          throw error;
-        } finally {
-          clearTimeout(timeout);
-        }
-      }
-
-      function buildSystemPrompt(phoneticType) {
-        const config = PHONETIC_CONFIGS[phoneticType];
-        return [
-          'You are a meticulous Thai linguist and translation service.',
-          'The user message gives the number of input lines, then the lines. Produce exactly one result per input line, in the same order.',
-          'For Thai input, preserve the Thai text as original. For English or romanized input, infer the most natural common Thai equivalent and put that Thai script in original.',
-          'For each item, provide the Thai script, its pronunciation in ONLY the selected convention, and a natural English translation.',
-          'Use standard contemporary Bangkok Thai pronunciation. Preserve names and context faithfully. Check every syllable, vowel length, and lexical tone before answering.',
-          'Selected convention: ' + config.heading + '.',
-          '',
-          'CONVENTION RULES:',
-          config.rules.map((rule, index) => (index + 1) + '. ' + rule).join('\n'),
-          '',
-          'AUTHORITATIVE STYLE ANCHORS:',
-          config.examples.join('\n'),
-          '',
-          'The anchors define notation style, not a limited vocabulary list. Apply the same convention consistently to unseen words.',
-          'Do not mix conventions. Do not add commentary, Markdown, alternatives, slash-separated spellings, or fields outside the requested JSON schema.',
-          'Return the results in a JSON object: {"results": [ ... ]}.'
-        ].join('\n');
-      }
-
-      function parseJsonResponse(rawText) {
-        let cleanText = rawText.trim();
-        const fence = String.fromCharCode(96).repeat(3);
-        if (cleanText.startsWith(fence)) {
-          cleanText = cleanText.slice(fence.length).replace(/^json\s*/i, '');
-          if (cleanText.endsWith(fence)) cleanText = cleanText.slice(0, -fence.length);
-        }
-        return JSON.parse(cleanText.trim());
-      }
-
-      function validateResults(results, expectedCount) {
-        if (!Array.isArray(results)) {
-          throw new Error('The model returned an unexpected response format.');
-        }
-        if (results.length !== expectedCount) {
-          throw new Error('The model returned ' + results.length + ' results for ' + expectedCount + ' input lines. Please try again.');
-        }
-        const valid = results.every(item =>
-          item &&
-          typeof item.original === 'string' &&
-          typeof item.phonetics === 'string' &&
-          typeof item.translation === 'string'
-        );
-        if (!valid) {
-          throw new Error('The model returned an incomplete translation result. Please try again.');
-        }
-      }
-
-      async function handleTranslate() {
-        const apiKey = apiKeyInput.value.trim();
-        if (!apiKey) {
-          errorBox.textContent = 'Please enter your Gemini API key in the Settings section.';
-          errorBox.classList.remove('hidden');
-          return;
-        }
-
-        const inputText = thaiInput.value.trim();
-        if (!inputText) {
-          errorBox.textContent = 'Please enter some Thai or English text to translate.';
-          errorBox.classList.remove('hidden');
-          return;
-        }
-
-        const inputLines = inputText
-          .split(/\r?\n/)
-          .map(line => line.trim())
-          .filter(Boolean);
-
-        clearOutputs();
-        setLoading(true);
-        errorBox.classList.add('hidden');
-
-        const phoneticType = phoneticTypeSelect.value;
-        const mode = MODEL_CONFIGS[modelSelect.value] || MODEL_CONFIGS.fast;
-        const cacheKey = JSON.stringify([mode.model, phoneticType, inputLines]);
-        const request = {
-          systemInstruction: {
-            parts: [{ text: buildSystemPrompt(phoneticType) }]
-          },
-          contents: [{
-            role: 'user',
-            parts: [{ text: 'Number of input lines: ' + inputLines.length + '\n\n' + inputLines.join('\n') }]
-          }],
-          generationConfig: {
-            thinkingConfig: { thinkingLevel: mode.thinkingLevel },
-            responseMimeType: 'application/json',
-            responseSchema: OUTPUT_SCHEMA,
-            maxOutputTokens: Math.min(8192, Math.max(512, inputLines.length * 250))
-          }
-        };
-
-        try {
-          let results = translationCache.get(cacheKey);
-          if (!results) {
-            const responseText = await callGemini(apiKey, mode.model, request);
-            results = parseJsonResponse(responseText).results;
-            validateResults(results, inputLines.length);
-            if (translationCache.size >= MAX_CACHE_ENTRIES) {
-              translationCache.delete(translationCache.keys().next().value);
-            }
-            translationCache.set(cacheKey, results);
-          }
-
-          clearOutputs();
-          translationResults = results;
-          results.forEach(result => {
-            appendOutput(originalOutput, result.original);
-            appendOutput(phoneticsOutput, result.phonetics);
-            appendOutput(translationOutput, result.translation);
-          });
-        } catch (error) {
-          clearOutputs();
-          errorBox.textContent = 'Translation failed: ' + error.message;
-          errorBox.classList.remove('hidden');
-          console.error(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-
-      function appendOutput(container, text) {
-        const item = document.createElement('div');
-        item.className = 'mb-2 pb-2 border-b border-slate-200 last:border-b-0';
-        item.textContent = text;
-        container.appendChild(item);
-      }
-
-      function clearOutputs() {
-        originalOutput.innerHTML = '';
-        phoneticsOutput.innerHTML = '';
-        translationOutput.innerHTML = '';
-        translationResults = [];
-        errorBox.classList.add('hidden');
-      }
-
-      function setLoading(isLoading) {
-        translateBtn.disabled = isLoading;
-        translateBtn.classList.toggle('opacity-50', isLoading);
-        translateBtn.textContent = isLoading ? 'Translating...' : 'Translate';
-        if (isLoading) {
-          const loaderHtml = '<div class="loader"></div>';
-          originalOutput.innerHTML = loaderHtml;
-          phoneticsOutput.innerHTML = loaderHtml;
-          translationOutput.innerHTML = loaderHtml;
-        }
-      }
-
-      function handleCopy() {
-        if (!translationResults.length) {
-          errorBox.textContent = 'Nothing to copy. Please translate some text first.';
-          errorBox.classList.remove('hidden');
-          return;
-        }
-
-        const textToCopy = translationResults
-          .map(item => [item.original, item.phonetics, item.translation].join('\t'))
-          .join('\n');
-
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          const oldText = copyBtn.textContent;
-          copyBtn.textContent = 'Copied!';
-          copyBtn.classList.replace('bg-green-600', 'bg-green-500');
-          setTimeout(() => {
-            copyBtn.textContent = oldText;
-            copyBtn.classList.replace('bg-green-500', 'bg-green-600');
-          }, 2000);
-        }).catch(error => {
-          errorBox.textContent = 'Failed to copy text: ' + error;
-          errorBox.classList.remove('hidden');
-        });
-      }
-
-      translateBtn.addEventListener('click', handleTranslate);
-      copyBtn.addEventListener('click', handleCopy);
-      clearBtn.addEventListener('click', () => {
-        thaiInput.value = '';
-        clearOutputs();
-      });
-    });
-  </script>
-</body>
-</html>
+<body>
+<main>
+<section class="panel">
+<h1>คู่มือภาษาไทย · Thai Language Companion</h1>
+<p class="muted">Fast, completely AI-free dictionary. No API keys, requests to AI, or translation charges. Exact matches come from reviewed examples; unfamiliar words are shown for manual editing rather than guessed.</p>
+<div class="notice">A dictionary is not a full sentence translator. For unmatched Thai sentences, results are <b>word-by-word glosses</b> where available, not guaranteed natural English. Review all phonetics before teaching.</div>
+</section>
+<section class="panel">
+<label for="text-input">Thai or English text (one item per line)</label>
+<textarea id="text-input" rows="5" placeholder="สวัสดี&#10;ขอบคุณ&#10;hello"></textarea>
+<div class="row" style="margin-top:13px">
+<div><label for="system">Phonetic system</label><select id="system"><option value="paiboon">Paiboon (tone marks)</option><option value="ipa">IPA</option><option value="initials">Tone initials (m/l/f/h/r)</option><option value="numbers">Tone numbers (1–5)</option></select></div>
+<div><label for="entry-status">Available dictionary</label><div class="notice count" id="entry-status">Loading entries...</div></div>
+</div>
+<div class="actions">
+<button id="translate" class="primary">Translate instantly</button>
+<button id="copy">Copy for Sheets</button>
+<button id="save">Save my corrections</button>
+<button id="clear">Clear</button>
+</div>
+<p id="message" role="status" aria-live="polite"></p>
+</section>
+<section class="panel">
+<h2>Translation and editable phonetics</h2>
+<p class="muted">Edit any output directly. Click inside a phonetics box, then use the keyboard at the bottom. Your corrections stay on this device when saved.</p>
+<div id="warnings"></div>
+<div class="results"><table><thead><tr><th>Thai</th><th id="phonetics-head">Paiboon phonetics</th><th>English translation / gloss</th></tr></thead><tbody id="output"></tbody></table></div>
+</section>
+<section class="panel keyboard">
+<h2>Phonetics keyboard</h2>
+<p class="muted">Click in any editable field, position your cursor, and tap a symbol to insert it. The keyboard also works for corrections to existing results.</p>
+<div class="toolbar"><label for="keyboard-set" style="margin:0">Symbols</label><select id="keyboard-set"><option value="paiboon">Paiboon vowels & tones</option><option value="ipa">IPA</option><option value="initials">Tone initials</option><option value="numbers">Tone numbers</option></select></div>
+<div id="keys" class="keys"></div>
+</section>
+<section class="panel">
+<h2>Manage your dictionary</h2>
+<p class="muted">Saved corrections override dictionary entries locally. Export a JSON backup so you can reuse or publish your corrections later; nothing is uploaded automatically.</p>
+<div class="actions">
+<button id="export">Export corrections (.json)</button>
+<button id="import">Import corrections (.json)</button>
+<input id="file-input" type="file" accept=".json,application/json">
+<button id="erase">Delete saved corrections</button>
+</div>
+</section>
+<p class="foot">TalkACake • Runs on GitHub Pages • Static local dictionary and browser storage • No AI calls</p>
+</main>
+<script>
+"use strict";
+// Reviewed starter entries. Romanization is included only where individually supplied;
+// missing systems are deliberately left blank instead of algorithmically guessed.
+const seed = [
+["สวัสดี","Hello","sà-wàt-dii","sà.wàt.diː","sa(l) wat(l) dii(m)","sa2 wat2 dii1"],
+["ขอบคุณ","Thank you","khɔ̀ɔp-khun","kʰɔ̀ːp.kʰun","khop(l) khun(m)","khop2 khun1"],
+["ใช่","Yes / correct","châi","tɕʰâj","chai(f)","chai3"],
+["ไม่ใช่","No / not correct","mâi châi","mâj tɕʰâj","mai(f) chai(f)","mai3 chai3"],
+["ไม่","No / not","mâi","mâj","mai(f)","mai3"],
+["ใช่ไหม","Is that right?","châi mái","tɕʰâj máj","chai(f) mai(h)","chai3 mai4"],
+["น้ำ","Water","náam","náːm","naam(h)","naam4"],
+["น้ำเปล่า","Plain water","náam-plào","náːm plàw","naam(h) plao(l)","naam4 plao2"],
+["อาหาร","Food","aa-hǎan","ʔaː.hǎːn","aa(m) haan(r)","aa1 haan5"],
+["อร่อย","Delicious","à-rɔ̀i","ʔa.rɔ̀j","a(l) roi(l)","a2 roi2"],
+["เผ็ด","Spicy","phèt","pʰèt","phet(l)","phet2"],
+["ไม่เผ็ด","Not spicy","mâi phèt","mâj pʰèt","mai(f) phet(l)","mai3 phet2"],
+["ขอโทษ","Sorry / excuse me","khɔ̌ɔ-thôot","kʰɔ̌ː tʰôːt","kho(r) thot(f)","kho5 thot3"],
+["ทำไม","Why","tam-mai","tʰam.maj","tam(m) mai(m)","tam1 mai1"],
+["ใคร","Who","khrai","kʰraj","khrai(m)","khrai1"],
+["อะไร","What","à-rai","ʔa.raj","a(l) rai(m)","a2 rai1"],
+["ที่ไหน","Where","thîi-nǎi","tʰîː.nǎj","thii(f) nai(r)","thii3 nai5"],
+["ไป","Go","bpai","paj","bpai(m)","bpai1"],
+["มา","Come","maa","maː","maa(m)","maa1"],
+["กิน","Eat","gin","kin","gin(m)","gin1"],
+["ดี","Good","dii","diː","dii(m)","dii1"],
+["มาก","Very / much","mâak","mâːk","maak(f)","maak3"],
+["บ้าน","House / home","bâan","bâːn","baan(f)","baan3"],
+["วันนี้","Today","wan-níi","wan.níː","wan(m) nii(h)","wan1 nii4"],
+["พรุ่งนี้","Tomorrow","phrûng-níi","pʰrûŋ.níː","phrung(f) nii(h)","phrung3 nii4"],
+["เมื่อวาน","Yesterday","mʉ̂a-waan","mɯ̂ːa.waːn","muea(f) waan(m)","muea3 waan1"],
+["เรียน","Study / learn","rian","rian","rian(m)","rian1"],
+["ภาษาไทย","Thai language","phaa-sǎa thai","pʰaː.sǎː tʰaj","phaa(m) saa(r) thai(m)","phaa1 saa5 thai1"],
+["ภาษาอังกฤษ","English language","phaa-sǎa ang-grìt","","",""],
+["สบายดีไหม","How are you?","sà-baai-dii-mǎi","","",""],
+["สบายดี","I'm fine / doing well","sà-baai-dii","","",""],
+["เท่าไหร่","How much?","thâo-rài","","",""],
+["ขอบคุณมาก","Thank you very much","khɔ̀ɔp-khun mâak","","",""],
+["ยินดีต้อนรับ","Welcome","yin-dii-dtôn-ráp","","",""],
+["ทำงาน","Work","tam-ngaan","","",""],
+["ขับรถ","Drive","khàp-rót","","",""],
+["การเงิน","Finance","gaan-ngən","","",""],
+["กิจกรรม","Activities","gìt-jà-gam","","",""],
+["สนุก","Fun","sà-nùk","","",""],
+["เงียบ","Quiet","ngîap","","",""],
+["จำ","Remember","jam","","",""],
+["สะดวก","Convenient","sà-dùak","","",""],
+["ของฝาก","Souvenir / gift from a trip","khɔ̌ɔng-fàak","","",""],
+["ครึ่ง","Half","khrʉ̂ng","","",""],
+["สีอ่อน","Light colour","sǐi-ɔ̀ɔn","","",""],
+["หุ้น","Stocks / shares","hûn","","",""],
+["ขาย","Sell","khǎai","","",""],
+["เกี๊ยว","Dumpling","gíao","","",""],
+["ทน","Endure","ton","","",""],
+["เสีย","Lose / waste / broken","sǐa","","",""],
+["พากย์","Dub / voice over","phâak","","",""],
+["รูปแบบใหม่","New format","rûup-bɛ̀ɛp-mài","","",""]
+];
+const systems = ["paiboon","ipa","initials","numbers"];
+const labels = {paiboon:"Paiboon phonetics",ipa:"IPA phonetics",initials:"Tone initials",numbers:"Tone numbers"};
+const keyboard = {
+ paiboon:["à","â","á","ǎ","ɛ","ɛ̀","ɛ̂","ɛ́","ɛ̌","ɔ","ɔ̀","ɔ̂","ɔ́","ɔ̌","ʉ","ʉ̀","ʉ̂","ʉ́","ʉ̌","ə","ə̀","ə̂","ə́","ə̌","ŋ","-"],
+ ipa:["ʔ","ŋ","ɲ","ɯ","ɤ","ɛ","ɔ","ɐ","ə","ʰ","ː","tɕ","tɕʰ","kʰ","pʰ","tʰ","à","â","á","ǎ","˩","˨","˧","˦","˥","."],
+ initials:["(m)","(l)","(f)","(h)","(r)","bp","dt","kh","ph","th","ng","aa","ee","ue"],
+ numbers:["1","2","3","4","5","bp","dt","kh","ph","th","aa","ii","ɛ","ɔ","ʉ","ə"]
+};
+const STORE = "talkacake_local_dictionary_v1";
+const $ = id => document.getElementById(id);
+const lexicon = new Map(seed.map(row => [row[0],{th:row[0],en:row[1],paiboon:row[2],ipa:row[3],initials:row[4],numbers:row[5]}]));
+let corrections={};let currentRows=[];let focused=null;let lastRowsInput=[];
+function normalize(s){return s.trim().replace(/\s+/g," ").toLocaleLowerCase();}
+function loadSaved(){try{const val=JSON.parse(localStorage.getItem(STORE)||"{}");if(val&&typeof val==="object"&&!Array.isArray(val))corrections=val;}catch(e){corrections={};}}
+function textMatch(q){const n=normalize(q);const direct=lexicon.get(q);if(direct)return direct;for(const entry of lexicon.values())if(normalize(entry.en)===n||entry.en.toLowerCase().split(" / ").some(v=>v===n))return entry;return null;}
+function lookup(q){const c=corrections[normalize(q)];return c?{...c,_source:"saved"}:textMatch(q);}
+function segmentThai(str){const pieces=[];const sorted=[...lexicon.keys(),...Object.keys(corrections).filter(x=>/[\u0E00-\u0E7F]/.test(x))].sort((a,b)=>b.length-a.length);let i=0;while(i<str.length){if(/\s/.test(str[i])){i++;continue;}const rem=str.slice(i);const hit=sorted.find(k=>rem.startsWith(k));if(hit){pieces.push({text:hit,entry:lookup(hit)});i+=hit.length;continue;}let next=1;try{const first=new Intl.Segmenter("th",{granularity:"word"}).segment(rem)[Symbol.iterator]().next().value;if(first?.segment)next=first.segment.length;}catch(e){}pieces.push({text:rem.slice(0,next),entry:null});i+=next;}return pieces;}
+function render(){
+ const tbody=$("output");tbody.replaceChildren();let unknown=0,missing=0;
+ currentRows.forEach((r,index)=>{
+  const tr=document.createElement("tr");
+  ["th","phon","en"].forEach((field)=>{
+    const td=document.createElement("td");const ta=document.createElement("textarea");
+    ta.value=r[field]||"";ta.dataset.index=index;ta.dataset.field=field;
+    ta.setAttribute("aria-label",field+" line "+(index+1));
+    ta.addEventListener("focus",()=>focused=ta);
+    ta.addEventListener("input",()=>{r[field]=ta.value;r.changed=true;});
+    td.appendChild(ta);
+    if(field==="th"){const flag=document.createElement("div");flag.className="status "+(r.unknown?"unknown":"good");flag.textContent=r.unknown?"⚠ Unreviewed / missing dictionary entry":(r.gloss?"Dictionary word-by-word gloss":"Dictionary match");td.appendChild(flag);}
+    tr.appendChild(td);
+  });tbody.appendChild(tr);if(r.unknown)unknown++;if(!r.phon)missing++;
+ });
+ $("warnings").replaceChildren();const notes=[];
+ if(unknown)notes.push(unknown+" item(s) are unknown or lack an exact sentence match. Edit and save them before use.");
+ if(missing)notes.push(missing+" item(s) have no reviewed phonetics for this system. Blank is intentional; please fill it using the keyboard.");
+ for(const n of notes){const div=document.createElement("div");div.className="warn";div.textContent=n;$("warnings").appendChild(div);}
+ $("phonetics-head").textContent=labels[$("system").value];
+ $("message").textContent=currentRows.length+" row(s) ready — processed locally.";
+}
+function translate(){
+ const queries=$("text-input").value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+ lastRowsInput=queries;
+ const system=$("system").value;
+ currentRows=queries.map(q=>{
+  let e=lookup(q),gloss=false;
+  if(!e&&/[\u0E00-\u0E7F]/.test(q)){
+    const parts=segmentThai(q);if(parts.length>1){gloss=true;
+      e={th:q,en:parts.map(p=>p.entry?.en||"[unknown: "+p.text+"]").join(" · "),
+         [system]:parts.map(p=>p.entry?.[system]||"").join(" ").trim()};}
+  }
+  return {query:q,th:e?.th||(/[\u0E00-\u0E7F]/.test(q)?q:""),phon:e?.[system]||"",en:e?.en||"",unknown:!e||gloss,gloss,changed:false};
+ });
+ render();
+}
+function save(){
+ if(!currentRows.length){$("message").textContent="Translate something first.";return;}
+ const system=$("system").value;
+ currentRows.forEach(r=>{
+  const key=normalize(r.query);const existing=corrections[key]||lookup(r.query)||{};
+  const data={th:r.th,en:r.en,paiboon:existing.paiboon||"",ipa:existing.ipa||"",initials:existing.initials||"",numbers:existing.numbers||""};
+  data[system]=r.phon;
+  corrections[key]=data;
+  if(r.th&&normalize(r.th)!==key)corrections[normalize(r.th)]=data;
+ });
+ try{localStorage.setItem(STORE,JSON.stringify(corrections));$("message").textContent="Saved corrections on this device ("+Object.keys(corrections).length+" lookup keys).";}catch(e){$("message").textContent="Storage unavailable. Export corrections instead.";}
+ updateCount();
+}
+function updateCount(){$("entry-status").textContent=lexicon.size+" starter entries + "+Object.keys(corrections).length+" saved local lookup keys.";}
+function updateKeys(){
+ const set=$("keyboard-set").value;const box=$("keys");box.replaceChildren();
+ keyboard[set].forEach(symbol=>{const btn=document.createElement("button");btn.className="key";btn.type="button";btn.textContent=symbol;
+  btn.addEventListener("mousedown",e=>e.preventDefault());
+  btn.addEventListener("click",()=>{
+   let el=focused;if(!el||!document.contains(el)){el=document.querySelector("#output textarea[data-field='phon']");}
+   if(!el){$("message").textContent="Translate something and select a phonetics field first.";return;}
+   const a=el.selectionStart??el.value.length,b=el.selectionEnd??a;
+   el.value=el.value.slice(0,a)+symbol+el.value.slice(b);el.focus();el.setSelectionRange(a+symbol.length,a+symbol.length);
+   el.dispatchEvent(new Event("input",{bubbles:true}));
+  });box.appendChild(btn);
+ });
+}
+$("translate").addEventListener("click",translate);
+$("system").addEventListener("change",()=>{$("keyboard-set").value=$("system").value;updateKeys();translate();});
+$("keyboard-set").addEventListener("change",updateKeys);
+$("clear").addEventListener("click",()=>{$("text-input").value="";currentRows=[];$("output").replaceChildren();$("warnings").replaceChildren();$("message").textContent="Cleared.";});
+$("save").addEventListener("click",save);
+$("copy").addEventListener("click",async()=>{
+ if(!currentRows.length){$("message").textContent="Nothing to copy.";return;}
+ const t=currentRows.map(r=>[r.th,r.phon,r.en].map(v=>String(v||"").replace(/\t/g," ").replace(/\n/g," ")).join("\t")).join("\n");
+ try{await navigator.clipboard.writeText(t);$("message").textContent="Copied three columns for Google Sheets.";}
+ catch(e){$("message").textContent="Clipboard unavailable. Select and copy the output manually.";}
+});
+$("export").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify({version:1,corrections},null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="talkacake-dictionary-corrections.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+$("import").addEventListener("click",()=>$("file-input").click());
+$("file-input").addEventListener("change",async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{const obj=JSON.parse(await file.text());const entries=obj.corrections;
+  if(!entries||typeof entries!=="object"||Array.isArray(entries))throw Error("Invalid dictionary backup");
+  let added=0;for(const [key,v] of Object.entries(entries)){if(!v||typeof v.th!=="string"||typeof v.en!=="string")continue;
+   const clean={th:v.th,en:v.en};for(const sys of systems)clean[sys]=typeof v[sys]==="string"?v[sys]:"";
+   corrections[normalize(key)]=clean;added++;
+  }
+  localStorage.setItem(STORE,JSON.stringify(corrections));updateCount();$("message").textContent="Imported "+added+" dictionary entries.";
+ }catch(err){$("message").textContent="Import failed: "+err.message;}e.target.value="";
+});
+$("erase").addEventListener("click",()=>{if(!confirm("Delete all locally saved corrections on this device? Export a backup first."))return;corrections={};localStorage.removeItem(STORE);updateCount();$("message").textContent="Saved corrections deleted.";});
+loadSaved();updateCount();updateKeys();
+</script>
+</body></html>
