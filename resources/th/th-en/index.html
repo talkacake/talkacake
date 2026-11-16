@@ -31,7 +31,7 @@
 </section>
 <section class="panel">
 <h2>Translation and editable phonetics</h2>
-<p class="muted">Edit any output directly. Click inside a phonetics box, then use the keyboard at the bottom. Your corrections stay on this device when saved.</p>
+<p class="muted">Edit any output directly. Click inside a phonetics box, then use the keyboard at the bottom. Your corrections stay on this device when saved. Conflicting source pronunciations remain blank for review.</p>
 <div id="warnings"></div>
 <div class="results"><table><thead><tr><th>Thai</th><th id="phonetics-head">Paiboon phonetics</th><th>English translation / gloss</th></tr></thead><tbody id="output"></tbody></table></div>
 </section>
@@ -122,12 +122,66 @@ const keyboard = {
 const STORE = "talkacake_local_dictionary_v1";
 const $ = id => document.getElementById(id);
 const lexicon = new Map(seed.map(row => [row[0],{th:row[0],en:row[1],paiboon:row[2],ipa:row[3],initials:row[4],numbers:row[5]}]));
+const reviewedSources=["paiboon","numbers","initials","ipa"];
+const conflictingPronunciations=new Map();
+const importedCounts={};
+let entriesLoading=true,sortedThaiKeys=[];
+function rebuildThaiKeys(){
+ sortedThaiKeys=Array.from(new Set([...lexicon.keys(),...Object.keys(corrections).filter(v=>/[\u0E00-\u0E7F]/.test(v))]))
+   .filter(v=>/[\u0E00-\u0E7F]/.test(v)&&!/[+*]/.test(v)&&!v.startsWith("..."))
+   .sort((a,b)=>b.length-a.length);
+}
+async function loadExampleDictionaries(){
+ const imported=new Map(),problems=[];
+ for(const system of reviewedSources){
+  try{
+   const resp=await fetch("./data/examples-"+system+".json");
+   if(!resp.ok)throw Error("HTTP "+resp.status);
+   const data=await resp.json();
+   if(data.mode!==system||!Array.isArray(data.rows))throw Error("Unexpected format");
+   importedCounts[system]=data.rows.length;
+   for(const [rawThai,rawPhon,rawEnglish] of data.rows){
+    const th=String(rawThai||"").trim(),phon=String(rawPhon||"").trim(),en=String(rawEnglish||"").trim();
+    if(!th||!/[\u0E00-\u0E7F]/.test(th)||/[+*]/.test(th)||th.startsWith("..."))continue;
+    if(!imported.has(th))imported.set(th,{th,en:"",paiboon:"",ipa:"",initials:"",numbers:""});
+    const item=imported.get(th);
+    if(en&&(!item.en||system==="paiboon"))item.en=en;
+    if(phon){
+     const key=system+"\t"+th;
+     if(item[system]&&item[system]!==phon)conflictingPronunciations.set(key,[...new Set([...(conflictingPronunciations.get(key)||[item[system]]),phon])]);
+     else item[system]=phon;
+    }
+   }
+  }catch(e){importedCounts[system]=0;problems.push(system+": "+e.message);}
+ }
+ for(const [th,item] of imported){
+  const existing=lexicon.get(th)||{th,en:"",paiboon:"",ipa:"",initials:"",numbers:""};
+  lexicon.set(th,{...existing,...Object.fromEntries(Object.entries(item).filter(([k,v])=>Boolean(v)))});
+ }
+ for(const key of conflictingPronunciations.keys()){
+  const [sys,th]=key.split("\t");const item=lexicon.get(th);if(item)item[sys]="";
+ }
+ entriesLoading=false;rebuildThaiKeys();updateCount();
+ $("message").textContent=problems.length?"Could not load: "+problems.join("; "):"Loaded "+lexicon.size+" Thai dictionary entries.";
+ if($("text-input").value.trim())translate();
+}
 let corrections={};let currentRows=[];let focused=null;let lastRowsInput=[];
 function normalize(s){return s.trim().replace(/\s+/g," ").toLocaleLowerCase();}
 function loadSaved(){try{const val=JSON.parse(localStorage.getItem(STORE)||"{}");if(val&&typeof val==="object"&&!Array.isArray(val))corrections=val;}catch(e){corrections={};}}
 function textMatch(q){const n=normalize(q);const direct=lexicon.get(q);if(direct)return direct;for(const entry of lexicon.values())if(normalize(entry.en)===n||entry.en.toLowerCase().split(" / ").some(v=>v===n))return entry;return null;}
 function lookup(q){const c=corrections[normalize(q)];return c?{...c,_source:"saved"}:textMatch(q);}
-function segmentThai(str){const pieces=[];const sorted=[...lexicon.keys(),...Object.keys(corrections).filter(x=>/[\u0E00-\u0E7F]/.test(x))].sort((a,b)=>b.length-a.length);let i=0;while(i<str.length){if(/\s/.test(str[i])){i++;continue;}const rem=str.slice(i);const hit=sorted.find(k=>rem.startsWith(k));if(hit){pieces.push({text:hit,entry:lookup(hit)});i+=hit.length;continue;}let next=1;try{const first=new Intl.Segmenter("th",{granularity:"word"}).segment(rem)[Symbol.iterator]().next().value;if(first?.segment)next=first.segment.length;}catch(e){}pieces.push({text:rem.slice(0,next),entry:null});i+=next;}return pieces;}
+function segmentThai(str){
+ const pieces=[];let i=0;
+ while(i<str.length){
+  if(/\s/.test(str[i])){i++;continue;}
+  const rem=str.slice(i),hit=sortedThaiKeys.find(k=>rem.startsWith(k));
+  if(hit){pieces.push({text:hit,entry:lookup(hit)});i+=hit.length;continue;}
+  let next=1;
+  try{const first=new Intl.Segmenter("th",{granularity:"word"}).segment(rem)[Symbol.iterator]().next().value;if(first?.segment)next=first.segment.length;}catch(e){}
+  pieces.push({text:rem.slice(0,next),entry:null});i+=next;
+ }
+ return pieces;
+}
 function render(){
  const tbody=$("output");tbody.replaceChildren();let unknown=0,missing=0;
  currentRows.forEach((r,index)=>{
@@ -145,7 +199,7 @@ function render(){
  });
  $("warnings").replaceChildren();const notes=[];
  if(unknown)notes.push(unknown+" item(s) are unknown or lack an exact sentence match. Edit and save them before use.");
- if(missing)notes.push(missing+" item(s) have no reviewed phonetics for this system. Blank is intentional; please fill it using the keyboard.");
+ if(missing)notes.push(missing+" item(s) have no verified phonetics or conflicting examples. Blank is intentional; use the keyboard to correct.");
  for(const n of notes){const div=document.createElement("div");div.className="warn";div.textContent=n;$("warnings").appendChild(div);}
  $("phonetics-head").textContent=labels[$("system").value];
  $("message").textContent=currentRows.length+" row(s) ready — processed locally.";
@@ -175,10 +229,13 @@ function save(){
   corrections[key]=data;
   if(r.th&&normalize(r.th)!==key)corrections[normalize(r.th)]=data;
  });
- try{localStorage.setItem(STORE,JSON.stringify(corrections));$("message").textContent="Saved corrections on this device ("+Object.keys(corrections).length+" lookup keys).";}catch(e){$("message").textContent="Storage unavailable. Export corrections instead.";}
+ try{localStorage.setItem(STORE,JSON.stringify(corrections));rebuildThaiKeys();$("message").textContent="Saved corrections on this device ("+Object.keys(corrections).length+" lookup keys).";}catch(e){$("message").textContent="Storage unavailable. Export corrections instead.";}
  updateCount();
 }
-function updateCount(){$("entry-status").textContent=lexicon.size+" starter entries + "+Object.keys(corrections).length+" saved local lookup keys.";}
+function updateCount(){
+ const counts=reviewedSources.map(x=>x+": "+(importedCounts[x]||0)).join(" · ");
+ $("entry-status").textContent=(entriesLoading?"Loading examples...":lexicon.size+" Thai entries")+" · "+counts+" · "+Object.keys(corrections).length+" saved corrections · "+conflictingPronunciations.size+" conflicting phonetics.";
+}
 function updateKeys(){
  const set=$("keyboard-set").value;const box=$("keys");box.replaceChildren();
  keyboard[set].forEach(symbol=>{const btn=document.createElement("button");btn.className="key";btn.type="button";btn.textContent=symbol;
@@ -216,10 +273,10 @@ $("file-input").addEventListener("change",async e=>{
    const clean={th:v.th,en:v.en};for(const sys of systems)clean[sys]=typeof v[sys]==="string"?v[sys]:"";
    corrections[normalize(key)]=clean;added++;
   }
-  localStorage.setItem(STORE,JSON.stringify(corrections));updateCount();$("message").textContent="Imported "+added+" dictionary entries.";
+  localStorage.setItem(STORE,JSON.stringify(corrections));rebuildThaiKeys();updateCount();$("message").textContent="Imported "+added+" dictionary entries.";
  }catch(err){$("message").textContent="Import failed: "+err.message;}e.target.value="";
 });
-$("erase").addEventListener("click",()=>{if(!confirm("Delete all locally saved corrections on this device? Export a backup first."))return;corrections={};localStorage.removeItem(STORE);updateCount();$("message").textContent="Saved corrections deleted.";});
-loadSaved();updateCount();updateKeys();
+$("erase").addEventListener("click",()=>{if(!confirm("Delete all locally saved corrections on this device? Export a backup first."))return;corrections={};localStorage.removeItem(STORE);rebuildThaiKeys();updateCount();$("message").textContent="Saved corrections deleted.";});
+loadSaved();rebuildThaiKeys();updateCount();updateKeys();loadExampleDictionaries();
 </script>
 </body></html>
