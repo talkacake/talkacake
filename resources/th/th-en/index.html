@@ -54,13 +54,13 @@
         </summary>
         <div class="p-4 border-t border-slate-200">
           <p class="text-sm text-slate-500 mb-2">
-            ใช้ Google AI Studio API Key (จะถูกเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น)
-            <span class="block text-xs text-blue-600">Your key is saved locally in your browser only.</span>
+            ใช้ Claude API Key (จะถูกเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น)
+            <span class="block text-xs text-blue-600">Your key is saved locally in your browser only. Get a key in the <a class="underline" href="https://platform.claude.com/" target="_blank" rel="noopener noreferrer">Claude Console</a>.</span>
           </p>
           <label for="api-key-input" class="block text-sm font-medium text-slate-600 mb-1">
             คีย์ API ของคุณ:
             <span class="block text-xs font-normal text-blue-600">kii ee-pii-ai kɔ̌ɔng kun:</span>
-            <span class="block text-xs font-normal text-green-600">Your Google AI API Key:</span>
+            <span class="block text-xs font-normal text-green-600">Your Claude API Key:</span>
           </label>
           <div class="relative">
             <input type="password" id="api-key-input" class="w-full p-2 pr-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ป้อนคีย์ API ของคุณที่นี่">
@@ -96,9 +96,8 @@
         <div>
           <label for="model-select" class="block text-sm font-semibold text-slate-700 mb-2">AI model</label>
           <select id="model-select" class="w-full p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview — highest accuracy</option>
-            <option value="gemini-3.6-flash">Gemini 3.6 Flash — faster</option>
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash — legacy</option>
+            <option value="fast">Claude Opus 5.5 — fast (recommended)</option>
+            <option value="careful">Claude Opus 5.5 — extra careful (slower)</option>
           </select>
           <p id="model-help" class="mt-2 text-xs text-slate-500"></p>
         </div>
@@ -131,17 +130,21 @@
   </div>
 
   <script>
-    const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+    // Official Anthropic SDK (JavaScript), pinned. Loaded as soon as the page opens so the first
+    // Translate click doesn't wait for the download.
+    const ANTHROPIC_SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.3.0/+esm';
+    const CLAUDE_MODEL = 'claude-opus-5-5';
 
+    // Both modes use Claude Opus 5.5. Effort sets how long it thinks before answering:
+    // low keeps short words and phrases quick; high checks harder and takes longer.
     const MODEL_CONFIGS = {
-      'gemini-3.1-pro-preview': {
-        help: 'Highest accuracy and reasoning quality. This preview model may require billing or preview access for your API key.'
+      fast: {
+        effort: 'low',
+        help: 'Claude Opus 5.5 with a short think. Best for words and short phrases.'
       },
-      'gemini-3.6-flash': {
-        help: 'Faster stable model with lower latency. Use this if Pro Preview is unavailable for your API key.'
-      },
-      'gemini-2.5-flash': {
-        help: 'Legacy option kept for compatibility with API keys that cannot access newer models.'
+      careful: {
+        effort: 'high',
+        help: 'Claude Opus 5.5 thinks longer before answering. Slower; use it for long or tricky text.'
       }
     };
 
@@ -295,27 +298,38 @@
       }
     };
 
-    const OUTPUT_SCHEMA = {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          original: {
-            type: 'string',
-            description: 'Thai-script equivalent of the input line.'
-          },
-          phonetics: {
-            type: 'string',
-            description: 'Pronunciation using only the selected phonetic convention.'
-          },
-          translation: {
-            type: 'string',
-            description: 'Natural English translation.'
-          }
+    const RESULT_ITEM_SCHEMA = {
+      type: 'object',
+      properties: {
+        original: {
+          type: 'string',
+          description: 'Thai-script equivalent of the input line.'
         },
-        required: ['original', 'phonetics', 'translation'],
-        additionalProperties: false
-      }
+        phonetics: {
+          type: 'string',
+          description: 'Pronunciation using only the selected phonetic convention.'
+        },
+        translation: {
+          type: 'string',
+          description: 'Natural English translation.'
+        }
+      },
+      required: ['original', 'phonetics', 'translation'],
+      additionalProperties: false
+    };
+
+    // Structured outputs need an object at the top, so the per-line results sit in { results: [...] }.
+    const OUTPUT_SCHEMA = {
+      type: 'object',
+      properties: {
+        results: {
+          type: 'array',
+          description: 'One result per input line, in the same order.',
+          items: RESULT_ITEM_SCHEMA
+        }
+      },
+      required: ['results'],
+      additionalProperties: false
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -340,7 +354,7 @@
 
       let translationResults = [];
 
-      const savedApiKey = localStorage.getItem('thaiCompanionApiKey');
+      const savedApiKey = localStorage.getItem('thaiCompanionClaudeApiKey');
       if (savedApiKey) apiKeyInput.value = savedApiKey;
 
       const savedPhoneticType = localStorage.getItem('thaiCompanionPhoneticType');
@@ -348,7 +362,7 @@
         phoneticTypeSelect.value = savedPhoneticType;
       }
 
-      const savedModel = localStorage.getItem('thaiCompanionModel');
+      const savedModel = localStorage.getItem('thaiCompanionClaudeMode');
       if (savedModel && MODEL_CONFIGS[savedModel]) {
         modelSelect.value = savedModel;
       }
@@ -362,14 +376,14 @@
 
       function updateModelUi() {
         modelHelp.textContent = MODEL_CONFIGS[modelSelect.value].help;
-        localStorage.setItem('thaiCompanionModel', modelSelect.value);
+        localStorage.setItem('thaiCompanionClaudeMode', modelSelect.value);
       }
 
       updatePhoneticUi();
       updateModelUi();
 
       apiKeyInput.addEventListener('input', () => {
-        localStorage.setItem('thaiCompanionApiKey', apiKeyInput.value.trim());
+        localStorage.setItem('thaiCompanionClaudeApiKey', apiKeyInput.value.trim());
       });
 
       phoneticTypeSelect.addEventListener('change', updatePhoneticUi);
@@ -382,47 +396,50 @@
         eyeIconClosed.classList.toggle('hidden', isPassword);
       });
 
-      async function callGemini(apiKey, model, payload, retriesLeft = 2) {
-        const endpoint = GEMINI_API_BASE + '/' + encodeURIComponent(model) + ':generateContent';
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey
-          },
-          body: JSON.stringify(payload)
-        });
+      // Start loading the SDK now; a failed load is reported when Translate is pressed.
+      const sdkPromise = import(ANTHROPIC_SDK_URL);
+      sdkPromise.catch(() => {});
 
-        let dataText = '';
-        try { dataText = await res.text(); } catch {}
-        let data;
-        try { data = dataText ? JSON.parse(dataText) : {}; } catch { data = { raw: dataText }; }
-
-        if (!res.ok) {
-          if (res.status === 429 && retriesLeft > 0) {
-            const retryInfo = data?.error?.details?.find(detail => detail['@type']?.includes('RetryInfo'));
-            const retryDelay = parseFloat(retryInfo?.retryDelay) || (3 - retriesLeft) * 2;
-            await new Promise(resolve => setTimeout(resolve, (retryDelay + 0.5) * 1000));
-            return callGemini(apiKey, model, payload, retriesLeft - 1);
-          }
-
-          const message = data?.error?.message || data?.message || (res.status + ' ' + res.statusText);
-          if (res.status === 429) {
-            throw new Error('Rate limit reached for this API key. Please wait and try again, or use a key with billing enabled. (' + message + ')');
-          }
-          if (res.status === 404 && model === 'gemini-3.1-pro-preview') {
-            throw new Error('Gemini 3.1 Pro Preview is not available for this API key. Select Gemini 3.6 Flash and try again. (' + message + ')');
-          }
-          throw new Error('API error: ' + message);
+      async function callClaude(apiKey, request) {
+        let Anthropic;
+        try {
+          ({ default: Anthropic } = await sdkPromise);
+        } catch (error) {
+          throw new Error('Could not load the Claude SDK. Check your internet connection and reload the page.');
         }
-        return data;
+
+        // The key belongs to the person using this page and stays in their browser.
+        const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+        try {
+          return await client.beta.messages.create(request);
+        } catch (error) {
+          if (error instanceof Anthropic.AuthenticationError) {
+            throw new Error('Your Claude API key was not accepted. Please check it in Settings. (' + error.message + ')');
+          }
+          if (error instanceof Anthropic.PermissionDeniedError) {
+            throw new Error('This API key is not allowed to use Claude Opus 5.5. (' + error.message + ')');
+          }
+          if (error instanceof Anthropic.RateLimitError) {
+            throw new Error('Rate limit reached for this API key. Please wait a moment and try again. (' + error.message + ')');
+          }
+          if (error instanceof Anthropic.BadRequestError) {
+            throw new Error('Claude could not process this request. (' + error.message + ')');
+          }
+          if (error instanceof Anthropic.APIConnectionError) {
+            throw new Error('Could not reach the Claude API. Please check your internet connection. (' + error.message + ')');
+          }
+          if (error instanceof Anthropic.APIError) {
+            throw new Error('Claude API error' + (error.status ? ' ' + error.status : '') + ': ' + error.message);
+          }
+          throw error;
+        }
       }
 
-      function buildSystemPrompt(phoneticType, lineCount) {
+      function buildSystemPrompt(phoneticType) {
         const config = PHONETIC_CONFIGS[phoneticType];
         return [
           'You are a meticulous Thai linguist and translation service.',
-          'The user supplies exactly ' + lineCount + ' non-empty input lines. Produce exactly one result per input line, in the same order.',
+          'The user message gives the number of input lines, then the lines. Produce exactly one result per input line, in the same order.',
           'For Thai input, preserve the Thai text as original. For English or romanized input, infer the most natural common Thai equivalent and put that Thai script in original.',
           'For each item, provide the Thai script, its pronunciation in ONLY the selected convention, and a natural English translation.',
           'Use standard contemporary Bangkok Thai pronunciation. Preserve names and context faithfully. Check every syllable, vowel length, and lexical tone before answering.',
@@ -435,15 +452,21 @@
           config.examples.join('\n'),
           '',
           'The anchors define notation style, not a limited vocabulary list. Apply the same convention consistently to unseen words.',
-          'Do not mix conventions. Do not add commentary, Markdown, alternatives, slash-separated spellings, or fields outside the requested JSON schema.'
+          'Do not mix conventions. Do not add commentary, Markdown, alternatives, slash-separated spellings, or fields outside the requested JSON schema.',
+          'Return the results in a JSON object: {"results": [ ... ]}.'
         ].join('\n');
       }
 
-      function extractJsonText(data) {
-        const parts = data?.candidates?.[0]?.content?.parts || [];
-        return parts
-          .filter(part => !part.thought && typeof part.text === 'string')
-          .map(part => part.text)
+      function extractJsonText(response) {
+        if (response.stop_reason === 'refusal') {
+          throw new Error('Claude declined to translate this text.');
+        }
+        if (response.stop_reason === 'max_tokens') {
+          throw new Error('The answer was too long. Please translate fewer lines at a time.');
+        }
+        return (response.content || [])
+          .filter(block => block.type === 'text')
+          .map(block => block.text)
           .join('')
           .trim();
       }
@@ -479,7 +502,7 @@
       async function handleTranslate() {
         const apiKey = apiKeyInput.value.trim();
         if (!apiKey) {
-          errorBox.textContent = 'Please enter your Google AI API key in the Settings section.';
+          errorBox.textContent = 'Please enter your Claude API key in the Settings section.';
           errorBox.classList.remove('hidden');
           return;
         }
@@ -501,31 +524,37 @@
         errorBox.classList.add('hidden');
 
         const phoneticType = phoneticTypeSelect.value;
-        const model = modelSelect.value;
-        const payload = {
-          contents: [{
-            role: 'user',
-            parts: [{ text: inputLines.join('\n') }]
+        const mode = MODEL_CONFIGS[modelSelect.value] || MODEL_CONFIGS.fast;
+        const request = {
+          model: CLAUDE_MODEL,
+          max_tokens: 16000,
+          // If Claude declines a request, the API retries it on a fallback model in the same call.
+          betas: ['server-side-fallback-2026-07-01'],
+          fallbacks: 'default',
+          // Rules and anchors for the chosen phonetic type: the same on every request, so they are cached.
+          system: [{
+            type: 'text',
+            text: buildSystemPrompt(phoneticType),
+            cache_control: { type: 'ephemeral' }
           }],
-          systemInstruction: {
-            parts: [{ text: buildSystemPrompt(phoneticType, inputLines.length) }]
-          },
-          generationConfig: {
-            responseMimeType: 'application/json',
-            responseJsonSchema: OUTPUT_SCHEMA,
-            temperature: 0.1,
-            maxOutputTokens: 8192
+          messages: [{
+            role: 'user',
+            content: 'Number of input lines: ' + inputLines.length + '\n\n' + inputLines.join('\n')
+          }],
+          output_config: {
+            effort: mode.effort,
+            format: { type: 'json_schema', schema: OUTPUT_SCHEMA }
           }
         };
 
         try {
-          const data = await callGemini(apiKey, model, payload);
-          const responseText = extractJsonText(data);
+          const response = await callClaude(apiKey, request);
+          const responseText = extractJsonText(response);
           if (!responseText) {
             throw new Error('No usable text was returned by the model.');
           }
 
-          const results = parseJsonResponse(responseText);
+          const results = parseJsonResponse(responseText).results;
           validateResults(results, inputLines.length);
 
           clearOutputs();
