@@ -1,0 +1,64 @@
+/**
+ * Talk a Cake voice recorder: saves the MP3s made on talkacake.com/tools/voice-recorder/ into your Drive folder.
+ * (Paste this whole file into a new Apps Script project.)
+ *
+ * Setup (once):
+ *  1. Paste your mp3 folder's ID below (open the folder in Drive; it's the part of the address after /folders/).
+ *  2. Choose a password below. You'll type the same password into the recorder page's Settings.
+ *  3. Deploy > New deployment > type "Web app". Execute as: Me. Who has access: Anyone. Deploy, then allow access.
+ *  4. Copy the Web app URL (it ends in /exec) into the recorder page's Settings, with the password.
+ * If you change this code later: Deploy > Manage deployments > edit (pencil) > Version: New version > Deploy.
+ */
+const FOLDER_ID = 'PASTE_YOUR_MP3_FOLDER_ID_HERE';
+const PASSWORD = 'CHOOSE_A_PASSWORD_HERE';
+
+function doPost(e) {
+  let req;
+  try { req = JSON.parse(e.postData.contents); } catch (err) { return reply_({ ok: false, error: 'Bad request.' }); }
+  if (!PASSWORD || PASSWORD === 'CHOOSE_A_PASSWORD_HERE') return reply_({ ok: false, error: 'Choose a password in the Apps Script first.' });
+  if (req.password !== PASSWORD) { Utilities.sleep(1500); return reply_({ ok: false, error: 'Wrong password: check Settings on the recorder page.' }); }
+
+  let folder;
+  try { folder = DriveApp.getFolderById(FOLDER_ID); }
+  catch (err) { return reply_({ ok: false, error: 'Folder not found: check FOLDER_ID in the Apps Script.' }); }
+
+  if (req.action === 'ping') return reply_({ ok: true, folder: folder.getName() });
+  if (req.action !== 'save') return reply_({ ok: false, error: 'Unknown request.' });
+
+  let name = String(req.name || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!name) return reply_({ ok: false, error: 'No file name.' });
+  if (!/\.mp3$/i.test(name)) name += '.mp3';
+
+  // A file with this name already? Ask first; when replacing, the old one goes to the Drive bin.
+  const old = [];
+  const same = folder.getFilesByName(name);
+  while (same.hasNext()) old.push(same.next());
+  if (old.length && !req.overwrite) return reply_({ ok: false, exists: true, name: name });
+
+  let bytes;
+  try { bytes = Utilities.base64Decode(String(req.data || '')); }
+  catch (err) { return reply_({ ok: false, error: "The audio didn't arrive in one piece. Please try again." }); }
+  if (!bytes.length) return reply_({ ok: false, error: 'The audio was empty.' });
+
+  const file = folder.createFile(Utilities.newBlob(bytes, 'audio/mpeg', name));
+  old.forEach(f => f.setTrashed(true));
+
+  let shared = false;
+  if (req.share) {
+    try { file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); shared = true; } catch (err) { /* sharing blocked: file stays private */ }
+  }
+  const id = file.getId();
+  return reply_({
+    ok: true, name: name, id: id, folder: folder.getName(), shared: shared,
+    url: 'https://drive.google.com/file/d/' + id + '/view',
+    preview: 'https://drive.google.com/file/d/' + id + '/preview'
+  });
+}
+
+function doGet() {
+  return ContentService.createTextOutput('The Talk a Cake recorder is connected. Use it from the recorder page.');
+}
+
+function reply_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
