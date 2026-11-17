@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Voice Recorder | Talk a Cake</title>
+<title>อัดเสียง · Voice Recorder | Talk a Cake</title>
 <link rel="icon" type="image/jpeg" href="../../logo.jpg">
 <style>
 :root{--ink:#3d2f35;--muted:#76656b;--pink:#ff8fab;--pink-d:#d9577a;--soft:#ffe4ec;--cream:#fff8ef;--line:#eedde3;--card:#fff;--blue:#2a5d8f;--ok:#1f7a4d;--warn:#a15c00;--bad:#b3261e;--wave:#c7b6bc;--sel:#ff8fab}
@@ -56,88 +56,90 @@ dialog{border:none;border-radius:16px;padding:20px;width:min(460px,calc(100vw - 
 dialog::backdrop{background:#3d2f3566}
 dialog input[type=text]{width:100%}
 .hidden{display:none!important}
+.en{display:block;font-size:.92em;opacity:.85;margin-top:2px;font-weight:inherit}
+.status,.meter-note,#saved-text{white-space:pre-line}
 .kbd{font-size:.85rem;color:var(--muted)}
 </style>
 </head>
 <body>
 <main>
-<h1>🎙️ Voice Recorder</h1>
-<p class="muted">Record, trim and save MP3s straight into a folder in your own Google Drive. Anyone can record and download here; to save to Drive, connect your own Google account once in Settings. Settings stay on your device, so recordings only ever go to the Drive you connected.</p>
+<h1>🎙️ อัดเสียง · Voice Recorder</h1>
+<p class="muted">อัดเสียง ตัดต่อ และบันทึกเป็นไฟล์ MP3 ลงโฟลเดอร์ใน Google Drive ของคุณเองได้ทันที ทุกคนอัดเสียงและดาวน์โหลดได้ ถ้าจะบันทึกลง Drive ให้เชื่อมต่อบัญชี Google ของคุณเองครั้งเดียวในการตั้งค่า การตั้งค่าเก็บไว้ในเครื่องนี้เท่านั้น ไฟล์เสียงจึงไปที่ Drive ที่คุณเชื่อมต่อไว้เท่านั้น<span class="en">Record, trim and save MP3s straight into a folder in your own Google Drive. Anyone can record and download here; to save to Drive, connect your own Google account once in Settings. Settings stay on your device, so recordings only ever go to the Drive you connected.</span></p>
 
 <section class="card" id="record-card">
- <h2>1. Record</h2>
+ <h2>1. อัดเสียง · Record</h2>
  <div class="row">
-  <div style="flex:1 1 240px"><label for="mic">Microphone</label><select id="mic"><option value="">Default microphone</option></select></div>
-  <div><label for="kbps">MP3 quality</label><select id="kbps"><option value="128">128 kbps (voice)</option><option value="192">192 kbps (higher)</option></select></div>
+  <div style="flex:1 1 240px"><label for="mic">ไมโครโฟน · Microphone</label><select id="mic"><option value="">ไมโครโฟนหลัก · Default microphone</option></select></div>
+  <div><label for="kbps">คุณภาพ MP3 · MP3 quality</label><select id="kbps"><option value="128">128 kbps (เสียงพูด · voice)</option><option value="192">192 kbps (สูงกว่า · higher)</option></select></div>
  </div>
  <div class="row" style="margin-top:12px">
-  <label class="check"><input type="checkbox" id="ns"> Noise reduction <span class="muted">(off = most natural voice; turn on only in a noisy room)</span></label>
+  <label class="check"><input type="checkbox" id="ns"> <span>ลดเสียงรบกวน · Noise reduction<span class="muted en">ปิดไว้ = เสียงเป็นธรรมชาติที่สุด เปิดเฉพาะเมื่ออยู่ในห้องที่มีเสียงดัง</span><span class="muted en">Off = most natural voice; turn on only in a noisy room.</span></span></label>
  </div>
- <p class="muted">Steady volume: the browser's automatic volume control and echo cancellation are switched off, so your voice doesn't get louder and quieter by itself.</p>
+ <p class="muted">ระดับเสียงคงที่: ปิดการปรับระดับเสียงอัตโนมัติและการตัดเสียงสะท้อนของเบราว์เซอร์ไว้ เสียงของคุณจึงไม่ดังขึ้นหรือเบาลงเอง<span class="en">Steady volume: the browser's automatic volume control and echo cancellation are switched off, so your voice doesn't get louder and quieter by itself.</span></p>
  <div class="recbar">
-  <button id="rec" aria-label="Start recording" title="Start recording"></button>
-  <button id="pause" disabled>Pause</button>
-  <span class="kbd">Keys: R record / stop · P pause</span>
+  <button id="rec" aria-label="เริ่มอัดเสียง · Start recording" title="เริ่มอัดเสียง · Start recording"></button>
+  <button id="pause" disabled>หยุดชั่วคราว · Pause</button>
+  <span class="kbd">แป้นลัด: R อัด / หยุด · P หยุดชั่วคราว<span class="en">Keys: R record / stop · P pause</span></span>
   <div id="timer" aria-live="off">00:00.0</div>
-  <div class="meter"><div class="meter-track"><div class="meter-fill" id="meter"></div></div><div class="meter-note" id="meter-note">Input level</div></div>
+  <div class="meter"><div class="meter-track"><div class="meter-fill" id="meter"></div></div><div class="meter-note" id="meter-note">ระดับเสียงเข้า · Input level</div></div>
  </div>
  <div class="status" id="rec-status" role="status"></div>
 </section>
 
 <section class="card hidden" id="trim-card">
- <h2>2. Trim</h2>
- <p class="muted">Drag the pink edges (or type the times) to cut the start and end. Only the bright part is saved.</p>
- <canvas id="wave" aria-label="Waveform. Drag the edges to trim."></canvas>
+ <h2>2. ตัดเสียง · Trim</h2>
+ <p class="muted">ลากขอบสีชมพู (หรือพิมพ์เวลา) เพื่อตัดตอนต้นและตอนท้าย จะบันทึกเฉพาะช่วงที่เป็นสีชมพูเข้มเท่านั้น<span class="en">Drag the pink edges (or type the times) to cut the start and end. Only the bright part is saved.</span></p>
+ <canvas id="wave" aria-label="รูปคลื่นเสียง ลากขอบเพื่อตัด · Waveform. Drag the edges to trim."></canvas>
  <div class="times">
-  <div><label for="t-start">Start (s)</label><input type="number" id="t-start" min="0" step="0.05"></div>
-  <div><label for="t-end">End (s)</label><input type="number" id="t-end" min="0" step="0.05"></div>
-  <div class="len" id="t-len">Length 0.0 s</div>
+  <div><label for="t-start">เริ่ม (วินาที) · Start (s)</label><input type="number" id="t-start" min="0" step="0.05"></div>
+  <div><label for="t-end">จบ (วินาที) · End (s)</label><input type="number" id="t-end" min="0" step="0.05"></div>
+  <div class="len" id="t-len">ความยาว 0.0 วินาที · Length 0.0 s</div>
  </div>
  <div class="actions">
-  <button id="play">▶ Play selection</button>
-  <button id="stop-play" disabled>■ Stop</button>
-  <button id="reset-trim">Reset trim</button>
+  <button id="play">▶ ฟังช่วงที่เลือก · Play selection</button>
+  <button id="stop-play" disabled>■ หยุด · Stop</button>
+  <button id="reset-trim">ยกเลิกการตัด · Reset trim</button>
  </div>
- <div class="row" style="margin-top:12px"><label class="check"><input type="checkbox" id="normalize" checked> Even out loudness <span class="muted">(makes every file about equally loud)</span></label></div>
+ <div class="row" style="margin-top:12px"><label class="check"><input type="checkbox" id="normalize" checked> <span>ปรับความดังให้เท่ากัน · Even out loudness<span class="muted en">ทุกไฟล์จะดังพอ ๆ กัน · Makes every file about equally loud.</span></span></label></div>
  <div class="actions">
-  <button class="primary" id="save">บันทึกลง Drive</button>
-  <button id="download">Download MP3</button>
-  <button id="again">Record again</button>
+  <button class="primary" id="save">บันทึกลง Drive · Save to Drive</button>
+  <button id="download">ดาวน์โหลด MP3 · Download MP3</button>
+  <button id="again">อัดใหม่ · Record again</button>
  </div>
  <div class="status" id="trim-status" role="status"></div>
 </section>
 
 <section class="card saved hidden" id="saved-card" aria-live="polite">
- <h2>✓ Saved</h2>
+ <h2>✓ บันทึกแล้ว · Saved</h2>
  <p id="saved-text"></p>
  <div class="actions">
-  <a id="saved-open" href="#" target="_blank" rel="noopener">Open in Drive</a>
-  <button id="copy-embed">Copy embed link</button>
-  <button id="copy-link">Copy share link</button>
+  <a id="saved-open" href="#" target="_blank" rel="noopener">เปิดใน Drive · Open in Drive</a>
+  <button id="copy-embed">คัดลอกลิงก์ฝัง · Copy embed link</button>
+  <button id="copy-link">คัดลอกลิงก์แชร์ · Copy share link</button>
  </div>
  <div class="status" id="saved-status"></div>
 </section>
 
 <section class="card">
  <details id="settings">
-  <summary>Settings: connect to your Google Drive</summary>
-  <p class="muted" style="margin-top:10px">These stay on this device only.</p>
+  <summary>การตั้งค่า: เชื่อมต่อ Google Drive ของคุณ · Settings: connect to your Google Drive</summary>
+  <p class="muted" style="margin-top:10px">เก็บไว้ในเครื่องนี้เท่านั้น · These stay on this device only.</p>
   <div class="row" style="margin-top:8px">
-   <div style="flex:1 1 100%"><label for="s-url">Apps Script web app URL</label><input type="url" id="s-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></div>
-   <div style="flex:1 1 220px"><label for="s-pw">Password</label><input type="password" id="s-pw" autocomplete="off"></div>
+   <div style="flex:1 1 100%"><label for="s-url">ลิงก์ Web app ของ Apps Script · Apps Script web app URL</label><input type="url" id="s-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></div>
+   <div style="flex:1 1 220px"><label for="s-pw">รหัสผ่าน · Password</label><input type="password" id="s-pw" autocomplete="off"></div>
   </div>
-  <div class="actions"><button id="s-save" class="primary">Save settings</button><button id="s-test">Test connection</button></div>
+  <div class="actions"><button id="s-save" class="primary">บันทึกการตั้งค่า · Save settings</button><button id="s-test">ทดสอบการเชื่อมต่อ · Test connection</button></div>
   <div class="status" id="s-status" role="status"></div>
   <details style="margin-top:14px">
-   <summary>How to set up (once)</summary>
+   <summary>วิธีตั้งค่า (ทำครั้งเดียว) · How to set up (once)</summary>
    <ol>
-    <li>Sign in to your Google account, open <a href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> and click <b>New project</b>. Name it “Talk a Cake recorder”.</li>
-    <li>Delete the code that's there and paste in this code: <button type="button" id="copy-code">Copy the code</button> <a href="apps-script.txt" target="_blank">(view it)</a></li>
-    <li>In the first lines, paste the ID of the Drive folder for your recordings: open the folder in Drive and copy the part of the address after <code>/folders/</code>. Then choose a password.</li>
-    <li>Click <b>Deploy → New deployment</b>, pick type <b>Web app</b>, set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, then <b>Deploy</b> and allow access.</li>
-    <li>Copy the <b>Web app URL</b> (it ends in <code>/exec</code>), paste it above with the same password, press <b>Save settings</b>, then <b>Test connection</b>.</li>
+    <li>ลงชื่อเข้าใช้บัญชี Google เปิด <a href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> แล้วกด <b>New project</b> (โปรเจกต์ใหม่) ตั้งชื่อว่า “Talk a Cake recorder”<span class="en">Sign in to your Google account, open script.google.com and click <b>New project</b>. Name it “Talk a Cake recorder”.</span></li>
+    <li>ลบโค้ดเดิมที่มีอยู่ แล้ววางโค้ดนี้แทน: <button type="button" id="copy-code">คัดลอกโค้ด · Copy the code</button> <a href="apps-script.txt" target="_blank">(ดูโค้ด · view it)</a><span class="en">Delete the code that's there and paste in this code.</span></li>
+    <li>ในบรรทัดแรก ๆ ให้วาง ID ของโฟลเดอร์ใน Drive ที่จะเก็บไฟล์เสียง: เปิดโฟลเดอร์ใน Drive แล้วคัดลอกส่วนของที่อยู่หลัง <code>/folders/</code> จากนั้นตั้งรหัสผ่าน<span class="en">In the first lines, paste the ID of the Drive folder for your recordings: open the folder in Drive and copy the part of the address after <code>/folders/</code>. Then choose a password.</span></li>
+    <li>กด <b>Deploy → New deployment</b> เลือกประเภท <b>Web app</b> ตั้ง <b>Execute as: Me</b> และ <b>Who has access: Anyone</b> แล้วกด <b>Deploy</b> และอนุญาตการเข้าถึง<span class="en">Click <b>Deploy → New deployment</b>, pick type <b>Web app</b>, set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, then <b>Deploy</b> and allow access.</span></li>
+    <li>คัดลอก <b>Web app URL</b> (ลงท้ายด้วย <code>/exec</code>) วางด้านบนพร้อมรหัสผ่านเดียวกัน กด <b>บันทึกการตั้งค่า</b> แล้วกด <b>ทดสอบการเชื่อมต่อ</b><span class="en">Copy the <b>Web app URL</b> (it ends in <code>/exec</code>), paste it above with the same password, press <b>Save settings</b>, then <b>Test connection</b>.</span></li>
    </ol>
-   <p class="muted">“Anyone” only means the page can reach the script without a Google sign-in; the script refuses anything without your password.</p>
+   <p class="muted">“Anyone” แค่หมายความว่าหน้านี้ติดต่อสคริปต์ได้โดยไม่ต้องลงชื่อเข้าใช้ Google ส่วนสคริปต์จะไม่รับอะไรเลยถ้าไม่มีรหัสผ่านของคุณ<span class="en">“Anyone” only means the page can reach the script without a Google sign-in; the script refuses anything without your password.</span></p>
   </details>
  </details>
 </section>
@@ -145,15 +147,15 @@ dialog input[type=text]{width:100%}
 
 <dialog id="name-dialog">
  <form method="dialog" id="name-form">
-  <h2>Name this recording</h2>
-  <label for="file-name">File name</label>
-  <input type="text" id="file-name" placeholder="e.g. julia-ไปเที่ยว-1" autocomplete="off" required>
-  <p class="kbd">“.mp3” is added for you.</p>
-  <label class="check" style="margin-top:10px"><input type="checkbox" id="share" checked> Anyone with the link can listen <span class="muted">(needed to play it on a lesson page)</span></label>
+  <h2>ตั้งชื่อไฟล์เสียง · Name this recording</h2>
+  <label for="file-name">ชื่อไฟล์ · File name</label>
+  <input type="text" id="file-name" placeholder="เช่น · e.g. julia-ไปเที่ยว-1" autocomplete="off" required>
+  <p class="kbd">ระบบเติม “.mp3” ให้เอง · “.mp3” is added for you.</p>
+  <label class="check" style="margin-top:10px"><input type="checkbox" id="share" checked> <span>ทุกคนที่มีลิงก์ฟังได้ · Anyone with the link can listen<span class="muted en">จำเป็นถ้าจะเล่นในหน้าบทเรียน · Needed to play it on a lesson page.</span></span></label>
   <div class="status" id="dlg-status" role="status"></div>
   <div class="actions" style="justify-content:flex-end">
-   <button type="button" id="dlg-cancel">Cancel</button>
-   <button type="submit" class="primary" id="dlg-save">Save</button>
+   <button type="button" id="dlg-cancel">ยกเลิก · Cancel</button>
+   <button type="submit" class="primary" id="dlg-save">บันทึก · Save</button>
   </div>
  </form>
 </dialog>
@@ -168,6 +170,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
 };
 function say(id, text, kind) { const el = $(id); el.textContent = text || ""; el.className = "status" + (kind ? " " + kind : ""); }
+const bi = (th, en) => th + "\n" + en;      // a message in Thai, with the English on the next line
 const fmt = s => { s = Math.max(0, s); const m = Math.floor(s / 60), r = s - m * 60; return String(m).padStart(2, "0") + ":" + r.toFixed(1).padStart(4, "0"); };
 
 // ------------------------------------------------------------------ recording (raw samples, converted to MP3 only once at the end)
@@ -180,18 +183,18 @@ let audio = null, trimStart = 0, trimEnd = 0, unsaved = false, encoded = null;
 async function listMics() {
   if (!navigator.mediaDevices?.enumerateDevices) return;
   const keep = $("mic").value, devs = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "audioinput");
-  $("mic").replaceChildren(new Option("Default microphone", ""));
-  devs.forEach((d, n) => { if (d.deviceId && d.deviceId !== "default") $("mic").add(new Option(d.label || "Microphone " + (n + 1), d.deviceId)); });
+  $("mic").replaceChildren(new Option("ไมโครโฟนหลัก · Default microphone", ""));
+  devs.forEach((d, n) => { if (d.deviceId && d.deviceId !== "default") $("mic").add(new Option(d.label || "ไมโครโฟน " + (n + 1) + " · Microphone " + (n + 1), d.deviceId)); });
   $("mic").value = [...$("mic").options].some(o => o.value === keep) ? keep : "";
 }
 
 async function startRecording() {
-  if (audio && unsaved && !confirm("Discard this recording and record a new one?")) return;
-  if (!navigator.mediaDevices?.getUserMedia) { say("rec-status", "This browser can't record. Please use Chrome, Edge, Firefox or Safari.", "bad"); return; }
+  if (audio && unsaved && !confirm(bi("ทิ้งเสียงที่อัดไว้แล้วอัดใหม่ไหม?", "Discard this recording and record a new one?"))) return;
+  if (!navigator.mediaDevices?.getUserMedia) { say("rec-status", bi("เบราว์เซอร์นี้อัดเสียงไม่ได้ กรุณาใช้ Chrome, Edge, Firefox หรือ Safari", "This browser can't record. Please use Chrome, Edge, Firefox or Safari."), "bad"); return; }
   const want = { echoCancellation: false, autoGainControl: false, noiseSuppression: $("ns").checked, channelCount: 1 };
   if ($("mic").value) want.deviceId = { exact: $("mic").value };
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: want }); }
-  catch (e) { say("rec-status", "The microphone is blocked or missing (" + e.name + "). Allow the microphone for this site and try again.", "bad"); return; }
+  catch (e) { say("rec-status", bi("ไมโครโฟนถูกปิดกั้นหรือไม่พบ (" + e.name + ") อนุญาตให้เว็บนี้ใช้ไมโครโฟนแล้วลองอีกครั้ง", "The microphone is blocked or missing (" + e.name + "). Allow the microphone for this site and try again."), "bad"); return; }
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   await ctx.resume();
   rate = ctx.sampleRate;
@@ -209,10 +212,10 @@ async function startRecording() {
   const silent = ctx.createGain(); silent.gain.value = 0;      // keeps the graph running without playing the mic aloud
   src.connect(tapNode); tapNode.connect(silent); silent.connect(ctx.destination);
   recording = true; paused = false; elapsed = 0; startedAt = performance.now();
-  $("rec").classList.add("on"); $("rec").setAttribute("aria-label", "Stop recording"); $("rec").title = "Stop recording";
-  $("pause").disabled = false; $("pause").textContent = "Pause";
+  $("rec").classList.add("on"); $("rec").setAttribute("aria-label", "หยุดอัดเสียง · Stop recording"); $("rec").title = "หยุดอัดเสียง · Stop recording";
+  $("pause").disabled = false; $("pause").textContent = "หยุดชั่วคราว · Pause";
   $("trim-card").classList.add("hidden"); $("saved-card").classList.add("hidden");
-  say("rec-status", "Recording… press the button again to stop.", "warn");
+  say("rec-status", bi("กำลังอัดเสียง… กดปุ่มอีกครั้งเพื่อหยุด", "Recording… press the button again to stop."), "warn");
   timerId = setInterval(tick, 100);
   listMics().catch(() => {});
 }
@@ -229,27 +232,28 @@ function tick() {
   const db = levelPeak > 0 ? 20 * Math.log10(levelPeak) : -60, w = Math.max(0, Math.min(100, (db + 60) / 60 * 100));
   const m = $("meter"); m.style.width = w + "%"; m.className = "meter-fill" + (levelPeak >= 0.99 ? " clip" : db > -3 ? " hot" : "");
   const note = $("meter-note");
-  if (clipSeen) { note.textContent = "Too loud: some peaks hit the top. Move back a little or speak more softly."; note.className = "meter-note bad"; }
-  else { note.textContent = paused ? "Paused" : "Input level"; note.className = "meter-note"; }
+  if (clipSeen) { note.textContent = bi("เสียงดังเกินไป บางช่วงดังจนสุด ถอยห่างไมค์อีกนิดหรือพูดเบาลง", "Too loud: some peaks hit the top. Move back a little or speak more softly."); note.className = "meter-note bad"; }
+  else { note.textContent = paused ? "หยุดชั่วคราว · Paused" : "ระดับเสียงเข้า · Input level"; note.className = "meter-note"; }
 }
 function togglePause() {
   if (!recording) return;
-  if (!paused) { elapsed += (performance.now() - startedAt) / 1000; paused = true; $("pause").textContent = "Resume"; say("rec-status", "Paused.", "warn"); }
-  else { startedAt = performance.now(); paused = false; $("pause").textContent = "Pause"; say("rec-status", "Recording… press the button again to stop.", "warn"); }
+  if (!paused) { elapsed += (performance.now() - startedAt) / 1000; paused = true; $("pause").textContent = "อัดต่อ · Resume"; say("rec-status", "หยุดชั่วคราว · Paused.", "warn"); }
+  else { startedAt = performance.now(); paused = false; $("pause").textContent = "หยุดชั่วคราว · Pause"; say("rec-status", bi("กำลังอัดเสียง… กดปุ่มอีกครั้งเพื่อหยุด", "Recording… press the button again to stop."), "warn"); }
 }
 async function stopRecording() {
   recording = false; clearInterval(timerId); tick();
   try { tapNode && tapNode.disconnect(); } catch (e) {}
   stream && stream.getTracks().forEach(t => t.stop());
   try { await ctx.close(); } catch (e) {}
-  $("rec").classList.remove("on"); $("rec").setAttribute("aria-label", "Start recording"); $("rec").title = "Start recording";
-  $("pause").disabled = true; $("pause").textContent = "Pause";
+  $("rec").classList.remove("on"); $("rec").setAttribute("aria-label", "เริ่มอัดเสียง · Start recording"); $("rec").title = "เริ่มอัดเสียง · Start recording";
+  $("pause").disabled = true; $("pause").textContent = "หยุดชั่วคราว · Pause";
   const n = chunks.reduce((a, c) => a + c.length, 0);
-  if (n < rate * 0.2) { say("rec-status", "That was too short to keep. Press the red button to record.", "warn"); return; }
+  if (n < rate * 0.2) { say("rec-status", bi("สั้นเกินไป กดปุ่มอัดเสียงเพื่ออัดใหม่", "That was too short to keep. Press the record button to record."), "warn"); return; }
   audio = new Float32Array(n); let o = 0; for (const c of chunks) { audio.set(c, o); o += c.length; } chunks = [];
   trimStart = 0; trimEnd = audio.length / rate; unsaved = true; encoded = null;
   $("trim-card").classList.remove("hidden");
-  say("rec-status", "Recorded " + (audio.length / rate).toFixed(1) + " s." + (clipSeen ? " Some peaks were too loud: listen before saving." : ""), clipSeen ? "warn" : "ok");
+  const secs = (audio.length / rate).toFixed(1);
+  say("rec-status", bi("อัดได้ " + secs + " วินาที" + (clipSeen ? " บางช่วงเสียงดังเกินไป ลองฟังก่อนบันทึก" : ""), "Recorded " + secs + " s." + (clipSeen ? " Some peaks were too loud: listen before saving." : "")), clipSeen ? "warn" : "ok");
   say("trim-status", "");
   peaksFor = null; syncInputs(); draw();
   $("trim-card").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -290,8 +294,9 @@ function draw() {
 function syncInputs() {
   $("t-start").value = trimStart.toFixed(2); $("t-end").value = trimEnd.toFixed(2);
   $("t-start").max = $("t-end").max = dur().toFixed(2);
-  // Coding lesson 9 (the teacher's own line, with the spaces inside the quotes)
-  $("t-len").textContent = "ความยาว " + (trimEnd - trimStart).toFixed(1) + " วินาที";
+  // Coding lesson 9 (the teacher's line), now in both languages. The length goes in a box (lesson 3) so it's worked out once.
+  const len = (trimEnd - trimStart).toFixed(1);
+  $("t-len").textContent = "ความยาว " + len + " วินาที · Length " + len + " s";
   encoded = null;
 }
 function setTrim(which, t) {
@@ -353,7 +358,7 @@ function loadEncoder() {
   if (window.lamejs) return Promise.resolve();
   return new Promise((res, rej) => {      // backup copy if the first library address didn't load
     const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js";
-    s.onload = () => window.lamejs ? res() : rej(Error("MP3 encoder missing")); s.onerror = () => rej(Error("Couldn't load the MP3 encoder. Check the internet connection."));
+    s.onload = () => window.lamejs ? res() : rej(Error(bi("ไม่พบตัวสร้าง MP3", "MP3 encoder missing"))); s.onerror = () => rej(Error(bi("โหลดตัวสร้าง MP3 ไม่ได้ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต", "Couldn't load the MP3 encoder. Check the internet connection.")));
     document.head.appendChild(s);
   });
 }
@@ -383,11 +388,11 @@ const stamp = () => { const d = new Date(), p = n => String(n).padStart(2, "0");
 function cleanName(s) { s = String(s || "").replace(/[\\/:*?"<>|\u0000-\u001f]+/g, " ").replace(/\s+/g, " ").trim().replace(/\.mp3$/i, "").trim(); return s ? s + ".mp3" : ""; }
 async function download(name) {
   try {
-    say("trim-status", "Making the MP3…");
+    say("trim-status", "กำลังสร้างไฟล์ MP3… · Making the MP3…");
     const blob = await makeMp3(), url = URL.createObjectURL(blob), a = document.createElement("a");
     a.href = url; a.download = name || "recording_" + stamp() + ".mp3"; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-    say("trim-status", "Downloaded " + a.download + " (" + Math.round(blob.size / 1024) + " KB).", "ok");
+    say("trim-status", "ดาวน์โหลดแล้ว · Downloaded " + a.download + " (" + Math.round(blob.size / 1024) + " KB).", "ok");
   } catch (e) { say("trim-status", e.message, "bad"); }
 }
 $("download").addEventListener("click", () => download());
@@ -395,25 +400,25 @@ $("download").addEventListener("click", () => download());
 // ------------------------------------------------------------------ Google Drive (through your Apps Script)
 async function callScript(payload) {
   const url = store.get(K_URL).trim(), pw = store.get(K_PW);
-  if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) throw Error("Add your Apps Script web app URL in Settings first.");
+  if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) throw Error(bi("ใส่ลิงก์ Web app ของ Apps Script ในการตั้งค่าก่อน", "Add your Apps Script web app URL in Settings first."));
   let resp;
   try { resp = await fetch(url, { method: "POST", body: JSON.stringify({ ...payload, password: pw }) }); }   // plain text body: no CORS preflight
-  catch (e) { throw Error("Couldn't reach your Apps Script. Check the URL and that the deployment's access is “Anyone”."); }
+  catch (e) { throw Error(bi("ติดต่อ Apps Script ไม่ได้ ตรวจสอบลิงก์ และดูว่าตั้งการเข้าถึงเป็น “Anyone” แล้ว", "Couldn't reach your Apps Script. Check the URL and that the deployment's access is “Anyone”.")); }
   const text = await resp.text();
-  try { return JSON.parse(text); } catch (e) { throw Error("Your Apps Script didn't answer as expected. Check that the URL ends in /exec and the access is “Anyone”."); }
+  try { return JSON.parse(text); } catch (e) { throw Error(bi("Apps Script ตอบกลับไม่ถูกต้อง ตรวจสอบว่าลิงก์ลงท้ายด้วย /exec และตั้งการเข้าถึงเป็น “Anyone”", "Your Apps Script didn't answer as expected. Check that the URL ends in /exec and the access is “Anyone”.")); }
 }
 const blobToBase64 = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
 let lastSaved = null;
 function openSaveDialog() {
   if (!audio) return;
-  if (!store.get(K_URL)) { $("settings").open = true; say("s-status", "Connect your Google Drive here first (see “How to set up”).", "warn"); $("settings").scrollIntoView({ behavior: "smooth" }); return; }
+  if (!store.get(K_URL)) { $("settings").open = true; say("s-status", bi("เชื่อมต่อ Google Drive ที่นี่ก่อน (ดู “วิธีตั้งค่า”)", "Connect your Google Drive here first (see “How to set up”)."), "warn"); $("settings").scrollIntoView({ behavior: "smooth" }); return; }
   say("dlg-status", ""); $("dlg-save").disabled = false;
   $("name-dialog").showModal(); $("file-name").focus(); $("file-name").select();
 }
 async function saveToDrive(ev) {
   ev.preventDefault();
   const name = cleanName($("file-name").value);
-  if (!name) { say("dlg-status", "Please type a name.", "bad"); $("file-name").focus(); return; }
+  if (!name) { say("dlg-status", bi("กรุณาพิมพ์ชื่อ", "Please type a name."), "bad"); $("file-name").focus(); return; }
   if (name.length > 80) {
 
     say("dlg-status", "ชื่อยาวเกินไปค่ะ The name is too long", "bad");
@@ -421,54 +426,55 @@ async function saveToDrive(ev) {
   }
   $("dlg-save").disabled = true;
   try {
-    say("dlg-status", "Making the MP3…");
+    say("dlg-status", "กำลังสร้างไฟล์ MP3… · Making the MP3…");
     const data = await blobToBase64(await makeMp3());
-    say("dlg-status", "Saving to Google Drive…");
+    say("dlg-status", "กำลังบันทึกลง Google Drive… · Saving to Google Drive…");
     let r = await callScript({ action: "save", name, data, share: $("share").checked });
     if (!r.ok && r.exists) {
-      if (!confirm("“" + r.name + "” is already in your folder. Replace it? (The old one goes to the Drive bin.)")) { say("dlg-status", "Not saved. Choose another name.", "warn"); $("dlg-save").disabled = false; $("file-name").focus(); return; }
-      say("dlg-status", "Replacing…");
+      if (!confirm(bi("มี “" + r.name + "” อยู่ในโฟลเดอร์แล้ว จะแทนที่ไหม? (ไฟล์เก่าจะไปอยู่ในถังขยะของ Drive)", "“" + r.name + "” is already in your folder. Replace it? (The old one goes to the Drive bin.)"))) { say("dlg-status", bi("ยังไม่ได้บันทึก กรุณาเลือกชื่ออื่น", "Not saved. Choose another name."), "warn"); $("dlg-save").disabled = false; $("file-name").focus(); return; }
+      say("dlg-status", "กำลังแทนที่… · Replacing…");
       r = await callScript({ action: "save", name, data, share: $("share").checked, overwrite: true });
     }
-    if (!r.ok) throw Error(r.error || "Saving failed.");
+    if (!r.ok) throw Error(r.error || bi("บันทึกไม่สำเร็จ", "Saving failed."));
     lastSaved = r; unsaved = false;
     $("name-dialog").close(); $("file-name").value = "";      // the next recording starts with an empty name box
-    $("saved-text").textContent = "“" + r.name + "” is in your " + (r.folder ? "“" + r.folder + "”" : "mp3") + " folder." + (r.shared ? " Anyone with the link can listen." : " Only you can open it.");
+    const folderName = r.folder ? "“" + r.folder + "”" : "mp3";
+    $("saved-text").textContent = bi("“" + r.name + "” อยู่ในโฟลเดอร์ " + folderName + " ของคุณแล้ว" + (r.shared ? " ทุกคนที่มีลิงก์ฟังได้" : " เปิดได้เฉพาะคุณ"), "“" + r.name + "” is in your " + folderName + " folder." + (r.shared ? " Anyone with the link can listen." : " Only you can open it."));
     $("saved-open").href = r.url; $("copy-embed").classList.toggle("hidden", !r.shared); $("copy-link").classList.toggle("hidden", !r.shared);
     say("saved-status", ""); $("saved-card").classList.remove("hidden");
-    say("trim-status", "Saved ✓ " + r.name, "ok");
+    say("trim-status", "บันทึกแล้ว · Saved ✓ " + r.name, "ok");
     $("saved-card").scrollIntoView({ behavior: "smooth", block: "nearest" });
   } catch (e) {
-    say("dlg-status", e.message + " Your recording is still here: you can try again or use Download MP3.", "bad");
+    say("dlg-status", e.message + "\n" + bi("เสียงที่อัดไว้ยังอยู่ ลองอีกครั้งหรือกดดาวน์โหลด MP3", "Your recording is still here: you can try again or use Download MP3."), "bad");
     $("dlg-save").disabled = false;
   }
 }
-async function copy(text, what) {
-  try { await navigator.clipboard.writeText(text); say("saved-status", what + " copied.", "ok"); }
-  catch (e) { prompt("Copy this " + what.toLowerCase() + ":", text); }
+async function copy(text, th, en) {
+  try { await navigator.clipboard.writeText(text); say("saved-status", th + "แล้ว · " + en + " copied.", "ok"); }
+  catch (e) { prompt(bi("คัดลอกลิงก์นี้:", "Copy this link:"), text); }
 }
 $("save").addEventListener("click", openSaveDialog);
 $("name-form").addEventListener("submit", saveToDrive);
 $("dlg-cancel").addEventListener("click", () => $("name-dialog").close());
-$("copy-embed").addEventListener("click", () => lastSaved && copy(lastSaved.preview, "Embed link"));
-$("copy-link").addEventListener("click", () => lastSaved && copy(lastSaved.url, "Share link"));
+$("copy-embed").addEventListener("click", () => lastSaved && copy(lastSaved.preview, "คัดลอกลิงก์ฝัง", "Embed link"));
+$("copy-link").addEventListener("click", () => lastSaved && copy(lastSaved.url, "คัดลอกลิงก์แชร์", "Share link"));
 
 // ------------------------------------------------------------------ settings
 $("s-url").value = store.get(K_URL); $("s-pw").value = store.get(K_PW);
 if (!store.get(K_URL)) $("settings").open = true;
 $("s-save").addEventListener("click", () => {
   const url = $("s-url").value.trim();
-  if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(url)) { say("s-status", "The URL should look like https://script.google.com/macros/s/…/exec", "bad"); return; }
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(url)) { say("s-status", bi("ลิงก์ควรมีหน้าตาแบบนี้ https://script.google.com/macros/s/…/exec", "The URL should look like https://script.google.com/macros/s/…/exec"), "bad"); return; }
   const ok = store.set(K_URL, url) && store.set(K_PW, $("s-pw").value);
-  say("s-status", ok ? "Saved on this device." : "This browser won't store settings (private window?).", ok ? "ok" : "bad");
+  say("s-status", ok ? "บันทึกไว้ในเครื่องนี้แล้ว · Saved on this device." : bi("เบราว์เซอร์นี้บันทึกการตั้งค่าไม่ได้ (เปิดหน้าต่างส่วนตัวอยู่หรือเปล่า?)", "This browser won't store settings (private window?)."), ok ? "ok" : "bad");
 });
 $("copy-code").addEventListener("click", async () => {
-  try { const code = await (await fetch("apps-script.txt", { cache: "no-store" })).text(); await navigator.clipboard.writeText(code); say("s-status", "Code copied: paste it into the Apps Script editor.", "ok"); }
+  try { const code = await (await fetch("apps-script.txt", { cache: "no-store" })).text(); await navigator.clipboard.writeText(code); say("s-status", bi("คัดลอกโค้ดแล้ว นำไปวางในตัวแก้ไข Apps Script", "Code copied: paste it into the Apps Script editor."), "ok"); }
   catch (e) { window.open("apps-script.txt", "_blank"); }
 });
 $("s-test").addEventListener("click", async () => {
-  say("s-status", "Testing…");
-  try { const r = await callScript({ action: "ping" }); say("s-status", r.ok ? "Connected ✓ Recordings will go to your “" + r.folder + "” folder." : (r.error || "Not connected."), r.ok ? "ok" : "bad"); }
+  say("s-status", "กำลังทดสอบ… · Testing…");
+  try { const r = await callScript({ action: "ping" }); say("s-status", r.ok ? bi("เชื่อมต่อแล้ว ✓ ไฟล์เสียงจะไปที่โฟลเดอร์ “" + r.folder + "”", "Connected ✓ Recordings will go to your “" + r.folder + "” folder.") : (r.error || "ยังไม่ได้เชื่อมต่อ · Not connected."), r.ok ? "ok" : "bad"); }
   catch (e) { say("s-status", e.message, "bad"); }
 });
 

@@ -14,19 +14,19 @@ const PASSWORD = 'CHOOSE_A_PASSWORD_HERE';
 
 function doPost(e) {
   let req;
-  try { req = JSON.parse(e.postData.contents); } catch (err) { return reply_({ ok: false, error: 'Bad request.' }); }
-  if (!PASSWORD || PASSWORD === 'CHOOSE_A_PASSWORD_HERE') return reply_({ ok: false, error: 'Choose a password in the Apps Script first.' });
-  if (req.password !== PASSWORD) { Utilities.sleep(1500); return reply_({ ok: false, error: 'Wrong password: check Settings on the recorder page.' }); }
+  try { req = JSON.parse(e.postData.contents); } catch (err) { return reply_({ ok: false, error: 'คำขอไม่ถูกต้อง · Bad request.' }); }
+  if (!PASSWORD || PASSWORD === 'CHOOSE_A_PASSWORD_HERE') return reply_({ ok: false, error: 'ตั้งรหัสผ่านใน Apps Script ก่อน · Choose a password in the Apps Script first.' });
+  if (req.password !== PASSWORD) { Utilities.sleep(1500); return reply_({ ok: false, error: 'รหัสผ่านไม่ถูกต้อง ตรวจสอบการตั้งค่าในหน้าอัดเสียง · Wrong password: check Settings on the recorder page.' }); }
 
   let folder;
   try { folder = DriveApp.getFolderById(FOLDER_ID); }
-  catch (err) { return reply_({ ok: false, error: 'Folder not found: check FOLDER_ID in the Apps Script.' }); }
+  catch (err) { return reply_({ ok: false, error: 'ไม่พบโฟลเดอร์ ตรวจสอบ FOLDER_ID ใน Apps Script · Folder not found: check FOLDER_ID in the Apps Script.' }); }
 
   if (req.action === 'ping') return reply_({ ok: true, folder: folder.getName() });
-  if (req.action !== 'save') return reply_({ ok: false, error: 'Unknown request.' });
+  if (req.action !== 'save') return reply_({ ok: false, error: 'ไม่รู้จักคำขอนี้ · Unknown request.' });
 
   let name = String(req.name || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!name) return reply_({ ok: false, error: 'No file name.' });
+  if (!name) return reply_({ ok: false, error: 'ไม่มีชื่อไฟล์ · No file name.' });
   if (!/\.mp3$/i.test(name)) name += '.mp3';
 
   // A file with this name already? Ask first; when replacing, the old one goes to the Drive bin.
@@ -37,8 +37,8 @@ function doPost(e) {
 
   let bytes;
   try { bytes = Utilities.base64Decode(String(req.data || '')); }
-  catch (err) { return reply_({ ok: false, error: "The audio didn't arrive in one piece. Please try again." }); }
-  if (!bytes.length) return reply_({ ok: false, error: 'The audio was empty.' });
+  catch (err) { return reply_({ ok: false, error: "ไฟล์เสียงมาไม่ครบ กรุณาลองอีกครั้ง · The audio didn't arrive in one piece. Please try again." }); }
+  if (!bytes.length) return reply_({ ok: false, error: 'ไฟล์เสียงว่างเปล่า · The audio was empty.' });
 
   const file = folder.createFile(Utilities.newBlob(bytes, 'audio/mpeg', name));
   old.forEach(f => f.setTrashed(true));
@@ -56,7 +56,7 @@ function doPost(e) {
 }
 
 function doGet() {
-  return ContentService.createTextOutput('The Talk a Cake recorder is connected. Use it from the recorder page.');
+  return ContentService.createTextOutput('เชื่อมต่อเครื่องอัดเสียง Talk a Cake แล้ว ใช้งานจากหน้าอัดเสียง · The Talk a Cake recorder is connected. Use it from the recorder page.');
 }
 
 function reply_(obj) {
