@@ -77,6 +77,7 @@ dialog input[type=text]{width:100%}
  <div class="recbar">
   <button id="rec" aria-label="Start recording" title="Start recording"></button>
   <button id="pause" disabled>Pause</button>
+  <span class="kbd">or press R</span>
   <div id="timer" aria-live="off">00:00.0</div>
   <div class="meter"><div class="meter-track"><div class="meter-fill" id="meter"></div></div><div class="meter-note" id="meter-note">Input level</div></div>
  </div>
@@ -406,15 +407,7 @@ function openSaveDialog() {
   if (!audio) return;
   if (!store.get(K_URL)) { $("settings").open = true; say("s-status", "Connect your Google Drive here first (see “How to set up”).", "warn"); $("settings").scrollIntoView({ behavior: "smooth" }); return; }
   say("dlg-status", ""); $("dlg-save").disabled = false;
-  $("name-dialog").showModal();
-  if (!$("file-name").value) {
-    // Coding lesson 5 (the teacher's own lines): start the name with the Thai year
-    const thaiYear = new Date().getFullYear() + 543;
-    $("file-name").value = thaiYear + "_";
-  }
-  $("file-name").focus();
-  if ($("file-name").value.endsWith("_")) $("file-name").setSelectionRange(99, 99);   // cursor after "2569_", ready to type
-  else $("file-name").select();
+  $("name-dialog").showModal(); $("file-name").focus(); $("file-name").select();
 }
 async function saveToDrive(ev) {
   ev.preventDefault();
@@ -438,7 +431,7 @@ async function saveToDrive(ev) {
     }
     if (!r.ok) throw Error(r.error || "Saving failed.");
     lastSaved = r; unsaved = false;
-    $("name-dialog").close(); $("file-name").value = "";      // the next recording starts again from "2569_"
+    $("name-dialog").close(); $("file-name").value = "";      // the next recording starts with an empty name box
     $("saved-text").textContent = "“" + r.name + "” is in your " + (r.folder ? "“" + r.folder + "”" : "mp3") + " folder." + (r.shared ? " Anyone with the link can listen." : " Only you can open it.");
     $("saved-open").href = r.url; $("copy-embed").classList.toggle("hidden", !r.shared); $("copy-link").classList.toggle("hidden", !r.shared);
     say("saved-status", ""); $("saved-card").classList.remove("hidden");
@@ -482,6 +475,17 @@ $("s-test").addEventListener("click", async () => {
 $("rec").addEventListener("click", () => recording ? stopRecording() : startRecording());
 $("pause").addEventListener("click", togglePause);
 $("again").addEventListener("click", () => startRecording());
+// Coding lesson 6 (the teacher's own code): press R to start or stop recording.
+// Not while typing in a box or the name window, and not with Ctrl/⌘/Alt (so Ctrl+R still reloads the page).
+document.addEventListener("keydown", e => {
+  const typing = ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName) || $("name-dialog").open;
+  if (typing || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  // Coding lesson 7: || means "or", so the R key also works with Caps Lock and the Thai keyboard (พ, Shift: ฑ)
+  if (e.key === "r" || e.key === "R" || e.key === "ฑ" || e.key === "พ") {
+
+    $("rec").click();
+  }
+});
 window.addEventListener("beforeunload", e => { if (recording || (audio && unsaved)) { e.preventDefault(); e.returnValue = ""; } });
 listMics().catch(() => {});
 </script>
