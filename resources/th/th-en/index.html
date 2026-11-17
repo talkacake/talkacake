@@ -151,7 +151,7 @@ const PHONETIC_RULES={
 function showRules(){
  const system=$("system").value,rule=PHONETIC_RULES[system],target=$("rule-guide");
  target.replaceChildren();
- for(const text of [rule.description,"Written and spoken: ไหม, ฉัน and เขา are kept in the dictionary with their written rising tone (mǎi, chǎn, kǎo). The phonetics box shows the spoken high tone (mái, chán, káo), and the written form is shown under it. Copy for Sheets copies the box; saved corrections keep the written form.","Sentence rule: split the sentence into reviewed Thai words and phrases that have "+labels[system]+", choosing the split with the fewest unknown pieces, then the fewest pieces. A match must end where a Thai word can end (so ข้า is never matched inside ข้าว, or ที inside ที่). Pieces are joined with spaces; numbers, punctuation and English words stay as written; unknown pieces become [?]. Pronunciations are copied exactly as reviewed.",...rule.examples,rule.caution,
+ for(const text of [rule.description,"Written and spoken: ไหม, ฉัน, ดิฉัน and เขา are kept in the dictionary with their written rising tone (mǎi, chǎn, dì chǎn, kǎo). The phonetics box shows the spoken high tone (mái, chán, dì chán, káo), and the written form is shown under it. Copy for Sheets copies the box; saved corrections keep the written form.","Sentence rule: split the sentence into reviewed Thai words and phrases that have "+labels[system]+", choosing the split with the fewest unknown pieces, then the fewest pieces. A match must end where a Thai word can end (so ข้า is never matched inside ข้าว, or ที inside ที่). Pieces are joined with spaces; numbers, punctuation and English words stay as written; unknown pieces become [?]. Pronunciations are copied exactly as reviewed.",...rule.examples,rule.caution,
   "English rule (all systems): a new sentence that fits a common pattern gets an English sentence — question words (ทำไม อะไร ที่ไหน ใคร เมื่อไหร่ ยังไง เท่าไหร่ กี่), ไม่, ไหม / หรือเปล่า / หรือยัง / ใช่ไหม / เหรอ, จะ / แล้ว / กำลัง / เคย / ได้, อยาก / ชอบ / ต้อง / ควร, ช่วย / อย่า / ขอ / เถอะ, pronouns, and ครับ / ค่ะ / นะ dropped. Missing subjects become “you” in questions and “I” in statements (“it” for things like อร่อย or ร้อน). Anything else gets a word-by-word gloss (word · word)."]){
   const p=document.createElement("p");p.style.margin="5px 0";p.textContent=text;target.appendChild(p);
  }
@@ -805,30 +805,34 @@ const englishSentence=(()=>{
  english.keys=[...W.keys()];
  return english;
 })();
-// ไหม, ฉัน and เขา are written with a rising tone but usually spoken with a high tone. The dictionary keeps
-// the written form; the page shows the spoken form beside it. A syllable is changed only when the Thai has as many
-// of these words as the phonetics has matching syllables (so ภูเขา, ผ้าไหม, ไหม้ and ดิฉัน are left alone).
+// ไหม, ฉัน, ดิฉัน and เขา are written with a rising tone but usually spoken with a high tone. The dictionary keeps
+// the written form; the phonetics box shows the spoken form and the note under it the written one. A syllable is changed
+// only when the Thai has as many of the word as the phonetics has matching forms (ภูเขา, ผ้าไหม and ไหม้ are left alone).
+// forms: how the written word appears in each system; syl: [written, spoken] — the part that changes inside it.
 const SPOKEN_WORDS=[
- {th:"ไหม",thai:/(?<!ผ้า)ไหม(?!้|พรหม)/g,written:{paiboon:["mǎi"],ipa:["mǎj"],initials:["mai(r)"],numbers:["mai5"]},spoken:{paiboon:"mái",ipa:"máj",initials:"mai(h)",numbers:"mai4"}},
- {th:"ฉัน",thai:/(?<!ดิ)ฉัน/g,written:{paiboon:["chǎn"],ipa:["tɕʰǎn"],initials:["chan(r)"],numbers:["chan5"]},spoken:{paiboon:"chán",ipa:"tɕʰán",initials:"chan(h)",numbers:"chan4"}},
- {th:"เขา",thai:/(?<!ภู)เขา(?!ใหญ่)/g,written:{paiboon:["kǎo"],ipa:["kʰǎw","kʰǎu"],initials:["kao(r)"],numbers:["kao5"]},spoken:{paiboon:"káo",ipa:"kʰáw",initials:"kao(h)",numbers:"kao4"}},
+ {th:"ไหม",thai:/(?<!ผ้า)ไหม(?!้|พรหม)/g,forms:{paiboon:["mǎi"],ipa:["mǎj"],initials:["mai(r)"],numbers:["mai5"]},
+  syl:{paiboon:["mǎi","mái"],ipa:["mǎj","máj"],initials:["mai(r)","mai(h)"],numbers:["mai5","mai4"]}},
+ {th:"ดิฉัน",thai:/ดิฉัน/g,forms:{paiboon:["dì chǎn","dì-chǎn"],ipa:["dì.tɕʰǎn","dì tɕʰǎn","dì-tɕʰǎn"],initials:["di(l) chan(r)"],numbers:["di2 chan5"]},
+  syl:{paiboon:["chǎn","chán"],ipa:["tɕʰǎn","tɕʰán"],initials:["chan(r)","chan(h)"],numbers:["chan5","chan4"]}},
+ {th:"ฉัน",thai:/(?<!ดิ)ฉัน/g,forms:{paiboon:["chǎn"],ipa:["tɕʰǎn"],initials:["chan(r)"],numbers:["chan5"]},
+  syl:{paiboon:["chǎn","chán"],ipa:["tɕʰǎn","tɕʰán"],initials:["chan(r)","chan(h)"],numbers:["chan5","chan4"]}},
+ {th:"เขา",thai:/(?<!ภู)เขา(?!ใหญ่)/g,forms:{paiboon:["kǎo"],ipa:["kʰǎw","kʰǎu"],initials:["kao(r)"],numbers:["kao5"]},
+  syl:{paiboon:["kǎo","káo"],ipa:["ǎ","á"],initials:["kao(r)","kao(h)"],numbers:["kao5","kao4"]}},
 ];
-// Turn ไหม / ฉัน / เขา syllables from written to spoken (toSpoken) or back (toWritten). Only when the Thai has as many
-// of the word as the phonetics has matching syllables; otherwise null (unclear which syllable is which).
+// Turn these words from written to spoken (toSpoken) or back (toWritten). Only when the Thai has as many of the word
+// as the phonetics has matching forms; otherwise null (unclear which syllable is which).
 function convertTones(th,phon,system,toSpoken){
  th=normText(th);let out=normText(phon);const words=[];
  if(!out)return null;
  for(const w of SPOKEN_WORDS){
   const k=(th.match(w.thai)||[]).length;if(!k)continue;
-  if(th.split(w.th).length-1!==k)return null;
-  const ipaKao=system==="ipa"&&w.th==="เขา";
-  const from=toSpoken?w.written[system]:(ipaKao?["kʰáw","kʰáu"]:[w.spoken[system]]);
-  const re=new RegExp("(?<![^\\s\\-.(])("+from.map(x=>x.replace(/[()]/g,"\\$&")).join("|")+")(?![^\\s\\-.,?!)])","g");
+  if(w.th!=="ฉัน"&&th.split(w.th).length-1!==k)return null;
+  const [sw,ss]=w.syl[system],speak=m=>m.replace(sw,ss),write=m=>m.replace(ss,sw);
+  const from=toSpoken?w.forms[system]:w.forms[system].map(speak);
+  const re=new RegExp("(?<![^\\s\\-.(])("+from.map(x=>x.replace(/[().]/g,"\\$&")).join("|")+")(?![^\\s\\-.,?!)])","g");
   const found=out.match(re)||[];if(found.length!==k)return null;
-  const swap=m=>ipaKao?(toSpoken?m.replace("ǎ","á"):m.replace("á","ǎ")):(toSpoken?w.spoken[system]:w.written[system][0]);
-  out=out.replace(re,swap);
-  const written=toSpoken?found[0]:swap(found[0]),spoken=toSpoken?swap(found[0]):found[0];
-  words.push({th:w.th,written,spoken});
+  out=out.replace(re,toSpoken?speak:write);
+  words.push({th:w.th,written:toSpoken?found[0]:write(found[0]),spoken:toSpoken?speak(found[0]):found[0]});
  }
  return words.length?{text:out,words}:null;
 }
