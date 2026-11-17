@@ -62,7 +62,7 @@ dialog input[type=text]{width:100%}
 <body>
 <main>
 <h1>🎙️ Voice Recorder</h1>
-<p class="muted">Record, trim and save MP3s straight to your Google Drive mp3 folder. This page isn't linked anywhere or shown in search results, and only someone with your password can save to your Drive.</p>
+<p class="muted">Record, trim and save MP3s straight into a folder in your own Google Drive. Anyone can record and download here; to save to Drive, connect your own Google account once in Settings. Settings stay on your device, so recordings only ever go to the Drive you connected.</p>
 
 <section class="card" id="record-card">
  <h2>1. Record</h2>
@@ -130,9 +130,9 @@ dialog input[type=text]{width:100%}
   <details style="margin-top:14px">
    <summary>How to set up (once)</summary>
    <ol>
-    <li>Open <a href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> and click <b>New project</b>. Name it “Talk a Cake recorder”.</li>
+    <li>Sign in to your Google account, open <a href="https://script.google.com/home" target="_blank" rel="noopener">script.google.com</a> and click <b>New project</b>. Name it “Talk a Cake recorder”.</li>
     <li>Delete the code that's there and paste in this code: <button type="button" id="copy-code">Copy the code</button> <a href="apps-script.txt" target="_blank">(view it)</a></li>
-    <li>In the first lines, paste your mp3 folder's ID: open the folder in Drive and copy the part of the address after <code>/folders/</code>. Then choose a password.</li>
+    <li>In the first lines, paste the ID of the Drive folder for your recordings: open the folder in Drive and copy the part of the address after <code>/folders/</code>. Then choose a password.</li>
     <li>Click <b>Deploy → New deployment</b>, pick type <b>Web app</b>, set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, then <b>Deploy</b> and allow access.</li>
     <li>Copy the <b>Web app URL</b> (it ends in <code>/exec</code>), paste it above with the same password, press <b>Save settings</b>, then <b>Test connection</b>.</li>
    </ol>
@@ -412,6 +412,11 @@ async function saveToDrive(ev) {
   ev.preventDefault();
   const name = cleanName($("file-name").value);
   if (!name) { say("dlg-status", "Please type a name.", "bad"); $("file-name").focus(); return; }
+  if (name.length > 80) {
+
+    say("dlg-status", "ชื่อยาวเกินไปค่ะ The name is too long", "bad");
+    return;
+  }
   $("dlg-save").disabled = true;
   try {
     say("dlg-status", "Making the MP3…");
