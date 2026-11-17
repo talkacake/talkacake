@@ -406,7 +406,15 @@ function openSaveDialog() {
   if (!audio) return;
   if (!store.get(K_URL)) { $("settings").open = true; say("s-status", "Connect your Google Drive here first (see “How to set up”).", "warn"); $("settings").scrollIntoView({ behavior: "smooth" }); return; }
   say("dlg-status", ""); $("dlg-save").disabled = false;
-  $("name-dialog").showModal(); $("file-name").focus(); $("file-name").select();
+  $("name-dialog").showModal();
+  if (!$("file-name").value) {
+    // Coding lesson 5 (the teacher's own lines): start the name with the Thai year
+    const thaiYear = new Date().getFullYear() + 543;
+    $("file-name").value = thaiYear + "_";
+  }
+  $("file-name").focus();
+  if ($("file-name").value.endsWith("_")) $("file-name").setSelectionRange(99, 99);   // cursor after "2569_", ready to type
+  else $("file-name").select();
 }
 async function saveToDrive(ev) {
   ev.preventDefault();
@@ -430,7 +438,7 @@ async function saveToDrive(ev) {
     }
     if (!r.ok) throw Error(r.error || "Saving failed.");
     lastSaved = r; unsaved = false;
-    $("name-dialog").close();
+    $("name-dialog").close(); $("file-name").value = "";      // the next recording starts again from "2569_"
     $("saved-text").textContent = "“" + r.name + "” is in your " + (r.folder ? "“" + r.folder + "”" : "mp3") + " folder." + (r.shared ? " Anyone with the link can listen." : " Only you can open it.");
     $("saved-open").href = r.url; $("copy-embed").classList.toggle("hidden", !r.shared); $("copy-link").classList.toggle("hidden", !r.shared);
     say("saved-status", ""); $("saved-card").classList.remove("hidden");
