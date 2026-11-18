@@ -24,6 +24,7 @@
         
         /* Highlight Utility */
         .highlight { background-color: rgba(250, 204, 21, 0.3); padding: 0 4px; border-radius: 2px; }
+        .buzz-mark { background-color: rgba(250, 204, 21, 0.45); color: inherit; font-weight: 700; padding: 0 2px; border-radius: 3px; }
 
         /* Teacher controls only show after Teacher login */
         body:not(.teacher) .teacher-only { display: none !important; }
@@ -257,7 +258,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="md:col-span-3 bg-white p-5 rounded-xl border border-yellow-200 shadow-sm">
+                    <div class="md:col-span-3 bg-white p-5 rounded-xl border border-yellow-200 shadow-sm" data-buzz-key="utcc-buzz-used">
                         <div class="flex justify-between items-start gap-3 flex-wrap">
                             <div>
                                 <h4 class="font-bold text-blue-900 mb-1 flex items-center gap-2">
@@ -266,10 +267,10 @@
                                 </h4>
                                 <p class="text-sm font-medium text-blue-600">คำที่ใช้ไปแล้ว</p>
                             </div>
-                            <button onclick="resetBuzzwords()" class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1 rounded-full transition"><i class="fas fa-undo"></i> Reset <span class="font-normal">(ล้าง)</span></button>
+                            <button onclick="resetBuzz(this)" class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1 rounded-full transition"><i class="fas fa-undo"></i> Reset <span class="font-normal">(ล้าง)</span></button>
                         </div>
-                        <div id="buzz-tracker" class="flex flex-wrap gap-2 mt-4"></div>
-                        <p id="buzz-count" class="text-sm font-bold text-blue-900 mt-4"></p>
+                        <div class="buzz-chips flex flex-wrap gap-2 mt-4"></div>
+                        <p class="buzz-count text-sm font-bold text-blue-900 mt-4"></p>
                     </div>
                 </div>
             </div>
@@ -290,6 +291,17 @@
                     <button onclick="speak('Great business relationships start with shared interests. Stand up, introduce yourself to someone new, and find at least ONE thing you have in common. Then, post your connection below!')" class="text-gray-400 hover:text-yellow-500 ml-1"><i class="fas fa-volume-up"></i></button>
                 </p>
                 <p class="text-blue-500 mt-2 max-w-2xl mx-auto text-sm">ความสัมพันธ์ทางธุรกิจที่ดีเริ่มจากความสนใจที่ตรงกัน ลุกขึ้นไปแนะนำตัวกับคนที่ยังไม่รู้จัก แล้วหาสิ่งที่เหมือนกันให้ได้อย่างน้อย 1 อย่าง จากนั้นโพสต์คอนเนกชันของคุณไว้ด้านล่างเลย!</p>
+                <div class="mt-5 max-w-2xl mx-auto bg-yellow-400 text-blue-900 rounded-2xl px-5 py-3 shadow-sm">
+                    <p class="font-bold flex items-center justify-center gap-2 flex-wrap">
+                        <i class="fas fa-bolt"></i> Buzzword Challenge
+                        <button onclick="speak('Buzzword Challenge')" class="text-blue-700 hover:text-white"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-sm font-medium mt-1">
+                        Use as many buzzwords from Module 2 as you can while you chat. When you post, your buzzwords light up in the Live Feed!
+                        <button onclick="speak('Use as many buzzwords from Module 2 as you can while you chat. When you post, your buzzwords light up in the Live Feed!')" class="text-blue-700 hover:text-white ml-1"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-xs text-blue-800 mt-1">ตอนคุยกัน ใช้ศัพท์ฮิตจากโมดูล 2 ให้ได้มากที่สุด พอโพสต์แล้ว ศัพท์ฮิตที่ใช้จะขึ้นไฮไลต์ในไลฟ์ฟีด!</p>
+                </div>
             </div>
 
             <!-- Networking timer -->
@@ -360,7 +372,7 @@
                                     <button type="button" onclick="speak('What do you have in common?')" class="text-gray-400 hover:text-yellow-500"><i class="fas fa-volume-up"></i></button>
                                 </label>
                                 <p class="text-xs text-blue-500 mb-2">คุณสองคนมีอะไรเหมือนกันบ้าง</p>
-                                <textarea id="commonGround" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-0 focus:border-yellow-400 outline-none transition" placeholder="We both love spicy food and want to start our own tech companies..."></textarea>
+                                <textarea id="commonGround" required rows="2" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-0 focus:border-yellow-400 outline-none transition" placeholder="We both have a side hustle and want to be digital nomads one day..."></textarea>
                             </div>
                             <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-wait text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex justify-center items-center gap-2 shadow-md">
                                 <i class="fas fa-paper-plane text-yellow-400"></i> Post to Forum <span class="text-xs font-normal text-blue-200">(โพสต์ลงฟอรัม)</span>
@@ -380,31 +392,61 @@
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
-                                        "What do you usually do when you're not working/studying?"
-                                        <button onclick="speak('What do you usually do when you\'re not working or studying?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        "Would you like to be an <span class="highlight font-semibold">entrepreneur</span> one day?"
+                                        <button onclick="speak('Would you like to be an entrepreneur one day?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
-                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">เวลาว่างจากงานหรือการเรียน ปกติคุณทำอะไรบ้าง</div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">สักวันหนึ่งอยากเป็นผู้ประกอบการไหม</div>
                             </li>
                             <li>
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
-                                        "Have you watched or read anything interesting lately?"
-                                        <button onclick="speak('Have you watched or read anything interesting lately?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        "Would you rather be an <span class="highlight font-semibold">expat</span> or a <span class="highlight font-semibold">digital nomad</span>?"
+                                        <button onclick="speak('Would you rather be an expat or a digital nomad?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
-                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ช่วงนี้ได้ดูหรืออ่านอะไรน่าสนใจบ้างไหม</div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">อยากเป็นเอ็กซ์แพตหรือดิจิทัลโนแมดมากกว่ากัน</div>
                             </li>
                             <li>
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
-                                        "What kind of industry are you hoping to go into?"
-                                        <button onclick="speak('What kind of industry are you hoping to go into?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        "Do you prefer <span class="highlight font-semibold">hybrid work</span> or going to the office every day?"
+                                        <button onclick="speak('Do you prefer hybrid work or going to the office every day?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
-                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">คุณอยากทำงานในอุตสาหกรรมไหน</div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ชอบทำงานแบบไฮบริด หรือเข้าออฟฟิศทุกวันมากกว่า</div>
+                            </li>
+                            <li>
+                                <div class="flex items-start">
+                                    <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
+                                    <span>
+                                        "If you had a <span class="highlight font-semibold">side hustle</span>, what would it be?"
+                                        <button onclick="speak('If you had a side hustle, what would it be?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ถ้ามีอาชีพเสริม จะทำอะไร</div>
+                            </li>
+                            <li>
+                                <div class="flex items-start">
+                                    <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
+                                    <span>
+                                        "What would you like to <span class="highlight font-semibold">upskill</span> in this year?"
+                                        <button onclick="speak('What would you like to upskill in this year?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ปีนี้อยากอัปสกิลเรื่องอะไร</div>
+                            </li>
+                            <li>
+                                <div class="flex items-start">
+                                    <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
+                                    <span>
+                                        "How do you avoid <span class="highlight font-semibold">burnout</span>?"
+                                        <button onclick="speak('How do you avoid burnout?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ทำยังไงไม่ให้หมดไฟ</div>
                             </li>
                         </ul>
                     </div>
@@ -421,6 +463,11 @@
                             <button onclick="clearPosts()" class="teacher-only text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1 rounded-full transition"><i class="fas fa-broom"></i> Clear feed</button>
                             <span class="live-status bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-2"><span class="w-2 h-2 bg-gray-400 rounded-full"></span> CONNECTING <span class="font-normal opacity-80">(กำลังเชื่อมต่อ)</span></span>
                         </div>
+                    </div>
+                    <!-- Buzzwords spotted in the posts light up here -->
+                    <div class="mb-3">
+                        <p class="text-xs font-bold text-blue-900">Buzzwords in the feed: <span id="feed-buzz-count">0 / 15</span> <span class="font-normal text-blue-500">(ศัพท์ฮิตในฟีด)</span></p>
+                        <div id="feed-buzz" class="flex flex-wrap gap-1.5 mt-2"></div>
                     </div>
                     <!-- On wide screens the feed stretches to the bottom of Conversation Starters and scrolls inside -->
                     <div class="relative flex-1 min-h-[300px]">
@@ -445,6 +492,17 @@
                         <button onclick="speak('After networking, come back together as a whole class. Take turns: each person tells everyone the most interesting thing they have in common with someone they met, in about 30 seconds. After each person shares, the class can ask them 1 or 2 questions.')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                     </p>
                     <p class="text-blue-600 text-sm max-w-3xl mx-auto mt-2">หลังทำความรู้จักกันแล้ว กลับมารวมกันทั้งห้อง แล้วผลัดกันเล่าให้ทุกคนฟังทีละคนว่า สิ่งที่เหมือนกันที่น่าสนใจที่สุดที่คุณเจอกับคนที่ได้คุยด้วยคืออะไร (ประมาณ 30 วินาที) หลังจากแต่ละคนเล่าจบ เพื่อนๆ ในห้องถามคำถามคนนั้นได้ 1-2 ข้อ</p>
+                <div class="mt-5 max-w-2xl mx-auto bg-yellow-400 text-blue-900 rounded-2xl px-5 py-3 shadow-sm">
+                    <p class="font-bold flex items-center justify-center gap-2 flex-wrap">
+                        <i class="fas fa-bolt"></i> Buzzword Challenge
+                        <button onclick="speak('Buzzword Challenge')" class="text-blue-700 hover:text-white"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-sm font-medium mt-1">
+                        Use buzzwords when you share and when you ask questions. The teacher taps each buzzword the class uses.
+                        <button onclick="speak('Use buzzwords when you share and when you ask questions. The teacher taps each buzzword the class uses.')" class="text-blue-700 hover:text-white ml-1"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-xs text-blue-800 mt-1">ใช้ศัพท์ฮิตทั้งตอนเล่าและตอนถามคำถาม ครูจะแตะคำที่มีคนในห้องใช้แล้ว</p>
+                </div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mt-6">
@@ -460,7 +518,7 @@
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
                                         "I talked to ___, and we both ___."
-                                        <button onclick="speak('I talked to..., and we both...')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        <button onclick="speak('I talked to ..., and we both ...')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
                                 <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ได้คุยกับ ___ แล้วพบว่าเราทั้งคู่ ___</div>
@@ -469,8 +527,18 @@
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
+                                        "We both want to start a <span class="highlight font-semibold">side hustle</span> / a <span class="highlight font-semibold">start-up</span>."
+                                        <button onclick="speak('We both want to start a side hustle / a start-up.')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">เราทั้งคู่อยากเริ่มทำอาชีพเสริม / สตาร์ทอัพ</div>
+                            </li>
+                            <li>
+                                <div class="flex items-start">
+                                    <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
+                                    <span>
                                         "The most interesting thing we have in common is ___."
-                                        <button onclick="speak('The most interesting thing we have in common is...')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        <button onclick="speak('The most interesting thing we have in common is ...')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
                                 <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">สิ่งที่เหมือนกันที่น่าสนใจที่สุดของเราคือ ___</div>
@@ -479,11 +547,11 @@
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
-                                        "I was surprised that ___."
-                                        <button onclick="speak('I was surprised that...')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        "I was surprised that ___ is an <span class="highlight font-semibold">expat</span> / an <span class="highlight font-semibold">entrepreneur</span>."
+                                        <button onclick="speak('I was surprised that ... is an expat / an entrepreneur.')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
-                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">แปลกใจมากที่ ___</div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">แปลกใจมากที่ ___ เป็นเอ็กซ์แพต / ผู้ประกอบการ</div>
                             </li>
                         </ul>
                     </div>
@@ -508,26 +576,52 @@
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
-                                        "How did you find that out?"
-                                        <button onclick="speak('How did you find that out?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        "Can you do a quick <span class="highlight font-semibold">deep dive</span> into ___ for us?"
+                                        <button onclick="speak('Can you do a quick deep dive into ... for us?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
-                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">รู้เรื่องนี้ได้ยังไง</div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ช่วยเจาะลึกเรื่อง ___ ให้ฟังอีกหน่อยได้ไหม</div>
                             </li>
                             <li>
                                 <div class="flex items-start">
                                     <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
                                     <span>
-                                        "Can you tell us more about ___?"
-                                        <button onclick="speak('Can you tell us more about...?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                        "Would that make a good <span class="highlight font-semibold">side hustle</span>?"
+                                        <button onclick="speak('Would that make a good side hustle?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                     </span>
                                 </div>
-                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">เล่าเรื่อง ___ ให้ฟังอีกหน่อยได้ไหม</div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">เรื่องนั้นเอามาทำเป็นอาชีพเสริมได้ไหม</div>
+                            </li>
+                            <li>
+                                <div class="flex items-start">
+                                    <span class="text-yellow-500 font-bold mr-2 mt-0.5">»</span>
+                                    <span>
+                                        "How do you keep a good <span class="highlight font-semibold">work-life balance</span> with that?"
+                                        <button onclick="speak('How do you keep a good work-life balance with that?')" class="text-blue-300 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                    </span>
+                                </div>
+                                <div class="text-xs text-blue-500 mt-1 ml-5 font-normal">ทำแบบนั้นแล้วรักษาสมดุลระหว่างงานกับชีวิตยังไง</div>
                             </li>
                         </ul>
                     </div>
                 </div>
 
+
+                <div class="bg-white p-5 rounded-xl border border-yellow-200 shadow-sm mt-6" data-buzz-key="utcc-buzz-groupshare">
+                    <div class="flex justify-between items-start gap-3 flex-wrap">
+                        <div class="text-left">
+                            <h4 class="font-bold text-blue-900 mb-1 flex items-center gap-2">
+                                <i class="fas fa-tasks text-yellow-500"></i> Buzzwords Used
+                                <button onclick="speak('Buzzwords Used')" class="text-blue-400 hover:text-yellow-600"><i class="fas fa-volume-up"></i></button>
+                            </h4>
+                            <p class="text-sm font-medium text-blue-600">คำที่ใช้ไปแล้ว</p>
+                            <p class="text-xs text-blue-500 mt-1">Tap a buzzword when someone uses it. (แตะที่คำเมื่อมีคนใช้คำนั้น)</p>
+                        </div>
+                        <button onclick="resetBuzz(this)" class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1 rounded-full transition"><i class="fas fa-undo"></i> Reset <span class="font-normal">(ล้าง)</span></button>
+                    </div>
+                    <div class="buzz-chips flex flex-wrap gap-2 mt-4"></div>
+                    <p class="buzz-count text-sm font-bold text-blue-900 mt-4 text-left"></p>
+                </div>
                 <p class="text-center text-sm text-blue-800 font-medium mt-6 flex items-center justify-center gap-2 flex-wrap">
                     <i class="fas fa-lightbulb text-yellow-500"></i> Tip: Check the Live Feed to remember who you met.
                     <button onclick="speak('Tip: Check the Live Feed to remember who you met.')" class="text-blue-400 hover:text-yellow-600"><i class="fas fa-volume-up"></i></button>
@@ -551,6 +645,17 @@
                     <button onclick="speak('Stand up and form groups of 2 or 3! Choose a scenario from the board. Scan the QR code with your phone, or tap the card, to see your roleplay situation and sentence starters.')" class="text-gray-400 hover:text-yellow-500 ml-1"><i class="fas fa-volume-up"></i></button>
                 </p>
                 <p class="text-blue-500 mt-2 max-w-2xl mx-auto text-sm">ลุกขึ้นแล้วจับกลุ่ม 2-3 คน! เลือกสถานการณ์จากบอร์ด แล้วสแกนคิวอาร์โค้ดด้วยมือถือ (หรือแตะที่การ์ด) เพื่อดูรายละเอียดบทบาทสมมติและประโยคช่วยเริ่มพูดของกลุ่มคุณ</p>
+                <div class="mt-5 max-w-2xl mx-auto bg-yellow-400 text-blue-900 rounded-2xl px-5 py-3 shadow-sm">
+                    <p class="font-bold flex items-center justify-center gap-2 flex-wrap">
+                        <i class="fas fa-bolt"></i> Buzzword Challenge
+                        <button onclick="speak('Buzzword Challenge')" class="text-blue-700 hover:text-white"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-sm font-medium mt-1">
+                        Use as many buzzwords as you can in your role-play. Your scenario page has ideas. Tick every buzzword your group uses!
+                        <button onclick="speak('Use as many buzzwords as you can in your role-play. Your scenario page has ideas. Tick every buzzword your group uses!')" class="text-blue-700 hover:text-white ml-1"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-xs text-blue-800 mt-1">ใช้ศัพท์ฮิตในบทบาทสมมติให้ได้มากที่สุด หน้าสถานการณ์ของกลุ่มคุณมีตัวอย่างประโยคให้ ใช้คำไหนแล้วก็ติ๊กไว้เลย!</p>
+                </div>
             </div>
 
             <!-- Video example (instead of a volunteer demo) -->
@@ -662,6 +767,17 @@
                     <button onclick="speak('Change groups! Form new small groups of 3 to 4. Scan or tap a topic below and discuss it together. Listen carefully and build on each other\'s ideas.')" class="text-gray-400 hover:text-yellow-500 ml-1"><i class="fas fa-volume-up"></i></button>
                 </p>
                 <p class="text-blue-500 mt-2 max-w-2xl mx-auto text-sm">เปลี่ยนกลุ่ม! จับกลุ่มใหม่ 3-4 คน แล้วสแกน (หรือแตะ) หัวข้อด้านล่างเพื่อคุยกัน ตั้งใจฟังและต่อยอดไอเดียของกันและกัน</p>
+                <div class="mt-5 max-w-2xl mx-auto bg-yellow-400 text-blue-900 rounded-2xl px-5 py-3 shadow-sm">
+                    <p class="font-bold flex items-center justify-center gap-2 flex-wrap">
+                        <i class="fas fa-bolt"></i> Buzzword Challenge
+                        <button onclick="speak('Buzzword Challenge')" class="text-blue-700 hover:text-white"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-sm font-medium mt-1">
+                        Use as many buzzwords as you can in your discussion. Your topic page has ideas. Tick every buzzword your group uses!
+                        <button onclick="speak('Use as many buzzwords as you can in your discussion. Your topic page has ideas. Tick every buzzword your group uses!')" class="text-blue-700 hover:text-white ml-1"><i class="fas fa-volume-up"></i></button>
+                    </p>
+                    <p class="text-xs text-blue-800 mt-1">ใช้ศัพท์ฮิตในการพูดคุยให้ได้มากที่สุด หน้าหัวข้อของกลุ่มคุณมีตัวอย่างประโยคให้ ใช้คำไหนแล้วก็ติ๊กไว้เลย!</p>
+                </div>
             </div>
 
             <!-- Whole-Class Warm-up: video -->
@@ -794,11 +910,11 @@
                             <div class="flex items-start">
                                 <i class="fas fa-check-circle text-green-500 mt-1 mr-3 text-lg"></i> 
                                 <span>
-                                    Use at least TWO buzzwords from Module 2.
-                                    <button onclick="speak('Use at least TWO buzzwords from Module 2.')" class="text-gray-400 hover:text-yellow-500 ml-1"><i class="fas fa-volume-up"></i></button>
+                                    Use as many buzzwords from Module 2 as you can.
+                                    <button onclick="speak('Use as many buzzwords from Module 2 as you can.')" class="text-gray-400 hover:text-yellow-500 ml-1"><i class="fas fa-volume-up"></i></button>
                                 </span>
                             </div>
-                            <div class="text-xs text-blue-500 mt-1 ml-8 font-normal">ใช้ศัพท์ฮิตจากโมดูล 2 อย่างน้อย 2 คำ</div>
+                            <div class="text-xs text-blue-500 mt-1 ml-8 font-normal">ใช้ศัพท์ฮิตจากโมดูล 2 ให้ได้มากที่สุด</div>
                         </li>
                         <li>
                             <div class="flex items-start">
@@ -826,6 +942,30 @@
                             <li>
                                 "The main issue our target market faces is..." <button onclick="speak('The main issue our target market faces is...')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
                                 <div class="text-xs text-blue-500 font-normal mt-0.5">ปัญหาหลักที่กลุ่มลูกค้าเป้าหมายของเราเจอคือ...</div>
+                            </li>
+                            <li>
+                                "Our <span class="highlight font-semibold">start-up</span> is a <span class="highlight font-semibold">game changer</span> for ___." <button onclick="speak('Our start-up is a game changer for ...')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                <div class="text-xs text-blue-500 font-normal mt-0.5">สตาร์ทอัพของเราจะพลิกเกมให้กับ ___</div>
+                            </li>
+                            <li>
+                                "Many <span class="highlight font-semibold">entrepreneurs</span> struggle with <span class="highlight font-semibold">burnout</span>." <button onclick="speak('Many entrepreneurs struggle with burnout.')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                <div class="text-xs text-blue-500 font-normal mt-0.5">ผู้ประกอบการหลายคนต้องเจอกับภาวะหมดไฟ</div>
+                            </li>
+                            <li>
+                                "It's perfect for <span class="highlight font-semibold">digital nomads</span>, <span class="highlight font-semibold">expats</span> and <span class="highlight font-semibold">hybrid work</span>." <button onclick="speak('It\'s perfect for digital nomads, expats and hybrid work.')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                <div class="text-xs text-blue-500 font-normal mt-0.5">เหมาะมากสำหรับดิจิทัลโนแมด เอ็กซ์แพต และการทำงานแบบไฮบริด</div>
+                            </li>
+                            <li>
+                                "It helps people keep a healthy <span class="highlight font-semibold">work-life balance</span>." <button onclick="speak('It helps people keep a healthy work-life balance.')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                <div class="text-xs text-blue-500 font-normal mt-0.5">ช่วยให้ผู้คนรักษาสมดุลระหว่างงานกับชีวิตได้ดี</div>
+                            </li>
+                            <li>
+                                "Investors, this is your chance to earn <span class="highlight font-semibold">passive income</span>!" <button onclick="speak('Investors, this is your chance to earn passive income!')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                <div class="text-xs text-blue-500 font-normal mt-0.5">นักลงทุนทุกท่าน นี่คือโอกาสสร้างรายได้แบบพาสซีฟของคุณ!</div>
+                            </li>
+                            <li>
+                                "Let's <span class="highlight font-semibold">touch base</span> after the pitch!" <button onclick="speak('Let\'s touch base after the pitch!')" class="text-blue-400 hover:text-yellow-600 ml-1"><i class="fas fa-volume-up"></i></button>
+                                <div class="text-xs text-blue-500 font-normal mt-0.5">หลังพิตช์แล้วมาคุยกันต่อนะ!</div>
                             </li>
                         </ul>
                     </div>
@@ -884,6 +1024,21 @@
                             <i class="fas fa-undo mb-1"></i> Reset <span class="text-[10px] font-normal">(รีเซ็ต)</span>
                         </button>
                     </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-yellow-200 shadow-sm " data-buzz-key="utcc-buzz-pitch" data-buzz-noconfirm data-buzz-theme="score">
+                    <div class="flex justify-between items-start gap-3 flex-wrap">
+                        <div class="text-left">
+                            <h4 class="font-bold text-blue-900 mb-1 flex items-center gap-2">
+                                <i class="fas fa-tasks text-yellow-500"></i> Buzzword Score
+                                <button onclick="speak('Buzzword Score')" class="text-blue-400 hover:text-yellow-600"><i class="fas fa-volume-up"></i></button>
+                            </h4>
+                            <p class="text-sm font-medium text-blue-600">คะแนนศัพท์ฮิต</p>
+                            <p class="text-xs text-blue-500 mt-1">Tap each buzzword the speaker uses. Press Reset before the next pitch. (แตะคำที่ผู้พิตช์ใช้ กดล้างก่อนเริ่มพิตช์ถัดไป)</p>
+                        </div>
+                        <button onclick="resetBuzz(this)" class="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1 rounded-full transition"><i class="fas fa-undo"></i> Reset <span class="font-normal">(ล้าง)</span></button>
+                    </div>
+                    <div class="buzz-chips flex flex-wrap gap-2 mt-4"></div>
+                    <p class="buzz-count text-sm font-bold text-blue-900 mt-4 text-left"></p>
                 </div>
                 </div>
             </div>
@@ -988,6 +1143,26 @@
             return String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
+        // Module 2 buzzwords, and how to spot each one in free text (used by the Live Feed and the trackers)
+        const BUZZ_MATCH = [
+            ['Expat', /\bexpats?\b/i],
+            ['Entrepreneur', /\bentrepreneur(?:s|ship)?\b/i],
+            ['Start-up', /\bstart-?\s?ups?\b/i],
+            ['Passive Income', /\bpassive income\b/i],
+            ['Ghosting', /\bghost(?:ing|ed|s)?\b/i],
+            ['Digital Nomad', /\bdigital nomads?\b/i],
+            ['Side Hustle', /\bside[- ]hustles?\b/i],
+            ['Deep Dive', /\bdeep[- ]dives?\b/i],
+            ['Work-Life Balance', /\bwork[- ]life balance\b/i],
+            ['Burnout', /\bburn(?:out|-out|ed out|t out|ing out| out)\b/i],
+            ['Upskill', /\bupskill(?:s|ed|ing)?\b/i],
+            ['Hybrid Work', /\bhybrid(?: work(?:ing)?)?\b/i],
+            ['Quiet Quitting', /\bquiet(?:ly)?[- ]quit(?:ting|s)?\b/i],
+            ['Game Changer', /\bgame[- ]changers?\b/i],
+            ['Touch Base', /\btouch(?:ed|ing)? base\b/i],
+        ];
+        const BUZZWORDS = BUZZ_MATCH.map(b => b[0]);
+
         async function apiPost(data) {
             if (!WORKSHOP_API_URL) throw new Error('not connected');
             // text/plain keeps this a "simple" request, which Apps Script accepts from other sites.
@@ -1046,6 +1221,7 @@
             lastFeedRender = Date.now();
             const feed = document.getElementById('connection-feed');
             const posts = liveState.posts || [];
+            renderFeedBuzzwords(posts);
             if (!posts.length) {
                 feed.innerHTML = `
                     <div class="text-center text-blue-400 text-sm py-12">
@@ -1067,9 +1243,24 @@
                             <p class="text-xs text-blue-500 font-medium">${timeAgo(p.time)}</p>
                         </div>
                     </div>
-                    <p class="text-blue-900 text-sm font-medium break-words">${escapeHtml(p.text)}</p>
+                    <p class="text-blue-900 text-sm font-medium break-words">${markBuzzwords(p.text)}</p>
                 </div>`;
             }).join('');
+        }
+
+        // Buzzwords in a post are highlighted; the strip above the feed shows which ones the class has used.
+        function markBuzzwords(text) {
+            let out = escapeHtml(text);
+            BUZZ_MATCH.forEach(([, re]) => { out = out.replace(new RegExp(re.source, 'gi'), m => `<mark class="buzz-mark">${m}</mark>`); });
+            return out;
+        }
+        function renderFeedBuzzwords(posts) {
+            const seen = new Set();
+            posts.forEach(p => BUZZ_MATCH.forEach(([word, re]) => { if (re.test(String(p.text))) seen.add(word); }));
+            document.getElementById('feed-buzz-count').textContent = `${seen.size} / ${BUZZWORDS.length}`;
+            document.getElementById('feed-buzz').innerHTML = BUZZWORDS.map(word => seen.has(word)
+                ? `<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-400 text-blue-900"><i class="fas fa-check mr-1"></i>${word}</span>`
+                : `<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-white text-gray-400 border border-gray-200">${word}</span>`).join('');
         }
 
         document.getElementById('connection-form').addEventListener('submit', async function(e) {
@@ -1268,36 +1459,40 @@
             flashcardContainer.innerHTML += cardHTML;
         });
 
-        // ---------------- MODULE 2: BUZZWORD QUESTION CHAIN ----------------
-        // The teacher clicks a word when a student uses it. Marks are saved on this device (e.g. the projector laptop).
-        const usedBuzzwords = new Set(JSON.parse(storageGet('utcc-buzz-used') || '[]'));
-
-        function renderBuzzTracker() {
-            document.getElementById('buzz-tracker').innerHTML = vocabData.map(item => {
-                const used = usedBuzzwords.has(item.word);
-                const style = used
-                    ? 'bg-gray-100 border-gray-200 text-gray-400 line-through'
-                    : 'bg-white border-yellow-300 text-blue-900 hover:bg-yellow-100';
-                return `<button data-word="${item.word}" onclick="toggleBuzzword(this.dataset.word)" aria-pressed="${used}" class="px-3 py-1.5 rounded-full border-2 text-sm font-bold transition ${style}">${used ? '<i class="fas fa-check text-green-500 mr-1"></i>' : ''}${item.word}</button>`;
+        // ---------------- BUZZWORD TRACKERS ----------------
+        // Every box with data-buzz-key is a tracker: tap a buzzword when someone uses it.
+        // Marks are saved on this device under that key.
+        function buzzUsed(key) {
+            try { return new Set(JSON.parse(storageGet(key) || '[]').filter(w => BUZZWORDS.includes(w))); } catch (e) { return new Set(); }
+        }
+        function renderBuzzBox(box) {
+            const used = buzzUsed(box.dataset.buzzKey);
+            const suggest = (box.dataset.buzzSuggest || '').split('|');
+            const dark = box.dataset.buzzTheme === 'dark', score = box.dataset.buzzTheme === 'score';   // score: used words turn green
+            box.querySelector('.buzz-chips').innerHTML = BUZZWORDS.map(word => {
+                const on = used.has(word), tip = suggest.includes(word);
+                const style = on
+                    ? (dark || score ? 'bg-green-500 border-green-300 text-white' : 'bg-gray-100 border-gray-200 text-gray-400 line-through')
+                    : dark
+                        ? (tip ? 'bg-white border-yellow-400 text-blue-900 hover:bg-yellow-100' : 'bg-blue-800 border-blue-600 text-white hover:bg-blue-700')
+                        : 'bg-white border-yellow-300 text-blue-900 hover:bg-yellow-100';
+                return `<button data-word="${word}" onclick="toggleBuzz(this)" aria-pressed="${on}" class="px-3 py-1.5 rounded-full border-2 text-sm font-bold transition ${style}">${on ? '<i class="fas fa-check ' + (dark || score ? 'text-white' : 'text-green-500') + ' mr-1"></i>' : ''}${word}</button>`;
             }).join('');
-            document.getElementById('buzz-count').innerHTML = `Used: ${usedBuzzwords.size} / ${vocabData.length} <span class="font-normal text-blue-500">(ใช้ไปแล้ว ${usedBuzzwords.size} / ${vocabData.length} คำ)</span>`;
+            box.querySelector('.buzz-count').innerHTML = `Used: ${used.size} / ${BUZZWORDS.length} <span class="font-normal ${dark ? 'text-blue-200' : 'text-blue-500'}">(ใช้ไปแล้ว ${used.size} / ${BUZZWORDS.length} คำ)</span>`;
         }
-
-        function toggleBuzzword(word) {
-            if (usedBuzzwords.has(word)) usedBuzzwords.delete(word);
-            else usedBuzzwords.add(word);
-            storageSet('utcc-buzz-used', JSON.stringify([...usedBuzzwords]));
-            renderBuzzTracker();
+        function toggleBuzz(button) {
+            const box = button.closest('[data-buzz-key]'), used = buzzUsed(box.dataset.buzzKey), word = button.dataset.word;
+            used.has(word) ? used.delete(word) : used.add(word);
+            storageSet(box.dataset.buzzKey, JSON.stringify([...used]));
+            renderBuzzBox(box);
         }
-
-        function resetBuzzwords() {
-            if (!confirm('Clear all marked buzzwords?')) return;
-            usedBuzzwords.clear();
-            storageSet('utcc-buzz-used', null);
-            renderBuzzTracker();
+        function resetBuzz(button) {
+            const box = button.closest('[data-buzz-key]');
+            if (!('buzzNoconfirm' in box.dataset) && !confirm('Clear all marked buzzwords? (ล้างคำที่เลือกไว้ทั้งหมดไหม)')) return;
+            storageSet(box.dataset.buzzKey, null);
+            renderBuzzBox(box);
         }
-
-        renderBuzzTracker();
+        document.querySelectorAll('[data-buzz-key]').forEach(renderBuzzBox);
 
         // ---------------- MODULE 4: SCENARIOS ----------------
         const scenarios = [
