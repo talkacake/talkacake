@@ -482,7 +482,18 @@ $("s-test").addEventListener("click", async () => {
 // ------------------------------------------------------------------ buttons
 $("rec").addEventListener("click", () => recording ? stopRecording() : startRecording());
 $("pause").addEventListener("click", togglePause);
-$("again").addEventListener("click", () => startRecording());
+// "Record again" clears the recording and waits: recording starts only with the record button or R
+$("again").addEventListener("click", () => {
+  if (audio && unsaved && !confirm(bi("ทิ้งเสียงที่อัดไว้แล้วอัดใหม่ไหม?", "Discard this recording and record a new one?"))) return;
+  stopPlay();
+  audio = null; unsaved = false; encoded = null; clipSeen = false; levelPeak = 0; elapsed = 0; paused = false;
+  $("trim-card").classList.add("hidden"); $("saved-card").classList.add("hidden");
+  $("timer").textContent = fmt(0); $("meter").style.width = "0%"; $("meter").className = "meter-fill";
+  $("meter-note").textContent = "ระดับเสียงเข้า · Input level"; $("meter-note").className = "meter-note";
+  say("trim-status", "");
+  say("rec-status", bi("พร้อมแล้ว กดปุ่มอัดเสียงหรือแป้น R เพื่อเริ่มอัด", "Ready. Press the record button or R to start."), "ok");
+  $("record-card").scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
 // Coding lesson 6 (the teacher's own code): press R to start or stop recording.
 // Not while typing in a box or the name window, and not with Ctrl/⌘/Alt (so Ctrl+R still reloads the page).
 document.addEventListener("keydown", e => {
