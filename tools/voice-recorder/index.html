@@ -248,11 +248,12 @@ async function stopRecording() {
   $("rec").classList.remove("on"); $("rec").setAttribute("aria-label", "เริ่มอัดเสียง · Start recording"); $("rec").title = "เริ่มอัดเสียง · Start recording";
   $("pause").disabled = true; $("pause").textContent = "หยุดชั่วคราว · Pause";
   const n = chunks.reduce((a, c) => a + c.length, 0);
-  if (n < rate * 0.2) { say("rec-status", bi("สั้นเกินไป กดปุ่มอัดเสียงเพื่ออัดใหม่", "That was too short to keep. Press the record button to record."), "warn"); return; }
+  // No minimum length: a short word is fine. Only a recording with no sound at all is dropped.
+  if (n === 0) { say("rec-status", bi("ไม่ได้อัดเสียงเลย กดปุ่มอัดเสียงเพื่ออัดใหม่", "Nothing was recorded. Press the record button to record."), "warn"); return; }
   audio = new Float32Array(n); let o = 0; for (const c of chunks) { audio.set(c, o); o += c.length; } chunks = [];
   trimStart = 0; trimEnd = audio.length / rate; unsaved = true; encoded = null;
   $("trim-card").classList.remove("hidden");
-  const secs = (audio.length / rate).toFixed(1);
+  const secs = secsText(audio.length / rate);
   say("rec-status", bi("อัดได้ " + secs + " วินาที" + (clipSeen ? " บางช่วงเสียงดังเกินไป ลองฟังก่อนบันทึก" : ""), "Recorded " + secs + " s." + (clipSeen ? " Some peaks were too loud: listen before saving." : "")), clipSeen ? "warn" : "ok");
   say("trim-status", "");
   peaksFor = null; syncInputs(); draw();
@@ -295,14 +296,16 @@ function syncInputs() {
   $("t-start").value = trimStart.toFixed(2); $("t-end").value = trimEnd.toFixed(2);
   $("t-start").max = $("t-end").max = dur().toFixed(2);
   // Coding lesson 9 (the teacher's line), now in both languages. The length goes in a box (lesson 3) so it's worked out once.
-  const len = (trimEnd - trimStart).toFixed(1);
+  const len = secsText(trimEnd - trimStart);
   $("t-len").textContent = "ความยาว " + len + " วินาที · Length " + len + " s";
   encoded = null;
 }
+// Short lengths get two decimals ("0.35"), so a one-syllable word doesn't show as "0.3" or "0.0".
+function secsText(s) { return s < 1 ? s.toFixed(2) : s.toFixed(1); }
 function setTrim(which, t) {
-  const minLen = 0.5;
-  if (which === "start") trimStart = Math.max(0, Math.min(t, trimEnd - minLen));
-  else trimEnd = Math.min(dur(), Math.max(t, trimStart + minLen));
+  const gap = 0.01;   // no minimum length; this 10 ms only keeps the start before the end, so the selection is never empty
+  if (which === "start") trimStart = Math.max(0, Math.min(t, trimEnd - gap));
+  else trimEnd = Math.min(dur(), Math.max(t, trimStart + gap));
   syncInputs(); draw();
 }
 const wave = $("wave");
