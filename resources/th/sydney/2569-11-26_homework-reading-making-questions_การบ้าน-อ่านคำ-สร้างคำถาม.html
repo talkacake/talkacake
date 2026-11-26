@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>การบ้าน: อ่านคำ และสร้างคำถาม</title>
+<style>
+  
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+  :root {
+    --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body.modern-thai {
+    --font-main: "Noto Sans Thai", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+
+  :root {
+    --bg: #fffaf4;
+    --card: #ffffff;
+    --ink: #202124;
+    --muted: #6b7280;
+    --line: #eadfd2;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  header {
+    padding: 32px 20px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 48px;
+  }
+
+  h1,
+  h2 {
+    margin: 0;
+  }
+
+  .heading-block {
+    margin: 0 0 12px;
+  }
+
+  .heading-controls {
+    margin-top: 6px;
+  }
+
+  .page-title {
+    margin: 0 0 8px;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.25;
+  }
+
+  .section-title {
+    margin: 32px 0 8px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.35;
+  }
+
+  .subtitle {
+    color: var(--muted);
+  }
+
+  .video-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .lesson-film {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px;
+    margin: 16px 0 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  }
+
+  .lesson-film-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+  }
+
+  .lesson-film-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .lesson-film-note {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 8px;
+  }
+
+  .lesson-audio-frame {
+    display: block;
+    width: 100%;
+    height: 140px;
+    border: 0;
+    border-radius: 12px;
+    background: #292a2d;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,.03);
+  }
+
+  .meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 8px;
+  }
+
+  .emoji {
+    font-size: 1.2rem;
+  }
+
+  .main-text {
+    font-size: 1.35rem;
+    line-height: 1.8;
+    margin-top: 6px;
+  }
+
+  .main-text.thai {
+    font-size: 1.45rem;
+  }
+
+  .main-text.english {
+    font-size: 1.25rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 4px;
+  }
+
+  .controls button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .support-text,
+  .ipa-support {
+    display: none;
+  }
+
+  .support-text.show,
+  .ipa-support.show {
+    display: block;
+  }
+
+  .en-support,
+  .thai-support {
+    color: #374151;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .ipa {
+    color: #7c3aed;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .examples {
+    margin-top: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+
+  .examples summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .examples-main {
+    margin-top: 8px;
+  }
+
+  .examples-main,
+  .examples .support-text,
+  .examples .ipa-support {
+    white-space: pre-line;
+  }
+  
+  .font-toggle {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+  footer {
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 32px;
+    font-size: .9rem;
+  }
+
+  /* ---- homework ---- */
+  .muted { color: var(--muted); }
+  .small { font-size: .9rem; }
+  .tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; text-align: center; }
+  .tile .main-text { margin-top: 0; }
+  .tile .controls { justify-content: center; margin: 6px 0 0; }
+  .card.good { border-color: #86efac; }
+  .card.bad { border-color: #fca5a5; }
+  .card.bad .main-text { text-decoration: line-through; text-decoration-color: #ef4444; }
+  .quiz-q .blank { display: inline-block; min-width: 3em; border-bottom: 2px solid var(--line); text-align: center; color: #16a34a; }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+  .opts button { border: 2px solid var(--line); background: #fff; border-radius: 12px; padding: 8px 16px; font-size: 1.25rem; cursor: pointer; font-family: inherit; }
+  .opts button.correct { border-color: #22c55e; background: #dcfce7; }
+  .opts button.wrong { border-color: #ef4444; background: #fee2e2; opacity: .7; }
+  .q-feedback { min-height: 1.4em; font-weight: 600; }
+  .mc .q-row { display: flex; align-items: center; gap: 10px; }
+  .mc .q-num { color: var(--muted); font-weight: 600; }
+  .mc .main-text { font-size: 1.7rem; margin: 0; }
+  .mc .q-listen { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .mc .opts button { font-size: 1.05rem; text-align: left; }
+  .quiz-score { font-weight: 600; margin: 8px 0; }
+  .recorder { border: 2px dashed #f59e0b; background: #fffbeb; }
+  .rec-head { font-weight: 700; font-size: 1.15rem; }
+  .rec-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 10px 0 4px; }
+  .rec-btn, .send-btn, .save-btn { border: 0; border-radius: 999px; padding: 10px 18px; font-size: 1.05rem; cursor: pointer; font-family: inherit; }
+  .rec-btn { background: #f59e0b; color: #fff; }
+  .rec-btn .muted, .send-btn .muted { color: rgba(255,255,255,.85); }
+  .rec-btn.recording { background: #dc2626; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 50% { opacity: .7; } }
+  .rec-time { font-variant-numeric: tabular-nums; font-weight: 700; color: #dc2626; }
+  .rec-msg { color: #b91c1c; font-weight: 600; min-height: 1.2em; }
+  .take { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .take audio { max-width: 100%; height: 36px; }
+  .take button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .send-btn { background: #16a34a; color: #fff; }
+  .save-btn { background: #fff; border: 1px solid var(--line); }
+  .rec-btn:disabled { opacity: .6; cursor: wait; }
+  .rec-hint { margin: 6px 0 0; }
+  .send-count { font-weight: 700; margin: 0 0 6px; }
+  .send-item { font-size: 1.1rem; margin: 4px 0; }
+  .sent-tag { color: #16a34a; font-size: .9rem; font-weight: 600; }
+  .send-btn:disabled { opacity: .6; cursor: wait; }
+  .q-why { color: #374151; font-weight: 500; margin-top: 4px; line-height: 1.5; }
+  .q-big { font-size: 1.8rem; }
+  .q-answer { font-size: 1.3rem; }
+  .q-answer b { color: #7c3aed; text-decoration: underline; text-underline-offset: 4px; }
+  .q-answer-rom { color: var(--muted); margin: 2px 0 6px; }
+  .th-opts button { text-align: left; font-size: 1.15rem; }
+  .th-opts button .opt-rom { display: block; font-size: .85rem; color: var(--muted); font-weight: 400; }
+  .letters { font-size: 1.6rem; letter-spacing: .12em; }
+  .en-opts button { font-size: 1rem; text-align: left; }
+</style>
+</head>
+<body>
+<header>
+  <div class="heading-block" id="title-การบ้าน-อ่านคำ-สร้างคำถาม" data-tts-lang="th-TH">
+    <h1 class="page-title">การบ้าน: อ่านคำ และสร้างคำถาม</h1>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('title-การบ้าน-อ่านคำ-สร้างคำถาม')">🔊</button>
+      <button type="button" onclick="togglePart('title-การบ้าน-อ่านคำ-สร้างคำถาม', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">Homework: Reading Words and Making Questions</div>
+  </div>
+
+  <div class="subtitle">
+    <button type="button" class="font-toggle" onclick="toggleThaiFont()">Aa เปลี่ยนฟอนต์</button>
+  </div>
+</header>
+
+<main>
+
+<section class="section">
+  <div class="heading-block" id="section-วิธีทำ" data-tts-lang="th-TH">
+    <h2 class="section-title">วิธีทำการบ้าน</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-วิธีทำ')">🔊</button>
+      <button type="button" onclick="togglePart('section-วิธีทำ', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">How to Do Your Homework</div>
+  </div>
+  <article class="card text-block " id="how-0" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">⏱️</span></div>
+    <div class="main-text thai">การบ้านมี 24 ข้อ ใช้เวลาประมาณ 25 นาทีค่ะ</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('how-0')">🔊</button>
+      <button type="button" onclick="togglePart('how-0', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">24 tasks, about 25 minutes.</div>
+  </article>
+  <article class="card text-block " id="how-1" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">📝</span></div>
+    <div class="main-text thai">1. อ่านคำถาม ไม่เข้าใจ กด EN หรือ IPA ได้<br>2. เลือกคำตอบ ถ้าผิด อ่านคำใบ้แล้วลองใหม่<br>3. ข้อที่มี 🎙️ ให้อัดเสียง (3 ข้อ)<br>4. กด 📤 ส่งให้เค้ก</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('how-1')">🔊</button>
+      <button type="button" onclick="togglePart('how-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('how-1', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">1. àan kam-tǎam. mâi kâo-jai gòt EN rʉ̌ʉ IPA dâi<br>2. lʉ̂ak kam-dtɔ̀ɔp. tâa pìt, àan kam-bâi lɛ́ɛw lɔɔng mài<br>3. kɔ̂ɔ tîi mii 🎙️ hâi àt sǐang (sǎam kɔ̂ɔ)<br>4. gòt 📤 sòng hâi kéek</div>
+    <div class="support-text en-support">1. Read the question. Stuck? Press EN or IPA. 2. Choose your answer. If it's wrong, read the hint and try again. 3. For the 3 tasks with 🎙️, record your voice. 4. Press 📤 to send your homework to Cake.</div>
+  </article>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-อ่าน" data-tts-lang="th-TH">
+    <h2 class="section-title">อ่านได้แล้ว!</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-อ่าน')">🔊</button>
+      <button type="button" onclick="togglePart('section-อ่าน', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">You Can Read These!</div>
+  </div>
+  <article class="card text-block " id="letters" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🔤</span></div>
+    <div class="main-text thai">ตัวที่รู้จักแล้ว:<br>ก ฃ จ ด ต ท น ป พ ม ร ส อ · ะ า ำ ไ</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('letters')">🔊</button>
+      <button type="button" onclick="togglePart('letters', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('letters', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">gɔɔ · kɔ̌ɔ · jɔɔ · dɔɔ · dtɔɔ · tɔɔ · nɔɔ · bpɔɔ · pɔɔ · mɔɔ · rɔɔ · sɔ̌ɔ · ɔɔ · a · aa · am · ai</div>
+    <div class="support-text en-support">Letters you already know: 13 consonants and 4 vowels. Every word below uses only these letters, so you can read all of them!</div>
+  </article>
+  <article class="card text-block " id="read-intro" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🐢</span></div>
+    <div class="main-text thai">ข้อ 1-12: อ่านช้าๆ ได้ค่ะ ทีละตัว แล้วเลือกความหมาย 🔊 จะขึ้นหลังตอบถูก</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('read-intro')">🔊</button>
+      <button type="button" onclick="togglePart('read-intro', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('read-intro', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kɔ̂ɔ 1-12: àan cháa-cháa dâi kâ, tii-lá dtua, lɛ́ɛw lʉ̂ak kwaam-mǎai</div>
+    <div class="support-text en-support">Questions 1-12: Read slowly, one letter at a time, then choose the meaning. The 🔊 appears after the right answer. Slow is fine!</div>
+  </article>
+  <div class="quiz" id="quiz-read" data-section="Reading (1-12)">
+    <div class="quiz-q card" id="quiz-read-1" data-answer="rice field" data-n="1" data-q="นา" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="น n + า aa → naa (rice field)">
+      <div class="q-text main-text thai q-big">1. นา</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">rice field</button><button type="button" onclick="answerQuiz(this)">eye</button><button type="button" onclick="answerQuiz(this)">crow</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-1')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-2" data-answer="eye; grandpa" data-n="2" data-q="ตา" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ต dt + า aa → dtaa (eye; grandpa)">
+      <div class="q-text main-text thai q-big">2. ตา</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">plate</button><button type="button" onclick="answerQuiz(this)">eye; grandpa</button><button type="button" onclick="answerQuiz(this)">three</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-2')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-3" data-answer="crow" data-n="3" data-q="กา" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ก g + า aa → gaa (crow)">
+      <div class="q-text main-text thai q-big">3. กา</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">crow</button><button type="button" onclick="answerQuiz(this)">rice field</button><button type="button" onclick="answerQuiz(this)">to go</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-3')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-4" data-answer="plate" data-n="4" data-q="จาน" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="จ j + า aa + น n → jaan (plate)">
+      <div class="q-text main-text thai q-big">4. จาน</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">eye; grandpa</button><button type="button" onclick="answerQuiz(this)">ants</button><button type="button" onclick="answerQuiz(this)">plate</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-4')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-5" data-answer="to do; to make" data-n="5" data-q="ทำ" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ท t + ำ am → tam (to do; to make)">
+      <div class="q-text main-text thai q-big">5. ทำ</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">to do; to make</button><button type="button" onclick="answerQuiz(this)">clean</button><button type="button" onclick="answerQuiz(this)">to go</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-5')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-6" data-answer="to go" data-n="6" data-q="ไป" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ไ ai is written first, but you say ป bp first → bpai (to go)">
+      <div class="q-text main-text thai q-big">6. ไป</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">three</button><button type="button" onclick="answerQuiz(this)">to go</button><button type="button" onclick="answerQuiz(this)">crow</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-6')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-7" data-answer="three" data-n="7" data-q="สาม" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ส s + า aa + ม m → sǎam (three)">
+      <div class="q-text main-text thai q-big">7. สาม</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">three</button><button type="button" onclick="answerQuiz(this)">plate</button><button type="button" onclick="answerQuiz(this)">a lot</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-7')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-8" data-answer="clean" data-n="8" data-q="สะอาด" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ส+ะ sà · อ+า+ด àat → sà-àat (clean). You know it from ทำความสะอาด!">
+      <div class="q-text main-text thai q-big">8. สะอาด</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">ants</button><button type="button" onclick="answerQuiz(this)">rice field</button><button type="button" onclick="answerQuiz(this)">clean</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-8')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-9" data-answer="ants" data-n="9" data-q="มด" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ม m + ด t, with no vowel written: add an o → mót (ants)">
+      <div class="q-text main-text thai q-big">9. มด</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">ants</button><button type="button" onclick="answerQuiz(this)">to do; to make</button><button type="button" onclick="answerQuiz(this)">eye; grandpa</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-9')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-10" data-answer="Grandpa goes to the rice field." data-n="10" data-q="ตาไปนา" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="ตา dtaa + ไป bpai + นา naa">
+      <div class="q-text main-text thai q-big">10. ตาไปนา</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">Grandpa goes to the rice field.</button><button type="button" onclick="answerQuiz(this)">The crow is in the rice field.</button><button type="button" onclick="answerQuiz(this)">The plates are clean.</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-10')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-11" data-answer="The plates are clean." data-n="11" data-q="จานสะอาด" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="จาน jaan + สะอาด sà-àat">
+      <div class="q-text main-text thai q-big">11. จานสะอาด</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">Grandpa cleans the plates.</button><button type="button" onclick="answerQuiz(this)">The plates are clean.</button><button type="button" onclick="answerQuiz(this)">Three plates.</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-11')">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-read-12" data-answer="A lot of ants." data-n="12" data-q="มดมาก" data-hint="Go one letter at a time: say each sound, then put them together. The letter card above can help." data-rule="มด mót + มาก mâak (a lot)">
+      <div class="q-text main-text thai q-big">12. มดมาก</div>
+      <div class="opts"><button type="button" onclick="answerQuiz(this)">Three ants.</button><button type="button" onclick="answerQuiz(this)">The ants go.</button><button type="button" onclick="answerQuiz(this)">A lot of ants.</button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakQuiz('quiz-read-12')">🔊</button></div>
+    </div>
+    <p class="quiz-score">ทำแล้ว 0/12 ข้อ <span class="muted">(Done 0/12)</span></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-คำถาม" data-tts-lang="th-TH">
+    <h2 class="section-title">สร้างคำถาม</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-คำถาม')">🔊</button>
+      <button type="button" onclick="togglePart('section-คำถาม', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">Making Questions</div>
+  </div>
+  <article class="card text-block " id="rule-backwards" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🔁</span></div>
+    <div class="main-text thai">1. คิดคำตอบก่อน<br>2. หาส่วนที่ไม่รู้<br>3. เปลี่ยนเป็นคำถาม<br>ทำความสะอาดห้องวันเสาร์ → ทำความสะอาดห้องวันไหน</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('rule-backwards')">🔊</button>
+      <button type="button" onclick="togglePart('rule-backwards', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('rule-backwards', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">1. kít kam-dtɔ̀ɔp gɔ̀ɔn<br>2. hǎa sùan tîi mâi rúu<br>3. bplìan bpen kam-tǎam<br>tam kwaam sà-àat hɔ̂ng wan-sǎo → tam kwaam sà-àat hɔ̂ng wan nǎi</div>
+    <div class="support-text en-support">1. Think of the answer first. 2. Find the part you don't know. 3. Swap it for a question word. I clean my room on Saturday → Which day do you clean your room?</div>
+  </article>
+  <article class="card text-block " id="qwords" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">❓</span></div>
+    <div class="main-text thai">อะไร · ที่ไหน · เมื่อไร / วันไหน · ใคร<br>ยังไง · ทำไม · ...ไหม</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('qwords')">🔊</button>
+      <button type="button" onclick="togglePart('qwords', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('qwords', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">à-rai · tîi-nǎi · mʉ̂a-rài / wan nǎi · krai<br>yang-ngai · tam-mai · ...mái</div>
+    <div class="support-text en-support">what · where · when / which day · who · how · why · ...? (yes/no)</div>
+  </article>
+  <article class="card text-block " id="make-intro" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🧩</span></div>
+    <div class="main-text thai">ข้อ 13-21: คำที่ขีดเส้นใต้คือส่วนที่ไม่รู้ เลือกคำถามที่ถูกค่ะ</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('make-intro')">🔊</button>
+      <button type="button" onclick="togglePart('make-intro', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('make-intro', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">kɔ̂ɔ 13-21: kam tîi kìit sên dtâi kʉʉ sùan tîi mâi rúu. lʉ̂ak kam-tǎam tîi tùuk kâ</div>
+    <div class="support-text en-support">Questions 13-21: The underlined part is the part you don't know. Choose the right question.</div>
+  </article>
+  <div class="quiz" id="quiz-make" data-section="Making questions (13-21)">
+    <div class="quiz-q card" id="quiz-make-1" data-answer="ทำความสะอาดห้องวันไหน" data-n="13" data-q="ทำความสะอาดห้องวันเสาร์" data-rule="วันเสาร์ (a day) → วันไหน (which day)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">13. ทำความสะอาดห้อง<b>วันเสาร์</b></div>
+      <div class="q-answer-rom">tam kwaam sà-àat hɔ̂ng wan-sǎo · I clean my room on Saturday.</div>
+      <div class="opts th-opts"><button type="button" data-val="ทำความสะอาดอะไร" data-why="This asks WHAT you clean → the answer would be ห้อง (the room)." onclick="answerQuiz(this)">ทำความสะอาดอะไร<span class="opt-rom">tam kwaam sà-àat à-rai</span></button><button type="button" data-val="ทำความสะอาดห้องกับใคร" data-why="This asks WHO with → the answer would be a person." onclick="answerQuiz(this)">ทำความสะอาดห้องกับใคร<span class="opt-rom">tam kwaam sà-àat hɔ̂ng gàp krai</span></button><button type="button" data-val="ทำความสะอาดห้องวันไหน" onclick="answerQuiz(this)">ทำความสะอาดห้องวันไหน<span class="opt-rom">tam kwaam sà-àat hɔ̂ng wan nǎi</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ทำความสะอาดห้องวันไหน&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-2" data-answer="ชอบชอปออนไลน์ด้วยกันกับใคร" data-n="14" data-q="ชอบชอปออนไลน์ด้วยกันกับแฟน" data-rule="แฟน (a person) → ใคร (who)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">14. ชอบชอปออนไลน์ด้วยกัน<b>กับแฟน</b></div>
+      <div class="q-answer-rom">chɔ̂ɔp chɔ́p ɔɔn-lai dûai-gan gàp fɛɛn · I like shopping online together with my partner.</div>
+      <div class="opts th-opts"><button type="button" data-val="ชอบชอปออนไลน์ที่ไหน" data-why="This asks WHERE → the answer would be a place or a website." onclick="answerQuiz(this)">ชอบชอปออนไลน์ที่ไหน<span class="opt-rom">chɔ̂ɔp chɔ́p ɔɔn-lai tîi-nǎi</span></button><button type="button" data-val="ชอบชอปออนไลน์ด้วยกันกับใคร" onclick="answerQuiz(this)">ชอบชอปออนไลน์ด้วยกันกับใคร<span class="opt-rom">chɔ̂ɔp chɔ́p ɔɔn-lai dûai-gan gàp krai</span></button><button type="button" data-val="ชอบชอปออนไลน์ไหม" data-why="This is a yes/no question → the answer would be ชอบ or ไม่ชอบ." onclick="answerQuiz(this)">ชอบชอปออนไลน์ไหม<span class="opt-rom">chɔ̂ɔp chɔ́p ɔɔn-lai mái</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ชอบชอปออนไลน์ด้วยกันกับใคร&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-3" data-answer="เรียนอะไรที่มหาลัย" data-n="15" data-q="เรียนสถาปัตย์ที่มหาลัย" data-rule="สถาปัตย์ (a thing) → อะไร (what)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">15. เรียน<b>สถาปัตย์</b>ที่มหาลัย</div>
+      <div class="q-answer-rom">rian sà-tǎa-bpàt tîi má-hǎa-lai · I study architecture at uni.</div>
+      <div class="opts th-opts"><button type="button" data-val="เรียนอะไรที่มหาลัย" onclick="answerQuiz(this)">เรียนอะไรที่มหาลัย<span class="opt-rom">rian à-rai tîi má-hǎa-lai</span></button><button type="button" data-val="เรียนสถาปัตย์ที่ไหน" data-why="This asks WHERE → the answer would be ที่มหาลัย (at uni)." onclick="answerQuiz(this)">เรียนสถาปัตย์ที่ไหน<span class="opt-rom">rian sà-tǎa-bpàt tîi-nǎi</span></button><button type="button" data-val="เรียนสถาปัตย์ไหม" data-why="This is a yes/no question → the answer would be เรียน or ไม่เรียน." onclick="answerQuiz(this)">เรียนสถาปัตย์ไหม<span class="opt-rom">rian sà-tǎa-bpàt mái</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;เรียนอะไรที่มหาลัย&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-4" data-answer="ชอบกินอะไร" data-n="16" data-q="ชอบกินลูกชิ้นปลา" data-rule="ลูกชิ้นปลา (a food) → อะไร (what)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">16. ชอบกิน<b>ลูกชิ้นปลา</b></div>
+      <div class="q-answer-rom">chɔ̂ɔp gin lûuk-chín bplaa · I like eating fish balls.</div>
+      <div class="opts th-opts"><button type="button" data-val="ชอบกินลูกชิ้นปลาไหม" data-why="This is a yes/no question → the answer would be ชอบ or ไม่ชอบ." onclick="answerQuiz(this)">ชอบกินลูกชิ้นปลาไหม<span class="opt-rom">chɔ̂ɔp gin lûuk-chín bplaa mái</span></button><button type="button" data-val="ชอบกินที่ไหน" data-why="This asks WHERE → the answer would be a place." onclick="answerQuiz(this)">ชอบกินที่ไหน<span class="opt-rom">chɔ̂ɔp gin tîi-nǎi</span></button><button type="button" data-val="ชอบกินอะไร" onclick="answerQuiz(this)">ชอบกินอะไร<span class="opt-rom">chɔ̂ɔp gin à-rai</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ชอบกินอะไร&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-5" data-answer="ส้อมอยู่ที่ไหน" data-n="17" data-q="ส้อมอยู่ในครัว" data-rule="ในครัว (a place) → อยู่ที่ไหน (where is it)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">17. ส้อมอยู่<b>ในครัว</b></div>
+      <div class="q-answer-rom">sɔ̂ɔm yùu nai krua · The forks are in the kitchen.</div>
+      <div class="opts th-opts"><button type="button" data-val="ส้อมอยู่ที่ไหน" onclick="answerQuiz(this)">ส้อมอยู่ที่ไหน<span class="opt-rom">sɔ̂ɔm yùu tîi-nǎi</span></button><button type="button" data-val="ส้อมมาจากที่ไหน" data-why="Close! This asks where forks COME FROM, like in class: ไม่รู้ส้อมมาจากที่ไหน. Here they&#x27;re just in the kitchen." onclick="answerQuiz(this)">ส้อมมาจากที่ไหน<span class="opt-rom">sɔ̂ɔm maa jàak tîi-nǎi</span></button><button type="button" data-val="ใช้ส้อมทำอะไร" data-why="This asks what you use a fork FOR." onclick="answerQuiz(this)">ใช้ส้อมทำอะไร<span class="opt-rom">chái sɔ̂ɔm tam à-rai</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ส้อมอยู่ที่ไหน&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-6" data-answer="ไปเลือกตั้งกับใคร" data-n="18" data-q="ไปเลือกตั้งกับแม่" data-rule="แม่ (a person) → ใคร (who)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">18. ไปเลือกตั้ง<b>กับแม่</b></div>
+      <div class="q-answer-rom">bpai lʉ̂ak-dtâng gàp mɛ̂ɛ · I went to vote with my mum.</div>
+      <div class="opts th-opts"><button type="button" data-val="ไปเลือกตั้งเมื่อไร" data-why="This asks WHEN → the answer would be a day or a time." onclick="answerQuiz(this)">ไปเลือกตั้งเมื่อไร<span class="opt-rom">bpai lʉ̂ak-dtâng mʉ̂a-rài</span></button><button type="button" data-val="ไปเลือกตั้งกับใคร" onclick="answerQuiz(this)">ไปเลือกตั้งกับใคร<span class="opt-rom">bpai lʉ̂ak-dtâng gàp krai</span></button><button type="button" data-val="ไปเลือกตั้งยังไง" data-why="This asks HOW you got there → the answer would be by car, on foot ..." onclick="answerQuiz(this)">ไปเลือกตั้งยังไง<span class="opt-rom">bpai lʉ̂ak-dtâng yang-ngai</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ไปเลือกตั้งกับใคร&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-7" data-answer="คิดยังไงเกี่ยวกับรัฐบาลไทย" data-n="19" data-q="คิดว่ารัฐบาลไทยน่าสนใจ" data-rule="น่าสนใจ (your opinion) → คิดยังไงเกี่ยวกับ... (what do you think about...)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">19. คิดว่ารัฐบาลไทย<b>น่าสนใจ</b></div>
+      <div class="q-answer-rom">kít wâa rát-tà-baan tai nâa-sǒn-jai · I think the Thai government is interesting.</div>
+      <div class="opts th-opts"><button type="button" data-val="รัฐบาลไทยอยู่ที่ไหน" data-why="This asks WHERE the government is." onclick="answerQuiz(this)">รัฐบาลไทยอยู่ที่ไหน<span class="opt-rom">rát-tà-baan tai yùu tîi-nǎi</span></button><button type="button" data-val="รู้จักรัฐบาลไทยไหม" data-why="This is a yes/no question: do you know about the Thai government?" onclick="answerQuiz(this)">รู้จักรัฐบาลไทยไหม<span class="opt-rom">rúu-jàk rát-tà-baan tai mái</span></button><button type="button" data-val="คิดยังไงเกี่ยวกับรัฐบาลไทย" onclick="answerQuiz(this)">คิดยังไงเกี่ยวกับรัฐบาลไทย<span class="opt-rom">kít yang-ngai gìao-gàp rát-tà-baan tai</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;คิดยังไงเกี่ยวกับรัฐบาลไทย&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-8" data-answer="ทำไมทำความสะอาดบ้าน" data-n="20" data-q="ทำความสะอาดบ้าน เพราะแขกจะมา" data-rule="เพราะ... (a reason) → ทำไม (why)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">20. ทำความสะอาดบ้าน <b>เพราะแขกจะมา</b></div>
+      <div class="q-answer-rom">tam kwaam sà-àat bâan prɔ́ kɛ̀ɛk jà maa · I'm cleaning the house because guests are coming.</div>
+      <div class="opts th-opts"><button type="button" data-val="ทำความสะอาดบ้านเมื่อไร" data-why="This asks WHEN → the answer would be a day or a time." onclick="answerQuiz(this)">ทำความสะอาดบ้านเมื่อไร<span class="opt-rom">tam kwaam sà-àat bâan mʉ̂a-rài</span></button><button type="button" data-val="ใครทำความสะอาดบ้าน" data-why="This asks WHO cleans → the answer would be a person." onclick="answerQuiz(this)">ใครทำความสะอาดบ้าน<span class="opt-rom">krai tam kwaam sà-àat bâan</span></button><button type="button" data-val="ทำไมทำความสะอาดบ้าน" onclick="answerQuiz(this)">ทำไมทำความสะอาดบ้าน<span class="opt-rom">tam-mai tam kwaam sà-àat bâan</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ทำไมทำความสะอาดบ้าน&#x27;)">🔊</button></div>
+    </div>
+    <div class="quiz-q card" id="quiz-make-9" data-answer="ใช้อะไรกินก๋วยเตี๋ยว" data-n="21" data-q="ใช้ตะเกียบกินก๋วยเตี๋ยว" data-rule="ตะเกียบ → อะไร: ใช้อะไรกิน... (like ใช้อะไรบด)" data-tts-lang="th-TH">
+      <div class="q-text main-text thai q-answer">21. ใช้<b>ตะเกียบ</b>กินก๋วยเตี๋ยว</div>
+      <div class="q-answer-rom">chái dtà-gìap gin gǔai-dtǐao · I use chopsticks to eat noodles.</div>
+      <div class="opts th-opts"><button type="button" data-val="ใช้อะไรกินก๋วยเตี๋ยว" onclick="answerQuiz(this)">ใช้อะไรกินก๋วยเตี๋ยว<span class="opt-rom">chái à-rai gin gǔai-dtǐao</span></button><button type="button" data-val="กินก๋วยเตี๋ยวที่ไหน" data-why="This asks WHERE → the answer would be a place." onclick="answerQuiz(this)">กินก๋วยเตี๋ยวที่ไหน<span class="opt-rom">gin gǔai-dtǐao tîi-nǎi</span></button><button type="button" data-val="ใช้ตะเกียบกินอะไร" data-why="Close! This asks what you eat WITH chopsticks → the answer would be ก๋วยเตี๋ยว. Swap the part you don&#x27;t know: ตะเกียบ." onclick="answerQuiz(this)">ใช้ตะเกียบกินอะไร<span class="opt-rom">chái dtà-gìap gin à-rai</span></button></div>
+      <div class="q-feedback" aria-live="polite"></div>
+      <div class="controls"><button type="button" class="q-say" hidden onclick="speakText(&#x27;ใช้อะไรกินก๋วยเตี๋ยว&#x27;)">🔊</button></div>
+    </div>
+    <p class="quiz-score">ทำแล้ว 0/9 ข้อ <span class="muted">(Done 0/9)</span></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-พูดและอัดเสียง" data-tts-lang="th-TH">
+    <h2 class="section-title">พูดและอัดเสียง</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-พูดและอัดเสียง')">🔊</button>
+      <button type="button" onclick="togglePart('section-พูดและอัดเสียง', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">Speak and Record</div>
+  </div>
+  <article class="card text-block " id="read-aloud" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🗣️</span></div>
+    <div class="main-text thai">นา · ตา · กา · จาน · ทำ · ไป · สาม · สะอาด · มด<br>ตาไปนา · จานสะอาด · มดมาก</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('read-aloud')">🔊</button>
+      <button type="button" onclick="togglePart('read-aloud', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('read-aloud', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">naa · dtaa · gaa · jaan · tam · bpai · sǎam · sà-àat · mót<br>dtaa bpai naa · jaan sà-àat · mót mâak</div>
+    <div class="support-text en-support">rice field · eye; grandpa · crow · plate · to do · to go · three · clean · ants / Grandpa goes to the rice field. · The plates are clean. · A lot of ants.</div>
+  </article>
+  <div class="recorder card" data-rec="read-words" data-label="read-words" data-title="อ่านคำ" data-n="22">
+    <div class="rec-head">22. 🎙️ อัดเสียง: อ่านคำ</div>
+    <div class="muted rec-en">Record: Read the words and sentences aloud.</div>
+    <div class="rec-row">
+      <button type="button" class="rec-btn" onclick="toggleRecording('read-words')">🎙️ เริ่มอัด <span class="muted">(Start)</span></button>
+      <span class="rec-time" aria-live="polite"></span>
+    </div>
+    <div class="rec-msg" aria-live="polite"></div>
+    <div class="rec-takes"></div>
+  </div>
+  <article class="card text-block " id="answers-intro" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🔁</span></div>
+    <div class="main-text thai">ฟังคำตอบ แล้วพูดคำถามค่ะ (คิดคำตอบก่อน แล้วถอยกลับมาเป็นคำถาม)</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('answers-intro')">🔊</button>
+      <button type="button" onclick="togglePart('answers-intro', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('answers-intro', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">fang kam-dtɔ̀ɔp lɛ́ɛw pûut kam-tǎam kâ</div>
+    <div class="support-text en-support">Listen to each answer, then say the question for it. (Answer first, then work backwards.) Press EN to check a possible question.</div>
+  </article>
+  <article class="card text-block " id="answer-1" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">💬</span></div>
+    <div class="main-text thai">ทำความสะอาดทุกวันเสาร์</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('answer-1')">🔊</button>
+      <button type="button" onclick="togglePart('answer-1', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('answer-1', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">tam kwaam sà-àat túk wan-sǎo</div>
+    <div class="support-text en-support">I clean every Saturday. → Possible question: ทำความสะอาดวันไหน / เมื่อไร</div>
+  </article>
+  <article class="card text-block " id="answer-2" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">💬</span></div>
+    <div class="main-text thai">ชอปออนไลน์กับเพื่อน</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('answer-2')">🔊</button>
+      <button type="button" onclick="togglePart('answer-2', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('answer-2', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">chɔ́p ɔɔn-lai gàp pʉ̂an</div>
+    <div class="support-text en-support">I shop online with a friend. → Possible question: ชอปออนไลน์กับใคร</div>
+  </article>
+  <article class="card text-block " id="answer-3" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">💬</span></div>
+    <div class="main-text thai">ชอบกินข้าวเหนียวมะม่วง</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('answer-3')">🔊</button>
+      <button type="button" onclick="togglePart('answer-3', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('answer-3', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">chɔ̂ɔp gin kâao-nǐao má-mûang</div>
+    <div class="support-text en-support">I like eating mango sticky rice. → Possible question: ชอบกินอะไร</div>
+  </article>
+  <article class="card text-block " id="answer-4" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">💬</span></div>
+    <div class="main-text thai">มาช้า เพราะรถติด</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('answer-4')">🔊</button>
+      <button type="button" onclick="togglePart('answer-4', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('answer-4', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">maa cháa prɔ́ rót dtìt</div>
+    <div class="support-text en-support">I'm late because of a traffic jam. → Possible question: ทำไมมาช้า</div>
+  </article>
+  <div class="recorder card" data-rec="answer-to-question" data-label="answer-to-question" data-title="จากคำตอบเป็นคำถาม" data-n="23">
+    <div class="rec-head">23. 🎙️ อัดเสียง: จากคำตอบเป็นคำถาม</div>
+    <div class="muted rec-en">Record: Say the question for each answer.</div>
+    <div class="rec-row">
+      <button type="button" class="rec-btn" onclick="toggleRecording('answer-to-question')">🎙️ เริ่มอัด <span class="muted">(Start)</span></button>
+      <span class="rec-time" aria-live="polite"></span>
+    </div>
+    <div class="rec-msg" aria-live="polite"></div>
+    <div class="rec-takes"></div>
+  </div>
+  <article class="card text-block " id="ask-cake-intro" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">🎤</span></div>
+    <div class="main-text thai">ถามเค้ก 5 คำถาม เรื่องอะไรก็ได้ เช่น ทำความสะอาด ชอปออนไลน์ อาหาร การเลือกตั้ง เค้กจะตอบในคาบหน้าค่ะ</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('ask-cake-intro')">🔊</button>
+      <button type="button" onclick="togglePart('ask-cake-intro', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('ask-cake-intro', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">tǎam kéek hâa kam-tǎam rʉ̂ang à-rai gɔ̂ɔ dâi, chên tam kwaam sà-àat, chɔ́p ɔɔn-lai, aa-hǎan, gaan lʉ̂ak-dtâng. kéek jà dtɔ̀ɔp nai kâap nâa kâ</div>
+    <div class="support-text en-support">Ask Cake 5 questions about anything, for example cleaning, shopping online, food or the election. Cake will answer them in the next class!</div>
+  </article>
+  <div class="recorder card" data-rec="ask-cake" data-label="ask-cake" data-title="ถามเค้ก 5 คำถาม" data-n="24">
+    <div class="rec-head">24. 🎙️ อัดเสียง: ถามเค้ก 5 คำถาม</div>
+    <div class="muted rec-en">Record: Ask Cake 5 questions.</div>
+    <div class="rec-row">
+      <button type="button" class="rec-btn" onclick="toggleRecording('ask-cake')">🎙️ เริ่มอัด <span class="muted">(Start)</span></button>
+      <span class="rec-time" aria-live="polite"></span>
+    </div>
+    <div class="rec-msg" aria-live="polite"></div>
+    <div class="rec-takes"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="heading-block" id="section-ส่งการบ้าน" data-tts-lang="th-TH">
+    <h2 class="section-title">ส่งการบ้าน</h2>
+    <div class="controls heading-controls">
+      <button type="button" onclick="speakMainText('section-ส่งการบ้าน')">🔊</button>
+      <button type="button" onclick="togglePart('section-ส่งการบ้าน', 'support')">EN</button>
+    </div>
+    <div class="support-text en-support">Send Your Homework</div>
+  </div>
+  <article class="card text-block " id="send-intro" data-tts-lang="th-TH">
+    <div class="meta"><span class="emoji">📤</span></div>
+    <div class="main-text thai">ทำครบ 24 ข้อแล้ว กด 📤 ส่งให้เค้กค่ะ</div>
+    <div class="controls">
+      <button type="button" onclick="speakMainText('send-intro')">🔊</button>
+      <button type="button" onclick="togglePart('send-intro', 'ipa')">IPA</button>
+      <button type="button" onclick="togglePart('send-intro', 'support')">EN</button>
+    </div>
+    <div class="ipa ipa-support">tam króp lɛ́ɛw gòt sòng hâi kéek kâ</div>
+    <div class="support-text en-support">When you've done all 24 tasks, press 📤 to send your answers and recordings to Cake.</div>
+  </article>
+  <div class="card send-box">
+    <div id="send-list" class="send-list"></div>
+    <div class="rec-row">
+      <button type="button" class="send-btn" onclick="sendHomework()">📤 ส่งให้เค้ก <span class="muted">(Send to Cake)</span></button>
+      <button type="button" class="save-btn" onclick="saveAll()">💾 บันทึกไฟล์ <span class="muted">(Save files)</span></button>
+    </div>
+    <div id="send-msg" class="rec-msg" aria-live="polite"></div>
+    <p class="muted small">คำตอบและเสียงที่อัดอยู่ในเครื่องนี้เท่านั้น อย่าเพิ่งปิดหน้านี้ก่อนส่งนะคะ<br>(Your answers and recordings are only on this device. Don't close this page before sending them.)</p>
+  </div>
+</section>
+
+<footer>การบ้านจากเค้ก · TalkaCake</footer>
+</main>
+
+<script>
+function togglePart(rowId, type) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+  const el = type === 'ipa' ? block.querySelector('.ipa-support') : block.querySelector('.support-text');
+  if (el) el.classList.toggle('show');
+}
+
+function speakText(text) {
+  if (!text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'th-TH';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+function speakMainText(rowId) {
+  const block = document.getElementById(rowId);
+  if (!block) return;
+  const main = block.querySelector('.main-text, .page-title, .section-title');
+  if (main) speakText(main.textContent.trim());
+}
+
+function toggleThaiFont() {
+  document.body.classList.toggle('modern-thai');
+  try {
+    localStorage.setItem('talkacakeThaiFont', document.body.classList.contains('modern-thai') ? 'modern' : 'default');
+  } catch (e) {}
+}
+
+(function initThaiFont() {
+  try {
+    if (localStorage.getItem('talkacakeThaiFont') === 'modern') document.body.classList.add('modern-thai');
+  } catch (e) {}
+})();
+
+// ---------------- Quizzes ----------------
+const quizLog = {};  // question id -> wrong choices picked, in order
+
+function answerQuiz(btn) {
+  const q = btn.closest('.quiz-q');
+  if (q.classList.contains('done')) return;
+  const feedback = q.querySelector('.q-feedback');
+  const val = btn.dataset.val || btn.textContent.trim();   // Thai questions: the button shows the Thai + romanization
+  if (val === q.dataset.answer) {
+    btn.classList.add('correct');
+    q.classList.add('done');
+    const blank = q.querySelector('.blank');
+    if (blank) blank.textContent = q.dataset.answer;
+    q.querySelectorAll('.opts button').forEach(b => { b.disabled = true; });
+    const say = q.querySelector('.q-say');
+    if (say) say.hidden = false;
+    feedback.textContent = '✓ ถูกต้อง! (Correct!)';
+    feedback.style.color = '#16a34a';
+    if (q.dataset.rule) {   // the rule behind the right answer
+      const el = document.createElement('div');
+      el.className = 'q-why';
+      el.textContent = q.dataset.rule;
+      feedback.appendChild(el);
+    }
+    const quiz = q.closest('.quiz');
+    const total = quiz.querySelectorAll('.quiz-q').length;
+    const done = quiz.querySelectorAll('.quiz-q.done').length;
+    quiz.querySelector('.quiz-score').innerHTML = done === total
+      ? `เก่งมาก! ทำครบ ${total} ข้อ 🎉 <span class="muted">(Well done! All ${total} done.)</span>`
+      : `ทำแล้ว ${done}/${total} ข้อ <span class="muted">(Done ${done}/${total})</span>`;
+    quizLog[q.id] = quizLog[q.id] || [];
+    renderSendList();
+  } else {
+    (quizLog[q.id] = quizLog[q.id] || []).push(val);
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    feedback.textContent = 'ลองอีกครั้งนะคะ (Try again.)';
+    feedback.style.color = '#b91c1c';
+    const why = btn.dataset.why || q.dataset.hint;   // explain the wrong answer
+    if (why) {
+      const el = document.createElement('div');
+      el.className = 'q-why';
+      el.textContent = why;
+      feedback.appendChild(el);
+    }
+  }
+}
+
+function speakQuiz(id) {
+  const text = document.querySelector('#' + CSS.escape(id) + ' .q-text').textContent.replace(/^\d+\.\s*/, '');
+  speakText(text);
+}
+
+// ---------------- Voice recording ----------------
+// One recording per task. "Record again" replaces the old one, so Cake only gets the latest.
+// Recordings stay in this browser until the student sends or saves them.
+const MAX_SECONDS = 180;
+const recordings = {};
+let activeRec = null;
+const REC_MIME = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus']
+  .find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+
+function recBox(recId) {
+  return document.querySelector(`.recorder[data-rec="${recId}"]`);
+}
+
+function recordedList() {
+  return [...document.querySelectorAll('.recorder')].map(b => recordings[b.dataset.rec]).filter(Boolean);
+}
+
+function setRecButton(box, state) {
+  const btn = box.querySelector('.rec-btn');
+  btn.classList.toggle('recording', state === 'recording');
+  btn.innerHTML = state === 'recording' ? '⏹️ หยุด <span class="muted">(Stop)</span>'
+    : state === 'again' ? '🔁 อัดใหม่ <span class="muted">(Record again)</span>'
+    : '🎙️ เริ่มอัด <span class="muted">(Start)</span>';
+}
+
+function setRecMsg(box, text, color) {
+  const msg = box.querySelector('.rec-msg');
+  msg.textContent = text;
+  msg.style.color = color || '';
+}
+
+async function toggleRecording(recId) {
+  if (activeRec && activeRec.recId === recId) return stopRecording();
+  if (activeRec) stopRecording();
+  const box = recBox(recId);
+  setRecMsg(box, '');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+    setRecMsg(box, 'เครื่องนี้อัดเสียงไม่ได้ ลองใช้ Chrome หรือ Safari นะคะ (This browser can\'t record. Please try Chrome or Safari.)');
+    return;
+  }
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    setRecMsg(box, 'กรุณาอนุญาตให้ใช้ไมค์ค่ะ (Please allow the microphone.)');
+    return;
+  }
+  // don't record the page's own sounds
+  document.querySelectorAll('audio').forEach(a => a.pause());
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  const chunks = [];
+  const mr = new MediaRecorder(stream, REC_MIME ? { mimeType: REC_MIME } : undefined);
+  mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  mr.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    saveRecording(recId, new Blob(chunks, { type: mr.mimeType || REC_MIME || 'audio/webm' }));
+  };
+  mr.start();
+  const start = Date.now();
+  setRecButton(box, 'recording');
+  const time = box.querySelector('.rec-time');
+  time.textContent = '0:00';
+  const timer = setInterval(() => {
+    const s = Math.floor((Date.now() - start) / 1000);
+    time.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    if (s >= MAX_SECONDS) stopRecording();
+  }, 250);
+  activeRec = { recId, mr, timer, box };
+}
+
+function stopRecording() {
+  if (!activeRec) return;
+  const { mr, timer, box } = activeRec;
+  activeRec = null;
+  clearInterval(timer);
+  setRecButton(box, 'start');
+  box.querySelector('.rec-btn').disabled = true;
+  box.querySelector('.rec-time').textContent = '';
+  setRecMsg(box, 'รอสักครู่... (One moment...)', 'var(--muted)');
+  if (mr.state !== 'inactive') mr.stop();
+}
+
+// WAV plays on every phone and computer, so recordings are converted before saving or sending.
+async function toWav(blob) {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  const ctx = new Ctx();
+  try {
+    const decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
+    const rate = 22050;
+    const offline = new OfflineAudioContext(1, Math.max(1, Math.ceil(decoded.duration * rate)), rate);
+    const source = offline.createBufferSource();
+    source.buffer = decoded;
+    source.connect(offline.destination);
+    source.start();
+    const rendered = await offline.startRendering();
+    return encodeWav(rendered.getChannelData(0), rate);
+  } finally {
+    ctx.close();
+  }
+}
+
+function encodeWav(samples, rate) {
+  const buffer = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buffer);
+  const write = (offset, text) => { for (let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i)); };
+  write(0, 'RIFF'); view.setUint32(4, 36 + samples.length * 2, true); write(8, 'WAVE');
+  write(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true); view.setUint32(28, rate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+  write(36, 'data'); view.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Blob([buffer], { type: 'audio/wav' });
+}
+
+// A new recording replaces the old one. If nothing was recorded, the old one is kept.
+async function saveRecording(recId, raw) {
+  const box = recBox(recId);
+  try {
+    if (!raw.size) {
+      setRecMsg(box, 'ไม่มีเสียง ลองอีกครั้งนะคะ (Nothing was recorded. Please try again.)');
+      return;
+    }
+    let blob = raw;
+    let ext = raw.type.includes('mp4') ? 'm4a' : raw.type.includes('ogg') ? 'ogg' : 'webm';
+    try {
+      blob = await toWav(raw);
+      ext = 'wav';
+    } catch (e) {
+      // keep the browser's own format if it can't be converted
+    }
+    const old = recordings[recId];
+    if (old) URL.revokeObjectURL(old.url);
+    const file = new File([blob], `sydney-homework-${box.dataset.label}.${ext}`, { type: blob.type });
+    recordings[recId] = { recId, title: box.dataset.title, file, url: URL.createObjectURL(file) };
+    setRecMsg(box, '');
+    renderTake(recId);
+    renderSendList();
+  } finally {
+    box.querySelector('.rec-btn').disabled = false;
+    setRecButton(box, recordings[recId] ? 'again' : 'start');
+  }
+}
+
+function deleteRecording(recId) {
+  const r = recordings[recId];
+  if (!r || !confirm('ลบเสียงนี้ไหมคะ? (Delete this recording?)')) return;
+  URL.revokeObjectURL(r.url);
+  delete recordings[recId];
+  renderTake(recId);
+  renderSendList();
+  setRecButton(recBox(recId), 'start');
+}
+
+function renderTake(recId) {
+  const r = recordings[recId];
+  recBox(recId).querySelector('.rec-takes').innerHTML = r
+    ? `<div class="take"><audio controls preload="metadata" src="${r.url}"></audio>`
+      + `<button type="button" onclick="deleteRecording('${recId}')">🗑️ ลบ <span class="muted">(Delete)</span></button></div>`
+      + '<p class="muted small rec-hint">ฟังเสียงของคุณ ไม่ชอบ? กด 🔁 อัดใหม่ได้ค่ะ<br>'
+      + '(Listen to your recording. Not happy with it? Press 🔁 Record again. The new recording replaces the old one.)</p>'
+    : '';
+}
+
+function quizCount() {
+  const all = document.querySelectorAll('.quiz-q').length;
+  return { done: document.querySelectorAll('.quiz-q.done').length, all };
+}
+
+function renderSendList() {
+  const boxes = [...document.querySelectorAll('.recorder')];
+  const done = recordedList().length;
+  const quiz = quizCount();
+  document.getElementById('send-list').innerHTML =
+    `<p class="send-count">ตอบคำถามแล้ว ${quiz.done}/${quiz.all} ข้อ <span class="muted">(Answered ${quiz.done}/${quiz.all})</span></p>`
+    + `<p class="send-count">อัดเสียงแล้ว ${done}/${boxes.length} ข้อ <span class="muted">(Recorded ${done}/${boxes.length})</span></p>`
+    + boxes.map(b => {
+      const r = recordings[b.dataset.rec];
+      return `<div class="send-item">${r ? '✅' : '⬜'} ${b.dataset.title}`
+        + (r && r.uploaded ? ' <span class="sent-tag">ส่งแล้ว (Sent)</span>' : '') + '</div>';
+    }).join('');
+}
+
+// ---------------- Sending ----------------
+// With HOMEWORK_API_URL set, the quiz results and recordings go straight to Cake's Google Drive and email
+// (TalkaCake homework Apps Script). Without it, the recordings are shared or saved to send by LINE or email.
+const HOMEWORK_API_URL = 'https://script.google.com/macros/s/AKfycbxT47I5E7dQbV0B0oDegKLwxhzFRQ0KkQ08OQaBFP0FRVfJCVWLtfb0zmFSSVBS7gXi/exec';
+const HOMEWORK = { student: 'sydney', homework: '2569-11-26 การบ้าน อ่านคำ สร้างคำถาม' };
+let resultsSent = '';
+
+function setSendMsg(text, color) {
+  const msg = document.getElementById('send-msg');
+  msg.textContent = text;
+  msg.style.color = color || '';
+}
+
+// Right = right on the first try. "wrong" lists the wrong choices they picked, in order.
+function quizResults() {
+  return [...document.querySelectorAll('.quiz-q')].map(q => ({
+    n: Number(q.dataset.n),
+    section: q.closest('.quiz').dataset.section,
+    q: q.dataset.q,
+    answer: q.dataset.answer,
+    done: q.classList.contains('done'),
+    wrong: (quizLog[q.id] || []).slice(),
+  }));
+}
+
+// For Cake's email: each recording task is new (sent now), sent before, or missing (not recorded).
+function recordingStatus() {
+  return [...document.querySelectorAll('.recorder')].map(b => {
+    const r = recordings[b.dataset.rec];
+    return { n: Number(b.dataset.n), title: b.dataset.title, status: !r || !r.uploaded ? 'missing' : r.reported ? 'sent before' : 'new' };
+  });
+}
+
+function notDoneNumbers() {
+  const quiz = [...document.querySelectorAll('.quiz-q:not(.done)')].map(q => Number(q.dataset.n));
+  const rec = [...document.querySelectorAll('.recorder')].filter(b => !recordings[b.dataset.rec]).map(b => Number(b.dataset.n));
+  return quiz.concat(rec).sort((a, b) => a - b);
+}
+
+function toBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function apiPost(data) {
+  // text/plain keeps this a "simple" request, which Apps Script accepts from other sites.
+  const res = await fetch(HOMEWORK_API_URL, { method: 'POST', body: JSON.stringify(data) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+async function sendHomework() {
+  const list = recordedList();
+  if (!HOMEWORK_API_URL) {
+    if (!list.length) return setSendMsg('ยังไม่มีเสียงที่อัดค่ะ (No recordings yet.)');
+    return shareFiles(list);
+  }
+  const results = quizResults();
+  const resultsKey = JSON.stringify(results);
+  if (!list.length && results.every(r => !r.done && !r.wrong.length)) {
+    return setSendMsg('ยังไม่ได้ทำการบ้านค่ะ (You haven\'t done any questions yet.)');
+  }
+  const todo = list.filter(r => !r.uploaded);
+  const unreported = list.some(r => !r.reported);
+  if (!todo.length && !unreported && resultsKey === resultsSent) return setSendMsg('ส่งครบแล้วค่ะ ✅ (Already sent.)', '#16a34a');
+  const missing = notDoneNumbers();
+  if (missing.length && !confirm(`ยังไม่ได้ทำข้อ ${missing.join(', ')} ส่งเลยไหมคะ? (You haven't done question ${missing.join(', ')} yet. Send now?)`)) return;
+  const btn = document.querySelector('.send-btn');
+  btn.disabled = true;
+  try {
+    for (let i = 0; i < todo.length; i++) {
+      setSendMsg(`กำลังส่งเสียง ${i + 1}/${todo.length}... (Sending recording ${i + 1}/${todo.length}...)`, 'var(--muted)');
+      const r = todo[i];
+      await apiPost({ action: 'upload', ...HOMEWORK, task: r.title, type: r.file.type, audio: await toBase64(r.file) });
+      r.uploaded = true;
+      renderSendList();
+    }
+    setSendMsg('กำลังส่งคำตอบ... (Sending your answers...)', 'var(--muted)');
+    await apiPost({ action: 'done', ...HOMEWORK, recordings: recordingStatus(), questions: results });
+    list.forEach(r => { if (r.uploaded) r.reported = true; });
+    resultsSent = resultsKey;
+    setSendMsg('ส่งแล้ว ขอบคุณค่ะ! ✅ (Sent. Thank you!)', '#16a34a');
+  } catch (e) {
+    setSendMsg('ส่งไม่ได้ กด 📤 อีกครั้งนะคะ หรือกด 💾 บันทึกไฟล์ แล้วส่งทาง LINE (Couldn\'t send. Press 📤 again, or press 💾 Save files and send them by LINE.)');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function shareFiles(list) {
+  const files = list.map(r => r.file);
+  if (navigator.canShare && navigator.canShare({ files })) {
+    try {
+      await navigator.share({ files, title: 'การบ้านของ Sydney' });
+      list.forEach(r => { r.saved = true; });
+      setSendMsg('ส่งแล้ว ขอบคุณค่ะ! (Sent. Thank you!)', '#16a34a');
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        saveAll();
+        setSendMsg('ส่งไม่ได้ บันทึกไฟล์แล้วส่งทาง LINE หรืออีเมลนะคะ (Couldn\'t send. The files were saved; please send them by LINE or email.)');
+      }
+    }
+  } else {
+    saveAll();
+    setSendMsg('บันทึกไฟล์แล้ว ส่งให้เค้กทาง LINE หรืออีเมลนะคะ (Files saved. Please send them to Cake by LINE or email.)', 'var(--ink)');
+  }
+}
+
+function saveAll() {
+  const list = recordedList();
+  list.forEach((r, i) => setTimeout(() => {
+    const a = document.createElement('a');
+    a.href = r.url;
+    a.download = r.file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }, i * 400));
+  list.forEach(r => { r.saved = true; });
+}
+
+window.addEventListener('beforeunload', e => {
+  const unsentRecording = recordedList().some(r => !r.uploaded && !r.saved);
+  const unsentAnswers = HOMEWORK_API_URL && Object.keys(quizLog).length && JSON.stringify(quizResults()) !== resultsSent;
+  if (unsentRecording || unsentAnswers) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', renderSendList);
+</script>
+</body>
+</html>
